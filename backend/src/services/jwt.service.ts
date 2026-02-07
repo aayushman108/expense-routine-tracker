@@ -1,27 +1,24 @@
 import jwt, { Secret } from "jsonwebtoken";
-import dotenv from "dotenv";
-import path from "path";
-
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+import { ENV } from "../constants";
 
 class JwtService {
   private accessSecret: Secret;
   private refreshSecret: Secret;
 
   constructor() {
-    this.accessSecret = process.env.ACCESS_TOKEN_SECRET as Secret;
-    this.refreshSecret = process.env.REFRESH_TOKEN_SECRET as Secret;
+    this.accessSecret = ENV.ACCESS_TOKEN_SECRET as Secret;
+    this.refreshSecret = ENV.REFRESH_TOKEN_SECRET as Secret;
   }
 
   generateAccessToken(payload: object): string {
     return jwt.sign(payload, this.accessSecret, {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY + "m" || "15m",
+      expiresIn: ENV.ACCESS_TOKEN_EXPIRY + "m" || "15m",
     });
   }
 
   generateRefreshToken(payload: object): string {
     return jwt.sign(payload, this.refreshSecret, {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY + "d" || "15d",
+      expiresIn: ENV.REFRESH_TOKEN_EXPIRY + "d" || "15d",
     });
   }
 
