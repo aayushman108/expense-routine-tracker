@@ -1,58 +1,73 @@
 import { db } from "../database/db";
 
 interface IRegisterUser {
-  username: string;
+  full_name: string;
+  nickname?: string;
   email: string;
   hashedPassword: string;
 }
-class AuthDao {
-  async findByEmail(email: string): Promise<any> {
-    const user = await db("users").where({ email }).first();
-    return user;
-  }
 
-  async findById(userId: string): Promise<any> {
-    const user = await db("users").where({ id: userId }).first();
-    return user;
-  }
+const findByEmail = async (email: string): Promise<any> => {
+  const { rows } = await db.raw("SELECT * FROM users WHERE email = ? LIMIT 1", [
+    email,
+  ]);
+  return rows[0];
+};
 
-  async createUser(user: IRegisterUser) {
-    const { username, email, hashedPassword } = user;
+const findById = async (userId: string): Promise<any> => {
+  const { rows } = await db.raw("SELECT * FROM users WHERE id = ? LIMIT 1", [
+    userId,
+  ]);
+  return rows[0];
+};
 
-    const [newUser] = await db("users")
-      .insert({
-        username,
-        email,
-        password_hash: hashedPassword,
-        is_verified: true,
-      })
-      .returning("*");
-    return newUser;
-  }
+const createUser = async (user: IRegisterUser) => {
+  const { full_name, nickname, email, hashedPassword } = user;
 
-  async verifyUser(email: string) {
-    await db("users").where({ email }).update({
-      is_verified: true,
-      updated_at: db.fn.now(),
-    });
+  const { rows } = await db.raw(
+    `INSERT INTO users (full_name, nickname, email, password_hash) 
+       VALUES (?, ?, ?, ?) 
+       RETURNING *`,
+    [full_name, nickname || null, email, hashedPassword],
+  );
+  return rows[0];
+};
 
-    return true;
-  }
+const verifyUser = async (email: string) => {
+  await db.raw("UPDATE users SET updated_at = NOW() WHERE email = ?", [email]);
+  return true;
+};
 
-  async updateProfile(
-    userId: string,
-    updates: {
-      username?: string;
-      email?: string;
-      avatar?: { url: string; public_id: string };
-    }
-  ) {
-    const [updatedUser] = await db("users")
-      .where({ id: userId })
-      .update(updates, ["id", "username", "email", "avatar"]);
+const updateProfile = async (
+  userId: string,
+  updates: {
+    full_name?: string;
+    nickname?: string;
+    email?: string;
+    profile_pic_url?: string;
+  },
+) => {
+  const keys = Object.keys(updates);
+  if (keys.length === 0) return null;
 
-    return updatedUser;
-  }
-}
+  const setClause = keys.map((key) => `${key} = ?`).join(", ");
+  const values = [...Object.values(updates), userId];
 
-export const authDao = new AuthDao();
+  const { rows } = await db.raw(
+    `UPDATE users 
+       SET ${setClause}, updated_at = NOW() 
+       WHERE id = ? 
+       RETURNING id, full_name, nickname, email, profile_pic_url`,
+    values,
+  );
+
+  return rows[0];
+};
+
+export const authDeo = {
+  findByEmail,
+  findById,
+  createUser,
+  verifyUser,
+  updateProfile,
+};
