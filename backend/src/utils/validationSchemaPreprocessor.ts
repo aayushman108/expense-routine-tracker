@@ -1,0 +1,45 @@
+/**
+ * Preprocessor for required fields.
+ * Converts null or empty strings to undefined so Zod's required_error can trigger.
+ * Also trims string values.
+ */
+export const requiredPreprocessor = (val: any) => {
+  if (
+    val === undefined ||
+    val === null ||
+    (typeof val === "string" && val.trim() === "")
+  ) {
+    return undefined;
+  }
+  return typeof val === "string" ? val.trim() : val;
+};
+
+/**
+ * Preprocessor for optional fields.
+ * Converts undefined, null, or empty strings to null for database consistency.
+ * Also trims string values.
+ */
+export const optionalPreprocessor = (val: any) => {
+  if (
+    val === undefined ||
+    val === null ||
+    (typeof val === "string" && val.trim() === "")
+  ) {
+    return null;
+  }
+  return typeof val === "string" ? val.trim() : val;
+};
+
+/**
+ * Specifically for emails: Trims and converts to lowercase.
+ */
+export const emailPreprocessor = (val: any) => {
+  const processed = requiredPreprocessor(val);
+  return typeof processed === "string" ? processed.toLowerCase() : processed;
+};
+
+/**
+ * Specifically for text that should be trimmed but case-preserved (like names/descriptions).
+ * (Note: optionalPreprocessor already does trimming, this is a semantic wrapper)
+ */
+export const textPreprocessor = (val: any) => requiredPreprocessor(val);
