@@ -10,196 +10,192 @@ import {
 import { authDao } from "../dao";
 import { jwtService } from "./jwt.service";
 import { v2 as cloudinary } from "cloudinary";
+import { ILoginInput, ISignupInput } from "../schema/auth.schema";
+import { keysToSnakeCase } from "../utils/caseConverter";
+import { ENV } from "../constants";
 
-interface IRegisterUser {
-  username: string;
-  email: string;
-  password: string;
-}
+interface IRegisterUser extends ISignupInput {}
 
 interface ITokenVerificationBody {
   token: string;
   activationCode: string;
 }
 
-interface ILoginUser {
-  email: string;
-  password: string;
+interface ILoginUser extends ILoginInput {}
+
+async function createEmailVerificationCode(user: ISignupInput) {
+  const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+  const token = jwt.sign(
+    { user, activationCode },
+    ENV.EMAIL_VERIFICATION_SECRET as Secret,
+    {
+      expiresIn: ENV.EMAIL_VERIFICATION_TOKEN_EXPIRY + "m" || "5m",
+    },
+  );
+
+  return { token, activationCode };
 }
-class AuthService {
-  async createEmailVerificationCode(user: IRegisterUser) {
-    const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-    const token = jwt.sign(
-      { user, activationCode },
-      process.env.EMAIL_VERIFICATION_SECRET as Secret,
-      {
-        expiresIn: process.env.EMAIL_VERIFICATION_TOKEN_EXPIRY + "m" || "5m",
-      }
-    );
-
-    return { token, activationCode };
+async function signup(user: ISignupInput) {
+  const isExistingUser = await authDao.findByEmail(user.email);
+  if (!!isExistingUser) {
+    throw new ConflictError("User Already Exists!!");
   }
 
-  async signup(user: { username: string; email: string; password: string }) {
-    const isExistingUser = await authDao.findByEmail(user.email);
-    if (!!isExistingUser) {
-      throw new ConflictError("User Already Exists!!");
-    }
+  const { token, activationCode } = await createEmailVerificationCode(user);
 
-    const { token, activationCode } = await this.createEmailVerificationCode(
-      user
-    );
+  const info = await sendMail({
+    email: user.email,
+    subject: "Verify your email",
+    template: "emailActivation.ejs",
+    data: {
+      username: user.fullName,
+      activationCode,
+    },
+  });
 
-    const info = await sendMail({
-      email: user.email,
-      subject: "Verify your email",
-      template: "emailActivation.ejs",
-      data: {
-        username: user.username,
-        activationCode,
-      },
-    });
+  return { token };
+}
 
-    return { token };
-  }
+async function verifyEmailVerificationToken(data: ITokenVerificationBody) {
+  try {
+    const decoded = jwt.verify(
+      data.token,
+      ENV.EMAIL_VERIFICATION_SECRET as Secret,
+    ) as { user: ISignupInput; activationCode: string };
 
-  async verifyEmailVerificationToken(data: ITokenVerificationBody) {
-    try {
-      const decoded = jwt.verify(
-        data.token,
-        process.env.EMAIL_VERIFICATION_SECRET as Secret
-      ) as { user: IRegisterUser; activationCode: string };
-
-      if (!decoded.user || !decoded.activationCode) {
-        throw new UnAuthorizedError("Unauthorized: Invalid token");
-      }
-
-      if (decoded.activationCode === data.activationCode) {
-        return { user: decoded.user };
-      } else {
-        throw new UnAuthorizedError("Unauthorized: Unmatched activation code");
-      }
-    } catch (error) {
+    if (!decoded.user || !decoded.activationCode) {
       throw new UnAuthorizedError("Unauthorized: Invalid token");
     }
-  }
 
-  async createUser(user: IRegisterUser) {
-    const { username, email, password } = user;
-    const salt = await bcrypt.genSalt(10);
-
-    const hashedPassword = await bcrypt.hash(user.password, salt);
-
-    const newUser = await authDao.createUser({
-      username,
-      email,
-      hashedPassword,
-    });
-    return newUser;
-  }
-
-  async comparePassword(password: string, hashedpasswordFromDb: string) {
-    try {
-      return await bcrypt.compare(password, hashedpasswordFromDb);
-    } catch (error) {
-      throw new UnAuthorizedError("Password is unmatched!!");
+    if (decoded.activationCode === data.activationCode) {
+      return { user: decoded.user };
+    } else {
+      throw new UnAuthorizedError("Unauthorized: Unmatched activation code");
     }
-  }
-
-  async login(user: ILoginUser) {
-    const { email, password } = user;
-
-    const userFromDb = await authDao.findByEmail(email);
-
-    if (!userFromDb) {
-      throw new NotFoundError(`User with ${email} is not registered!!`);
-    }
-
-    await this.comparePassword(password, userFromDb.password_hash);
-
-    return userFromDb;
-  }
-
-  async refreshAccessToken(refreshToken: string) {
-    try {
-      const decoded = jwtService.verifyRefreshToken(refreshToken) as {
-        id: string;
-      };
-      if (!decoded?.id) {
-        throw new UnAuthorizedError("Unauthorized: Invalid Refresh Token");
-      }
-
-      const user = await authDao.findById(decoded.id);
-
-      if (!user) {
-        throw new NotFoundError("User not found");
-      }
-
-      return jwtService.generateAccessToken(user);
-    } catch (error) {
-      throw new UnAuthorizedError("Invalid or expired refresh token.");
-    }
-  }
-
-  async logout(refreshToken: string) {
-    try {
-      const decoded = jwtService.verifyRefreshToken(refreshToken) as {
-        id: string;
-      };
-
-      if (!decoded?.id) {
-        throw new UnAuthorizedError("Unauthorized: Invalid Refresh Token");
-      }
-
-      const user = await authDao.findById(decoded.id);
-
-      if (!user) {
-        throw new NotFoundError("User not found");
-      }
-    } catch (error) {
-      throw new UnAuthorizedError("Error while logging out!!");
-    }
-  }
-
-  async uploadAvatar(userId: string, filePath: string) {
-    try {
-      const user = await authDao.findById(userId);
-
-      // If the user already has an avatar, delete it from Cloudinary
-      if (user?.avatar && user.avatar?.public_id) {
-        await cloudinary.uploader.destroy(user.avatar.public_id);
-      }
-
-      // Upload the new avatar to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(filePath, {
-        folder: "user_avatars",
-        transformation: [{ width: 500, height: 500, crop: "limit" }],
-      });
-
-      console.log(user);
-
-      return {
-        url: uploadResult.secure_url,
-        public_id: uploadResult.public_id,
-      };
-    } catch (error) {
-      throw new Error("Error occur while uploading avatar to cloudinary!!");
-    }
-  }
-
-  async updateProfile(
-    userId: string,
-    payload: {
-      username?: string;
-      email?: string;
-      avatar?: { url: string; public_id: string };
-    }
-  ) {
-    const updatedUser = await authDao.updateProfile(userId, payload);
-
-    return updatedUser;
+  } catch (error) {
+    throw new UnAuthorizedError("Unauthorized: Invalid token");
   }
 }
 
-export const authService = new AuthService();
+async function createUser(user: ISignupInput) {
+  const { password } = user;
+  const salt = await bcrypt.genSalt(10);
+
+  const passwordHash = await bcrypt.hash(password, salt);
+
+  const secureUser = {
+    ...user,
+    password: passwordHash,
+  };
+
+  const newUser = await authDao.createUser(secureUser);
+  return newUser;
+}
+
+async function comparePassword(password: string, hashedpasswordFromDb: string) {
+  try {
+    return await bcrypt.compare(password, hashedpasswordFromDb);
+  } catch (error) {
+    throw new UnAuthorizedError("Password is unmatched!!");
+  }
+}
+
+async function login(user: ILoginUser) {
+  const { email, password } = user;
+
+  const userFromDb = await authDao.findByEmail(email);
+
+  if (!userFromDb) {
+    throw new NotFoundError(`User with ${email} is not registered!!`);
+  }
+
+  await comparePassword(password, userFromDb.password_hash);
+
+  return userFromDb;
+}
+
+async function refreshAccessToken(refreshToken: string) {
+  try {
+    const decoded = jwtService.verifyRefreshToken(refreshToken) as {
+      id: string;
+    };
+    if (!decoded?.id) {
+      throw new UnAuthorizedError("Unauthorized: Invalid Refresh Token");
+    }
+
+    const user = await authDao.findById(decoded.id);
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    return jwtService.generateAccessToken(user);
+  } catch (error) {
+    throw new UnAuthorizedError("Invalid or expired refresh token.");
+  }
+}
+
+async function logout(refreshToken: string) {
+  try {
+    const decoded = jwtService.verifyRefreshToken(refreshToken) as {
+      id: string;
+    };
+
+    if (!decoded?.id) {
+      throw new UnAuthorizedError("Unauthorized: Invalid Refresh Token");
+    }
+
+    const user = await authDao.findById(decoded.id);
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+  } catch (error) {
+    throw new UnAuthorizedError("Error while logging out!!");
+  }
+}
+
+async function uploadAvatar(userId: string, filePath: string) {
+  try {
+    const user = await authDao.findById(userId);
+
+    // If the user already has an avatar, delete it from Cloudinary
+    if (user?.avatar && user.avatar?.public_id) {
+      await cloudinary.uploader.destroy(user.avatar.public_id);
+    }
+
+    // Upload the new avatar to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(filePath, {
+      folder: "user_avatars",
+      transformation: [{ width: 500, height: 500, crop: "limit" }],
+    });
+
+    console.log(user);
+
+    return {
+      url: uploadResult.secure_url,
+      public_id: uploadResult.public_id,
+    };
+  } catch (error) {
+    throw new Error("Error occur while uploading avatar to cloudinary!!");
+  }
+}
+
+async function updateProfile(userId: string, payload: Partial<ISignupInput>) {
+  const updatedUser = await authDao.updateProfile(userId, payload);
+
+  return updatedUser;
+}
+
+export const authService = {
+  signup,
+  verifyEmailVerificationToken,
+  createUser,
+  login,
+  refreshAccessToken,
+  logout,
+  uploadAvatar,
+  updateProfile,
+};

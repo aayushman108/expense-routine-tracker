@@ -6,7 +6,7 @@ import { jwtService } from "../services/jwt.service";
 export const verifyJWT = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authHeaders = req.headers?.["authorization"];

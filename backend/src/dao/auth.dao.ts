@@ -1,11 +1,8 @@
 import { db } from "../database/db";
+import { ISignupInput } from "../schema/auth.schema";
+import { keysToSnakeCase } from "../utils/caseConverter";
 
-interface IRegisterUser {
-  full_name: string;
-  nickname?: string;
-  email: string;
-  hashedPassword: string;
-}
+interface IRegisterUser extends ISignupInput {}
 
 const findByEmail = async (email: string): Promise<any> => {
   const { rows } = await db.raw("SELECT * FROM users WHERE email = ? LIMIT 1", [
@@ -22,13 +19,13 @@ const findById = async (userId: string): Promise<any> => {
 };
 
 const createUser = async (user: IRegisterUser) => {
-  const { full_name, nickname, email, hashedPassword } = user;
+  const { fullName, nickname, email, phone, password, profilePicUrl } = user;
 
   const { rows } = await db.raw(
-    `INSERT INTO users (full_name, nickname, email, password_hash) 
-       VALUES (?, ?, ?, ?) 
+    `INSERT INTO users (id, full_name, nickname, email, phone, password_hash, profile_pic_url) 
+       VALUES (uuid_generate_v4(), ?, ?, ?, ?, ?, ?) 
        RETURNING *`,
-    [full_name, nickname || null, email, hashedPassword],
+    [fullName, nickname, email, phone, password, profilePicUrl],
   );
   return rows[0];
 };
@@ -40,18 +37,16 @@ const verifyUser = async (email: string) => {
 
 const updateProfile = async (
   userId: string,
-  updates: {
-    full_name?: string;
-    nickname?: string;
-    email?: string;
-    profile_pic_url?: string;
-  },
+  updates: Partial<ISignupInput>,
 ) => {
-  const keys = Object.keys(updates);
+  const updatedObj = keysToSnakeCase(updates);
+
+  const keys = Object.keys(updatedObj);
+
   if (keys.length === 0) return null;
 
   const setClause = keys.map((key) => `${key} = ?`).join(", ");
-  const values = [...Object.values(updates), userId];
+  const values = [...Object.values(updatedObj), userId];
 
   const { rows } = await db.raw(
     `UPDATE users 
@@ -64,7 +59,7 @@ const updateProfile = async (
   return rows[0];
 };
 
-export const authDeo = {
+export const authDao = {
   findByEmail,
   findById,
   createUser,

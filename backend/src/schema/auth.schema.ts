@@ -7,7 +7,7 @@ import {
 
 export class UserValidation {
   static signupSchema = z.object({
-    full_name: z.preprocess(
+    fullName: z.preprocess(
       requiredPreprocessor,
       z
         .string({ required_error: "Full name is required" })
@@ -44,7 +44,7 @@ export class UserValidation {
           message: "Password must contain at least one letter and one number",
         }),
     ),
-    profile_pic_url: z.preprocess(
+    profilePicUrl: z.preprocess(
       optionalPreprocessor,
       z.string().url({ message: "Invalid URL format" }).nullable(),
     ),
@@ -68,3 +68,6 @@ export class UserValidation {
     ),
   });
 }
+
+export type ISignupInput = z.infer<typeof UserValidation.signupSchema>;
+export type ILoginInput = z.infer<typeof UserValidation.loginSchema>;
