@@ -122,6 +122,22 @@ const updateProfile = asyncHandler(
   },
 );
 
+const uploadAvatar = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+
+  if (!req.file) {
+    throw new BadRequestError("No file uploaded!");
+  }
+
+  const updatedUser = await authService.uploadAvatar(userId, req.file.path);
+
+  return sendSuccessResponse(res, {
+    message: "Avatar uploaded successfully.",
+    data: updatedUser,
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
 export const authController = {
   signup,
   verifyEmail,
@@ -129,4 +145,5 @@ export const authController = {
   refresh,
   logout,
   updateProfile,
+  uploadAvatar,
 };

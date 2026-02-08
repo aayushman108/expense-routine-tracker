@@ -8,6 +8,7 @@ export const ENV = {
   CLOUD_NAME: process.env.CLOUD_NAME || "",
   CLOUD_API_KEY: process.env.CLOUD_API_KEY || "",
   CLOUD_SECRET_KEY: process.env.CLOUD_SECRET_KEY || "",
+  CLOUD_AVATAR_FOLDER: process.env.CLOUD_AVATAR_FOLDER || "user_avatars",
 
   // JWT
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "",

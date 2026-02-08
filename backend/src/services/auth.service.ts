@@ -1,4 +1,5 @@
 import jwt, { Secret } from "jsonwebtoken";
+import fs from "fs";
 
 import bcrypt from "bcrypt";
 import {
@@ -11,10 +12,7 @@ import { authDao } from "../dao";
 import { jwtService } from "./jwt.service";
 import { v2 as cloudinary } from "cloudinary";
 import { ILoginInput, ISignupInput } from "../schema/auth.schema";
-import { keysToSnakeCase } from "../utils/caseConverter";
 import { ENV } from "../constants";
-
-interface IRegisterUser extends ISignupInput {}
 
 interface ITokenVerificationBody {
   token: string;
@@ -161,31 +159,42 @@ async function uploadAvatar(userId: string, filePath: string) {
   try {
     const user = await authDao.findById(userId);
 
-    // If the user already has an avatar, delete it from Cloudinary
-    if (user?.avatar && user.avatar?.public_id) {
-      await cloudinary.uploader.destroy(user.avatar.public_id);
+    // If the user already has an avatar in Cloudinary, delete it
+    if (user?.avatar?.publicId) {
+      await cloudinary.uploader.destroy(user.avatar.publicId);
     }
 
     // Upload the new avatar to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(filePath, {
-      folder: "user_avatars",
+      folder: ENV.CLOUD_AVATAR_FOLDER,
       transformation: [{ width: 500, height: 500, crop: "limit" }],
     });
 
-    console.log(user);
-
-    return {
+    // Update the database with the new avatar object
+    const avatar = {
       url: uploadResult.secure_url,
-      public_id: uploadResult.public_id,
+      publicId: uploadResult.public_id,
     };
+
+    const updatedUser = await authDao.updateProfile(userId, { avatar });
+
+    // Remove the temporary local file
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    return updatedUser;
   } catch (error) {
-    throw new Error("Error occur while uploading avatar to cloudinary!!");
+    // Cleanup on error if file exists
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    throw new Error("Failed to upload avatar to Cloudinary");
   }
 }
 
 async function updateProfile(userId: string, payload: Partial<ISignupInput>) {
   const updatedUser = await authDao.updateProfile(userId, payload);
-
   return updatedUser;
 }
 

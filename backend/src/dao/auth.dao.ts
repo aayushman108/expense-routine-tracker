@@ -2,7 +2,9 @@ import { db } from "../database/db";
 import { ISignupInput } from "../schema/auth.schema";
 import { keysToSnakeCase } from "../utils/caseConverter";
 
-interface IRegisterUser extends ISignupInput {}
+interface IRegisterUser extends ISignupInput {
+  avatar?: { url: string; publicId: string } | null;
+}
 
 const findByEmail = async (email: string): Promise<any> => {
   const { rows } = await db.raw("SELECT * FROM users WHERE email = ? LIMIT 1", [
@@ -19,13 +21,20 @@ const findById = async (userId: string): Promise<any> => {
 };
 
 const createUser = async (user: IRegisterUser) => {
-  const { fullName, nickname, email, phone, password, profilePicUrl } = user;
+  const { fullName, nickname, email, phone, password, avatar } = user;
 
   const { rows } = await db.raw(
-    `INSERT INTO users (id, full_name, nickname, email, phone, password_hash, profile_pic_url) 
-       VALUES (uuid_generate_v4(), ?, ?, ?, ?, ?, ?) 
+    `INSERT INTO users (id, full_name, nickname, email, phone, password_hash, avatar) 
+       VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?) 
        RETURNING *`,
-    [fullName, nickname, email, phone, password, profilePicUrl],
+    [
+      fullName,
+      nickname,
+      email,
+      phone,
+      password,
+      avatar ? JSON.stringify(avatar) : null,
+    ],
   );
   return rows[0];
 };
@@ -37,7 +46,9 @@ const verifyUser = async (email: string) => {
 
 const updateProfile = async (
   userId: string,
-  updates: Partial<ISignupInput>,
+  updates: Partial<ISignupInput> & {
+    avatar?: { url: string; publicId: string } | null;
+  },
 ) => {
   const updatedObj = keysToSnakeCase(updates);
 
@@ -52,7 +63,7 @@ const updateProfile = async (
     `UPDATE users 
        SET ${setClause}, updated_at = NOW() 
        WHERE id = ? 
-       RETURNING id, full_name, nickname, email, profile_pic_url`,
+       RETURNING id, full_name, nickname, email, phone, avatar`,
     values,
   );
 

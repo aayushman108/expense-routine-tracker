@@ -11,20 +11,21 @@ export const authRouter = express.Router();
 authRouter.post(
   "/signup",
   validateRequest(UserValidation.signupSchema),
-  authController.signup
+  authController.signup,
 );
 
 authRouter.post("/verify-email", authController.verifyEmail);
 authRouter.post(
   "/login",
   validateRequest(UserValidation.loginSchema),
-  authController.login
+  authController.login,
 );
 authRouter.get("/refresh", authController.refresh);
 authRouter.get("/logout", verifyJWT, authController.logout);
+authRouter.patch("/update-profile", verifyJWT, authController.updateProfile);
 authRouter.patch(
-  "/update-profile",
+  "/upload-avatar",
   verifyJWT,
   singleImageUpload,
-  authController.updateProfile
+  authController.uploadAvatar,
 );

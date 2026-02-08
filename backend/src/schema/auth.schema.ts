@@ -44,10 +44,6 @@ export class UserValidation {
           message: "Password must contain at least one letter and one number",
         }),
     ),
-    profilePicUrl: z.preprocess(
-      optionalPreprocessor,
-      z.string().url({ message: "Invalid URL format" }).nullable(),
-    ),
   });
 
   static loginSchema = z.object({
