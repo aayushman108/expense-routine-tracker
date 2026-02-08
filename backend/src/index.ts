@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { authRouter } from "./routes";
+import { authRouter, expenseRouter } from "./routes";
 import { errorHandler, verifyJWT } from "./middlewares";
 import cookieParser from "cookie-parser";
 import "./config/cloudinary.config";
@@ -33,8 +33,12 @@ app.use(cors());
 app.use("/api/auth", authRouter);
 app.use(verifyJWT);
 
+app.use("/api/expenses", expenseRouter);
+
 app.use(errorHandler);
 
-app.listen(8000, () => {
-  console.log("Listening on port 8000");
+const PORT = process.env.PORT || 8000;
+
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
 });
