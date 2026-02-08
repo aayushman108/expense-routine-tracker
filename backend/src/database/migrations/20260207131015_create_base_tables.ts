@@ -25,7 +25,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("email", 255).unique().notNullable();
     table.string("phone", 20);
     table.text("password_hash").notNullable();
-    table.text("profile_pic_url");
+    table.jsonb("avatar");
     table.timestamps(true, true);
   });
 
@@ -113,7 +113,7 @@ export async function up(knex: Knex): Promise<void> {
       .onDelete("CASCADE");
     table.string("provider", 100).notNullable();
     table.string("external_id", 255);
-    table.json("metadata");
+    table.jsonb("metadata");
     table.boolean("is_verified").defaultTo(false);
     table.boolean("is_default").defaultTo(false);
     table.timestamps(true, true);
