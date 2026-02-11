@@ -1,0 +1,73 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.imageUpload {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+
+  .preview {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    background: var(--bg-tertiary);
+    border: 2px dashed var(--border-default);
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-tertiary);
+
+      svg {
+        font-size: 2rem;
+      }
+
+      span {
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+    }
+
+    .uploadBtn {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.5rem;
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all $transition-base;
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+
+      &:hover {
+        transform: scale(1.1);
+        background: var(--primary-hover);
+      }
+    }
+  }
+}

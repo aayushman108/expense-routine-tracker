@@ -1,0 +1,119 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.page {
+  @include flex-column;
+  gap: $space-8;
+}
+
+.header {
+  @include flex-between;
+  align-items: flex-start;
+  gap: $space-6;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.titleArea {
+  flex: 1;
+  @include flex-column;
+  gap: $space-2;
+
+  .backBtn {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    color: var(--text-tertiary);
+    font-size: $font-size-sm;
+    margin-bottom: $space-2;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  h1 {
+    @include heading($font-size-3xl);
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+
+    .icon {
+      color: var(--color-primary);
+    }
+  }
+
+  p {
+    @include body-text;
+    max-width: 600px;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $space-3;
+}
+
+.summaryCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $space-6;
+}
+
+.expenseSection {
+  @include flex-column;
+  gap: $space-6;
+}
+
+.sectionHeader {
+  @include flex-between;
+
+  h2 {
+    @include heading($font-size-xl);
+  }
+}
+
+.expenseItem {
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: $space-5;
+  padding: $space-4 $space-6;
+  margin-bottom: $space-3;
+
+  .iconWrap {
+    @include flex-center;
+    width: 44px;
+    height: 44px;
+    background: var(--bg-tertiary);
+    color: var(--color-primary);
+    border-radius: $radius-full;
+    font-size: $font-size-lg;
+  }
+
+  .info {
+    flex: 1;
+    @include flex-column;
+
+    .title {
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary);
+    }
+
+    .meta {
+      font-size: $font-size-xs;
+      color: var(--text-tertiary);
+    }
+  }
+
+  .amount {
+    text-align: right;
+    font-weight: $font-weight-bold;
+    color: var(--text-primary);
+    font-size: $font-size-md;
+  }
+}

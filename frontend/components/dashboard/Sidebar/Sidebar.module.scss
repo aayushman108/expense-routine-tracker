@@ -1,0 +1,215 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-default);
+  @include flex-column;
+  z-index: $z-sticky;
+  transition:
+    transform $transition-base,
+    width $transition-base;
+  overflow: hidden;
+
+  &.collapsed {
+    width: 72px;
+
+    .logo span,
+    .navLabel,
+    .userInfo {
+      display: none;
+    }
+
+    .navItem {
+      justify-content: center;
+      padding: $space-3;
+    }
+  }
+
+  @include mobile-only {
+    transform: translateX(-100%);
+
+    &.mobileOpen {
+      transform: translateX(0);
+    }
+  }
+}
+
+.logo {
+  @include flex-between;
+  padding: $space-6;
+  border-bottom: 1px solid var(--border-default);
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    text-decoration: none;
+  }
+
+  .logoIcon {
+    @include flex-center;
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-md;
+    background: var(--gradient-primary);
+    color: #fff;
+    font-size: $font-size-md;
+    flex-shrink: 0;
+  }
+
+  span {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+  }
+}
+
+.collapseBtn {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--bg-tertiary);
+  border-radius: $radius-md;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--color-primary);
+  }
+}
+
+.nav {
+  flex: 1;
+  padding: $space-4;
+  overflow-y: auto;
+  @include styled-scrollbar;
+}
+
+.navSection {
+  margin-bottom: $space-6;
+}
+
+.navLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: $space-2 $space-3;
+  margin-bottom: $space-2;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all $transition-fast;
+  text-decoration: none;
+  margin-bottom: 2px;
+
+  svg {
+    font-size: $font-size-lg;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--color-primary);
+  }
+
+  &.active {
+    background: var(--color-primary-50);
+    color: var(--color-primary);
+    font-weight: $font-weight-semibold;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      border-radius: 0 2px 2px 0;
+      background: var(--color-primary);
+    }
+  }
+
+  position: relative;
+}
+
+.userSection {
+  padding: $space-4;
+  border-top: 1px solid var(--border-default);
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3;
+  border-radius: $radius-md;
+  transition: background $transition-fast;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-full;
+  background: var(--gradient-primary);
+  @include flex-center;
+  color: #fff;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+
+  .userName {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    @include truncate;
+  }
+
+  .userEmail {
+    font-size: $font-size-xs;
+    color: var(--text-tertiary);
+    @include truncate;
+  }
+}

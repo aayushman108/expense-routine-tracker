@@ -1,0 +1,33 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.card {
+  @include card;
+  padding: $space-6;
+  position: relative;
+  overflow: hidden;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &.gradient {
+    background: var(--gradient-card);
+  }
+
+  &.glass {
+    @include glass;
+  }
+
+  &.noPadding {
+    padding: 0;
+  }
+}

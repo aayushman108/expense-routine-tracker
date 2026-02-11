@@ -1,0 +1,327 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.page {
+  @include flex-column;
+  gap: $space-8;
+}
+
+.header {
+  @include flex-between;
+  align-items: flex-start;
+  gap: $space-6;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.titleArea {
+  flex: 1;
+  @include flex-column;
+  gap: $space-2;
+
+  .backBtn {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    color: var(--text-tertiary);
+    font-size: $font-size-sm;
+    margin-bottom: $space-2;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  h1 {
+    @include heading($font-size-3xl);
+  }
+
+  p {
+    @include body-text;
+    max-width: 600px;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $space-3;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: $space-8;
+
+  @media (max-width: $bp-xl) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mainColumn {
+  @include flex-column;
+  gap: $space-8;
+}
+
+.tabHeader {
+  display: flex;
+  gap: $space-8;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: $space-6;
+}
+
+.tab {
+  padding: $space-3 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  position: relative;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &.active {
+    color: var(--color-primary);
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--color-primary);
+    }
+  }
+}
+
+// ── Expenses List ──
+.expenseList {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.expenseCard {
+  @include card;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: $space-5;
+  padding: $space-4 $space-6;
+
+  .date {
+    @include flex-center;
+    flex-direction: column;
+    width: 50px;
+    height: 50px;
+    background: var(--bg-tertiary);
+    border-radius: $radius-md;
+
+    .day {
+      font-size: $font-size-md;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .month {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  .info {
+    @include flex-column;
+
+    .desc {
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary);
+    }
+
+    .payer {
+      font-size: $font-size-xs;
+      color: var(--text-tertiary);
+
+      span {
+        font-weight: $font-weight-semibold;
+        color: var(--text-secondary);
+      }
+    }
+  }
+
+  .amount {
+    text-align: right;
+    @include flex-column;
+
+    .value {
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+    }
+
+    .status {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: $font-weight-bold;
+      color: var(--color-success);
+    }
+  }
+
+  .menu {
+    @include flex-center;
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-full;
+    color: var(--text-tertiary);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+  }
+
+  @include mobile-only {
+    grid-template-columns: auto 1fr auto;
+    padding: $space-4;
+
+    .menu {
+      display: none;
+    }
+  }
+}
+
+// ── Members Column ──
+.sidebarColumn {
+  @include flex-column;
+  gap: $space-6;
+}
+
+.sidebarSection {
+  @include card;
+  padding: $space-6;
+
+  h3 {
+    @include heading($font-size-md);
+    margin-bottom: $space-5;
+    @include flex-between;
+  }
+}
+
+.memberList {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.memberItem {
+  @include flex-between;
+
+  .memberInfo {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      @include flex-center;
+      color: #fff;
+      font-size: 10px;
+      font-weight: $font-weight-bold;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .details {
+      @include flex-column;
+
+      .name {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: var(--text-primary);
+        @include truncate;
+        max-width: 140px;
+      }
+
+      .role {
+        font-size: 10px;
+        color: var(--text-tertiary);
+        text-transform: capitalize;
+      }
+    }
+  }
+
+  .balance {
+    text-align: right;
+
+    .value {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+
+      &.positive {
+        color: var(--color-success);
+      }
+      &.negative {
+        color: var(--color-danger);
+      }
+    }
+  }
+}
+
+// ── Settlement Cards ──
+.settlementCard {
+  @include card;
+  padding: $space-5;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  margin-bottom: $space-3;
+
+  .arrow {
+    color: var(--text-tertiary);
+    font-size: $font-size-xl;
+  }
+
+  .party {
+    flex: 1;
+    @include flex-column;
+
+    .label {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+    }
+
+    .name {
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary);
+      @include truncate;
+    }
+  }
+
+  .amountWrap {
+    text-align: right;
+    @include flex-column;
+
+    .amount {
+      font-weight: $font-weight-bold;
+      color: var(--color-primary);
+    }
+  }
+}

@@ -1,0 +1,114 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+// ═══════════════════════════════════════════════════
+// LANDING PAGE NAVBAR
+// ═══════════════════════════════════════════════════
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-sticky;
+  padding: $space-4 0;
+  transition: all $transition-base;
+
+  &.scrolled {
+    @include glass;
+    padding: $space-3 0;
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.navContent {
+  @include container;
+  @include flex-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-extrabold;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+
+  .logoIcon {
+    @include flex-center;
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-lg;
+    background: var(--gradient-primary);
+    color: #fff;
+    font-size: $font-size-lg;
+  }
+
+  span {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+
+  @include mobile-only {
+    display: none;
+  }
+
+  a {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: var(--text-secondary);
+    transition: color $transition-fast;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      border-radius: 1px;
+      transition: width $transition-base;
+    }
+
+    &:hover {
+      color: var(--color-primary);
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.mobileMenuBtn {
+  display: none;
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: $font-size-xl;
+  cursor: pointer;
+
+  @include mobile-only {
+    display: flex;
+  }
+}

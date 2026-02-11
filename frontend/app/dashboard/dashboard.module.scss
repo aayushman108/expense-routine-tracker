@@ -1,0 +1,188 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.dashboard {
+  @include flex-column;
+  gap: $space-10;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: $space-6;
+}
+
+.statCard {
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: $space-5;
+  padding: $space-6;
+
+  .statIcon {
+    @include flex-center;
+    width: 52px;
+    height: 52px;
+    border-radius: $radius-lg;
+    font-size: $font-size-xl;
+
+    &.blue {
+      background: var(--color-info-light);
+      color: var(--color-info);
+    }
+    &.green {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+    &.orange {
+      background: var(--color-warning-light);
+      color: var(--color-warning);
+    }
+    &.red {
+      background: var(--color-danger-light);
+      color: var(--color-danger);
+    }
+  }
+
+  .statInfo {
+    @include flex-column;
+
+    .statLabel {
+      font-size: $font-size-xs;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: $space-1;
+    }
+
+    .statValue {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+    }
+  }
+}
+
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: $space-6;
+
+  h2 {
+    @include heading($font-size-xl);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $space-6;
+
+  @include mobile-only {
+    grid-template-columns: 1fr;
+  }
+}
+
+.groupCard {
+  @include card;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .image {
+    height: 140px;
+    background: var(--gradient-primary);
+    position: relative;
+    @include flex-center;
+    color: #fff;
+    font-size: $font-size-4xl;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .details {
+    padding: $space-5;
+    flex: 1;
+    @include flex-column;
+    gap: $space-2;
+
+    .top {
+      @include flex-between;
+      margin-bottom: $space-1;
+    }
+
+    .name {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: $radius-full;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      font-weight: $font-weight-semibold;
+      text-transform: uppercase;
+    }
+
+    .desc {
+      font-size: $font-size-sm;
+      color: var(--text-secondary);
+      @include truncate(2);
+      min-height: 2.8em;
+    }
+  }
+
+  .footer {
+    padding: $space-4 $space-5;
+    border-top: 1px solid var(--border-default);
+    background: var(--bg-tertiary);
+    @include flex-between;
+    font-size: $font-size-xs;
+    color: var(--text-tertiary);
+
+    .members {
+      display: flex;
+      align-items: center;
+      gap: $space-1;
+
+      svg {
+        font-size: $font-size-sm;
+      }
+    }
+  }
+}
+
+.emptyState {
+  @include card;
+  @include flex-center;
+  flex-direction: column;
+  padding: $space-16;
+  text-align: center;
+  gap: $space-4;
+  color: var(--text-secondary);
+  border: 2px dashed var(--border-default);
+  background: transparent;
+
+  .icon {
+    font-size: $font-size-5xl;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+  }
+
+  h3 {
+    @include heading($font-size-lg);
+  }
+
+  p {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}

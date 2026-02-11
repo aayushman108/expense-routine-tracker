@@ -1,65 +1,305 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useRef } from "react";
+import Link from "next/link";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  HiOutlineCurrencyDollar,
+  HiOutlineUserGroup,
+  HiOutlineChartBar,
+  HiOutlineShieldCheck,
+  HiOutlineLightningBolt,
+  HiOutlineGlobe,
+} from "react-icons/hi";
+import { FiArrowRight } from "react-icons/fi";
+import LandingNavbar from "@/components/landing/Navbar";
+import Button from "@/components/ui/Button/Button";
+import styles from "./page.module.scss";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const features = [
+  {
+    icon: <HiOutlineCurrencyDollar />,
+    title: "Smart Splitting",
+    desc: "Split expenses with custom ratios. No more equal splits when fairness matters.",
+  },
+  {
+    icon: <HiOutlineUserGroup />,
+    title: "Group Management",
+    desc: "Create groups for trips, roommates, or projects. Track who owes whom effortlessly.",
+  },
+  {
+    icon: <HiOutlineChartBar />,
+    title: "Visual Analytics",
+    desc: "Beautiful charts showing spending patterns, category breakdowns, and trends.",
+  },
+  {
+    icon: <HiOutlineShieldCheck />,
+    title: "Secure Payments",
+    desc: "Integrated with Khalti, eSewa, and bank transfers for seamless settlements.",
+  },
+  {
+    icon: <HiOutlineLightningBolt />,
+    title: "Instant Settlements",
+    desc: "Monthly auto-calculated settlements. Know exactly who pays whom and how much.",
+  },
+  {
+    icon: <HiOutlineGlobe />,
+    title: "Multi-Currency",
+    desc: "Support for NPR and multiple currencies. Perfect for international groups.",
+  },
+];
+
+const steps = [
+  {
+    num: "1",
+    title: "Create a Group",
+    desc: "Set up a group and invite friends, roommates, or colleagues.",
+  },
+  {
+    num: "2",
+    title: "Add Expenses",
+    desc: "Log expenses and split them fairly with custom ratios.",
+  },
+  {
+    num: "3",
+    title: "Settle Up",
+    desc: "View monthly settlements and pay with your preferred method.",
+  },
+];
+
+export default function LandingPage() {
+  const heroRef = useRef<HTMLElement>(null);
+  const featuresRef = useRef<HTMLElement>(null);
+  const stepsRef = useRef<HTMLElement>(null);
+  const ctaRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Hero animations
+      gsap.from(`.${styles.badge}`, {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        delay: 0.2,
+      });
+      gsap.from(`.${styles.heroTitle}`, {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        delay: 0.4,
+      });
+      gsap.from(`.${styles.heroSubtitle}`, {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        delay: 0.6,
+      });
+      gsap.from(`.${styles.heroCTA}`, {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        delay: 0.8,
+      });
+      gsap.from(`.${styles.heroVisual}`, {
+        opacity: 0,
+        y: 60,
+        scale: 0.95,
+        duration: 1,
+        delay: 1,
+        ease: "power3.out",
+      });
+
+      // Floating orbs animation
+      gsap.to(`.${styles.orb}`, {
+        y: "random(-30, 30)",
+        x: "random(-20, 20)",
+        duration: "random(3, 5)",
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        stagger: 0.5,
+      });
+
+      // Feature cards
+      gsap.from(`.${styles.featureCard}`, {
+        scrollTrigger: {
+          trigger: `.${styles.featureGrid}`,
+          start: "top 80%",
+          toggleActions: "play none none none",
+        },
+        opacity: 0,
+        y: 40,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+
+      // Steps
+      gsap.from(`.${styles.step}`, {
+        scrollTrigger: {
+          trigger: `.${styles.stepsGrid}`,
+          start: "top 80%",
+        },
+        opacity: 0,
+        y: 30,
+        stagger: 0.2,
+        duration: 0.6,
+      });
+
+      // CTA
+      gsap.from(`.${styles.ctaCard}`, {
+        scrollTrigger: {
+          trigger: `.${styles.cta}`,
+          start: "top 80%",
+        },
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.8,
+        ease: "power2.out",
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+      <LandingNavbar />
+
+      {/* Hero */}
+      <section ref={heroRef} className={styles.hero}>
+        <div className={styles.floatingOrbs}>
+          <div className={styles.orb} />
+          <div className={styles.orb} />
+          <div className={styles.orb} />
+        </div>
+
+        <div className={styles.heroContent}>
+          <div className={styles.badge}>✨ Smart Expense Tracking</div>
+
+          <h1 className={styles.heroTitle}>
+            Split expenses <span className={styles.gradient}>effortlessly</span>{" "}
+            with your group
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className={styles.heroSubtitle}>
+            Track personal and group expenses, settle debts monthly, and never
+            lose track of who owes whom. Built for roommates, trips, and teams.
+          </p>
+
+          <div className={styles.heroCTA}>
+            <Link href="/signup">
+              <Button variant="primary" size="lg">
+                Start for Free <FiArrowRight />
+              </Button>
+            </Link>
+            <a href="#features">
+              <Button variant="secondary" size="lg">
+                See Features
+              </Button>
+            </a>
+          </div>
+
+          <div className={styles.heroVisual}>
+            <div className={styles.mockup}>
+              <div className={styles.mockupGrid}>
+                <div className={styles.mockupCard}>
+                  <span className={styles.mockupLabel}>Total Spent</span>
+                  <span className={styles.mockupValue}>रू 42,580</span>
+                  <div className={styles.mockupBar} />
+                </div>
+                <div className={styles.mockupCard}>
+                  <span className={styles.mockupLabel}>You Owe</span>
+                  <span className={styles.mockupValue}>रू 8,200</span>
+                  <div className={styles.mockupBar} />
+                </div>
+                <div className={styles.mockupCard}>
+                  <span className={styles.mockupLabel}>Owed to You</span>
+                  <span className={styles.mockupValue}>रू 15,400</span>
+                  <div className={styles.mockupBar} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section ref={featuresRef} id="features" className={styles.features}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionLabel}>Features</span>
+          <h2 className={styles.sectionTitle}>
+            Everything you need to manage expenses
+          </h2>
+          <p className={styles.sectionSubtitle}>
+            From personal tracking to group settlements, we&apos;ve got you
+            covered.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className={styles.featureGrid}>
+          {features.map((f, i) => (
+            <div key={i} className={styles.featureCard}>
+              <div className={styles.featureIcon}>{f.icon}</div>
+              <h3 className={styles.featureTitle}>{f.title}</h3>
+              <p className={styles.featureDesc}>{f.desc}</p>
+            </div>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* How It Works */}
+      <section ref={stepsRef} id="how-it-works" className={styles.howItWorks}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionLabel}>How It Works</span>
+          <h2 className={styles.sectionTitle}>Get started in 3 simple steps</h2>
+          <p className={styles.sectionSubtitle}>
+            No complicated setup. Just create, track, and settle.
+          </p>
+        </div>
+
+        <div className={styles.stepsGrid}>
+          {steps.map((s, i) => (
+            <div key={i} className={styles.step}>
+              <div className={styles.stepNumber}>{s.num}</div>
+              <h3 className={styles.stepTitle}>{s.title}</h3>
+              <p className={styles.stepDesc}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section ref={ctaRef} className={styles.cta}>
+        <div className={styles.ctaCard}>
+          <h2 className={styles.ctaTitle}>Ready to simplify your expenses?</h2>
+          <p className={styles.ctaSubtitle}>
+            Join thousands of users who split expenses stress-free every day.
+          </p>
+          <Link href="/signup">
+            <Button variant="primary" size="lg">
+              Get Started — It&apos;s Free <FiArrowRight />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className={styles.footer}>
+        <div className={styles.footerContent}>
+          <span className={styles.footerCopy}>
+            © 2026 SplitWise. All rights reserved.
+          </span>
+          <div className={styles.footerLinks}>
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }

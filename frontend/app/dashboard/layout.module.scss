@@ -1,0 +1,57 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-secondary);
+}
+
+.main {
+  flex: 1;
+  margin-left: 260px;
+  @include flex-column;
+  transition: margin-left $transition-base;
+
+  &.collapsed {
+    margin-left: 72px;
+  }
+
+  @include mobile-only {
+    margin-left: 0;
+  }
+}
+
+.content {
+  flex: 1;
+  padding: $space-8;
+  overflow-y: auto;
+  @include styled-scrollbar;
+
+  @include mobile-only {
+    padding: $space-4;
+  }
+}
+
+// ── Mobile overlay ──
+.overlay {
+  display: none;
+
+  @include mobile-only {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: $z-overlay;
+    animation: fadeIn 0.2s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

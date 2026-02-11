@@ -1,0 +1,473 @@
+@use "../styles/variables" as *;
+@use "../styles/mixins" as *;
+
+// ═══════════════════════════════════════════════════
+// LANDING PAGE
+// ═══════════════════════════════════════════════════
+
+// ── Hero Section ──
+.hero {
+  position: relative;
+  min-height: 100vh;
+  @include flex-center;
+  overflow: hidden;
+  padding: $space-24 $container-padding $space-16;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(99, 102, 241, 0.15),
+      transparent 70%
+    );
+    top: -200px;
+    right: -200px;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(139, 92, 246, 0.1),
+      transparent 70%
+    );
+    bottom: -100px;
+    left: -200px;
+    pointer-events: none;
+  }
+}
+
+.heroContent {
+  @include container;
+  @include flex-center;
+  flex-direction: column;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  gap: $space-8;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-100);
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  @include heading($font-size-5xl);
+  max-width: 800px;
+  letter-spacing: -0.03em;
+
+  .gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @include mobile-only {
+    font-size: $font-size-3xl;
+  }
+}
+
+.heroSubtitle {
+  @include body-text;
+  font-size: $font-size-lg;
+  max-width: 600px;
+  color: var(--text-secondary);
+
+  @include mobile-only {
+    font-size: $font-size-base;
+  }
+}
+
+.heroCTA {
+  display: flex;
+  gap: $space-4;
+  margin-top: $space-4;
+
+  @include mobile-only {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+.heroVisual {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin-top: $space-12;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  aspect-ratio: 16 / 9;
+
+  .mockup {
+    width: 100%;
+    height: 100%;
+    @include flex-center;
+    padding: $space-8;
+    background: var(--gradient-card);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mockupGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-4;
+    width: 100%;
+
+    @include mobile-only {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .mockupCard {
+    @include card;
+    padding: $space-5;
+    @include flex-column;
+    gap: $space-3;
+
+    .mockupLabel {
+      font-size: $font-size-xs;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .mockupValue {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+    }
+
+    .mockupBar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-tertiary);
+      overflow: hidden;
+
+      &::after {
+        content: "";
+        display: block;
+        height: 100%;
+        border-radius: 3px;
+        background: var(--gradient-primary);
+      }
+    }
+
+    &:nth-child(1) .mockupBar::after {
+      width: 72%;
+    }
+    &:nth-child(2) .mockupBar::after {
+      width: 45%;
+    }
+    &:nth-child(3) .mockupBar::after {
+      width: 88%;
+    }
+  }
+}
+
+// ── Floating elements (decoration) ──
+.floatingOrbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.5;
+  filter: blur(60px);
+
+  &:nth-child(1) {
+    width: 200px;
+    height: 200px;
+    background: rgba(99, 102, 241, 0.2);
+    top: 20%;
+    left: 10%;
+  }
+
+  &:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    background: rgba(139, 92, 246, 0.15);
+    bottom: 30%;
+    right: 15%;
+  }
+
+  &:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    background: rgba(99, 102, 241, 0.1);
+    top: 60%;
+    left: 70%;
+  }
+}
+
+// ── Features Section ──
+.features {
+  padding: $space-24 $container-padding;
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: $space-16;
+  @include container;
+}
+
+.sectionLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  background: var(--color-primary-50);
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $space-4;
+}
+
+.sectionTitle {
+  @include heading($font-size-3xl);
+  margin-bottom: $space-4;
+
+  @include mobile-only {
+    font-size: $font-size-2xl;
+  }
+}
+
+.sectionSubtitle {
+  @include body-text;
+  font-size: $font-size-lg;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.featureGrid {
+  @include container;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-8;
+
+  @include responsive(lg) {
+    gap: $space-10;
+  }
+
+  @media (max-width: $bp-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile-only {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.featureCard {
+  @include card;
+  padding: $space-8;
+  text-align: left;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-6px);
+  }
+}
+
+.featureIcon {
+  @include flex-center;
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-lg;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: $font-size-xl;
+  margin-bottom: $space-5;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+}
+
+.featureTitle {
+  @include heading($font-size-lg);
+  margin-bottom: $space-3;
+}
+
+.featureDesc {
+  @include body-text;
+  font-size: $font-size-sm;
+}
+
+// ── How It Works ──
+.howItWorks {
+  padding: $space-24 $container-padding;
+}
+
+.stepsGrid {
+  @include container;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-10;
+  position: relative;
+
+  @include mobile-only {
+    grid-template-columns: 1fr;
+    gap: $space-8;
+  }
+
+  // Connecting line
+  &::before {
+    content: "";
+    position: absolute;
+    top: 44px;
+    left: calc(16.66% + 28px);
+    right: calc(16.66% + 28px);
+    height: 2px;
+    background: var(--gradient-primary);
+    opacity: 0.3;
+
+    @include mobile-only {
+      display: none;
+    }
+  }
+}
+
+.step {
+  text-align: center;
+  @include flex-column;
+  align-items: center;
+  gap: $space-5;
+  position: relative;
+}
+
+.stepNumber {
+  @include flex-center;
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-full;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.stepTitle {
+  @include heading($font-size-lg);
+}
+
+.stepDesc {
+  @include body-text;
+  font-size: $font-size-sm;
+  max-width: 280px;
+}
+
+// ── CTA Section ──
+.cta {
+  padding: $space-24 $container-padding;
+}
+
+.ctaCard {
+  @include container;
+  background: var(--gradient-hero);
+  border-radius: $radius-2xl;
+  padding: $space-16 $space-8;
+  text-align: center;
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-6;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    top: -100px;
+    right: -100px;
+  }
+}
+
+.ctaTitle {
+  @include heading($font-size-3xl);
+  color: #fff;
+
+  @include mobile-only {
+    font-size: $font-size-2xl;
+  }
+}
+
+.ctaSubtitle {
+  font-size: $font-size-lg;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 500px;
+}
+
+// ── Footer ──
+.footer {
+  padding: $space-12 $container-padding;
+  border-top: 1px solid var(--border-default);
+}
+
+.footerContent {
+  @include container;
+  @include flex-between;
+
+  @include mobile-only {
+    flex-direction: column;
+    gap: $space-6;
+    text-align: center;
+  }
+}
+
+.footerLinks {
+  display: flex;
+  gap: $space-8;
+
+  a {
+    font-size: $font-size-sm;
+    color: var(--text-secondary);
+    transition: color $transition-fast;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+}
+
+.footerCopy {
+  font-size: $font-size-sm;
+  color: var(--text-tertiary);
+}

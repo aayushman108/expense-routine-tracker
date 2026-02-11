@@ -1,0 +1,32 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: var(--bg-tertiary);
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-base;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--color-primary);
+    transform: rotate(15deg);
+  }
+
+  svg {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  &:active svg {
+    transform: rotate(360deg);
+  }
+}

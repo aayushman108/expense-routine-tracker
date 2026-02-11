@@ -1,0 +1,87 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.inputGroup {
+  @include flex-column;
+  gap: $space-2;
+  width: 100%;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+
+  .required {
+    color: var(--color-danger);
+  }
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  @include input-base;
+  height: 44px;
+
+  &.hasIcon {
+    padding-left: 42px;
+  }
+
+  &.hasError {
+    border-color: var(--color-danger);
+
+    &:focus {
+      box-shadow: 0 0 0 3px var(--color-danger-light);
+    }
+  }
+}
+
+.textarea {
+  @include input-base;
+  min-height: 100px;
+  resize: vertical;
+
+  &.hasError {
+    border-color: var(--color-danger);
+  }
+}
+
+.icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-tertiary);
+  font-size: $font-size-md;
+  pointer-events: none;
+  transition: color $transition-fast;
+
+  .inputWrapper:focus-within & {
+    color: var(--color-primary);
+  }
+}
+
+.error {
+  font-size: $font-size-xs;
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

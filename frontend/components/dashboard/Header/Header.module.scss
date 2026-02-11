@@ -1,0 +1,86 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.header {
+  @include flex-between;
+  padding: $space-5 $space-8;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-default);
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  @include glass;
+
+  @include mobile-only {
+    padding: $space-4;
+  }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+}
+
+.menuBtn {
+  display: none;
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--bg-tertiary);
+  border-radius: $radius-md;
+  color: var(--text-primary);
+  font-size: $font-size-lg;
+  cursor: pointer;
+
+  @include mobile-only {
+    display: flex;
+  }
+}
+
+.greeting {
+  @include heading($font-size-lg);
+
+  span {
+    font-weight: $font-weight-normal;
+    color: var(--text-secondary);
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.searchBtn,
+.notifBtn {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--bg-tertiary);
+  border-radius: $radius-full;
+  color: var(--text-secondary);
+  font-size: $font-size-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+  position: relative;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--color-primary);
+  }
+}
+
+.notifBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  border: 2px solid var(--bg-card);
+}
