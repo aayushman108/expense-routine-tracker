@@ -296,7 +296,6 @@
   @include card;
   padding: $space-8;
   text-align: left;
-  transition: all $transition-base;
 
   &:hover {
     transform: translateY(-6px);

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -29,17 +30,20 @@ export default function LoginPage() {
     dispatch(clearError());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (cardRef.current) {
-      gsap.from(cardRef.current, {
-        opacity: 0,
-        y: 30,
-        scale: 0.96,
-        duration: 0.6,
-        ease: "power3.out",
-      });
-    }
-  }, []);
+  useGSAP(
+    () => {
+      if (cardRef.current) {
+        gsap.from(cardRef.current, {
+          opacity: 0,
+          y: 30,
+          scale: 0.96,
+          duration: 0.6,
+          ease: "power3.out",
+        });
+      }
+    },
+    { scope: cardRef },
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));

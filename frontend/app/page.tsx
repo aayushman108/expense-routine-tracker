@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   HiOutlineCurrencyDollar,
@@ -71,102 +72,117 @@ const steps = [
 ];
 
 export default function LandingPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const featuresRef = useRef<HTMLElement>(null);
   const stepsRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Hero animations
-      gsap.from(`.${styles.badge}`, {
-        opacity: 0,
-        y: 20,
-        duration: 0.6,
-        delay: 0.2,
-      });
-      gsap.from(`.${styles.heroTitle}`, {
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-        delay: 0.4,
-      });
-      gsap.from(`.${styles.heroSubtitle}`, {
-        opacity: 0,
-        y: 20,
-        duration: 0.6,
-        delay: 0.6,
-      });
-      gsap.from(`.${styles.heroCTA}`, {
-        opacity: 0,
-        y: 20,
-        duration: 0.6,
-        delay: 0.8,
-      });
-      gsap.from(`.${styles.heroVisual}`, {
-        opacity: 0,
-        y: 60,
-        scale: 0.95,
-        duration: 1,
-        delay: 1,
-        ease: "power3.out",
-      });
+  useGSAP(
+    () => {
+      // Small delay to ensure DOM is fully ready and measured
+      const timer = setTimeout(() => {
+        // Hero animations
+        gsap.from(`.${styles.badge}`, {
+          opacity: 0,
+          y: 20,
+          duration: 0.6,
+          delay: 0.2,
+        });
+        gsap.from(`.${styles.heroTitle}`, {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          delay: 0.4,
+        });
+        gsap.from(`.${styles.heroSubtitle}`, {
+          opacity: 0,
+          y: 20,
+          duration: 0.6,
+          delay: 0.6,
+        });
+        gsap.from(`.${styles.heroCTA}`, {
+          opacity: 0,
+          y: 20,
+          duration: 0.6,
+          delay: 0.8,
+        });
+        gsap.from(`.${styles.heroVisual}`, {
+          opacity: 0,
+          y: 60,
+          scale: 0.95,
+          duration: 1,
+          delay: 1,
+          ease: "power3.out",
+        });
 
-      // Floating orbs animation
-      gsap.to(`.${styles.orb}`, {
-        y: "random(-30, 30)",
-        x: "random(-20, 20)",
-        duration: "random(3, 5)",
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        stagger: 0.5,
-      });
+        // Floating orbs animation
+        gsap.to(`.${styles.orb}`, {
+          y: "random(-30, 30)",
+          x: "random(-20, 20)",
+          duration: "random(3, 5)",
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          stagger: 0.5,
+        });
 
-      // Feature cards
-      gsap.from(`.${styles.featureCard}`, {
-        scrollTrigger: {
-          trigger: `.${styles.featureGrid}`,
-          start: "top 80%",
-          toggleActions: "play none none none",
-        },
-        opacity: 0,
-        y: 40,
-        stagger: 0.1,
-        duration: 0.6,
-        ease: "power2.out",
-      });
+        // Feature cards - use clear fromTo to ensure visibility
+        gsap.fromTo(
+          `.${styles.featureCard}`,
+          {
+            opacity: 0,
+            y: 40,
+          },
+          {
+            scrollTrigger: {
+              trigger: `.${styles.featureGrid}`,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            },
+            opacity: 1,
+            y: 0,
+            stagger: 0.1,
+            duration: 0.6,
+            ease: "power2.out",
+            clearProps: "all",
+          },
+        );
 
-      // Steps
-      gsap.from(`.${styles.step}`, {
-        scrollTrigger: {
-          trigger: `.${styles.stepsGrid}`,
-          start: "top 80%",
-        },
-        opacity: 0,
-        y: 30,
-        stagger: 0.2,
-        duration: 0.6,
-      });
+        // Steps
+        gsap.from(`.${styles.step}`, {
+          scrollTrigger: {
+            trigger: `.${styles.stepsGrid}`,
+            start: "top 85%",
+          },
+          opacity: 0,
+          y: 30,
+          stagger: 0.2,
+          duration: 0.6,
+        });
 
-      // CTA
-      gsap.from(`.${styles.ctaCard}`, {
-        scrollTrigger: {
-          trigger: `.${styles.cta}`,
-          start: "top 80%",
-        },
-        opacity: 0,
-        scale: 0.95,
-        duration: 0.8,
-        ease: "power2.out",
-      });
-    });
+        // CTA
+        gsap.from(`.${styles.ctaCard}`, {
+          scrollTrigger: {
+            trigger: `.${styles.cta}`,
+            start: "top 85%",
+          },
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.8,
+          ease: "power2.out",
+        });
 
-    return () => ctx.revert();
-  }, []);
+        ScrollTrigger.refresh();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    },
+    { scope: containerRef },
+  );
 
   return (
-    <>
+    <main ref={containerRef}>
       <LandingNavbar />
 
       {/* Hero */}
@@ -300,6 +316,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-    </>
+    </main>
   );
 }
