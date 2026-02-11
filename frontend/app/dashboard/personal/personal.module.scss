@@ -69,14 +69,6 @@
   gap: $space-6;
 }
 
-.sectionHeader {
-  @include flex-between;
-
-  h2 {
-    @include heading($font-size-xl);
-  }
-}
-
 .expenseItem {
   @include card;
   display: flex;

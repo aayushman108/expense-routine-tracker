@@ -16,6 +16,7 @@ import {
 import { FiArrowRight } from "react-icons/fi";
 import LandingNavbar from "@/components/landing/Navbar";
 import Button from "@/components/ui/Button/Button";
+import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./page.module.scss";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -245,16 +246,11 @@ export default function LandingPage() {
 
       {/* Features */}
       <section ref={featuresRef} id="features" className={styles.features}>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionLabel}>Features</span>
-          <h2 className={styles.sectionTitle}>
-            Everything you need to manage expenses
-          </h2>
-          <p className={styles.sectionSubtitle}>
-            From personal tracking to group settlements, we&apos;ve got you
-            covered.
-          </p>
-        </div>
+        <SectionHeader
+          label="Features"
+          title="Everything you need to manage expenses"
+          subtitle="From personal tracking to group settlements, we've got you covered."
+        />
 
         <div className={styles.featureGrid}>
           {features.map((f, i) => (
@@ -269,13 +265,11 @@ export default function LandingPage() {
 
       {/* How It Works */}
       <section ref={stepsRef} id="how-it-works" className={styles.howItWorks}>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionLabel}>How It Works</span>
-          <h2 className={styles.sectionTitle}>Get started in 3 simple steps</h2>
-          <p className={styles.sectionSubtitle}>
-            No complicated setup. Just create, track, and settle.
-          </p>
-        </div>
+        <SectionHeader
+          label="How It Works"
+          title="Get started in 3 simple steps"
+          subtitle="No complicated setup. Just create, track, and settle."
+        />
 
         <div className={styles.stepsGrid}>
           {steps.map((s, i) => (

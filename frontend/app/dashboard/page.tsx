@@ -18,6 +18,7 @@ import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import CreateGroupModal from "@/components/dashboard/GroupModals/CreateGroupModal";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
+import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
 
@@ -89,14 +90,13 @@ export default function DashboardPage() {
       </section>
 
       <section>
-        <div className={styles.sectionHeader}>
-          <h2>Personal Tracking</h2>
+        <SectionHeader title="Personal Tracking" align="between">
           <Link href="/dashboard/personal">
             <Button variant="outline" size="sm">
               View All
             </Button>
           </Link>
-        </div>
+        </SectionHeader>
 
         <div className={styles.grid}>
           <Card
@@ -127,8 +127,7 @@ export default function DashboardPage() {
       </section>
 
       <section>
-        <div className={styles.sectionHeader}>
-          <h2>Shared Groups</h2>
+        <SectionHeader title="Shared Groups" align="between">
           <Button
             variant="primary"
             size="sm"
@@ -136,7 +135,7 @@ export default function DashboardPage() {
           >
             <HiPlus /> Create Group
           </Button>
-        </div>
+        </SectionHeader>
 
         {groupsLoading ? (
           <div className={styles.grid}>

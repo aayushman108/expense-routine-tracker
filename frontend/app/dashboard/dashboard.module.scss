@@ -63,15 +63,6 @@
   }
 }
 
-.sectionHeader {
-  @include flex-between;
-  margin-bottom: $space-6;
-
-  h2 {
-    @include heading($font-size-xl);
-  }
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

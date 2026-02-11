@@ -16,6 +16,7 @@ import { fetchUserExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
+import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./personal.module.scss";
 import type { RootState } from "@/store";
 
@@ -124,12 +125,11 @@ export default function PersonalDetailsPage() {
       </div>
 
       <section className={styles.expenseSection}>
-        <div className={styles.sectionHeader}>
-          <h2>Recent Activities</h2>
+        <SectionHeader title="Recent Activities" align="between">
           <Button variant="ghost" size="sm">
             Filter By Date
           </Button>
-        </div>
+        </SectionHeader>
 
         <div className={styles.list}>
           {personalExpenses.length > 0 ? (

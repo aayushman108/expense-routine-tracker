@@ -235,43 +235,6 @@
   position: relative;
 }
 
-.sectionHeader {
-  text-align: center;
-  margin-bottom: $space-16;
-  @include container;
-}
-
-.sectionLabel {
-  display: inline-flex;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-2 $space-4;
-  background: var(--color-primary-50);
-  border-radius: $radius-full;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-semibold;
-  color: var(--color-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: $space-4;
-}
-
-.sectionTitle {
-  @include heading($font-size-3xl);
-  margin-bottom: $space-4;
-
-  @include mobile-only {
-    font-size: $font-size-2xl;
-  }
-}
-
-.sectionSubtitle {
-  @include body-text;
-  font-size: $font-size-lg;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
 .featureGrid {
   @include container;
   display: grid;
