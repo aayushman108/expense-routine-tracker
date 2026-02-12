@@ -4,8 +4,7 @@
 
 export interface User {
   id: string;
-  full_name: string;
-  nickname?: string;
+  fullName: string;
   email: string;
   phone?: string;
   avatar?: { url: string; publicId: string } | null;
@@ -28,6 +27,7 @@ export interface GroupMember {
   id: string;
   group_id: string;
   user_id: string;
+  nickname?: string;
   role: string;
   joined_at: string;
   left_at: string | null;
@@ -100,12 +100,11 @@ export interface LoginPayload {
 }
 
 export interface SignupPayload {
-  full_name: string;
-  nickname?: string;
+  fullName: string;
   email: string;
   phone?: string;
   password: string;
-  confirm_password: string;
+  confirmPassword: string;
 }
 
 export interface AuthResponse {

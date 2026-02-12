@@ -17,6 +17,7 @@ import { signupUser, clearError } from "@/store/slices/authSlice";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
+import { handleThunk } from "@/lib/utils";
 import styles from "../auth.module.scss";
 
 export default function SignupPage() {
@@ -26,12 +27,11 @@ export default function SignupPage() {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState({
-    full_name: "",
-    nickname: "",
+    fullName: "",
     email: "",
     phone: "",
     password: "",
-    confirm_password: "",
+    confirmPassword: "",
   });
   const [success, setSuccess] = useState(false);
 
@@ -60,11 +60,10 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await dispatch(signupUser(form));
-    if (signupUser.fulfilled.match(result)) {
+    await handleThunk(dispatch(signupUser(form)), () => {
       setSuccess(true);
       setTimeout(() => router.push("/login"), 3000);
-    }
+    });
   };
 
   return (
@@ -95,26 +94,15 @@ export default function SignupPage() {
         )}
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.row}>
-            <Input
-              label="Full Name"
-              name="full_name"
-              placeholder="Aayushman"
-              icon={<HiOutlineUser />}
-              value={form.full_name}
-              onChange={handleChange}
-              required
-            />
-            <Input
-              label="Nickname"
-              name="nickname"
-              placeholder="Aayush"
-              icon={<HiOutlineUser />}
-              value={form.nickname}
-              onChange={handleChange}
-            />
-          </div>
-
+          <Input
+            label="Full Name"
+            name="fullName"
+            placeholder="Aayushman"
+            icon={<HiOutlineUser />}
+            value={form.fullName}
+            onChange={handleChange}
+            required
+          />
           <Input
             label="Email"
             type="email"
@@ -150,10 +138,10 @@ export default function SignupPage() {
             <Input
               label="Confirm Password"
               type="password"
-              name="confirm_password"
+              name="confirmPassword"
               placeholder="••••••••"
               icon={<HiOutlineLockClosed />}
-              value={form.confirm_password}
+              value={form.confirmPassword}
               onChange={handleChange}
               required
             />
