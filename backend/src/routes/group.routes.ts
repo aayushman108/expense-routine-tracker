@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { uploadMiddleware, validateRequest } from "../middlewares";
-import { GroupValidation } from "../schema/group.schema";
+import { GroupValidation } from "@shared/validationSchema";
 import { groupController } from "../controllers/group.controller";
 
 const router = Router();

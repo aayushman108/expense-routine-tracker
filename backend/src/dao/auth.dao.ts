@@ -1,5 +1,5 @@
 import { db } from "../database/db";
-import { ISignupInput } from "../schema/auth.schema";
+import { ISignupInput } from "@shared/validationSchema";
 import { keysToSnakeCase } from "../utils/caseConverter";
 
 interface IRegisterUser extends ISignupInput {

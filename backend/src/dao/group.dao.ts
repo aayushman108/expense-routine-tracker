@@ -1,5 +1,5 @@
 import { db } from "../database/db";
-import { ICreateGroupInput, IUpdateGroupInput } from "../schema";
+import { ICreateGroupInput, IUpdateGroupInput } from "@shared/validationSchema";
 import { keysToSnakeCase } from "../utils/caseConverter";
 
 export interface IGroup {

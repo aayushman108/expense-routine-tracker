@@ -8,8 +8,7 @@ import {
 import { authService } from "../services/auth.service";
 import { HttpStatusCode } from "../enums/statusCode.enum";
 import { jwtService } from "../services/jwt.service";
-import { ILoginInput, ISignupInput } from "../schema/auth.schema";
-import { keysToSnakeCase } from "../utils/caseConverter";
+import { ILoginInput, ISignupInput } from "@shared/validationSchema";
 
 const cookieOptions = {
   httpOnly: true,

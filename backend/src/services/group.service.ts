@@ -6,7 +6,7 @@ import {
   IAddMemberInput,
   ICreateGroupInput,
   IUpdateGroupInput,
-} from "../schema/group.schema";
+} from "@shared/validationSchema";
 
 export interface IAddMember extends IAddMemberInput {
   adminId: string;

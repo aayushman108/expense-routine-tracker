@@ -1,12 +1,12 @@
 import express from "express";
 import { authController } from "../controllers";
 import { uploadMiddleware, validateRequest, verifyJWT } from "../middlewares";
-import { UserValidation } from "../schema";
 import { singleImageUpload } from "../middlewares/singleImageUpload.middleware";
+import { UserValidation } from "@shared/validationSchema";
 
 export const authRouter = express.Router();
 
-// const upload = uploadMiddleware("avatars");
+const upload = uploadMiddleware("avatars");
 
 authRouter.post(
   "/signup",

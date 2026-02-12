@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validateRequest } from "../middlewares";
-import { ExpenseValidation } from "../schema/expense.schema";
+import { ExpenseValidation } from "@shared/validationSchema";
 import { expenseController } from "../controllers";
 
 const router = Router();
