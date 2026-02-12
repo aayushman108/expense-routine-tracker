@@ -85,6 +85,7 @@ const addMember = async (data: IAddMember) => {
 
   return await groupDao.addMember({
     group_id: data.groupId,
+    nickname: data.nickname,
     user_id: data.newMemberId,
     role: data.role || "member",
   });

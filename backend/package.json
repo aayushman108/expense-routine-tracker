@@ -9,6 +9,7 @@
     "migrate:rollback": "npx knex migrate:rollback --knexfile src/database/knexfile.ts",
     "migrate:latest": "npx knex migrate:latest --knexfile src/database/knexfile.ts",
     "migrate:make": "npx knex migrate:make create_user_table -x ts --knexfile src/database/knexfile.ts",
+    "migrate:status": "npx knex migrate:status --knexfile src/database/knexfile.ts",
     "dev": "nodemon --exec ts-node-dev --files src/index.ts",
     "build": "tsc && tsc-alias",
     "start": "node dist/backend/src/index.js"

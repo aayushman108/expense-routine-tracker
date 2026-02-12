@@ -56,6 +56,13 @@ export class GroupValidation {
         .string({ required_error: "User ID is required" })
         .uuid({ message: "Invalid User ID format" }),
     ),
+    nickname: z.preprocess(
+      optionalPreprocessor,
+      z
+        .string()
+        .max(100, { message: "Nickname must not exceed 100 characters" })
+        .nullable(),
+    ),
     role: z.preprocess(
       optionalPreprocessor,
       z.enum(["member", "admin"]).default("member"),

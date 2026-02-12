@@ -14,13 +14,7 @@ export class UserValidation {
         .min(1, { message: "Full name is required" })
         .max(255, { message: "Full name must not exceed 255 characters" }),
     ),
-    nickname: z.preprocess(
-      optionalPreprocessor,
-      z
-        .string()
-        .max(100, { message: "Nickname must not exceed 100 characters" })
-        .nullable(),
-    ),
+
     email: z.preprocess(
       emailPreprocessor,
       z

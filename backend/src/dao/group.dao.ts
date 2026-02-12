@@ -96,18 +96,20 @@ const deleteGroup = async (groupId: string) => {
 const addMember = async (member: {
   group_id: string;
   user_id: string;
+  nickname: string | null;
   role?: string;
 }) => {
   const { rows } = await db.raw(
-    `INSERT INTO group_members (group_id, user_id, role) 
-     VALUES (?, ?, ?) 
+    `INSERT INTO group_members (group_id, user_id, nickname, role) 
+     VALUES (?, ?, ?, ?) 
      ON CONFLICT (group_id, user_id) 
      DO UPDATE SET 
         role = EXCLUDED.role,
+        nickname = EXCLUDED.nickname,
         joined_at = CURRENT_TIMESTAMP,
         left_at = NULL
      RETURNING *`,
-    [member.group_id, member.user_id, member.role || "member"],
+    [member.group_id, member.user_id, member.nickname, member.role || "member"],
   );
   return rows[0];
 };

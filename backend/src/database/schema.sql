@@ -3,7 +3,6 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name VARCHAR(255) NOT NULL,
-    nickname VARCHAR(100),
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(20),
     password_hash TEXT NOT NULL,
@@ -29,6 +28,7 @@ CREATE TABLE group_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     group_id UUID NOT NULL,
     user_id UUID NOT NULL,
+    nickname VARCHAR(100),
     role VARCHAR(50) DEFAULT 'member',
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     left_at TIMESTAMP NULL, -- NULL means currently a member

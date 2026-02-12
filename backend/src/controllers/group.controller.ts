@@ -40,9 +40,10 @@ const updateGroup = asyncHandler(async (req: Request, res: Response) => {
 
 const addMember = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { newMemberId, role } = req.body;
+  const { newMemberId, nickname, role } = req.body;
   const payload = {
     newMemberId,
+    nickname,
     role,
     groupId: id,
     adminId: req.userId!,

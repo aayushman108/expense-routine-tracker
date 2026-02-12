@@ -21,7 +21,6 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("users", (table) => {
     table.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     table.string("full_name", 255).notNullable();
-    table.string("nickname", 100);
     table.string("email", 255).unique().notNullable();
     table.string("phone", 20);
     table.text("password_hash").notNullable();
@@ -54,6 +53,7 @@ export async function up(knex: Knex): Promise<void> {
       .references("id")
       .inTable("users")
       .onDelete("RESTRICT");
+    table.string("nickname", 100);
     table.string("role", 50).defaultTo("member");
     table.timestamp("joined_at").defaultTo(knex.fn.now());
     table.timestamp("left_at").nullable();
