@@ -16,7 +16,7 @@ export class GroupValidation {
     name: z.preprocess(
       requiredPreprocessor,
       z
-        .string({ required_error: "Group name is required" })
+        .string({ message: "Group name is required" })
         .min(1, { message: "Group name is required" })
         .max(255, { message: "Group name must not exceed 255 characters" }),
     ),
@@ -53,7 +53,7 @@ export class GroupValidation {
     newMemberId: z.preprocess(
       requiredPreprocessor,
       z
-        .string({ required_error: "User ID is required" })
+        .string({ message: "User ID is required" })
         .uuid({ message: "Invalid User ID format" }),
     ),
     nickname: z.preprocess(

@@ -1,6 +1,6 @@
 /**
  * Preprocessor for required fields.
- * Converts null or empty strings to undefined so Zod's required_error can trigger.
+ * Converts null or empty strings to undefined so Zod's message can trigger.
  * Also trims string values.
  */
 export const requiredPreprocessor = (val: any) => {

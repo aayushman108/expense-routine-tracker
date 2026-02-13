@@ -149,6 +149,13 @@
   border-radius: $radius-md;
 }
 
+.passwordHint {
+  font-size: $font-size-xs;
+  color: var(--text-tertiary);
+  margin-top: -$space-2;
+  line-height: 1.4;
+}
+
 .themeToggleWrap {
   position: absolute;
   top: $space-6;

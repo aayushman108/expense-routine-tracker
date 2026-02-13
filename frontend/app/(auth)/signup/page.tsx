@@ -18,6 +18,8 @@ import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
 import { handleThunk } from "@/lib/utils";
+import { UserValidation } from "@shared/validationSchema/auth.schema";
+import { validateData } from "@/lib/validation";
 import styles from "../auth.module.scss";
 
 export default function SignupPage() {
@@ -34,6 +36,9 @@ export default function SignupPage() {
     confirmPassword: "",
   });
   const [success, setSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     dispatch(clearError());
@@ -56,10 +61,42 @@ export default function SignupPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    // Clear validation error when user types
+    if (validationErrors[e.target.name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[e.target.name];
+        return newErrors;
+      });
+    }
   };
+
+  console.log(validationErrors, "Validation Error");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // setValidationErrors({});
+
+    if (form.password !== form.confirmPassword) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Passwords do not match",
+      }));
+      return;
+    }
+
+    const result = validateData(UserValidation.signupSchema, {
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      password: form.password,
+    });
+
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
+
     await handleThunk(dispatch(signupUser(form)), () => {
       setSuccess(true);
       setTimeout(() => router.push("/login"), 3000);
@@ -101,6 +138,7 @@ export default function SignupPage() {
             icon={<HiOutlineUser />}
             value={form.fullName}
             onChange={handleChange}
+            error={validationErrors.fullName}
             required
           />
           <Input
@@ -111,6 +149,7 @@ export default function SignupPage() {
             icon={<HiOutlineMail />}
             value={form.email}
             onChange={handleChange}
+            error={validationErrors.email}
             required
           />
 
@@ -122,6 +161,7 @@ export default function SignupPage() {
             icon={<HiOutlinePhone />}
             value={form.phone}
             onChange={handleChange}
+            error={validationErrors.phone}
           />
 
           <div className={styles.row}>
@@ -133,6 +173,7 @@ export default function SignupPage() {
               icon={<HiOutlineLockClosed />}
               value={form.password}
               onChange={handleChange}
+              error={validationErrors.password}
               required
             />
             <Input
@@ -143,9 +184,15 @@ export default function SignupPage() {
               icon={<HiOutlineLockClosed />}
               value={form.confirmPassword}
               onChange={handleChange}
+              error={validationErrors.confirmPassword}
               required
             />
           </div>
+
+          <p className={styles.passwordHint}>
+            Password must be 8+ characters with uppercase, lowercase, numbers,
+            and symbols (@$!%*?&#).
+          </p>
 
           <Button type="submit" fullWidth isLoading={isLoading}>
             Create Account

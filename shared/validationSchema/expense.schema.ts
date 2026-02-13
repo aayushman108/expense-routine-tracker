@@ -10,19 +10,19 @@ export class ExpenseValidation {
       description: z.preprocess(
         requiredPreprocessor,
         z
-          .string({ required_error: "Description is required" })
+          .string({ message: "Description is required" })
           .min(1, "Description is required"),
       ),
       totalAmount: z.preprocess(
         requiredPreprocessor,
         z
-          .number({ required_error: "Total amount is required" })
+          .number({ message: "Total amount is required" })
           .positive("Amount must be positive"),
       ),
       expenseDate: z.preprocess(
         requiredPreprocessor,
         z
-          .string({ required_error: "Expense date is required" })
+          .string({ message: "Expense date is required" })
           .refine((val) => !isNaN(Date.parse(val)), {
             message: "Invalid date format",
           }),

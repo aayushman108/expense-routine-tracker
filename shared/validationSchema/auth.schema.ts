@@ -10,7 +10,7 @@ export class UserValidation {
     fullName: z.preprocess(
       requiredPreprocessor,
       z
-        .string({ required_error: "Full name is required" })
+        .string({ message: "Full name is required" })
         .min(1, { message: "Full name is required" })
         .max(255, { message: "Full name must not exceed 255 characters" }),
     ),
@@ -18,7 +18,7 @@ export class UserValidation {
     email: z.preprocess(
       emailPreprocessor,
       z
-        .string({ required_error: "Email is required" })
+        .string({ message: "Email is required" })
         .email({ message: "Invalid email format" })
         .max(255, { message: "Email must not exceed 255 characters" }),
     ),
@@ -32,11 +32,15 @@ export class UserValidation {
     password: z.preprocess(
       requiredPreprocessor,
       z
-        .string({ required_error: "Password is required" })
+        .string({ message: "Password is required" })
         .min(8, { message: "Password must be at least 8 characters" })
-        .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/, {
-          message: "Password must contain at least one letter and one number",
-        }),
+        .regex(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/,
+          {
+            message:
+              "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)",
+          },
+        ),
     ),
   });
 
@@ -44,17 +48,21 @@ export class UserValidation {
     email: z.preprocess(
       emailPreprocessor,
       z
-        .string({ required_error: "Email is required" })
+        .string({ message: "Email is required" })
         .email({ message: "Invalid email format" }),
     ),
     password: z.preprocess(
       requiredPreprocessor,
       z
-        .string({ required_error: "Password is required" })
+        .string({ message: "Password is required" })
         .min(8, { message: "Password must be at least 8 characters" })
-        .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/, {
-          message: "Password must contain at least one letter and one number",
-        }),
+        .regex(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/,
+          {
+            message:
+              "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)",
+          },
+        ),
     ),
   });
 }
