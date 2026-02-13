@@ -1,12 +1,11 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import { authRouter, expenseRouter, groupRouter } from "./routes";
 import { errorHandler, verifyJWT } from "./middlewares";
 import cookieParser from "cookie-parser";
 import "./config/cloudinary.config";
-
-dotenv.config();
+import { db } from "./database/db";
+import { ENV } from "./constants";
 
 const app = express();
 
@@ -38,8 +37,21 @@ app.use("/api/groups", groupRouter);
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 8000;
+const PORT = ENV.PORT;
 
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    // Verify database connection
+    await db.raw("SELECT 1");
+    console.log("✅ Database connected successfully");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to connect to the database:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
