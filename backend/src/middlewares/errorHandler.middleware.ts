@@ -13,7 +13,7 @@ export function errorHandler(
     error.handleError(res);
   } else if (error instanceof JsonWebTokenError) {
     return res
-      .status(HttpStatusCode.BAD_REQUEST)
+      .status(HttpStatusCode.UNAUTHORIZED)
       .json({ message: error.message });
   } else {
     console.log(error, "Error from error handler");

@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════
-// AXIOS INTERCEPTOR with Abort Controller support
-// ═══════════════════════════════════════════════════
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 const API_BASE_URL =
