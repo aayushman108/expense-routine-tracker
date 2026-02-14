@@ -29,7 +29,7 @@ export async function sendMail(options: IMailOptions) {
   const mailOptions = {
     from: process.env.SMTP_AUTH_USER,
     to: options.email,
-    Subject: options.subject,
+    subject: options.subject,
     html,
   };
 

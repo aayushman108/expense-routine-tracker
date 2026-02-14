@@ -9,6 +9,13 @@ import { ENV } from "./constants";
 
 const app = express();
 
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
+
 /**
  * It handles requests with the Content-Type: application/x-www-form-urlencoded header.
  *
@@ -26,8 +33,6 @@ app.use(express.urlencoded({ extended: false }));
  */
 app.use(express.json());
 app.use(cookieParser());
-
-app.use(cors());
 
 app.use("/api/auth", authRouter);
 app.use(verifyJWT);
