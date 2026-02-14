@@ -16,17 +16,18 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./src/*"],
+      "@expense-tracker/shared": ["../shared/index"],
       "@expense-tracker/shared/*": ["../shared/*"]
     }
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts",
+    "src/**/*.mts",
     "../shared/**/*"
   ],
   "exclude": ["node_modules"]
