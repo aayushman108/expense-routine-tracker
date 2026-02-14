@@ -1,14 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Management System</title>
-</head>
-<body>
-    Verify the email
-    <p>Hello <%= username %>,</p>
-    <p>Thank you for registration. Please use the given activation code below to activate your account.</p>
-    <p><%= activationCode %>,</p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Your Email - SplitWise</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <div class="header">
+          <h1>Verification Code</h1>
+        </div>
+        <div class="content">
+          <p class="greeting">Hello, <%= username %>!</p>
+          <p class="message">
+            Welcome to <strong>SplitWise</strong>. To complete your registration and secure your account, please use the following 6-digit verification code:
+          </p>
+          
+          <div class="code-container">
+            <p class="otp-code"><%= activationCode %></p>
+            <p class="expiry-notice">This code will expire in 10 minutes.</p>
+          </div>
+
+          <p class="message" style="margin-bottom: 0;">
+            If you didn't request this code, you can safely ignore this email. Someone may have entered your email address by mistake.
+          </p>
+        </div>
+        <div class="footer">
+          <p>© 2026 SplitWise. All rights reserved.</p>
+          <p>This is an automated message, please do not reply.</p>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

@@ -7,7 +7,7 @@ export function errorHandler(
   error: ErrorRequestHandler,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): any {
   if (error instanceof BaseError) {
     error.handleError(res);
@@ -15,8 +15,8 @@ export function errorHandler(
     return res
       .status(HttpStatusCode.BAD_REQUEST)
       .json({ message: error.message });
-  }
-  {
+  } else {
+    console.log(error, "Error from error handler");
     return res
       .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
       .json({ message: "Internal Server Error" });

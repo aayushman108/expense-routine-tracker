@@ -1,0 +1,103 @@
+:root {
+  --primary: #3b82f6;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --bg-light: #f9fafb;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f3f4f6;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrapper {
+  width: 100%;
+  padding: 40px 0;
+}
+
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  padding: 40px 20px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.content {
+  padding: 40px 30px;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.greeting {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.message {
+  color: #4b5563;
+  margin-bottom: 32px;
+}
+
+.code-container {
+  background-color: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.otp-code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: #2563eb;
+  margin: 0;
+}
+
+.footer {
+  padding: 30px;
+  text-align: center;
+  background-color: #f9fafb;
+  border-top: 1px solid #f3f4f6;
+}
+
+.footer p {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.expiry-notice {
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 500;
+  margin-top: 16px;
+}
+
+@media only screen and (max-width: 600px) {
+  .container {
+    margin: 0 20px;
+  }
+}

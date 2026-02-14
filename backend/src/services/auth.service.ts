@@ -25,7 +25,7 @@ interface ITokenVerificationBody {
 interface ILoginUser extends ILoginInput {}
 
 async function createEmailVerificationCode(user: ISignupInput) {
-  const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
+  const activationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   const token = jwt.sign(
     { user, activationCode },
