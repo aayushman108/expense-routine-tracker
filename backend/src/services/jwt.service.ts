@@ -12,13 +12,13 @@ class JwtService {
 
   generateAccessToken(payload: object): string {
     return jwt.sign(payload, this.accessSecret, {
-      expiresIn: ENV.ACCESS_TOKEN_EXPIRY + "m" || "15m",
+      expiresIn: ENV.ACCESS_TOKEN_EXPIRY || "15m",
     });
   }
 
   generateRefreshToken(payload: object): string {
     return jwt.sign(payload, this.refreshSecret, {
-      expiresIn: ENV.REFRESH_TOKEN_EXPIRY + "d" || "15d",
+      expiresIn: ENV.REFRESH_TOKEN_EXPIRY || "15d",
     });
   }
 
