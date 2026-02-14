@@ -12,9 +12,9 @@ import {
   HiOutlineChevronRight,
 } from "react-icons/hi";
 import { FiPieChart, FiUser } from "react-icons/fi";
-import { useAppSelector, useAppDispatch } from "@/src/store/hooks";
-import { logoutUser } from "@/src/store/slices/authSlice";
-import { toggleSidebar } from "@/src/store/slices/uiSlice";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { logoutUser } from "@/store/slices/authSlice";
+import { toggleSidebar } from "@/store/slices/uiSlice";
 import styles from "./Sidebar.module.scss";
 
 const mainNav = [
@@ -109,13 +109,13 @@ export default function Sidebar() {
         <div className={styles.userCard}>
           <div className={styles.avatar}>
             {user?.avatar?.url ? (
-              <img src={user.avatar.url} alt={user.full_name} />
+              <img src={user.avatar.url} alt={user.fullName} />
             ) : (
-              getInitials(user?.full_name)
+              getInitials(user?.fullName)
             )}
           </div>
           <div className={styles.userInfo}>
-            <div className={styles.userName}>{user?.full_name || "User"}</div>
+            <div className={styles.userName}>{user?.fullName || "User"}</div>
             <div className={styles.userEmail}>{user?.email || ""}</div>
           </div>
         </div>

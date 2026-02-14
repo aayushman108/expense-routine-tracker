@@ -1,9 +1,9 @@
 "use client";
 
 import { HiSun, HiMoon } from "react-icons/hi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { toggleTheme } from "@/src/store/slices/themeSlice";
 import styles from "./ThemeToggle.module.scss";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { toggleTheme } from "@/store/slices/themeSlice";
 
 export default function ThemeToggle() {
   const dispatch = useAppDispatch();

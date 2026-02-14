@@ -12,14 +12,14 @@ import {
   HiOutlinePhone,
 } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { signupUser, clearError } from "@/src/store/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { signupUser, clearError } from "@/store/slices/authSlice";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
-import { handleThunk } from "@/src/lib/utils";
+import { handleThunk } from "@/lib/utils";
 import { UserValidation } from "@expense-tracker/shared/validationSchema/auth.schema";
-import { validateData } from "@/src/lib/validation";
+import { validateData } from "@/lib/validation";
 import styles from "../auth.module.scss";
 
 export default function SignupPage() {

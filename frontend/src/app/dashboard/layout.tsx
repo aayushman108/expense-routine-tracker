@@ -2,14 +2,14 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppSelector, useAppDispatch } from "@/src/store/hooks";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
 import Header from "@/components/dashboard/Header/Header";
-import { refreshAuth } from "@/src/store/slices/authSlice";
-import { setSidebarOpen } from "@/src/store/slices/uiSlice";
+import { refreshAuth } from "@/store/slices/authSlice";
+import { setSidebarOpen } from "@/store/slices/uiSlice";
 import styles from "./layout.module.scss";
 
-import type { RootState } from "@/src/store";
+import type { RootState } from "@/store";
 
 export default function DashboardLayout({
   children,

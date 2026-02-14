@@ -8,9 +8,9 @@ import {
   HiInformationCircle,
   HiX,
 } from "react-icons/hi";
-import { useAppSelector, useAppDispatch } from "@/src/store/hooks";
-import { removeToast } from "@/src/store/slices/uiSlice";
 import styles from "./Toast.module.scss";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { removeToast } from "@/store/slices/uiSlice";
 
 const icons = {
   success: <HiCheckCircle />,

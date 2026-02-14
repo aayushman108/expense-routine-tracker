@@ -1,8 +1,8 @@
 "use client";
 
 import { HiMenuAlt2, HiOutlineSearch, HiOutlineBell } from "react-icons/hi";
-import { useAppSelector, useAppDispatch } from "@/src/store/hooks";
-import { setSidebarOpen } from "@/src/store/slices/uiSlice";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { setSidebarOpen } from "@/store/slices/uiSlice";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
 import styles from "./Header.module.scss";
 
@@ -10,7 +10,7 @@ export default function DashboardHeader() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
 
-  const firstName = user?.full_name?.split(" ")[0] || "there";
+  const firstName = user?.fullName?.split(" ")[0] || "there";
 
   return (
     <header className={styles.header}>

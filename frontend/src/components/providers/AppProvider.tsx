@@ -1,9 +1,9 @@
 "use client";
 
 import { Provider } from "react-redux";
-import { store } from "@/src/store";
 import { useEffect } from "react";
-import { initTheme } from "@/src/store/slices/themeSlice";
+import { store } from "@/store";
+import { initTheme } from "@/store/slices/themeSlice";
 
 function ThemeInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {

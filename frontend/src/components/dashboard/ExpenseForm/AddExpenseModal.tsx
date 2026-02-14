@@ -6,14 +6,14 @@ import {
   HiOutlineClipboardList,
   HiOutlineCalendar,
 } from "react-icons/hi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { createExpense } from "@/src/store/slices/expenseSlice";
-import { addToast } from "@/src/store/slices/uiSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { createExpense } from "@/store/slices/expenseSlice";
+import { addToast } from "@/store/slices/uiSlice";
 import Modal from "@/components/ui/Modal/Modal";
 import Input from "@/components/ui/Input/Input";
 import Button from "@/components/ui/Button/Button";
 import styles from "./ExpenseForm.module.scss";
-import type { RootState } from "@/src/store";
+import type { RootState } from "@/store";
 
 interface AddExpenseModalProps {
   isOpen: boolean;
@@ -153,7 +153,7 @@ export default function AddExpenseModal({
                   <div key={member.user_id} className={styles.splitItem}>
                     <div className={styles.userInfo}>
                       <span className="text-secondary">
-                        {member.user?.full_name}
+                        {member.user?.fullName}
                       </span>
                     </div>
                     <div className={styles.inputWrap}>

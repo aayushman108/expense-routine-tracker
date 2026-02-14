@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "@/src/lib/api";
-import type { Expense, CreateExpensePayload } from "@/src/lib/types";
+import api from "../../lib/api";
+import type { Expense, CreateExpensePayload } from "../../lib/types";
 
 interface ExpenseState {
   expenses: Expense[];

@@ -11,16 +11,16 @@ import {
   HiOutlineOfficeBuilding,
 } from "react-icons/hi";
 import { FiUsers } from "react-icons/fi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { fetchMyGroups } from "@/src/store/slices/groupSlice";
-import { fetchUserExpenses } from "@/src/store/slices/expenseSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchMyGroups } from "@/store/slices/groupSlice";
+import { fetchUserExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import CreateGroupModal from "@/components/dashboard/GroupModals/CreateGroupModal";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./dashboard.module.scss";
-import type { RootState } from "@/src/store";
+import type { RootState } from "@/store";
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();

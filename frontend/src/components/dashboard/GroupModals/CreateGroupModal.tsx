@@ -7,14 +7,14 @@ import {
   HiOutlinePhotograph,
   HiOutlinePlus,
 } from "react-icons/hi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { createGroup } from "@/src/store/slices/groupSlice";
-import { addToast } from "@/src/store/slices/uiSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { createGroup } from "@/store/slices/groupSlice";
+import { addToast } from "@/store/slices/uiSlice";
 import Modal from "@/components/ui/Modal/Modal";
 import Input from "@/components/ui/Input/Input";
 import Button from "@/components/ui/Button/Button";
 import styles from "./GroupModals.module.scss";
-import type { RootState } from "@/src/store";
+import type { RootState } from "@/store";
 
 interface CreateGroupModalProps {
   isOpen: boolean;

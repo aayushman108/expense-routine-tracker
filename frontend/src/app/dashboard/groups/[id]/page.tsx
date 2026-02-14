@@ -11,17 +11,17 @@ import {
   HiOutlineUserAdd,
 } from "react-icons/hi";
 import { FiUsers } from "react-icons/fi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchGroupDetails,
   clearCurrentGroup,
-} from "@/src/store/slices/groupSlice";
-import { fetchGroupExpenses } from "@/src/store/slices/expenseSlice";
+} from "@/store/slices/groupSlice";
+import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import styles from "./group-details.module.scss";
-import type { RootState } from "@/src/store";
+import type { RootState } from "@/store";
 
 export default function GroupDetailsPage() {
   const { id } = useParams();
@@ -136,7 +136,7 @@ export default function GroupDetailsPage() {
                         <div className={styles.desc}>{expense.description}</div>
                         <div className={styles.payer}>
                           Paid by{" "}
-                          <span>{expense.payer?.full_name || "Member"}</span>
+                          <span>{expense.payer?.fullName || "Member"}</span>
                         </div>
                       </div>
                       <div className={styles.amount}>
@@ -205,9 +205,7 @@ export default function GroupDetailsPage() {
                 <div className={styles.settlementCard}>
                   <div className={styles.party}>
                     <div className={styles.label}>OWES</div>
-                    <div className={styles.name}>
-                      Me ({user?.nickname || user?.full_name})
-                    </div>
+                    <div className={styles.name}>Me ({user?.fullName})</div>
                   </div>
                   <span className={styles.arrow}>
                     <HiOutlineArrowRight />
@@ -244,16 +242,14 @@ export default function GroupDetailsPage() {
                       {member.user?.avatar?.url ? (
                         <img
                           src={member.user.avatar.url}
-                          alt={member.user.full_name}
+                          alt={member.user?.fullName}
                         />
                       ) : (
-                        getInitials(member.user?.full_name)
+                        getInitials(member.user?.fullName)
                       )}
                     </div>
                     <div className={styles.details}>
-                      <div className={styles.name}>
-                        {member.user?.full_name}
-                      </div>
+                      <div className={styles.name}>{member.user?.fullName}</div>
                       <div className={styles.role}>{member.role}</div>
                     </div>
                   </div>

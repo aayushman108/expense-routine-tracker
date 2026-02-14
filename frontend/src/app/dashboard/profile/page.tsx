@@ -9,22 +9,21 @@ import {
   HiOutlineCheck,
   HiOutlineIdentification,
 } from "react-icons/hi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { updateProfile } from "@/src/store/slices/authSlice";
-import { addToast } from "@/src/store/slices/uiSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { updateProfile } from "@/store/slices/authSlice";
+import { addToast } from "@/store/slices/uiSlice";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import Card from "@/components/ui/Card/Card";
 import styles from "./profile.module.scss";
-import type { RootState } from "@/src/store";
+import type { RootState } from "@/store";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
   const { user, isLoading } = useAppSelector((s: RootState) => s.auth);
 
   const [form, setForm] = useState({
-    full_name: "",
-    nickname: "",
+    fullName: "",
     email: "",
     phone: "",
   });
@@ -32,8 +31,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       setForm({
-        full_name: user.full_name || "",
-        nickname: user.nickname || "",
+        fullName: user.fullName || "",
         email: user.email || "",
         phone: user.phone || "",
       });
@@ -80,9 +78,9 @@ export default function ProfilePage() {
           <div className={styles.avatarSection}>
             <div className={styles.avatar}>
               {user?.avatar?.url ? (
-                <img src={user.avatar.url} alt={user.full_name} />
+                <img src={user.avatar.url} alt={user.fullName} />
               ) : (
-                getInitials(user?.full_name)
+                getInitials(user?.fullName)
               )}
             </div>
             <button className={styles.editBtn} title="Upload New Avatar">
@@ -90,7 +88,7 @@ export default function ProfilePage() {
             </button>
           </div>
           <div className={styles.infoSection}>
-            <span className={styles.name}>{user?.full_name}</span>
+            <span className={styles.name}>{user?.fullName}</span>
             <span className={styles.email}>{user?.email}</span>
             <span className={styles.joined}>
               Member since{" "}
@@ -109,20 +107,12 @@ export default function ProfilePage() {
           <div className={styles.formGrid}>
             <Input
               label="Full Name"
-              name="full_name"
-              value={form.full_name}
+              name="fullName"
+              value={form.fullName}
               onChange={handleChange}
               icon={<HiOutlineUser />}
               placeholder="Enter full name"
               required
-            />
-            <Input
-              label="Nickname"
-              name="nickname"
-              value={form.nickname}
-              onChange={handleChange}
-              icon={<HiOutlineIdentification />}
-              placeholder="E.g. Aayush"
             />
             <Input
               label="Email Address"

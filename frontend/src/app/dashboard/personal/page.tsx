@@ -11,14 +11,14 @@ import {
   HiOutlineTruck,
   HiOutlineDotsVertical,
 } from "react-icons/hi";
-import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
-import { fetchUserExpenses } from "@/src/store/slices/expenseSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchUserExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./personal.module.scss";
-import type { RootState } from "@/src/store";
+import type { RootState } from "@/store";
 
 export default function PersonalDetailsPage() {
   const router = useRouter();

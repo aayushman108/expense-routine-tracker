@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "@/src/lib/api";
-import type { Group, GroupMember } from "@/src/lib/types";
+import api from "../../lib/api";
+import type { Group, GroupMember } from "../../lib/types";
 
 interface GroupState {
   groups: Group[];
