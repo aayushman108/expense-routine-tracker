@@ -12,6 +12,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  verificationToken: string | null;
 }
 
 const initialState: AuthState = {
@@ -19,6 +20,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  verificationToken: null,
 };
 
 // ── Thunks ──
@@ -39,18 +41,33 @@ export const loginUser = createAsyncThunk<AuthResponse, LoginPayload>(
   },
 );
 
-export const signupUser = createAsyncThunk<{ message: string }, SignupPayload>(
-  "auth/signup",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const { data } = await api.post("/auth/signup", payload);
-      return data;
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      return rejectWithValue(error.response?.data?.message || "Signup failed");
-    }
-  },
-);
+export const signupUser = createAsyncThunk<
+  { message: string; data: { token: string } },
+  SignupPayload
+>("auth/signup", async (payload, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post("/auth/signup", payload);
+    return data;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(error.response?.data?.message || "Signup failed");
+  }
+});
+
+export const verifyEmail = createAsyncThunk<
+  { message: string; data: User },
+  { token: string; activationCode: string }
+>("auth/verifyEmail", async (payload, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post("/auth/verify-email", payload);
+    return data;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Verification failed",
+    );
+  }
+});
 
 export const refreshAuth = createAsyncThunk<AuthResponse>(
   "auth/refresh",
@@ -133,10 +150,25 @@ const authSlice = createSlice({
       state.isLoading = true;
       state.error = null;
     });
-    builder.addCase(signupUser.fulfilled, (state) => {
+    builder.addCase(signupUser.fulfilled, (state, action) => {
       state.isLoading = false;
+      state.verificationToken = action.payload.data.token;
     });
     builder.addCase(signupUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
+    });
+
+    // Verify Email
+    builder.addCase(verifyEmail.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(verifyEmail.fulfilled, (state) => {
+      state.isLoading = false;
+      state.verificationToken = null;
+    });
+    builder.addCase(verifyEmail.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });

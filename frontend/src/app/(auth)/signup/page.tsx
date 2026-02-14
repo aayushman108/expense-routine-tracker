@@ -13,7 +13,8 @@ import {
 } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { signupUser, clearError } from "@/store/slices/authSlice";
+import { signupUser, clearError, verifyEmail } from "@/store/slices/authSlice";
+import VerifyEmailModal from "@/components/auth/VerifyEmailModal";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
@@ -25,7 +26,8 @@ import styles from "../auth.module.scss";
 export default function SignupPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { isLoading, error } = useAppSelector((s) => s.auth);
+  const { isLoading, error, verificationToken } = useAppSelector((s) => s.auth);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState({
@@ -99,8 +101,22 @@ export default function SignupPage() {
 
     await handleThunk(dispatch(signupUser(form)), () => {
       setSuccess(true);
-      setTimeout(() => router.push("/login"), 3000);
+      setShowVerifyModal(true);
     });
+  };
+
+  const handleVerify = async (otp: string) => {
+    if (verificationToken) {
+      await handleThunk(
+        dispatch(
+          verifyEmail({ token: verificationToken, activationCode: otp }),
+        ),
+        () => {
+          setShowVerifyModal(false);
+          router.push("/login?verified=true");
+        },
+      );
+    }
   };
 
   return (
@@ -203,6 +219,14 @@ export default function SignupPage() {
           Already have an account? <Link href="/login">Sign in</Link>
         </div>
       </div>
+
+      <VerifyEmailModal
+        isOpen={showVerifyModal}
+        onClose={() => setShowVerifyModal(false)}
+        onVerify={handleVerify}
+        isLoading={isLoading}
+        error={error}
+      />
     </div>
   );
 }
