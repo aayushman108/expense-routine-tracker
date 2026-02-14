@@ -12,6 +12,7 @@ import {
   ILoginInput,
   ISignupInput,
 } from "@expense-tracker/shared/validationSchema";
+import { ENV } from "src/constants";
 
 const cookieOptions = {
   httpOnly: true,
@@ -55,7 +56,12 @@ const login = asyncHandler(async (req: Request, res: Response) => {
 
   res.cookie("jwt", refreshToken, {
     ...cookieOptions,
-    maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY) * 24 * 60 * 60 * 1000,
+    maxAge:
+      Number(ENV.REFRESH_TOKEN_EXPIRY?.trim()?.slice(0, -1)) *
+      24 *
+      60 *
+      60 *
+      1000,
   });
 
   return sendSuccessResponse(res, {
