@@ -11,7 +11,10 @@ import {
 import { authDao } from "../dao";
 import { jwtService } from "./jwt.service";
 import { v2 as cloudinary } from "cloudinary";
-import { ILoginInput, ISignupInput } from "@shared/validationSchema";
+import {
+  ILoginInput,
+  ISignupInput,
+} from "@expense-tracker/shared/validationSchema";
 import { ENV } from "../constants";
 
 interface ITokenVerificationBody {

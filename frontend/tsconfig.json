@@ -17,7 +17,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@shared/*": ["../shared/*"]
+      "@expense-tracker/shared/*": ["../shared/*"]
     }
   },
   "include": [

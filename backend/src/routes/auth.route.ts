@@ -2,7 +2,7 @@ import express from "express";
 import { authController } from "../controllers";
 import { uploadMiddleware, validateRequest, verifyJWT } from "../middlewares";
 import { singleImageUpload } from "../middlewares/singleImageUpload.middleware";
-import { UserValidation } from "@shared/validationSchema";
+import { UserValidation } from "@expense-tracker/shared/validationSchema";
 
 export const authRouter = express.Router();
 

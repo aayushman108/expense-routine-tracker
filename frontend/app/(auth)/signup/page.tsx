@@ -18,7 +18,7 @@ import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
 import { handleThunk } from "@/lib/utils";
-import { UserValidation } from "@shared/validationSchema/auth.schema";
+import { UserValidation } from "@expense-tracker/shared/validationSchema/auth.schema";
 import { validateData } from "@/lib/validation";
 import styles from "../auth.module.scss";
 

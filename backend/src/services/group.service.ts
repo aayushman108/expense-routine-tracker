@@ -6,7 +6,7 @@ import {
   IAddMemberInput,
   ICreateGroupInput,
   IUpdateGroupInput,
-} from "@shared/validationSchema";
+} from "@expense-tracker/shared/validationSchema";
 
 export interface IAddMember extends IAddMemberInput {
   adminId: string;

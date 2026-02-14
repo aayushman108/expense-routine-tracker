@@ -8,7 +8,10 @@ import {
 import { authService } from "../services/auth.service";
 import { HttpStatusCode } from "../enums/statusCode.enum";
 import { jwtService } from "../services/jwt.service";
-import { ILoginInput, ISignupInput } from "@shared/validationSchema";
+import {
+  ILoginInput,
+  ISignupInput,
+} from "@expense-tracker/shared/validationSchema";
 
 const cookieOptions = {
   httpOnly: true,

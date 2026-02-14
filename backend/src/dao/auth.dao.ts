@@ -1,5 +1,5 @@
 import { db } from "../database/db";
-import { ISignupInput } from "@shared/validationSchema";
+import { ISignupInput } from "@expense-tracker/shared/validationSchema";
 import { keysToSnakeCase } from "../utils/caseConverter";
 
 interface IRegisterUser extends ISignupInput {
@@ -21,20 +21,13 @@ const findById = async (userId: string): Promise<any> => {
 };
 
 const createUser = async (user: IRegisterUser) => {
-  const { fullName, nickname, email, phone, password, avatar } = user;
+  const { fullName, email, phone, password, avatar } = user;
 
   const { rows } = await db.raw(
-    `INSERT INTO users (id, full_name, nickname, email, phone, password_hash, avatar) 
-       VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?) 
+    `INSERT INTO users (id, full_name, email, phone, password_hash, avatar) 
+       VALUES (gen_random_uuid(), ?, ?, ?, ?, ?) 
        RETURNING *`,
-    [
-      fullName,
-      nickname,
-      email,
-      phone,
-      password,
-      avatar ? JSON.stringify(avatar) : null,
-    ],
+    [fullName, email, phone, password, avatar ? JSON.stringify(avatar) : null],
   );
   return rows[0];
 };

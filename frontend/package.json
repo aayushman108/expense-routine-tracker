@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@expense-tracker/shared": "*",
     "@gsap/react": "^2.1.2",
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.5",

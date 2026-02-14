@@ -12,7 +12,7 @@ export const validateRequest = (schema: ZodSchema) => {
       if (error instanceof ZodError) {
         res.status(HttpStatusCode.BAD_REQUEST).json({
           success: false,
-          message: error.errors[0].message,
+          message: error.issues[0].message,
         });
       } else {
         next(error);

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"]
+      "@expense-tracker/shared/*": ["shared/*"]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

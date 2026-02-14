@@ -1,5 +1,5 @@
 import { expenseDao, IExpenseSplit } from "../dao/expense.dao";
-import { ICreateExpenseSchema } from "@shared/validationSchema";
+import { ICreateExpenseSchema } from "@expense-tracker/shared/validationSchema";
 
 export interface IAddExpense extends ICreateExpenseSchema {
   paidBy: string;
