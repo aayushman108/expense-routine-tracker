@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   HiOutlineChevronLeft,
@@ -9,6 +9,8 @@ import {
   HiOutlineArrowRight,
   HiOutlineCalendar,
   HiOutlineUserAdd,
+  HiOutlineCurrencyDollar,
+  HiOutlineChartPie,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
@@ -21,18 +23,16 @@ import {
   clearGroupDetails,
   fetchGroupDetailsAction,
 } from "@/store/slices/groupSlice";
+import type { GroupMember } from "@/lib/types";
 
 export default function GroupDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const {
-    groupDetails,
-    members: groupMembers,
-    isLoading: groupLoading,
-    error: groupError,
-  } = useAppSelector((s) => s.groups);
+  const { groupDetails, isLoading: groupLoading } = useAppSelector(
+    (s) => s.groups,
+  );
 
   const { groupExpenses, isLoading: expensesLoading } = useAppSelector(
     (s) => s.expenses,
@@ -53,6 +53,25 @@ export default function GroupDetailsPage() {
     };
   }, [id, dispatch]);
 
+  const members = useMemo(
+    () => groupDetails?.data?.members || [],
+    [groupDetails],
+  );
+
+  const totalGroupSpend = useMemo(() => {
+    return groupExpenses.reduce(
+      (acc, curr) => acc + Number(curr.total_amount),
+      0,
+    );
+  }, [groupExpenses]);
+
+  const myContribution = useMemo(() => {
+    if (!user) return 0;
+    return groupExpenses
+      .filter((e) => e.paid_by === user.id)
+      .reduce((acc, curr) => acc + Number(curr.total_amount), 0);
+  }, [groupExpenses, user]);
+
   const getInitials = (name?: string) => {
     if (!name) return "?";
     return name
@@ -68,17 +87,25 @@ export default function GroupDetailsPage() {
     return {
       day: d.getDate(),
       month: d.toLocaleString("en-US", { month: "short" }),
+      year: d.getFullYear(),
     };
   };
 
-  console.log(groupDetails, "GROUP DETAILS");
-
   if (groupLoading) {
-    return <div className="p-10 text-center">Loading group details...</div>;
+    return (
+      <div className={styles.loaderContainer}>Loading group details...</div>
+    );
   }
 
   if (!groupDetails?.data) {
-    return <div className="p-10 text-center">Group not found.</div>;
+    return (
+      <div className={styles.notFoundContainer}>
+        <p>Group not found.</p>
+        <Button variant="outline" onClick={() => router.push("/dashboard")}>
+          Back to Dashboard
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -91,11 +118,25 @@ export default function GroupDetailsPage() {
           >
             <HiOutlineChevronLeft /> Back to Dashboard
           </button>
-          <h1>{groupDetails?.data?.name}</h1>
-          <p>
-            {groupDetails?.data?.description ||
-              "Shared expenses for the group."}
-          </p>
+          <div className={styles.groupInfo}>
+            <div className={styles.groupImage}>
+              {groupDetails.data.image?.url ? (
+                <img
+                  src={groupDetails.data.image.url}
+                  alt={groupDetails.data.name}
+                />
+              ) : (
+                <HiOutlineChartPie />
+              )}
+            </div>
+            <div>
+              <h1>{groupDetails.data.name}</h1>
+              <p>
+                {groupDetails.data.description ||
+                  "Shared expenses for the group."}
+              </p>
+            </div>
+          </div>
         </div>
         <div className={styles.actions}>
           <Button variant="outline" size="sm">
@@ -130,9 +171,15 @@ export default function GroupDetailsPage() {
 
           {activeTab === "expenses" ? (
             <div className={styles.expenseList}>
-              {groupExpenses.length > 0 ? (
+              {expensesLoading ? (
+                <div className={styles.loaderContainer}>
+                  Loading expenses...
+                </div>
+              ) : groupExpenses.length > 0 ? (
                 groupExpenses.map((expense: any) => {
                   const { day, month } = formatDate(expense.expense_date);
+                  const isPayer = expense.paid_by === user?.id;
+
                   return (
                     <div key={expense.id} className={styles.expenseCard}>
                       <div className={styles.date}>
@@ -142,52 +189,67 @@ export default function GroupDetailsPage() {
                       <div className={styles.info}>
                         <div className={styles.desc}>{expense.description}</div>
                         <div className={styles.payer}>
-                          Paid by{" "}
-                          <span>{expense.payer?.fullName || "Member"}</span>
+                          {isPayer ? (
+                            <span
+                              style={{
+                                color: "var(--color-primary)",
+                                fontWeight: 500,
+                              }}
+                            >
+                              You
+                            </span>
+                          ) : (
+                            <span>{expense.payer?.fullName || "Member"}</span>
+                          )}{" "}
+                          paid{" "}
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color: "var(--color-primary)",
+                            }}
+                          >
+                            {Number(expense.total_amount).toLocaleString()}
+                          </span>
                         </div>
                       </div>
                       <div className={styles.amount}>
                         <div className={styles.value}>
-                          रू {Number(expense.total_amount).toLocaleString()}
+                          {expense.currency}{" "}
+                          {Number(expense.total_amount).toLocaleString()}
                         </div>
                         <div className={styles.status}>
-                          Split between {expense.splits?.length || 0}
+                          {expense.splits?.length
+                            ? `Split by ${expense.splits.length}`
+                            : "Unsplit"}
                         </div>
-                      </div>
-                      <div className={styles.menu}>
-                        <HiOutlineDotsVertical />
                       </div>
                     </div>
                   );
                 })
               ) : (
-                <Card className="text-center p-10">
-                  <span
-                    style={{
-                      fontSize: "3rem",
-                      opacity: 0.2,
-                      marginBottom: "1rem",
-                      display: "block",
-                    }}
-                  >
-                    <HiOutlineCalendar />
-                  </span>
-                  <p>No expenses recorded yet.</p>
+                <div className={styles.emptyStateCard}>
+                  <div className={styles.icon}>
+                    <HiOutlineCurrencyDollar />
+                  </div>
+                  <p className={styles.title}>No expenses yet</p>
+                  <p className={styles.subtext}>
+                    Start tracking your group spending.
+                  </p>
                   <Button
-                    variant="outline"
+                    variant="primary"
                     size="sm"
-                    className="mt-4"
                     onClick={() => setIsExpenseModalOpen(true)}
                   >
                     Log First Expense
                   </Button>
-                </Card>
+                </div>
               )}
             </div>
           ) : (
             <div className={styles.settlements}>
+              {/* Dummy Data for Settlements - to be implemented */}
               <div className="mb-6">
-                <h4 className="text-sm font-semibold mb-3 text-tertiary uppercase tracking-wider">
+                <h4 className="text-xs font-bold mb-4 text-tertiary uppercase tracking-wider flex items-center gap-2">
                   January 2026
                 </h4>
                 <div className={styles.settlementCard}>
@@ -209,40 +271,49 @@ export default function GroupDetailsPage() {
                     </Button>
                   </div>
                 </div>
-                <div className={styles.settlementCard}>
-                  <div className={styles.party}>
-                    <div className={styles.label}>OWES</div>
-                    <div className={styles.name}>Me ({user?.fullName})</div>
-                  </div>
-                  <span className={styles.arrow}>
-                    <HiOutlineArrowRight />
-                  </span>
-                  <div className={styles.party}>
-                    <div className={styles.label}>TO</div>
-                    <div className={styles.name}>Sita Thapa</div>
-                  </div>
-                  <div className={styles.amountWrap}>
-                    <div className={styles.amount}>रू 1,200</div>
-                    <span className="text-xs text-secondary italic">
-                      Awaiting Payment
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
           )}
         </main>
 
         <aside className={styles.sidebarColumn}>
+          {/* Stats Section */}
+          <section className={styles.sidebarSection}>
+            <h3>Group Overview</h3>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div className={styles.statsRow}>
+                <span className={styles.statLabel}>Total Spending</span>
+                <span className={styles.statValue}>
+                  रू {totalGroupSpend.toLocaleString()}
+                </span>
+              </div>
+              <div className={styles.statsRow}>
+                <span className={styles.statLabel}>Your Share</span>
+                <span className={`${styles.statValue} ${styles.success}`}>
+                  रू {myContribution.toLocaleString()}
+                </span>
+              </div>
+              <div className={styles.createdInfo}>
+                <span className={styles.label}>Created</span>
+                <span className={styles.value}>
+                  {formatDate(groupDetails.data.created_at).month}{" "}
+                  {formatDate(groupDetails.data.created_at).day},{" "}
+                  {formatDate(groupDetails.data.created_at).year}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          {/* Members Section */}
           <section className={styles.sidebarSection}>
             <h3>
-              Members
-              <span className="cursor-pointer hover:text-primary transition">
-                <HiOutlineUserAdd />
-              </span>
+              Members{" "}
+              <span className={styles.memberCount}>({members.length})</span>
             </h3>
             <div className={styles.memberList}>
-              {groupMembers?.data?.map((member: any) => (
+              {members.map((member: GroupMember) => (
                 <div key={member.id} className={styles.memberItem}>
                   <div className={styles.memberInfo}>
                     <div className={styles.avatar}>
@@ -256,46 +327,41 @@ export default function GroupDetailsPage() {
                       )}
                     </div>
                     <div className={styles.details}>
-                      <div className={styles.name}>{member.user?.fullName}</div>
+                      <div className={styles.name}>
+                        {member.user?.fullName}
+                        {user?.id === member.user?.id && (
+                          <span
+                            style={{
+                              color: "var(--color-primary)",
+                              fontSize: "0.75rem",
+                              marginLeft: "0.25rem",
+                            }}
+                          >
+                            (You)
+                          </span>
+                        )}
+                      </div>
                       <div className={styles.role}>{member.role}</div>
                     </div>
                   </div>
-                  <div className={styles.balance}>
-                    <div
-                      className={`${styles.value} ${member.id % 2 === 0 ? styles.positive : styles.negative}`}
-                    >
-                      {member.id % 2 === 0 ? "+" : "-"}रू{" "}
-                      {(Math.random() * 5000).toFixed(0)}
-                    </div>
-                  </div>
+                  {/* Future: Net Balance for each member */}
                 </div>
               ))}
             </div>
-          </section>
-
-          <section className={styles.sidebarSection}>
-            <h3>Group Stats</h3>
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-secondary">
-                  Total Group Spend
-                </span>
-                <span className="font-bold">रू 1,42,800</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-secondary">
-                  Your Contribution
-                </span>
-                <span className="font-bold text-success">रू 45,200</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-secondary">Last Settlement</span>
-                <span className="text-sm">Dec 15, 2025</span>
-              </div>
+            <div className={styles.sidebarBtnWrapper}>
+              <Button variant="outline" fullWidth size="sm">
+                <span
+                  style={{
+                    marginRight: "0.25rem",
+                    fontSize: "1.125rem",
+                    display: "flex",
+                  }}
+                >
+                  <HiOutlineUserAdd />
+                </span>{" "}
+                Add Member
+              </Button>
             </div>
-            <Button variant="outline" fullWidth className="mt-6">
-              View Analytics
-            </Button>
           </section>
         </aside>
       </div>
