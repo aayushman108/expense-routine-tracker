@@ -1,0 +1,228 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+// ── Container ──
+.selectGroup {
+  @include flex-column;
+  gap: $space-2;
+  width: 100%;
+}
+
+// ── Label ──
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+
+  .required {
+    color: var(--color-danger);
+  }
+}
+
+// ── Select container (positions the dropdown) ──
+.selectContainer {
+  position: relative;
+  width: 100%;
+}
+
+// ── Hidden native select for form submission ──
+.hiddenSelect {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+// ── Trigger button (looks like the Input) ──
+.trigger {
+  @include input-base;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+  padding-right: 36px; // space for chevron
+
+  &.hasIcon {
+    padding-left: 42px;
+  }
+
+  &.isOpen {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--color-primary-50);
+  }
+
+  &.hasError {
+    border-color: var(--color-danger);
+
+    &.isOpen {
+      box-shadow: 0 0 0 3px var(--color-danger-light);
+    }
+  }
+
+  &.isDisabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    background-color: var(--bg-surface);
+  }
+}
+
+// ── Icon (left side) ──
+.icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-tertiary);
+  font-size: $font-size-md;
+  pointer-events: none;
+  transition: color $transition-fast;
+  display: flex;
+  align-items: center;
+
+  .isOpen & {
+    color: var(--color-primary);
+  }
+}
+
+// ── Value text ──
+.valueText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: var(--text-primary);
+  @include truncate;
+
+  &.placeholder {
+    color: var(--text-tertiary);
+  }
+}
+
+// ── Chevron ──
+.chevron {
+  position: absolute;
+  right: 12px;
+  color: var(--text-tertiary);
+  font-size: $font-size-md;
+  display: flex;
+  align-items: center;
+  transition:
+    transform $transition-fast,
+    color $transition-fast;
+  pointer-events: none;
+
+  &.rotated {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+  }
+}
+
+// ── Dropdown ──
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: $z-dropdown;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: $space-1 0;
+  list-style: none;
+  margin: 0;
+  @include styled-scrollbar;
+
+  // Entrance animation
+  animation: dropdownIn 0.15s ease-out;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ── Option item ──
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-2 $space-3;
+  margin: 0 $space-1;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition:
+    background $transition-fast,
+    color $transition-fast;
+  user-select: none;
+
+  &.highlighted {
+    background: var(--bg-surface-hover);
+  }
+
+  &.selected {
+    color: var(--color-primary);
+    font-weight: $font-weight-semibold;
+    background: var(--bg-primary-subtle);
+  }
+
+  &.selected.highlighted {
+    background: var(--bg-primary-subtle);
+  }
+
+  &.optionDisabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ── Option label ──
+.optionLabel {
+  flex: 1;
+  @include truncate;
+}
+
+// ── Check icon ──
+.checkIcon {
+  color: var(--color-primary);
+  font-size: $font-size-base;
+  display: flex;
+  align-items: center;
+  margin-left: $space-2;
+  flex-shrink: 0;
+}
+
+// ── Error ──
+.error {
+  font-size: $font-size-xs;
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
