@@ -1,0 +1,244 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+// ═══════════════════════════════════════
+// INVITE USER MODAL
+// ═══════════════════════════════════════
+
+.inviteForm {
+  @include flex-column;
+  gap: $space-5;
+}
+
+.infoBlock {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-4;
+  padding: $space-4;
+  background: var(--bg-primary-subtle);
+  border-radius: $radius-md;
+  border: 1px solid var(--color-primary-subtle);
+}
+
+.infoIcon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: $radius-md;
+  background: var(--color-primary);
+  color: #fff;
+  @include flex-center;
+  font-size: $font-size-lg;
+}
+
+.infoTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+  margin-bottom: $space-1;
+
+  strong {
+    font-weight: $font-weight-bold;
+  }
+}
+
+.infoText {
+  font-size: $font-size-xs;
+  color: var(--text-tertiary);
+  line-height: $line-height-relaxed;
+}
+
+// ── Success state ──
+.successState {
+  text-align: center;
+  padding: $space-6 $space-4;
+  @include flex-column;
+  align-items: center;
+  gap: $space-3;
+
+  .successIcon {
+    font-size: 3rem;
+    margin-bottom: $space-2;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: var(--text-primary);
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: var(--text-secondary);
+    line-height: $line-height-relaxed;
+    max-width: 320px;
+
+    strong {
+      color: var(--color-primary);
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  .subtleNote {
+    font-size: $font-size-xs;
+    color: var(--text-tertiary);
+    margin-top: $space-1;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// ═══════════════════════════════════════
+// ADD MEMBER MODAL
+// ═══════════════════════════════════════
+
+.addMemberContent {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.searchResults {
+  @include flex-column;
+  gap: $space-2;
+  max-height: 320px;
+  overflow-y: auto;
+  @include styled-scrollbar;
+}
+
+// ── Search status (loading, no results, hint) ──
+.searchStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: $space-6 $space-4;
+  color: var(--text-tertiary);
+  font-size: $font-size-sm;
+
+  .noResults {
+    color: var(--text-secondary);
+  }
+
+  .hint {
+    font-style: italic;
+  }
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-default);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── User result item ──
+.userResult {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-surface-hover);
+  }
+
+  &.alreadyMember {
+    opacity: 0.7;
+
+    &:hover {
+      border-color: var(--border-default);
+      background: var(--bg-card);
+    }
+  }
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  @include flex-center;
+  color: #fff;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  overflow: hidden;
+  text-transform: uppercase;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.userDetails {
+  @include flex-column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.userName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  @include truncate;
+}
+
+.userEmail {
+  font-size: $font-size-xs;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  @include truncate;
+}
+
+.memberBadge {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: var(--color-success, #22c55e);
+  background: rgba(34, 197, 94, 0.1);
+  padding: $space-1 $space-2;
+  border-radius: $radius-full;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

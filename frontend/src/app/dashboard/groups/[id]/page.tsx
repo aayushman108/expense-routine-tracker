@@ -17,6 +17,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
+import InviteUserModal from "@/components/dashboard/GroupMembers/InviteUserModal";
+import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
 import styles from "./group-details.module.scss";
 import {
   clearGroupDetails,
@@ -41,6 +43,8 @@ export default function GroupDetailsPage() {
     "expenses",
   );
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -138,7 +142,11 @@ export default function GroupDetailsPage() {
           </div>
         </div>
         <div className={styles.actions}>
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsInviteModalOpen(true)}
+          >
             <HiOutlineUserAdd /> Invite
           </Button>
           <Button
@@ -348,7 +356,12 @@ export default function GroupDetailsPage() {
               ))}
             </div>
             <div className={styles.sidebarBtnWrapper}>
-              <Button variant="outline" fullWidth size="sm">
+              <Button
+                variant="outline"
+                fullWidth
+                size="sm"
+                onClick={() => setIsAddMemberModalOpen(true)}
+              >
                 <span
                   style={{
                     marginRight: "0.25rem",
@@ -369,6 +382,20 @@ export default function GroupDetailsPage() {
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
         groupId={id as string}
+      />
+
+      <InviteUserModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        groupId={id as string}
+        groupName={groupDetails.data.name}
+      />
+
+      <AddMemberModal
+        isOpen={isAddMemberModalOpen}
+        onClose={() => setIsAddMemberModalOpen(false)}
+        groupId={id as string}
+        existingMemberIds={members.map((m: GroupMember) => m.user_id)}
       />
     </div>
   );
