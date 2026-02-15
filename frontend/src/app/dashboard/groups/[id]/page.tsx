@@ -10,28 +10,30 @@ import {
   HiOutlineCalendar,
   HiOutlineUserAdd,
 } from "react-icons/hi";
-import { FiUsers } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  fetchGroupDetails,
-  clearCurrentGroup,
-} from "@/store/slices/groupSlice";
+
 import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import styles from "./group-details.module.scss";
-import type { RootState } from "@/store";
+import {
+  clearGroupDetails,
+  fetchGroupDetailsAction,
+} from "@/store/slices/groupSlice";
 
 export default function GroupDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
+
   const {
-    currentGroup,
-    members,
+    groupDetails,
+    members: groupMembers,
     isLoading: groupLoading,
+    error: groupError,
   } = useAppSelector((s) => s.groups);
+
   const { groupExpenses, isLoading: expensesLoading } = useAppSelector(
     (s) => s.expenses,
   );
@@ -43,11 +45,11 @@ export default function GroupDetailsPage() {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchGroupDetails(id as string));
+      dispatch(fetchGroupDetailsAction(id as string));
       dispatch(fetchGroupExpenses(id as string));
     }
     return () => {
-      dispatch(clearCurrentGroup());
+      dispatch(clearGroupDetails());
     };
   }, [id, dispatch]);
 
@@ -69,11 +71,13 @@ export default function GroupDetailsPage() {
     };
   };
 
+  console.log(groupDetails, "GROUP DETAILS");
+
   if (groupLoading) {
     return <div className="p-10 text-center">Loading group details...</div>;
   }
 
-  if (!currentGroup) {
+  if (!groupDetails?.data) {
     return <div className="p-10 text-center">Group not found.</div>;
   }
 
@@ -87,8 +91,11 @@ export default function GroupDetailsPage() {
           >
             <HiOutlineChevronLeft /> Back to Dashboard
           </button>
-          <h1>{currentGroup.name}</h1>
-          <p>{currentGroup.description || "Shared expenses for the group."}</p>
+          <h1>{groupDetails?.data?.name}</h1>
+          <p>
+            {groupDetails?.data?.description ||
+              "Shared expenses for the group."}
+          </p>
         </div>
         <div className={styles.actions}>
           <Button variant="outline" size="sm">
@@ -235,7 +242,7 @@ export default function GroupDetailsPage() {
               </span>
             </h3>
             <div className={styles.memberList}>
-              {members.map((member: any) => (
+              {groupMembers?.data?.map((member: any) => (
                 <div key={member.id} className={styles.memberItem}>
                   <div className={styles.memberInfo}>
                     <div className={styles.avatar}>

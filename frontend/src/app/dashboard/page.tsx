@@ -12,7 +12,7 @@ import {
 } from "react-icons/hi";
 import { FiUsers } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchMyGroups } from "@/store/slices/groupSlice";
+import { fetchMyGroupsAction } from "@/store/slices/groupSlice";
 import { fetchUserExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
@@ -36,7 +36,7 @@ export default function DashboardPage() {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchMyGroups());
+    dispatch(fetchMyGroupsAction());
     dispatch(fetchUserExpenses());
   }, [dispatch]);
 
@@ -44,7 +44,6 @@ export default function DashboardPage() {
     (acc: number, curr: any) => acc + Number(curr.total_amount),
     0,
   );
-  const totalGroups = groups.length;
 
   const stats = [
     {
@@ -55,7 +54,7 @@ export default function DashboardPage() {
     },
     {
       label: "Active Groups",
-      value: totalGroups,
+      value: groups?.totalGroups,
       icon: <HiOutlineUserGroup />,
       color: "green",
     },
@@ -147,9 +146,9 @@ export default function DashboardPage() {
               ></div>
             ))}
           </div>
-        ) : groups.length > 0 ? (
+        ) : groups?.totalGroups > 0 ? (
           <div className={styles.grid}>
-            {groups.map((group: any) => (
+            {groups?.data?.map((group: any) => (
               <Link
                 key={group.id}
                 href={`/dashboard/groups/${group.id}`}

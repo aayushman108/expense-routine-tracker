@@ -8,13 +8,14 @@ import {
   HiOutlinePlus,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { createGroup } from "@/store/slices/groupSlice";
+import { createGroupAction } from "@/store/slices/groupSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import Modal from "@/components/ui/Modal/Modal";
 import Input from "@/components/ui/Input/Input";
 import Button from "@/components/ui/Button/Button";
 import styles from "./GroupModals.module.scss";
 import type { RootState } from "@/store";
+import { handleThunk } from "@/lib/utils";
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -59,17 +60,17 @@ export default function CreateGroupModal({
       formData.append("image", image);
     }
 
-    const result = await dispatch(createGroup(formData));
-    if (createGroup.fulfilled.match(result)) {
+    await handleThunk(dispatch(createGroupAction(formData)), () => {
       dispatch(
         addToast({ type: "success", message: "Group created successfully!" }),
       );
-      onClose();
-      // Reset form
-      setForm({ name: "", description: "" });
-      setImage(null);
-      setPreview(null);
-    }
+    });
+    onClose();
+
+    // Reset form
+    setForm({ name: "", description: "" });
+    setImage(null);
+    setPreview(null);
   };
 
   return (

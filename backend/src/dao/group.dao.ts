@@ -155,6 +155,35 @@ const getMemberRole = async (
   return rows[0]?.role || null;
 };
 
+const getGroupWithMembers = async (groupId: string) => {
+  const { rows } = await db.raw(
+    `SELECT 
+       g.*,
+       COALESCE(
+         json_agg(
+           json_build_object(
+             'id', gm.id,
+             'group_id', gm.group_id,
+             'user_id', gm.user_id,
+             'role', gm.role,
+             'nickname', gm.nickname,
+             'joined_at', gm.joined_at,
+             'left_at', gm.left_at,
+             'user', u.*
+           )
+         ) FILTER (WHERE gm.id IS NOT NULL),
+         '[]'
+       ) as members
+     FROM groups g
+     LEFT JOIN group_members gm ON g.id = gm.group_id AND gm.left_at IS NULL
+     LEFT JOIN users u ON gm.user_id = u.id
+     WHERE g.id = ?
+     GROUP BY g.id`,
+    [groupId],
+  );
+  return rows[0] || null;
+};
+
 export const groupDao = {
   createGroup,
   findById,
@@ -166,4 +195,5 @@ export const groupDao = {
   removeMember,
   isMember,
   getMemberRole,
+  getGroupWithMembers,
 };

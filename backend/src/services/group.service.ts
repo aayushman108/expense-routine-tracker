@@ -37,13 +37,12 @@ const getGroupDetails = async (groupId: string, userId: string) => {
     );
   }
 
-  const group = await groupDao.findById(groupId);
+  const group = await groupDao.getGroupWithMembers(groupId);
   if (!group) {
     throw new BaseError(HttpStatusCode.NOT_FOUND, "Group not found");
   }
 
-  const members = await groupDao.getMembers(groupId);
-  return { ...group, members };
+  return group;
 };
 
 const updateGroup = async (

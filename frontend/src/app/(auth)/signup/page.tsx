@@ -73,8 +73,6 @@ export default function SignupPage() {
     }
   };
 
-  console.log(validationErrors, "Validation Error");
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // setValidationErrors({});

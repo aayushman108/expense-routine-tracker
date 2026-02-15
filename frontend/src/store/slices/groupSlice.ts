@@ -1,29 +1,55 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
-import type { Group, GroupMember } from "../../lib/types";
+import type { Group, GroupDetails, GroupMember } from "../../lib/types";
 
 interface GroupState {
-  groups: Group[];
-  currentGroup: Group | null;
-  members: GroupMember[];
-  isLoading: boolean;
-  error: string | null;
+  groups: {
+    data: Group[];
+    totalGroups: number;
+    isLoading: boolean;
+    error: string | null;
+  };
+  groupDetails: {
+    data: GroupDetails | null;
+    isLoading: boolean;
+    error: string | null;
+  };
+  members: {
+    data: GroupMember[];
+    isLoading: boolean;
+    error: string | null;
+  };
+  isLoading: boolean; //for delete, update, add member
+  error: string | null; //for delete, update, add member
 }
 
 const initialState: GroupState = {
-  groups: [],
-  currentGroup: null,
-  members: [],
-  isLoading: false,
-  error: null,
+  groups: {
+    totalGroups: 0,
+    data: [],
+    isLoading: false,
+    error: null,
+  },
+  groupDetails: {
+    data: null,
+    isLoading: false,
+    error: null,
+  },
+  members: {
+    data: [],
+    isLoading: false,
+    error: null,
+  },
+  isLoading: false, //for delete, update, add member
+  error: null, //for delete, update, add member
 };
 
-export const fetchMyGroups = createAsyncThunk<Group[]>(
+export const fetchMyGroupsAction = createAsyncThunk<Group[]>(
   "groups/fetchMyGroups",
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await api.get("/groups");
-      return data.data || data;
+      return data.data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(
@@ -33,30 +59,30 @@ export const fetchMyGroups = createAsyncThunk<Group[]>(
   },
 );
 
-export const fetchGroupDetails = createAsyncThunk<
-  { group: Group; members: GroupMember[] },
-  string
->("groups/fetchGroupDetails", async (groupId, { rejectWithValue }) => {
-  try {
-    const { data } = await api.get(`/groups/${groupId}`);
-    const result = data.data || data;
-    return result;
-  } catch (err: unknown) {
-    const error = err as { response?: { data?: { message?: string } } };
-    return rejectWithValue(
-      error.response?.data?.message || "Failed to fetch group",
-    );
-  }
-});
+export const fetchGroupDetailsAction = createAsyncThunk<GroupDetails, string>(
+  "groups/fetchGroupDetails",
+  async (groupId, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get(`/groups/${groupId}`);
+      const result = data.data;
+      return result;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch group",
+      );
+    }
+  },
+);
 
-export const createGroup = createAsyncThunk<Group, FormData>(
+export const createGroupAction = createAsyncThunk<Group, FormData>(
   "groups/createGroup",
   async (formData, { rejectWithValue }) => {
     try {
       const { data } = await api.post("/groups", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      return data.data || data;
+      return data.data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(
@@ -66,15 +92,15 @@ export const createGroup = createAsyncThunk<Group, FormData>(
   },
 );
 
-export const updateGroup = createAsyncThunk<
-  Group,
+export const updateGroupAction = createAsyncThunk<
+  GroupDetails,
   { groupId: string; formData: FormData }
 >("groups/updateGroup", async ({ groupId, formData }, { rejectWithValue }) => {
   try {
     const { data } = await api.put(`/groups/${groupId}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    return data.data || data;
+    return data.data;
   } catch (err: unknown) {
     const error = err as { response?: { data?: { message?: string } } };
     return rejectWithValue(
@@ -83,22 +109,25 @@ export const updateGroup = createAsyncThunk<
   }
 });
 
-export const addMemberToGroup = createAsyncThunk<
+export const addMemberToGroupAction = createAsyncThunk<
   GroupMember,
   { groupId: string; email: string }
->("groups/addMember", async ({ groupId, email }, { rejectWithValue }) => {
-  try {
-    const { data } = await api.post(`/groups/${groupId}/members`, { email });
-    return data.data || data;
-  } catch (err: unknown) {
-    const error = err as { response?: { data?: { message?: string } } };
-    return rejectWithValue(
-      error.response?.data?.message || "Failed to add member",
-    );
-  }
-});
+>(
+  "groups/addMemberToGroup",
+  async ({ groupId, email }, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post(`/groups/${groupId}/members`, { email });
+      return data.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to add member",
+      );
+    }
+  },
+);
 
-export const leaveGroup = createAsyncThunk<void, string>(
+export const leaveGroupAction = createAsyncThunk<void, string>(
   "groups/leaveGroup",
   async (groupId, { rejectWithValue }) => {
     try {
@@ -116,69 +145,103 @@ const groupSlice = createSlice({
   name: "groups",
   initialState,
   reducers: {
-    clearGroupError: (state) => {
-      state.error = null;
-    },
-    clearCurrentGroup: (state) => {
-      state.currentGroup = null;
-      state.members = [];
+    clearGroupDetails: (state) => {
+      state.groupDetails.data = null;
     },
   },
   extraReducers: (builder) => {
     // Fetch my groups
-    builder.addCase(fetchMyGroups.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
+    builder.addCase(fetchMyGroupsAction.pending, (state) => {
+      state.groups.isLoading = true;
+      state.groups.error = null;
     });
-    builder.addCase(fetchMyGroups.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.groups = action.payload;
+    builder.addCase(fetchMyGroupsAction.fulfilled, (state, action) => {
+      state.groups.isLoading = false;
+      state.groups.data = action.payload;
+      state.groups.totalGroups = action.payload.length;
     });
-    builder.addCase(fetchMyGroups.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
+    builder.addCase(fetchMyGroupsAction.rejected, (state, action) => {
+      state.groups.isLoading = false;
+      state.groups.error = action.payload as string;
     });
 
     // Fetch group details
-    builder.addCase(fetchGroupDetails.pending, (state) => {
+    builder.addCase(fetchGroupDetailsAction.pending, (state) => {
+      state.groupDetails.isLoading = true;
+      state.groupDetails.error = null;
+    });
+    builder.addCase(fetchGroupDetailsAction.fulfilled, (state, action) => {
+      state.groupDetails.isLoading = false;
+      state.groupDetails.data = action.payload;
+    });
+    builder.addCase(fetchGroupDetailsAction.rejected, (state, action) => {
+      state.groupDetails.isLoading = false;
+      state.groupDetails.error = action.payload as string;
+    });
+
+    // Create group
+    builder.addCase(createGroupAction.pending, (state) => {
       state.isLoading = true;
       state.error = null;
     });
-    builder.addCase(fetchGroupDetails.fulfilled, (state, action) => {
+    builder.addCase(createGroupAction.fulfilled, (state, action) => {
+      state.groups.data.push(action.payload);
+      state.groups.totalGroups++;
       state.isLoading = false;
-      state.currentGroup = action.payload.group;
-      state.members = action.payload.members;
+      state.error = null;
     });
-    builder.addCase(fetchGroupDetails.rejected, (state, action) => {
+    builder.addCase(createGroupAction.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });
 
-    // Create group
-    builder.addCase(createGroup.fulfilled, (state, action) => {
-      state.groups.unshift(action.payload);
-    });
-
     // Update group
-    builder.addCase(updateGroup.fulfilled, (state, action) => {
-      const idx = state.groups.findIndex((g) => g.id === action.payload.id);
-      if (idx !== -1) state.groups[idx] = action.payload;
-      if (state.currentGroup?.id === action.payload.id) {
-        state.currentGroup = action.payload;
-      }
+    builder.addCase(updateGroupAction.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(updateGroupAction.fulfilled, (state, action) => {
+      state.groupDetails.data = action.payload;
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(updateGroupAction.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
     });
 
     // Add member
-    builder.addCase(addMemberToGroup.fulfilled, (state, action) => {
-      state.members.push(action.payload);
+    builder.addCase(addMemberToGroupAction.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(addMemberToGroupAction.fulfilled, (state, action) => {
+      state.members.data.push(action.payload);
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(addMemberToGroupAction.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
     });
 
     // Leave group
-    builder.addCase(leaveGroup.fulfilled, (state, action) => {
-      state.groups = state.groups.filter((g) => g.id !== action.meta.arg);
+    builder.addCase(leaveGroupAction.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(leaveGroupAction.fulfilled, (state, action) => {
+      state.groupDetails.data = null;
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(leaveGroupAction.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
     });
   },
 });
 
-export const { clearGroupError, clearCurrentGroup } = groupSlice.actions;
+export const { clearGroupDetails } = groupSlice.actions;
+
 export default groupSlice.reducer;

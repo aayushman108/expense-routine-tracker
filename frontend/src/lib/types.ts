@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════
-// TYPES — mirrors the DB schema
-// ═══════════════════════════════════════════════════
-
 export interface User {
   id: string;
   fullName: string;
@@ -10,17 +6,6 @@ export interface User {
   avatar?: { url: string; publicId: string } | null;
   created_at: string;
   updated_at: string;
-}
-
-export interface Group {
-  id: string;
-  name: string;
-  description?: string;
-  image?: { url: string; publicId: string } | null;
-  created_by: string;
-  created_at: string;
-  member_count?: number;
-  role?: string;
 }
 
 export interface GroupMember {
@@ -32,6 +17,20 @@ export interface GroupMember {
   joined_at: string;
   left_at: string | null;
   user?: User;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  image?: { url: string; publicId: string } | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GroupDetails extends Group {
+  members: GroupMember[];
 }
 
 export interface Expense {

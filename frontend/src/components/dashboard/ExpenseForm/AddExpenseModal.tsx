@@ -42,9 +42,12 @@ export default function AddExpenseModal({
   >([]);
 
   useEffect(() => {
-    if (groupId && members.length > 0) {
+    if (groupId && members?.data?.length > 0) {
       setSplits(
-        members.map((m: any) => ({ user_id: m.user_id, split_ratio: 1 })),
+        members?.data?.map((m: any) => ({
+          user_id: m.user_id,
+          split_ratio: 1,
+        })),
       );
     } else if (user) {
       setSplits([{ user_id: user.id, split_ratio: 1 }]);
@@ -143,7 +146,7 @@ export default function AddExpenseModal({
               <span className="text-tertiary">Ratio Based</span>
             </h4>
             <div className="flex flex-col gap-2">
-              {members.map((member: any) => {
+              {members?.data?.map((member: any) => {
                 const split = splits.find((s) => s.user_id === member.user_id);
                 const ratio = split?.split_ratio || 0;
                 const share =
