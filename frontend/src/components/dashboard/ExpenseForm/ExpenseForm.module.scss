@@ -16,67 +16,376 @@
   }
 }
 
+// ═══════════════════════════════════════
+// SPLITS SECTION
+// ═══════════════════════════════════════
+
 .splitsSection {
-  margin-top: $space-4;
+  margin-top: $space-2;
   padding: $space-4;
   background: var(--bg-tertiary);
   border-radius: $radius-lg;
+  border: 1px solid var(--border-default);
   @include flex-column;
+  gap: $space-4;
+}
+
+.splitsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: $space-3;
+  flex-wrap: wrap;
 
   h4 {
     font-size: $font-size-sm;
-    color: var(--text-secondary);
-    @include flex-between;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    margin: 0;
   }
 }
 
+// ── Split mode toggle (Equal / Ratio / Amount) ──
+.splitModeToggle {
+  display: flex;
+  background: var(--bg-surface);
+  border-radius: $radius-md;
+  border: 1px solid var(--border-default);
+  padding: 2px;
+  gap: 2px;
+}
+
+.modeBtn {
+  padding: $space-1 $space-3;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  border-radius: calc(#{$radius-md} - 2px);
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--text-secondary);
+  }
+
+  &.modeActive {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: $shadow-sm;
+  }
+}
+
+// ── Actions bar ──
+.splitsActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectedCount {
+  font-size: $font-size-xs;
+  color: var(--text-tertiary);
+  font-weight: $font-weight-medium;
+  font-variant-numeric: tabular-nums;
+}
+
+.perPersonLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--color-primary);
+  background: var(--bg-primary-subtle);
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Members list ──
+.membersList {
+  @include flex-column;
+  gap: $space-2;
+}
+
+.memberName {
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+  font-weight: $font-weight-medium;
+  @include truncate;
+}
+
+// ── Individual split item ──
 .splitItem {
   @include flex-between;
-  padding: $space-2 $space-3;
+  padding: $space-3 $space-4;
   background: var(--bg-card);
   border-radius: $radius-md;
   border: 1px solid var(--border-default);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  position: relative;
+
+  &:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-surface-hover);
+  }
+
+  &.active {
+    border-color: var(--color-primary);
+    background: var(--bg-primary-subtle);
+    box-shadow: 0 0 0 1px var(--color-primary-subtle);
+  }
 
   .userInfo {
     display: flex;
     align-items: center;
-    gap: $space-2;
+    gap: $space-3;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 0;
   }
 
+  // ── Equal share display (read-only) ──
+  .equalShare {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  // ── Ratio & Amount inputs ──
   .inputWrap {
     display: flex;
     align-items: center;
-    gap: $space-2;
+    gap: $space-3;
+    z-index: 2;
+    flex-shrink: 0;
 
     input {
-      width: 60px;
+      width: 72px;
+      height: 32px;
       text-align: center;
-      padding: $space-1;
-      border-radius: $radius-sm;
+      padding: 0 $space-1;
+      border-radius: $radius-md;
       border: 1px solid var(--border-default);
-      background: var(--bg-input);
-      font-size: $font-size-xs;
+      background: var(--bg-surface);
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+      transition: all 0.2s;
+
+      &:focus {
+        border-color: var(--color-primary);
+        outline: none;
+        box-shadow: 0 0 0 2px var(--color-primary-subtle);
+      }
+
+      &::placeholder {
+        color: var(--text-tertiary);
+        font-weight: $font-weight-normal;
+      }
     }
 
     .share {
       font-size: $font-size-xs;
       color: var(--text-tertiary);
+      font-weight: $font-weight-semibold;
       min-width: 80px;
       text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  // ── Amount input with currency prefix ──
+  .amountInputWrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-default);
+    border-radius: $radius-md;
+    background: var(--bg-surface);
+    overflow: hidden;
+    transition: all 0.2s;
+
+    &:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+    }
+
+    .currencyPrefix {
+      padding: 0 $space-2;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: var(--text-tertiary);
+      background: var(--bg-tertiary);
+      height: 32px;
+      display: flex;
+      align-items: center;
+      border-right: 1px solid var(--border-default);
+      white-space: nowrap;
+    }
+
+    input {
+      width: 80px;
+      height: 32px;
+      text-align: right;
+      padding: 0 $space-2;
+      border: none;
+      background: transparent;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+      outline: none;
+
+      &::placeholder {
+        color: var(--text-tertiary);
+        font-weight: $font-weight-normal;
+      }
+    }
+  }
+
+  // ── Percentage input with % suffix ──
+  .percentInputWrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-default);
+    border-radius: $radius-md;
+    background: var(--bg-surface);
+    overflow: hidden;
+    transition: all 0.2s;
+
+    &:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+    }
+
+    input {
+      width: 56px;
+      height: 32px;
+      text-align: right;
+      padding: 0 $space-1 0 $space-2;
+      border: none;
+      background: transparent;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+      outline: none;
+
+      &::placeholder {
+        color: var(--text-tertiary);
+        font-weight: $font-weight-normal;
+      }
+    }
+
+    .percentSuffix {
+      padding: 0 $space-2 0 $space-1;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      color: var(--text-tertiary);
+      height: 32px;
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 2px solid var(--border-default);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background: var(--bg-surface);
+    color: white;
+    font-size: 14px;
+
+    &.checked {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      animation: checkPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
   }
 }
 
+@keyframes checkPop {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// ═══════════════════════════════════════
+// AMOUNT MODE STATUS
+// ═══════════════════════════════════════
+
+.amountStatus {
+  padding: $space-3 $space-4;
+  background: var(--bg-card);
+  border-radius: $radius-md;
+  border: 1px solid var(--border-default);
+  @include flex-column;
+  gap: $space-2;
+}
+
+.statusRow {
+  @include flex-between;
+  font-size: $font-size-xs;
+  color: var(--text-secondary);
+}
+
+.statusValue {
+  font-weight: $font-weight-semibold;
+  font-variant-numeric: tabular-nums;
+
+  &.statusOk {
+    color: var(--color-success, #22c55e);
+  }
+  &.statusWarn {
+    color: var(--color-warning, #f59e0b);
+  }
+}
+
+.progressBar {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+
+  &.progressOk {
+    background: var(--color-success, #22c55e);
+  }
+}
+
+// ═══════════════════════════════════════
+// SUMMARY
+// ═══════════════════════════════════════
+
 .summary {
   @include flex-between;
-  padding: $space-4;
+  padding: $space-3 0;
   border-top: 1px solid var(--border-default);
-  margin-top: $space-2;
 
-  .label {
+  .summaryLabel {
     color: var(--text-secondary);
     font-size: $font-size-sm;
   }
@@ -85,5 +394,31 @@
     font-weight: $font-weight-bold;
     color: var(--color-primary);
     font-size: $font-size-lg;
+  }
+}
+
+// ═══════════════════════════════════════
+// AVATAR
+// ═══════════════════════════════════════
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  @include flex-center;
+  overflow: hidden;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: #fff;
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 1px var(--border-default);
+  text-transform: uppercase;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }

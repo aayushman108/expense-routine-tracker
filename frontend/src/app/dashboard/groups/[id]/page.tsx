@@ -16,7 +16,6 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
-import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import styles from "./group-details.module.scss";
 import {
