@@ -5,8 +5,9 @@ import { sendSuccessResponse } from "../utils/successResponseHandler.utils";
 
 const createExpense = asyncHandler(async (req: Request, res: Response) => {
   const expense = await expenseService.addExpense({
-    ...req.body,
     paidBy: req.userId,
+    ...req.params,
+    ...req.body,
   });
 
   return sendSuccessResponse(res, {

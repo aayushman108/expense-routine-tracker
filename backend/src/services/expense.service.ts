@@ -1,9 +1,10 @@
 import { expenseDao, IExpenseSplit } from "../dao/expense.dao";
 import { ICreateExpenseSchema } from "@expense-tracker/shared/validationSchema";
 
-export interface IAddExpense extends ICreateExpenseSchema {
-  paidBy: string;
-}
+export type IAddExpense = ICreateExpenseSchema["body"] &
+  ICreateExpenseSchema["params"] & {
+    paidBy: string;
+  };
 
 async function addExpense(data: IAddExpense) {
   let calculatedSplits: IExpenseSplit[] = [];

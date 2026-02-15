@@ -10,6 +10,11 @@ router.post(
   validateRequest(ExpenseValidation.createExpenseSchema),
   expenseController.createExpense,
 );
+router.post(
+  "/group/:groupId",
+  validateRequest(ExpenseValidation.createExpenseSchema),
+  expenseController.createExpense,
+);
 router.get("/user", expenseController.getUserExpenses);
 router.get("/group/:groupId", expenseController.getGroupExpenses);
 router.get("/:id", expenseController.getExpense);

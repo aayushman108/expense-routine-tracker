@@ -2,11 +2,16 @@ import { Request, Response, NextFunction } from "express";
 import { ZodError, ZodSchema } from "zod";
 import { HttpStatusCode } from "../enums/statusCode.enum";
 
-export const validateRequest = (schema: ZodSchema) => {
+export const validateRequest = (schema: ZodSchema<any>) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       // Replacing req.body with parsed data ensures transformations (trim, lowercase) are applied
-      req.body = schema.parse(req.body);
+      const parsedData = schema.parse({
+        body: req.body,
+        params: req.params,
+      });
+      req.body = parsedData.body;
+      req.params = parsedData.params;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
