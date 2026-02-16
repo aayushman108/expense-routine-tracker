@@ -1,5 +1,7 @@
+import { keysToSnakeCase } from "src/utils/caseConverter";
 import { db } from "../database/db";
-import { IAddExpense } from "../services/expense.service";
+import { IAddExpense, IUpdateExpense } from "../services/expense.service";
+import { object } from "zod";
 
 export interface IExpenseSplit {
   user_id: string;
@@ -100,10 +102,64 @@ async function deleteExpense(id: string) {
   return true;
 }
 
+async function updateExpense({
+  expenseId,
+  data,
+  splits,
+}: {
+  expenseId: string;
+  data: IUpdateExpense;
+  splits?: IExpenseSplit[];
+}) {
+  return await db.transaction(async (trx) => {
+    const snakeCaseData = keysToSnakeCase(data);
+    delete (snakeCaseData as any).splits;
+
+    const updatePayload = Object.entries(snakeCaseData).reduce(
+      (acc, [key, value]) => {
+        if (value !== undefined && value !== null) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
+
+    if (Object.keys(updatePayload).length > 0) {
+      const setClause = Object.keys(updatePayload)
+        .map((key) => `${key} = ?`)
+        .join(", ");
+
+      await trx.raw(`UPDATE expenses SET ${setClause} WHERE id = ?`, [
+        ...Object.values(updatePayload),
+        expenseId,
+      ]);
+    }
+
+    if (splits && splits.length > 0) {
+      await trx.raw(`DELETE FROM expense_splits WHERE expense_id = ?`, [
+        expenseId,
+      ]);
+      for (const split of splits) {
+        await trx.raw(
+          `
+            INSERT INTO expense_splits (id, expense_id, user_id, split_ratio, share_amount)
+            VALUES (gen_random_uuid(), ?, ?, ?, ?)
+          `,
+          [expenseId, split.user_id, split.split_ratio, split.share_amount],
+        );
+      }
+    }
+
+    return await getExpenseById(expenseId);
+  });
+}
+
 export const expenseDao = {
   createExpense,
   getExpenseById,
   getGroupExpenses,
   getUserExpenses,
   deleteExpense,
+  updateExpense,
 };

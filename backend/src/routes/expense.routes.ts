@@ -15,6 +15,11 @@ router.post(
   validateRequest(ExpenseValidation.createExpenseSchema),
   expenseController.createExpense,
 );
+router.patch(
+  "/:id",
+  validateRequest(ExpenseValidation.updateExpenseSchema),
+  expenseController.updateExpense,
+);
 router.get("/user", expenseController.getUserExpenses);
 router.get("/group/:groupId", expenseController.getGroupExpenses);
 router.get("/:id", expenseController.getExpense);

@@ -17,6 +17,17 @@ const createExpense = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const updateExpense = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const expense = await expenseService.updateExpense(id, {
+    ...req.body,
+  });
+  return sendSuccessResponse(res, {
+    data: expense,
+    message: "Expense updated successfully",
+  });
+});
+
 const getExpense = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const expense = await expenseService.getExpenseDetails(id);
@@ -54,6 +65,7 @@ const deleteExpense = asyncHandler(async (req: Request, res: Response) => {
 
 export const expenseController = {
   createExpense,
+  updateExpense,
   getExpense,
   getGroupExpenses,
   getUserExpenses,
