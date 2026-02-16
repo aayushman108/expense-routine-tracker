@@ -49,59 +49,6 @@ async function createExpense({
   });
 }
 
-async function getExpenseById(id: string) {
-  const result = await db.raw(
-    `
-      SELECT e.*, 
-             json_agg(json_build_object(
-               'user_id', s.user_id, 
-               'split_ratio', s.split_ratio, 
-               'share_amount', s.share_amount
-             )) as splits
-      FROM expenses e
-      LEFT JOIN expense_splits s ON e.id = s.expense_id
-      WHERE e.id = ?
-      GROUP BY e.id
-    `,
-    [id],
-  );
-  return result.rows[0];
-}
-
-async function getGroupExpenses(groupId: string) {
-  const result = await db.raw(
-    `
-      SELECT e.*, u.full_name as paid_by_name
-      FROM expenses e
-      JOIN users u ON e.paid_by = u.id
-      WHERE e.group_id = ?
-      ORDER BY e.expense_date DESC
-    `,
-    [groupId],
-  );
-  return result.rows;
-}
-
-async function getUserExpenses(userId: string) {
-  const result = await db.raw(
-    `
-      SELECT e.*
-      FROM expenses e
-      WHERE e.paid_by = ? OR e.id IN (
-        SELECT expense_id FROM expense_splits WHERE user_id = ?
-      )
-      ORDER BY e.expense_date DESC
-    `,
-    [userId, userId],
-  );
-  return result.rows;
-}
-
-async function deleteExpense(id: string) {
-  await db.raw(`DELETE FROM expenses WHERE id = ?`, [id]);
-  return true;
-}
-
 async function updateExpense({
   expenseId,
   data,
@@ -155,11 +102,78 @@ async function updateExpense({
   });
 }
 
+async function getExpenseById(id: string) {
+  // const result = await db.raw(
+  //   `
+  //     SELECT e.*,
+  //            json_agg(json_build_object(
+  //              'user_id', s.user_id,
+  //              'split_ratio', s.split_ratio,
+  //              'share_amount', s.share_amount
+  //            )) as splits
+  //     FROM expenses e
+  //     LEFT JOIN expense_splits s ON e.id = s.expense_id
+  //     WHERE e.id = ?
+  //     GROUP BY e.id
+  //   `,
+  //   [id],
+  // );
+  const result = await db.raw(
+    `
+      SELECT e.*, 
+             json_agg(s.*, 'user', u.*) as splits
+      FROM expenses e
+      LEFT JOIN expense_splits s ON e.id = s.expense_id
+      LEFT JOIN users u ON s.user_id = u.id
+      WHERE e.id = ?
+      GROUP BY e.id
+    `,
+    [id],
+  );
+  return result.rows[0];
+}
+
+async function getGroupExpenses(groupId: string) {
+  const result = await db.raw(
+    `
+      SELECT e.*, json_agg(s.*, 'user', u.*) as splits
+      FROM expenses e
+      LEFT JOIN expense_splits s ON e.id = s.expense_id
+      LEFT JOIN users u ON s.user_id = u.id
+      WHERE e.group_id = ?
+      GROUP BY e.id
+      ORDER BY e.expense_date DESC
+    `,
+    [groupId],
+  );
+  return result.rows;
+}
+
+async function getUserExpenses(userId: string) {
+  const result = await db.raw(
+    `
+      SELECT e.*
+      FROM expenses e
+      WHERE e.paid_by = ? OR e.id IN (
+        SELECT expense_id FROM expense_splits WHERE user_id = ?
+      )
+      ORDER BY e.expense_date DESC
+    `,
+    [userId, userId],
+  );
+  return result.rows;
+}
+
+async function deleteExpense(id: string) {
+  await db.raw(`DELETE FROM expenses WHERE id = ?`, [id]);
+  return true;
+}
+
 export const expenseDao = {
   createExpense,
+  updateExpense,
   getExpenseById,
   getGroupExpenses,
   getUserExpenses,
   deleteExpense,
-  updateExpense,
 };
