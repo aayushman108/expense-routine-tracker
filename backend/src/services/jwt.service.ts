@@ -23,7 +23,6 @@ class JwtService {
   }
 
   verifyAccessToken(token: string): object | string {
-    console.log(token, "token");
     return jwt.verify(token, this.accessSecret);
   }
 
