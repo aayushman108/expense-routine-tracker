@@ -103,25 +103,26 @@ async function updateExpense({
 }
 
 async function getExpenseById(id: string) {
-  // const result = await db.raw(
-  //   `
-  //     SELECT e.*,
-  //            json_agg(json_build_object(
-  //              'user_id', s.user_id,
-  //              'split_ratio', s.split_ratio,
-  //              'share_amount', s.share_amount
-  //            )) as splits
-  //     FROM expenses e
-  //     LEFT JOIN expense_splits s ON e.id = s.expense_id
-  //     WHERE e.id = ?
-  //     GROUP BY e.id
-  //   `,
-  //   [id],
-  // );
   const result = await db.raw(
     `
       SELECT e.*, 
-             json_agg(s.*, 'user', u.*) as splits
+             COALESCE(
+               json_agg(
+                 json_build_object(
+                   'id', s.id,
+                   'user_id', s.user_id,
+                   'split_ratio', s.split_ratio,
+                   'share_amount', s.share_amount,
+                   'user', json_build_object(
+                     'id', u.id,
+                     'full_name', u.full_name,
+                     'email', u.email,
+                     'avatar', u.avatar
+                   )
+                 )
+               ) FILTER (WHERE s.id IS NOT NULL),
+               '[]'
+             ) as splits
       FROM expenses e
       LEFT JOIN expense_splits s ON e.id = s.expense_id
       LEFT JOIN users u ON s.user_id = u.id
@@ -134,18 +135,58 @@ async function getExpenseById(id: string) {
 }
 
 async function getGroupExpenses(groupId: string) {
+  // const result = await db.raw(
+  //   `
+  //     SELECT e.*,
+  //            COALESCE(
+  //              json_agg(
+  //                json_build_object(
+  //                  'id', s.id,
+  //                  'user_id', s.user_id,
+  //                  'split_ratio', s.split_ratio,
+  //                  'share_amount', s.share_amount,
+  //                  'user', json_build_object(
+  //                    'id', u.id,
+  //                    'full_name', u.full_name,
+  //                    'email', u.email,
+  //                    'avatar', u.avatar
+  //                  )
+  //                )
+  //              ) FILTER (WHERE s.id IS NOT NULL),
+  //              '[]'
+  //            ) as splits
+  //     FROM expenses e
+  //     LEFT JOIN expense_splits s ON e.id = s.expense_id
+  //     LEFT JOIN users u ON s.user_id = u.id
+  //     WHERE e.group_id = ?
+  //     GROUP BY e.id
+  //     ORDER BY e.expense_date DESC
+  //   `,
+  //   [groupId],
+  // );
+
   const result = await db.raw(
     `
-      SELECT e.*, json_agg(s.*, 'user', u.*) as splits
-      FROM expenses e
-      LEFT JOIN expense_splits s ON e.id = s.expense_id
-      LEFT JOIN users u ON s.user_id = u.id
-      WHERE e.group_id = ?
-      GROUP BY e.id
-      ORDER BY e.expense_date DESC
+    SELECT e.*,
+       COALESCE(
+         json_agg(
+           json_build_object(
+             'split', to_jsonb(s),
+             'user', to_jsonb(u)
+           )
+         ) FILTER (WHERE s.id IS NOT NULL),
+         '[]'
+       ) AS splits
+    FROM expenses e
+    LEFT JOIN expense_splits s ON e.id = s.expense_id
+    LEFT JOIN users u ON s.user_id = u.id
+    WHERE e.group_id = ?
+    GROUP BY e.id
+    ORDER BY e.expense_date DESC
     `,
     [groupId],
   );
+
   return result.rows;
 }
 
