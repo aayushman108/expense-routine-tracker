@@ -18,111 +18,91 @@ import Button from "@/components/ui/Button/Button";
 import Select from "@/components/ui/Select/Select";
 import styles from "./ExpenseForm.module.scss";
 import type { RootState } from "@/store";
+import {
+  SPLIT_MODE,
+  SUPPORTED_CURRENCIES,
+} from "@expense-tracker/shared/enum/general.enum";
+import { handleThunk } from "@/lib/utils";
+import { GroupMember } from "@/lib/types";
 
 interface AddExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  groupId?: string | null;
 }
-
-const SUPPORTED_CURRENCIES = ["NPR", "USD", "EUR", "GBP", "INR"];
-
-type SplitMode = "equal" | "percentage" | "amount";
-
-// ── Dummy members for UI testing (remove once backend provides data) ──
-const DUMMY_MEMBERS = [
-  {
-    user_id: "u1",
-    user: { id: "u1", fullName: "Aayushman Pradhan", avatar: null },
-  },
-  { user_id: "u2", user: { id: "u2", fullName: "Ravi Sharma", avatar: null } },
-  { user_id: "u3", user: { id: "u3", fullName: "Priya Thapa", avatar: null } },
-  { user_id: "u4", user: { id: "u4", fullName: "Suman Gurung", avatar: null } },
-  { user_id: "u5", user: { id: "u5", fullName: "Anita Rai", avatar: null } },
-];
 
 export default function AddExpenseModal({
   isOpen,
   onClose,
-  groupId = null,
 }: AddExpenseModalProps) {
   const dispatch = useAppDispatch();
   const { groupDetails } = useAppSelector((s: RootState) => s.groups);
   const { user } = useAppSelector((s: RootState) => s.auth);
 
+  const groupId = groupDetails.data?.id;
+
   const activeMembers = useMemo(() => {
-    if (groupId && groupDetails.data?.id === groupId) {
-      const members = groupDetails.data.members || [];
-      return members.length > 1 ? members : DUMMY_MEMBERS;
-    }
-    if (groupId) return DUMMY_MEMBERS;
-    return user ? [{ user_id: user.id, user }] : [];
-  }, [groupId, groupDetails, user]);
+    const members = groupDetails.data?.members || [];
+    return members;
+  }, [groupDetails]);
 
   const [form, setForm] = useState({
     description: "",
-    total_amount: "",
-    expense_date: new Date().toISOString().split("T")[0],
-    group_id: groupId || "",
-    paid_by: "",
+    totalAmount: "",
+    expenseDate: new Date().toISOString().split("T")[0],
+    paidBy: user?.id,
     currency: "NPR",
   });
 
   const [splits, setSplits] = useState<
-    { user_id: string; split_ratio: number }[]
+    { userId: string; splitRatio: number }[]
   >([]);
-  const [splitMode, setSplitMode] = useState<SplitMode>("equal");
 
-  const amount = Number(form.total_amount) || 0;
+  const [splitMode, setSplitMode] = useState<SPLIT_MODE>(SPLIT_MODE.EQUAL);
+
+  const amount = Number(form.totalAmount) || 0;
 
   // Initialize splits when members change
   useEffect(() => {
     if (groupId && activeMembers.length > 0) {
       setSplits(
-        activeMembers.map((m: any) => ({
-          user_id: m.user_id || m.id || m.user?.id,
-          split_ratio: 1,
+        activeMembers.map((m: GroupMember) => ({
+          userId: m.user_id,
+          splitRatio: 1,
         })),
       );
-      if (user && !form.paid_by) {
-        setForm((prev) => ({ ...prev, paid_by: user.id }));
-      }
-    } else if (user) {
-      setSplits([{ user_id: user.id, split_ratio: 1 }]);
-      setForm((prev) => ({ ...prev, paid_by: prev.paid_by || user.id }));
     }
   }, [activeMembers, user, groupId, isOpen]);
 
   // When switching modes, reset split values appropriately
-  const handleModeChange = (mode: SplitMode) => {
+  const handleModeChange = (mode: SPLIT_MODE) => {
     setSplitMode(mode);
-    const selectedIds = new Set(splits.map((s) => s.user_id));
+    const selectedIds = new Set(splits.map((s) => s.userId));
 
-    if (mode === "equal") {
-      setSplits((prev) => prev.map((s) => ({ ...s, split_ratio: 1 })));
-    } else if (mode === "percentage") {
+    if (mode === SPLIT_MODE.EQUAL) {
+      setSplits((prev) => prev.map((s) => ({ ...s, splitRatio: 1 })));
+    } else if (mode === SPLIT_MODE.PERCENTAGE) {
       // Distribute 100% evenly
       const count = selectedIds.size;
-      const pct = count > 0 ? Math.round((100 / count) * 100) / 100 : 0;
-      setSplits((prev) => prev.map((s) => ({ ...s, split_ratio: pct })));
-    } else if (mode === "amount") {
+      const pct = count > 0 ? Math.round(100 / count) : 0;
+      setSplits((prev) => prev.map((s) => ({ ...s, splitRatio: pct })));
+    } else if (mode === SPLIT_MODE.AMOUNT) {
       // Amount: distribute evenly among selected
       const count = selectedIds.size;
       if (count > 0 && amount > 0) {
-        const perPerson = Math.floor((amount / count) * 100) / 100;
-        const remainder = Math.round((amount - perPerson * count) * 100) / 100;
+        const perPerson = Math.floor(amount / count);
+        const remainder = amount - perPerson * count;
         let first = true;
         setSplits((prev) =>
           prev.map((s) => {
             if (first) {
               first = false;
-              return { ...s, split_ratio: perPerson + remainder };
+              return { ...s, splitRatio: perPerson + remainder };
             }
-            return { ...s, split_ratio: perPerson };
+            return { ...s, splitRatio: perPerson };
           }),
         );
       } else {
-        setSplits((prev) => prev.map((s) => ({ ...s, split_ratio: 0 })));
+        setSplits((prev) => prev.map((s) => ({ ...s, splitRatio: 0 })));
       }
     }
   };
@@ -135,117 +115,108 @@ export default function AddExpenseModal({
 
   const handleSplitChange = (userId: string, value: number) => {
     setSplits((prev) =>
-      prev.map((s) =>
-        s.user_id === userId ? { ...s, split_ratio: value } : s,
-      ),
+      prev.map((s) => (s.userId === userId ? { ...s, splitRatio: value } : s)),
     );
   };
 
   // Compute share for display
-  const computeShare = (split: { user_id: string; split_ratio: number }) => {
-    if (splitMode === "equal") {
+  const computeShare = (split: { userId: string; splitRatio: number }) => {
+    if (splitMode === SPLIT_MODE.EQUAL) {
       const count = splits.length;
       return count > 0 ? amount / count : 0;
     }
-    if (splitMode === "amount") {
-      return split.split_ratio;
+    if (splitMode === SPLIT_MODE.AMOUNT) {
+      return split.splitRatio;
     }
     // Percentage
-    return (amount * split.split_ratio) / 100;
+    return (amount * split.splitRatio) / 100;
   };
 
   // For amount mode: total assigned vs total amount
   const totalAssigned = useMemo(() => {
-    if (splitMode === "amount") {
-      return splits.reduce((acc, s) => acc + s.split_ratio, 0);
+    if (splitMode === SPLIT_MODE.AMOUNT) {
+      return splits.reduce((acc, s) => acc + s.splitRatio, 0);
     }
     return amount;
   }, [splits, splitMode, amount]);
 
-  const amountRemaining = splitMode === "amount" ? amount - totalAssigned : 0;
+  const amountRemaining =
+    splitMode === SPLIT_MODE.AMOUNT ? amount - totalAssigned : 0;
 
   // For percentage mode: total percentage
   const totalPercentage = useMemo(() => {
-    if (splitMode === "percentage") {
-      return splits.reduce((acc, s) => acc + s.split_ratio, 0);
+    if (splitMode === SPLIT_MODE.PERCENTAGE) {
+      return splits.reduce((acc, s) => acc + s.splitRatio, 0);
     }
     return 100;
   }, [splits, splitMode]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (amount <= 0) {
-      dispatch(
-        addToast({ type: "error", message: "Amount must be greater than 0" }),
-      );
-      return;
-    }
-    if (!form.paid_by) {
-      dispatch(addToast({ type: "error", message: "Please select who paid" }));
-      return;
-    }
+    e?.preventDefault();
 
-    let submissionSplits = splits.filter((s) => s.split_ratio > 0);
+    let submissionSplits = splits.filter((s) => s.splitRatio > 0);
 
-    if (splitMode === "equal") {
+    if (splitMode === SPLIT_MODE.EQUAL) {
       submissionSplits = submissionSplits.map((s) => ({
         ...s,
-        split_ratio: 1,
+        splitRatio: 1,
       }));
-    } else if (splitMode === "percentage") {
+    } else if (splitMode === SPLIT_MODE.PERCENTAGE) {
       // Convert percentages to ratio integers (multiply by 100)
       submissionSplits = submissionSplits.map((s) => ({
         ...s,
-        split_ratio: Math.round(s.split_ratio * 100),
+        splitRatio: Math.round(s.splitRatio * 100),
       }));
-    } else if (splitMode === "amount") {
+    } else if (splitMode === SPLIT_MODE.AMOUNT) {
       submissionSplits = submissionSplits.map((s) => ({
         ...s,
-        split_ratio: Math.round(s.split_ratio * 100),
+        splitRatio: Math.round(s.splitRatio * 100),
       }));
     }
 
     const payload = {
       ...form,
-      total_amount: amount,
-      group_id: form.group_id || null,
+      totalAmount: Number(form.totalAmount) || 0,
       splits: submissionSplits,
     };
 
-    const result = await dispatch(createExpense(payload));
-    if (createExpense.fulfilled.match(result)) {
+    await handleThunk(dispatch(createExpense(payload)), () => {
       dispatch(addToast({ type: "success", message: "Expense added!" }));
       onClose();
       setForm((prev) => ({
         ...prev,
         description: "",
-        total_amount: "",
-        expense_date: new Date().toISOString().split("T")[0],
+        totalAmount: "",
+        expenseDate: new Date().toISOString().split("T")[0],
       }));
-    }
+    });
   };
 
-  const currencyOptions = SUPPORTED_CURRENCIES.map((curr) => ({
+  const currencyOptions = Object.values(SUPPORTED_CURRENCIES).map((curr) => ({
     value: curr,
     label: curr,
   }));
 
-  const payerOptions = activeMembers.map((member: any) => ({
-    value: member.user?.id || member.id || member.user_id,
-    label: member.user?.fullName || member.fullName || "User",
-  }));
+  const payerOptions = useMemo(
+    () =>
+      activeMembers.map((member: GroupMember) => ({
+        value: member.user_id,
+        label: member.user.full_name,
+      })),
+    [activeMembers],
+  );
 
   const toggleMember = (memberId: string) => {
-    const exists = splits.find((s) => s.user_id === memberId);
+    const exists = splits.find((s) => s.userId === memberId);
     if (exists) {
-      setSplits((prev) => prev.filter((s) => s.user_id !== memberId));
+      setSplits((prev) => prev.filter((s) => s.userId !== memberId));
     } else {
       let defaultValue = 1;
       if (splitMode === "percentage") defaultValue = 0;
       if (splitMode === "amount") defaultValue = 0;
       setSplits((prev) => [
         ...prev,
-        { user_id: memberId, split_ratio: defaultValue },
+        { userId: memberId, splitRatio: defaultValue },
       ]);
     }
   };
@@ -280,11 +251,11 @@ export default function AddExpenseModal({
         <div className={styles.row}>
           <Input
             label="Amount"
-            name="total_amount"
+            name="totalAmount"
             type="number"
             placeholder="0.00"
             icon={<HiOutlineCurrencyDollar />}
-            value={form.total_amount}
+            value={form.totalAmount}
             onChange={handleChange}
             required
             step="0.01"
@@ -303,19 +274,19 @@ export default function AddExpenseModal({
         <div className={styles.row}>
           <Input
             label="Date"
-            name="expense_date"
+            name="expenseDate"
             type="date"
             icon={<HiOutlineCalendar />}
-            value={form.expense_date}
+            value={form.expenseDate}
             onChange={handleChange}
             required
           />
           {groupId && (
             <Select
               label="Paid By"
-              name="paid_by"
+              name="paidBy"
               icon={<HiOutlineUser />}
-              value={form.paid_by}
+              value={form.paidBy}
               onChange={handleChange}
               options={payerOptions}
               placeholder="Select Payer"
@@ -331,22 +302,22 @@ export default function AddExpenseModal({
               <div className={styles.splitModeToggle}>
                 <button
                   type="button"
-                  className={`${styles.modeBtn} ${splitMode === "equal" ? styles.modeActive : ""}`}
-                  onClick={() => handleModeChange("equal")}
+                  className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.EQUAL ? styles.modeActive : ""}`}
+                  onClick={() => handleModeChange(SPLIT_MODE.EQUAL)}
                 >
                   Equal
                 </button>
                 <button
                   type="button"
-                  className={`${styles.modeBtn} ${splitMode === "percentage" ? styles.modeActive : ""}`}
-                  onClick={() => handleModeChange("percentage")}
+                  className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.PERCENTAGE ? styles.modeActive : ""}`}
+                  onClick={() => handleModeChange(SPLIT_MODE.PERCENTAGE)}
                 >
                   By %
                 </button>
                 <button
                   type="button"
-                  className={`${styles.modeBtn} ${splitMode === "amount" ? styles.modeActive : ""}`}
-                  onClick={() => handleModeChange("amount")}
+                  className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.AMOUNT ? styles.modeActive : ""}`}
+                  onClick={() => handleModeChange(SPLIT_MODE.AMOUNT)}
                 >
                   By Amount
                 </button>
@@ -357,23 +328,25 @@ export default function AddExpenseModal({
               <span className={styles.selectedCount}>
                 {splits.length} of {activeMembers.length} selected
               </span>
-              {splitMode === "equal" && amount > 0 && splits.length > 0 && (
-                <span className={styles.perPersonLabel}>
-                  {form.currency}{" "}
-                  {(amount / splits.length).toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  / person
-                </span>
-              )}
+              {splitMode === SPLIT_MODE.EQUAL &&
+                amount > 0 &&
+                splits.length > 0 && (
+                  <span className={styles.perPersonLabel}>
+                    {form.currency}{" "}
+                    {(amount / splits.length).toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    / person
+                  </span>
+                )}
             </div>
 
             <div className={styles.membersList}>
               {activeMembers.map((member: any) => {
                 const memberId = member.user?.id || member.id || member.user_id;
-                const split = splits.find((s) => s.user_id === memberId);
+                const split = splits.find((s) => s.userId === memberId);
                 const isSelected = !!split;
-                const ratio = split?.split_ratio || 0;
+                const ratio = split?.splitRatio || 0;
                 const share = isSelected ? computeShare(split!) : 0;
 
                 return (

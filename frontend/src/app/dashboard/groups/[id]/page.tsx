@@ -327,15 +327,15 @@ export default function GroupDetailsPage() {
                       {member.user?.avatar?.url ? (
                         <img
                           src={member.user.avatar.url}
-                          alt={member.user?.fullName}
+                          alt={member.user?.full_name}
                         />
                       ) : (
-                        getInitials(member.user?.fullName)
+                        getInitials(member.user?.full_name)
                       )}
                     </div>
                     <div className={styles.details}>
                       <div className={styles.name}>
-                        {member.user?.fullName}
+                        {member.user?.full_name}
                         {user?.id === member.user?.id && (
                           <span
                             style={{
@@ -381,7 +381,6 @@ export default function GroupDetailsPage() {
       <AddExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
-        groupId={id as string}
       />
 
       <InviteUserModal

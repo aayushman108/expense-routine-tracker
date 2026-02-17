@@ -1,6 +1,6 @@
 export interface User {
   id: string;
-  fullName: string;
+  full_name: string;
   email: string;
   phone?: string;
   avatar?: { url: string; publicId: string } | null;
@@ -16,7 +16,7 @@ export interface GroupMember {
   role: string;
   joined_at: string;
   left_at: string | null;
-  user?: User;
+  user: User;
 }
 
 export interface Group {
@@ -111,12 +111,11 @@ export interface AuthResponse {
   accessToken: string;
 }
 
-// ── Expense form ──
 export interface CreateExpensePayload {
-  group_id?: string | null;
-  total_amount: number;
+  groupId?: string | null;
+  totalAmount: number;
   description?: string;
-  expense_date: string;
+  expenseDate: string;
   currency?: string;
-  splits: { user_id: string; split_ratio: number }[];
+  splits: { userId: string; splitRatio: number }[];
 }

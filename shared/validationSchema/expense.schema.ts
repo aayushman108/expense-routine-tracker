@@ -21,7 +21,7 @@ export class ExpenseValidation {
           requiredPreprocessor,
           z
             .number({ message: "Total amount is required" })
-            .positive("Amount must be positive"),
+            .positive("Amount must be greater than 0"),
         ),
         expenseDate: z.preprocess(
           requiredPreprocessor,
@@ -73,7 +73,11 @@ export class ExpenseValidation {
         ),
         totalAmount: z.preprocess(
           optionalPreprocessor,
-          z.number().positive().optional().nullable(),
+          z
+            .number()
+            .positive("Amount must be greater than 0")
+            .optional()
+            .nullable(),
         ),
         expenseDate: z.preprocess(
           optionalPreprocessor,
