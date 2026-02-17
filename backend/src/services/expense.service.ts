@@ -15,13 +15,13 @@ async function addExpense(data: IAddExpense) {
   let calculatedSplits: IExpenseSplit[] = [];
 
   if (data.splits && data.splits.length > 0) {
-    const totalRatio = data.splits.reduce((acc, s) => acc + s.split_ratio, 0);
+    const totalRatio = data.splits.reduce((acc, s) => acc + s.splitRatio, 0);
 
     calculatedSplits = data.splits.map((split) => ({
-      user_id: split.user_id,
-      split_ratio: split.split_ratio,
+      user_id: split.userId,
+      split_ratio: split.splitRatio,
       share_amount: Number(
-        ((split.split_ratio / totalRatio) * data.totalAmount).toFixed(2),
+        ((split.splitRatio / totalRatio) * data.totalAmount).toFixed(2),
       ),
     }));
 
@@ -50,14 +50,14 @@ async function updateExpense(id: string, data: IUpdateExpense) {
   let calculatedSplits: IExpenseSplit[] = [];
 
   if (data.splits && data.splits.length > 0 && data?.totalAmount) {
-    const totalRatio = data.splits.reduce((acc, s) => acc + s.split_ratio, 0);
+    const totalRatio = data.splits.reduce((acc, s) => acc + s.splitRatio, 0);
 
     calculatedSplits = data.splits.map((split) => ({
-      user_id: split.user_id,
-      split_ratio: split.split_ratio,
+      user_id: split.userId,
+      split_ratio: split.splitRatio,
       share_amount: Number(
         (
-          (split.split_ratio / totalRatio) *
+          (split.splitRatio / totalRatio) *
           (data?.totalAmount as number)
         ).toFixed(2),
       ),

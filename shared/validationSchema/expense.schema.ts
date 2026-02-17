@@ -44,8 +44,8 @@ export class ExpenseValidation {
           z
             .array(
               z.object({
-                user_id: z.string().uuid(),
-                split_ratio: z.number().int().positive(),
+                userId: z.string().uuid(),
+                splitRatio: z.number().int().positive(),
               }),
             )
             .optional(),
@@ -96,8 +96,8 @@ export class ExpenseValidation {
           z
             .array(
               z.object({
-                user_id: z.string().uuid(),
-                split_ratio: z.number().int().positive(),
+                userId: z.string().uuid(),
+                splitRatio: z.number().int().positive(),
               }),
             )
             .optional(),
