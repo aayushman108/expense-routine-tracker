@@ -69,7 +69,7 @@ export class GroupValidation {
           .nullable(),
       ),
       role: z.preprocess(
-        optionalPreprocessor,
+        requiredPreprocessor,
         z.enum(["member", "admin"]).default("member"),
       ),
     }),

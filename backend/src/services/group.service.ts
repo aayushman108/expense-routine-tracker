@@ -7,6 +7,7 @@ import {
   ICreateGroupInput,
   IUpdateGroupInput,
 } from "@expense-tracker/shared/validationSchema";
+import { BadRequestError, ForbiddentError, NotFoundError } from "src/utils";
 
 export interface IAddMember extends IAddMemberInput {
   adminId: string;
@@ -52,34 +53,25 @@ const updateGroup = async (
 ) => {
   const role = await groupDao.getMemberRole(groupId, userId);
   if (role !== "admin") {
-    throw new BaseError(
-      HttpStatusCode.FORBIDDEN,
-      "Only admins can update group details",
-    );
+    throw new ForbiddentError("Only admins can update group details");
   }
 
   const updatedGroup = await groupDao.updateGroup(groupId, updates);
   if (!updatedGroup) {
-    throw new BaseError(HttpStatusCode.NOT_FOUND, "Group not found");
+    throw new NotFoundError("Group not found");
   }
   return updatedGroup;
 };
 
 const addMember = async (data: IAddMember) => {
-  const adminRole = await groupDao.getMemberRole(data.groupId, data.adminId);
-  if (adminRole !== "admin") {
-    throw new BaseError(
-      HttpStatusCode.FORBIDDEN,
-      "Only admins can add members",
-    );
+  const memberRole = await groupDao.getMemberRole(data.groupId, data.adminId);
+  if (memberRole !== "admin") {
+    throw new ForbiddentError("Only admins can add members");
   }
 
   const alreadyMember = await groupDao.isMember(data.groupId, data.newMemberId);
   if (alreadyMember) {
-    throw new BaseError(
-      HttpStatusCode.BAD_REQUEST,
-      "User is already a member of this group",
-    );
+    throw new BadRequestError("User is already a member of this group");
   }
 
   return await groupDao.addMember({
