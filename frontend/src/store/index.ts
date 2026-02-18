@@ -4,6 +4,7 @@ import groupReducer from "./slices/groupSlice";
 import expenseReducer from "./slices/expenseSlice";
 import themeReducer from "./slices/themeSlice";
 import uiReducer from "./slices/uiSlice";
+import userReducer from "./slices/userSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     expenses: expenseReducer,
     theme: themeReducer,
     ui: uiReducer,
+    users: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

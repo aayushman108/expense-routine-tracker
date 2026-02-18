@@ -10,13 +10,16 @@ import {
 import Modal from "@/components/ui/Modal/Modal";
 import Input from "@/components/ui/Input/Input";
 import Button from "@/components/ui/Button/Button";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToast } from "@/store/slices/uiSlice";
 import {
   addMemberToGroupAction,
   fetchGroupDetailsAction,
 } from "@/store/slices/groupSlice";
-import api from "@/lib/api";
+import {
+  searchUsersAction,
+  clearSearchResults,
+} from "@/store/slices/userSlice";
 import type { User } from "@/lib/types";
 import styles from "./group-member-modals.module.scss";
 
@@ -34,32 +37,31 @@ export default function AddMemberModal({
   existingMemberIds,
 }: AddMemberModalProps) {
   const dispatch = useAppDispatch();
+  const {
+    searchResults: results,
+    isSearching,
+    searchError,
+  } = useAppSelector((state) => state.users);
+
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<User[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  // const [results, setResults] = useState<User[]>([]); // Removed local state
+  // const [isSearching, setIsSearching] = useState(false); // Removed local state
   const [addingUserId, setAddingUserId] = useState<string | null>(null);
   const [addedUserIds, setAddedUserIds] = useState<Set<string>>(new Set());
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Search users
-  const searchUsers = useCallback(async (searchQuery: string) => {
-    if (searchQuery.trim().length < 2) {
-      setResults([]);
-      return;
-    }
+  const searchUsers = useCallback(
+    async (searchQuery: string) => {
+      if (searchQuery.trim().length < 2) {
+        dispatch(clearSearchResults());
+        return;
+      }
 
-    setIsSearching(true);
-    try {
-      const { data } = await api.get(`/users/search`, {
-        params: { q: searchQuery.trim() },
-      });
-      setResults(data.data || []);
-    } catch {
-      setResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, []);
+      dispatch(searchUsersAction(searchQuery.trim()));
+    },
+    [dispatch],
+  );
 
   // Debounced search
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,11 +83,11 @@ export default function AddMemberModal({
   useEffect(() => {
     if (!isOpen) {
       setQuery("");
-      setResults([]);
+      dispatch(clearSearchResults());
       setAddingUserId(null);
       setAddedUserIds(new Set());
     }
-  }, [isOpen]);
+  }, [isOpen, dispatch]);
 
   const handleAddMember = async (user: User) => {
     setAddingUserId(user.id);
@@ -97,7 +99,7 @@ export default function AddMemberModal({
       dispatch(
         addToast({
           type: "success",
-          message: `${user.fullName} added to group`,
+          message: `${user.full_name} added to group`,
         }),
       );
       // Refresh group details to reflect updated members list
@@ -154,11 +156,20 @@ export default function AddMemberModal({
             </div>
           )}
 
-          {!isSearching && query.trim().length >= 2 && results.length === 0 && (
+          {!isSearching &&
+            query.trim().length >= 2 &&
+            results.length === 0 &&
+            !searchError && (
+              <div className={styles.searchStatus}>
+                <span className={styles.noResults}>
+                  No users found for &quot;{query}&quot;
+                </span>
+              </div>
+            )}
+
+          {searchError && (
             <div className={styles.searchStatus}>
-              <span className={styles.noResults}>
-                No users found for &quot;{query}&quot;
-              </span>
+              <span className={styles.error}>{searchError}</span>
             </div>
           )}
 
@@ -186,11 +197,11 @@ export default function AddMemberModal({
                     {user.avatar?.url ? (
                       <img src={user.avatar.url} alt="" />
                     ) : (
-                      getInitials(user.fullName)
+                      getInitials(user.full_name)
                     )}
                   </div>
                   <div className={styles.userDetails}>
-                    <span className={styles.userName}>{user.fullName}</span>
+                    <span className={styles.userName}>{user.full_name}</span>
                     <span className={styles.userEmail}>
                       <HiOutlineMail /> {user.email}
                     </span>
