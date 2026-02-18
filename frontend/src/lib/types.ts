@@ -117,5 +117,5 @@ export interface CreateExpensePayload {
   description?: string;
   expenseDate: string;
   currency?: string;
-  splits: { userId: string; splitRatio: number }[];
+  splits: { userId: string; splitPercentage: number; splitAmount: number }[];
 }
