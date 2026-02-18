@@ -75,7 +75,6 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // setValidationErrors({});
 
     if (form.password !== form.confirmPassword) {
       setValidationErrors((prev) => ({
