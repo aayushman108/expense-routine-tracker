@@ -18,10 +18,10 @@ export const searchUsersAction = createAsyncThunk<User[], string>(
   "users/searchUsers",
   async (query, { rejectWithValue }) => {
     try {
-      const { data } = await api.get("/users/search", {
-        params: { q: query },
+      const { data } = await api.get("/users", {
+        params: { query },
       });
-      return data.data;
+      return data.data?.users;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(

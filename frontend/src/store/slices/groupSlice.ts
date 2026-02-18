@@ -111,12 +111,14 @@ export const updateGroupAction = createAsyncThunk<
 
 export const addMemberToGroupAction = createAsyncThunk<
   GroupMember,
-  { groupId: string; email: string }
+  { groupId: string; newMemberId: string }
 >(
   "groups/addMemberToGroup",
-  async ({ groupId, email }, { rejectWithValue }) => {
+  async ({ groupId, newMemberId }, { rejectWithValue }) => {
     try {
-      const { data } = await api.post(`/groups/${groupId}/members`, { email });
+      const { data } = await api.post(`/groups/${groupId}/members`, {
+        newMemberId,
+      });
       return data.data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };

@@ -21,6 +21,7 @@ import {
   clearSearchResults,
 } from "@/store/slices/userSlice";
 import type { User } from "@/lib/types";
+import { handleThunk } from "@/lib/utils";
 import styles from "./group-member-modals.module.scss";
 
 interface AddMemberModalProps {
@@ -44,8 +45,6 @@ export default function AddMemberModal({
   } = useAppSelector((state) => state.users);
 
   const [query, setQuery] = useState("");
-  // const [results, setResults] = useState<User[]>([]); // Removed local state
-  // const [isSearching, setIsSearching] = useState(false); // Removed local state
   const [addingUserId, setAddingUserId] = useState<string | null>(null);
   const [addedUserIds, setAddedUserIds] = useState<Set<string>>(new Set());
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -58,7 +57,7 @@ export default function AddMemberModal({
         return;
       }
 
-      dispatch(searchUsersAction(searchQuery.trim()));
+      await handleThunk(dispatch(searchUsersAction(searchQuery.trim())));
     },
     [dispatch],
   );
@@ -91,25 +90,25 @@ export default function AddMemberModal({
 
   const handleAddMember = async (user: User) => {
     setAddingUserId(user.id);
-    try {
-      await dispatch(
-        addMemberToGroupAction({ groupId, email: user.email }),
-      ).unwrap();
-      setAddedUserIds((prev) => new Set(prev).add(user.id));
-      dispatch(
-        addToast({
-          type: "success",
-          message: `${user.full_name} added to group`,
-        }),
-      );
-      // Refresh group details to reflect updated members list
-      dispatch(fetchGroupDetailsAction(groupId));
-    } catch (err: any) {
-      const msg = typeof err === "string" ? err : "Failed to add member";
-      dispatch(addToast({ type: "error", message: msg }));
-    } finally {
-      setAddingUserId(null);
-    }
+    await handleThunk(
+      dispatch(addMemberToGroupAction({ groupId, newMemberId: user.id })),
+      () => {
+        setAddedUserIds((prev) => new Set(prev).add(user.id));
+        dispatch(
+          addToast({
+            type: "success",
+            message: `${user.full_name} added to group`,
+          }),
+        );
+        // Refresh group details to reflect updated members list
+        dispatch(fetchGroupDetailsAction(groupId));
+      },
+      (err: any) => {
+        const msg = typeof err === "string" ? err : "Failed to add member";
+        dispatch(addToast({ type: "error", message: msg }));
+      },
+    );
+    setAddingUserId(null);
   };
 
   const getInitials = (name?: string) => {
@@ -124,6 +123,17 @@ export default function AddMemberModal({
 
   const isExistingMember = (userId: string) =>
     existingMemberIds.includes(userId) || addedUserIds.has(userId);
+
+  const noResults =
+    !isSearching &&
+    query.trim().length >= 2 &&
+    results.length === 0 &&
+    !searchError;
+  const minCharMessage =
+    !isSearching &&
+    query.trim().length < 2 &&
+    results.length === 0 &&
+    !searchError;
 
   return (
     <Modal
@@ -146,6 +156,7 @@ export default function AddMemberModal({
           value={query}
           onChange={handleQueryChange}
           autoFocus
+          autoComplete="off"
         />
 
         <div className={styles.searchResults}>
@@ -156,16 +167,13 @@ export default function AddMemberModal({
             </div>
           )}
 
-          {!isSearching &&
-            query.trim().length >= 2 &&
-            results.length === 0 &&
-            !searchError && (
-              <div className={styles.searchStatus}>
-                <span className={styles.noResults}>
-                  No users found for &quot;{query}&quot;
-                </span>
-              </div>
-            )}
+          {noResults && (
+            <div className={styles.searchStatus}>
+              <span className={styles.noResults}>
+                No users found for &quot;{query}&quot;
+              </span>
+            </div>
+          )}
 
           {searchError && (
             <div className={styles.searchStatus}>
@@ -173,17 +181,13 @@ export default function AddMemberModal({
             </div>
           )}
 
-          {!isSearching &&
-            query.trim().length > 0 &&
-            query.trim().length < 2 && (
-              <div className={styles.searchStatus}>
-                <span className={styles.hint}>
-                  Type at least 2 characters...
-                </span>
-              </div>
-            )}
+          {minCharMessage && (
+            <div className={styles.searchStatus}>
+              <span className={styles.hint}>Type at least 2 characters...</span>
+            </div>
+          )}
 
-          {results.map((user) => {
+          {results?.map((user) => {
             const isMember = isExistingMember(user.id);
             const isAdding = addingUserId === user.id;
 

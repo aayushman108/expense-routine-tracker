@@ -5,9 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import {
   HiOutlineChevronLeft,
   HiOutlinePlus,
-  HiOutlineDotsVertical,
   HiOutlineArrowRight,
-  HiOutlineCalendar,
   HiOutlineUserAdd,
   HiOutlineCurrencyDollar,
   HiOutlineChartPie,
