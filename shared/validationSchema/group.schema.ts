@@ -74,6 +74,15 @@ export class GroupValidation {
       ),
     }),
   });
+
+  static inviteMemberSchema = z.object({
+    body: z.object({
+      email: z.preprocess(
+        requiredPreprocessor,
+        z.string().email({ message: "Invalid email address" }),
+      ),
+    }),
+  });
 }
 
 export type ICreateGroupInput = z.infer<
@@ -84,4 +93,7 @@ export type IUpdateGroupInput = z.infer<
 >;
 export type IAddMemberInput = z.infer<
   typeof GroupValidation.addMemberSchema.shape.body
+>;
+export type IInviteMemberInput = z.infer<
+  typeof GroupValidation.inviteMemberSchema.shape.body
 >;

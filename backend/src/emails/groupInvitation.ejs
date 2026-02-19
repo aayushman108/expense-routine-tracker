@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Invitation - SplitWise</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <div class="header">
+          <h1>Group Invitation</h1>
+        </div>
+        <div class="content">
+          <p class="greeting">Hello!</p>
+          <p class="message">
+            <strong><%= adminName %></strong> (<%= adminEmail %>) has invited you to join the group <strong>"<%= groupName %>"</strong> on <strong>SplitWise</strong>.
+          </p>
+          
+          <div class="cta-container">
+            <p class="message">
+              Click the button below to join the group and start tracking your shared expenses.
+            </p>
+            <a href="<%= inviteLink %>" class="button">Join Group</a>
+          </div>
+
+          <p class="message" style="margin-top: 20px;">
+            If you don't have an account yet, you'll be prompted to create one before joining the group.
+          </p>
+
+          <p class="message" style="margin-bottom: 0;">
+            If you weren't expecting this invitation, you can safely ignore this email.
+          </p>
+        </div>
+        <div class="footer">
+          <p>© 2026 SplitWise. All rights reserved.</p>
+          <p>This is an automated message, please do not reply.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

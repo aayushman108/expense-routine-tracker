@@ -5,9 +5,12 @@ import { HttpStatusCode } from "../enums/statusCode.enum";
 import {
   IAddMemberInput,
   ICreateGroupInput,
+  IInviteMemberInput,
   IUpdateGroupInput,
 } from "@expense-tracker/shared/validationSchema";
 import { BadRequestError, ForbiddentError, NotFoundError } from "src/utils";
+import { authDao } from "../dao/auth.dao";
+import { sendMail } from "../utils/sendEmail.util";
 
 export interface IAddMember extends IAddMemberInput {
   adminId: string;
@@ -106,6 +109,52 @@ const leaveGroup = async (groupId: string, userId: string) => {
   return await groupDao.removeMember(groupId, userId);
 };
 
+const inviteMember = async (
+  groupId: string,
+  adminId: string,
+  data: IInviteMemberInput,
+) => {
+  const group = await groupDao.findById(groupId);
+  if (!group) {
+    throw new NotFoundError("Group not found");
+  }
+
+  const admin = await authDao.findById(adminId);
+  if (!admin) {
+    throw new NotFoundError("Admin not found");
+  }
+
+  const adminRole = await groupDao.getMemberRole(groupId, adminId);
+  if (adminRole !== "admin") {
+    throw new ForbiddentError("Only admins can invite members");
+  }
+
+  // Optional: Check if the user is already a member if they exist
+  const user = await authDao.findByEmail(data.email);
+  if (user) {
+    const alreadyMember = await groupDao.isMember(groupId, user.id);
+    if (alreadyMember) {
+      throw new BadRequestError("User is already a member of this group");
+    }
+  }
+
+  const inviteLink = `${process.env.FRONTEND_URL}/signup?inviteToGroup=${groupId}`;
+
+  await sendMail({
+    email: data.email,
+    subject: `Invitation to join group: ${group.name}`,
+    template: "groupInvitation.ejs",
+    data: {
+      adminName: admin.full_name,
+      adminEmail: admin.email,
+      groupName: group.name,
+      inviteLink,
+    },
+  });
+
+  return { message: "Invitation sent successfully" };
+};
+
 export const groupService = {
   createGroup,
   getMyGroups,
@@ -113,4 +162,5 @@ export const groupService = {
   updateGroup,
   addMember,
   leaveGroup,
+  inviteMember,
 };

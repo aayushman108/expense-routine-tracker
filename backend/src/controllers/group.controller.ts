@@ -64,6 +64,15 @@ const leaveGroup = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const inviteMember = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await groupService.inviteMember(id, req.userId!, req.body);
+  return sendSuccessResponse(res, {
+    data: result,
+    message: "Invitation sent successfully",
+  });
+});
+
 export const groupController = {
   createGroup,
   getMyGroups,
@@ -71,4 +80,5 @@ export const groupController = {
   updateGroup,
   addMember,
   leaveGroup,
+  inviteMember,
 };

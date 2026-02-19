@@ -46,6 +46,12 @@ router.post(
   groupController.addMember,
 );
 
+router.post(
+  "/:id/invite",
+  validateRequest(GroupValidation.inviteMemberSchema),
+  groupController.inviteMember,
+);
+
 router.delete("/:id/leave", groupController.leaveGroup);
 
 export { router as groupRouter };
