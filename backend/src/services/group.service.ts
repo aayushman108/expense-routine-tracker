@@ -10,7 +10,7 @@ import {
 } from "@expense-tracker/shared/validationSchema";
 import { BadRequestError, ForbiddentError, NotFoundError } from "src/utils";
 import { authDao } from "../dao/auth.dao";
-import { sendMail } from "../utils/sendEmail.util";
+import { appEmitter, EVENTS } from "../utils/emitter.util";
 
 export interface IAddMember extends IAddMemberInput {
   adminId: string;
@@ -140,16 +140,12 @@ const inviteMember = async (
 
   const inviteLink = `${process.env.FRONTEND_URL}/signup?inviteToGroup=${groupId}`;
 
-  await sendMail({
+  appEmitter.emit(EVENTS.EMAIL.INVITE, {
     email: data.email,
-    subject: `Invitation to join group: ${group.name}`,
-    template: "groupInvitation.ejs",
-    data: {
-      adminName: admin.full_name,
-      adminEmail: admin.email,
-      groupName: group.name,
-      inviteLink,
-    },
+    adminName: admin.full_name,
+    adminEmail: admin.email,
+    groupName: group.name,
+    inviteLink,
   });
 
   return { message: "Invitation sent successfully" };

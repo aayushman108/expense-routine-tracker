@@ -2,12 +2,8 @@ import jwt, { Secret } from "jsonwebtoken";
 import fs from "fs";
 
 import bcrypt from "bcrypt";
-import {
-  ConflictError,
-  NotFoundError,
-  sendMail,
-  UnAuthorizedError,
-} from "../utils";
+import { ConflictError, NotFoundError, UnAuthorizedError } from "../utils";
+import { appEmitter, EVENTS } from "../utils/emitter.util";
 import { authDao } from "../dao";
 import { jwtService } from "./jwt.service";
 import { v2 as cloudinary } from "cloudinary";
@@ -46,14 +42,10 @@ async function signup(user: ISignupInput) {
 
   const { token, activationCode } = await createEmailVerificationCode(user);
 
-  const info = await sendMail({
+  appEmitter.emit(EVENTS.EMAIL.SIGNUP, {
     email: user.email,
-    subject: "Verify your email",
-    template: "emailActivation.ejs",
-    data: {
-      username: user.fullName,
-      activationCode,
-    },
+    fullName: user.fullName,
+    activationCode,
   });
 
   return { token };

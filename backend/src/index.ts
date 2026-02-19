@@ -6,6 +6,10 @@ import cookieParser from "cookie-parser";
 import "./config/cloudinary.config";
 import { db } from "./database/db";
 import { ENV } from "./constants";
+import { initEmailListeners } from "./listeners/email.listener";
+
+// Initialize Listeners
+initEmailListeners();
 
 const app = express();
 
