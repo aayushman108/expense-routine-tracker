@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   HiOutlineCurrencyDollar,
   HiOutlineClipboardList,
@@ -37,13 +37,17 @@ export default function AddExpenseModal({
   const dispatch = useAppDispatch();
   const { groupDetails } = useAppSelector((s: RootState) => s.groups);
   const { user } = useAppSelector((s: RootState) => s.auth);
+  const [activeMembers, setActiveMembers] = useState<string[]>([]);
 
   const groupId = groupDetails.data?.id;
 
-  const activeMembers = useMemo(() => {
-    const members = groupDetails.data?.members || [];
-    return members;
+  const groupMembers = useMemo(() => {
+    return groupDetails.data?.members || [];
   }, [groupDetails]);
+
+  useEffect(() => {
+    setActiveMembers(groupMembers.map((m: GroupMember) => m.user_id));
+  }, [groupMembers]);
 
   const [form, setForm] = useState({
     description: "",
@@ -63,16 +67,16 @@ export default function AddExpenseModal({
 
   // Initialize splits when members change
   useEffect(() => {
-    if (groupId && activeMembers.length > 0) {
+    if (groupId && groupMembers.length > 0) {
       setSplits(
-        activeMembers.map((m: GroupMember) => ({
+        groupMembers.map((m: GroupMember) => ({
           userId: m.user_id,
-          splitPercentage: 100 / activeMembers.length,
-          splitAmount: totalAmount / activeMembers.length,
+          splitPercentage: 100 / groupMembers.length,
+          splitAmount: totalAmount / groupMembers.length,
         })),
       );
     }
-  }, [activeMembers, user, groupId, isOpen]);
+  }, [groupMembers, user, groupId, isOpen]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -103,28 +107,59 @@ export default function AddExpenseModal({
             : s,
         );
       } else {
-        return prev;
+        return prev.map((s) => {
+          return {
+            ...s,
+            splitPercentage: 100 / activeMembers.length,
+            splitAmount: totalAmount / activeMembers.length,
+          };
+        });
       }
     });
   };
 
-  // Compute share for display
-  const computeShare = (split: { userId: string; splitPercentage: number }) => {
-    if (splitMode === SPLIT_MODE.EQUAL) {
-      const count = splits.length;
-      return count > 0 ? totalAmount / count : 0;
-    }
-    if (splitMode === SPLIT_MODE.AMOUNT) {
-      return split.splitPercentage;
-    }
-    // Percentage
-    return (totalAmount * split.splitPercentage) / 100;
-  };
+  const handleSetSplits = useCallback(() => {
+    setSplits((prev) => {
+      if (splitMode === SPLIT_MODE.PERCENTAGE) {
+        return prev.map((s) => {
+          return {
+            ...s,
+            splitPercentage: 100 / activeMembers.length,
+            splitAmount: totalAmount / activeMembers.length,
+          };
+        });
+      } else if (splitMode === SPLIT_MODE.AMOUNT) {
+        return prev.map((s) => {
+          return {
+            ...s,
+            splitPercentage: 100 / activeMembers.length,
+            splitAmount: totalAmount / activeMembers.length,
+          };
+        });
+      } else {
+        return prev.map((s) => {
+          if (activeMembers.includes(s.userId)) {
+            return {
+              ...s,
+              splitPercentage: 100 / activeMembers.length,
+              splitAmount: totalAmount / activeMembers.length,
+            };
+          } else {
+            return { ...s, splitPercentage: 0, splitAmount: 0 };
+          }
+        });
+      }
+    });
+  }, [totalAmount]);
+
+  useEffect(() => {
+    handleSetSplits();
+  }, [handleSetSplits]);
 
   // For amount mode: total assigned vs total amount
   const totalAssigned = useMemo(() => {
     if (splitMode === SPLIT_MODE.AMOUNT) {
-      return splits.reduce((acc, s) => acc + s.splitPercentage, 0);
+      return splits.reduce((acc, s) => acc + s.splitAmount, 0);
     }
     return totalAmount;
   }, [splits, splitMode, totalAmount]);
@@ -176,31 +211,86 @@ export default function AddExpenseModal({
 
   const payerOptions = useMemo(
     () =>
-      activeMembers.map((member: GroupMember) => ({
+      groupMembers.map((member: GroupMember) => ({
         value: member.user_id,
         label: member.user.full_name,
       })),
-    [activeMembers],
+    [groupMembers],
   );
 
   const toggleMember = (memberId: string) => {
-    const exists = splits.find((s) => s.userId === memberId);
-    if (exists) {
-      setSplits((prev) => prev.filter((s) => s.userId !== memberId));
+    if (activeMembers.includes(memberId)) {
+      setActiveMembers((prev) => prev.filter((id) => id !== memberId));
     } else {
-      let defaultValue = 1;
-      if (splitMode === SPLIT_MODE.PERCENTAGE) defaultValue = 0;
-      if (splitMode === SPLIT_MODE.AMOUNT) defaultValue = 0;
-      setSplits((prev) => [
-        ...prev,
-        {
-          userId: memberId,
-          splitPercentage: defaultValue,
-          splitAmount: defaultValue,
-        },
-      ]);
+      setActiveMembers((prev) => [...prev, memberId]);
     }
+    const exists = activeMembers.find((s) => s === memberId);
+
+    setSplits((prev) => {
+      if (exists) {
+        if (splitMode === SPLIT_MODE.EQUAL) {
+          return prev.map((s) => {
+            if (s.userId === memberId) {
+              return { ...s, splitPercentage: 0, splitAmount: 0 };
+            } else if (activeMembers.includes(s.userId)) {
+              return {
+                ...s,
+                splitPercentage: 100 / (activeMembers.length - 1),
+                splitAmount: totalAmount / (activeMembers.length - 1),
+              };
+            }
+            return s;
+          });
+        }
+        if (splitMode === SPLIT_MODE.PERCENTAGE) {
+          return prev.map((s) => {
+            if (s.userId === memberId) {
+              return { ...s, splitPercentage: 0, splitAmount: 0 };
+            }
+            return s;
+          });
+        }
+        if (splitMode === SPLIT_MODE.AMOUNT) {
+          return prev.map((s) => {
+            if (s.userId === memberId) {
+              return { ...s, splitPercentage: 0, splitAmount: 0 };
+            }
+            return s;
+          });
+        }
+      } else {
+        if (splitMode === SPLIT_MODE.EQUAL) {
+          return prev.map((s) => {
+            return {
+              ...s,
+              splitPercentage: 100 / (activeMembers.length + 1),
+              splitAmount: totalAmount / (activeMembers.length + 1),
+            };
+          });
+        }
+        if (splitMode === SPLIT_MODE.PERCENTAGE) {
+          return prev.map((s) => {
+            if (s.userId === memberId) {
+              return { ...s, splitPercentage: 0, splitAmount: 0 };
+            }
+            return s;
+          });
+        }
+        if (splitMode === SPLIT_MODE.AMOUNT) {
+          return prev.map((s) => {
+            if (s.userId === memberId) {
+              return { ...s, splitPercentage: 0, splitAmount: 0 };
+            }
+            return s;
+          });
+        }
+      }
+
+      return prev;
+    });
   };
+
+  console.log(splits, "SPLITS");
 
   return (
     <Modal
@@ -307,39 +397,44 @@ export default function AddExpenseModal({
 
             <div className={styles.splitsActions}>
               <span className={styles.selectedCount}>
-                {splits.length} of {activeMembers.length} selected
+                {activeMembers.length} of {groupMembers.length} selected
               </span>
               {splitMode === SPLIT_MODE.EQUAL &&
                 totalAmount > 0 &&
                 splits.length > 0 && (
                   <span className={styles.perPersonLabel}>
                     {form.currency}{" "}
-                    {(totalAmount / splits.length).toLocaleString(undefined, {
-                      maximumFractionDigits: 2,
-                    })}{" "}
+                    {(totalAmount / activeMembers.length).toLocaleString(
+                      undefined,
+                      {
+                        maximumFractionDigits: 2,
+                      },
+                    )}{" "}
                     / person
                   </span>
                 )}
             </div>
 
             <div className={styles.membersList}>
-              {activeMembers.map((member: GroupMember) => {
+              {groupMembers.map((member: GroupMember) => {
                 const memberId = member.user_id;
                 const split = splits.find((s) => s.userId === memberId);
                 const splitPercentage = split?.splitPercentage || 0;
                 const splitAmount = split?.splitAmount || 0;
 
+                const isActiveMember = activeMembers.includes(memberId);
+
                 return (
                   <div
                     key={memberId}
-                    className={`${styles.splitItem} ${splitPercentage > 0 ? styles.active : ""}`}
+                    className={`${styles.splitItem} ${isActiveMember ? styles.active : ""}`}
                     onClick={() => toggleMember(memberId)}
                   >
                     <div className={styles.userInfo}>
                       <div
-                        className={`${styles.checkbox} ${splitPercentage > 0 ? styles.checked : ""}`}
+                        className={`${styles.checkbox} ${isActiveMember ? styles.checked : ""}`}
                       >
-                        {splitPercentage > 0 && <HiCheck />}
+                        {isActiveMember && <HiCheck />}
                       </div>
                       <div className={styles.avatar}>
                         {member.user?.avatar?.url ? (
