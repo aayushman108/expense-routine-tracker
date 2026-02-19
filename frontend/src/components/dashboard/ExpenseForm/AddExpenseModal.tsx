@@ -84,59 +84,47 @@ export default function AddExpenseModal({
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSplitChange = (userId: string, value: number) => {
-    setSplits((prev) => {
-      if (splitMode === SPLIT_MODE.PERCENTAGE) {
-        return prev.map((s) =>
-          s.userId === userId
-            ? {
-                ...s,
-                splitPercentage: value,
-                splitAmount: (value * totalAmount) / 100,
-              }
-            : s,
-        );
-      } else if (splitMode === SPLIT_MODE.AMOUNT) {
-        return prev.map((s) =>
-          s.userId === userId
-            ? {
-                ...s,
-                splitPercentage: (value * 100) / totalAmount,
-                splitAmount: value,
-              }
-            : s,
-        );
-      } else {
-        return prev.map((s) => {
-          return {
-            ...s,
-            splitPercentage: 100 / activeMembers.length,
-            splitAmount: totalAmount / activeMembers.length,
-          };
-        });
-      }
-    });
-  };
+  const handleSplitChange = useCallback(
+    (userId: string, value: number) => {
+      if (!activeMembers.includes(userId)) return;
+      setSplits((prev) => {
+        if (splitMode === SPLIT_MODE.PERCENTAGE) {
+          return prev.map((s) =>
+            s.userId === userId
+              ? {
+                  ...s,
+                  splitPercentage: value,
+                  splitAmount: (value * totalAmount) / 100,
+                }
+              : s,
+          );
+        } else if (splitMode === SPLIT_MODE.AMOUNT) {
+          return prev.map((s) =>
+            s.userId === userId
+              ? {
+                  ...s,
+                  splitPercentage: (value * 100) / totalAmount,
+                  splitAmount: value,
+                }
+              : s,
+          );
+        } else {
+          return prev.map((s) => {
+            return {
+              ...s,
+              splitPercentage: 100 / activeMembers.length,
+              splitAmount: totalAmount / activeMembers.length,
+            };
+          });
+        }
+      });
+    },
+    [activeMembers, splitMode, totalAmount],
+  );
 
   const handleSetSplits = useCallback(() => {
     setSplits((prev) => {
-      if (splitMode === SPLIT_MODE.PERCENTAGE) {
-        return prev.map((s) => {
-          return {
-            ...s,
-            splitPercentage: 100 / activeMembers.length,
-            splitAmount: totalAmount / activeMembers.length,
-          };
-        });
-      } else if (splitMode === SPLIT_MODE.AMOUNT) {
-        return prev.map((s) => {
-          return {
-            ...s,
-            splitPercentage: 100 / activeMembers.length,
-            splitAmount: totalAmount / activeMembers.length,
-          };
-        });
-      } else {
+      if (splitMode === SPLIT_MODE.EQUAL) {
         return prev.map((s) => {
           if (activeMembers.includes(s.userId)) {
             return {
@@ -148,9 +136,13 @@ export default function AddExpenseModal({
             return { ...s, splitPercentage: 0, splitAmount: 0 };
           }
         });
+      } else {
+        return prev.map((s) => {
+          return { ...s, splitPercentage: 0, splitAmount: 0 };
+        });
       }
     });
-  }, [totalAmount]);
+  }, [totalAmount, splitMode, activeMembers]);
 
   useEffect(() => {
     handleSetSplits();
@@ -218,79 +210,66 @@ export default function AddExpenseModal({
     [groupMembers],
   );
 
-  const toggleMember = (memberId: string) => {
-    if (activeMembers.includes(memberId)) {
-      setActiveMembers((prev) => prev.filter((id) => id !== memberId));
-    } else {
-      setActiveMembers((prev) => [...prev, memberId]);
-    }
-    const exists = activeMembers.find((s) => s === memberId);
-
-    setSplits((prev) => {
-      if (exists) {
-        if (splitMode === SPLIT_MODE.EQUAL) {
-          return prev.map((s) => {
-            if (s.userId === memberId) {
-              return { ...s, splitPercentage: 0, splitAmount: 0 };
-            } else if (activeMembers.includes(s.userId)) {
-              return {
-                ...s,
-                splitPercentage: 100 / (activeMembers.length - 1),
-                splitAmount: totalAmount / (activeMembers.length - 1),
-              };
-            }
-            return s;
-          });
-        }
-        if (splitMode === SPLIT_MODE.PERCENTAGE) {
-          return prev.map((s) => {
-            if (s.userId === memberId) {
-              return { ...s, splitPercentage: 0, splitAmount: 0 };
-            }
-            return s;
-          });
-        }
-        if (splitMode === SPLIT_MODE.AMOUNT) {
-          return prev.map((s) => {
-            if (s.userId === memberId) {
-              return { ...s, splitPercentage: 0, splitAmount: 0 };
-            }
-            return s;
-          });
-        }
+  const toggleMember = useCallback(
+    (memberId: string) => {
+      let thisActiveMembers;
+      if (activeMembers.includes(memberId)) {
+        setActiveMembers((prev) => prev.filter((id) => id !== memberId));
+        thisActiveMembers = activeMembers.filter((id) => id !== memberId);
       } else {
-        if (splitMode === SPLIT_MODE.EQUAL) {
-          return prev.map((s) => {
-            return {
-              ...s,
-              splitPercentage: 100 / (activeMembers.length + 1),
-              splitAmount: totalAmount / (activeMembers.length + 1),
-            };
-          });
-        }
-        if (splitMode === SPLIT_MODE.PERCENTAGE) {
-          return prev.map((s) => {
-            if (s.userId === memberId) {
-              return { ...s, splitPercentage: 0, splitAmount: 0 };
-            }
-            return s;
-          });
-        }
-        if (splitMode === SPLIT_MODE.AMOUNT) {
-          return prev.map((s) => {
-            if (s.userId === memberId) {
-              return { ...s, splitPercentage: 0, splitAmount: 0 };
-            }
-            return s;
-          });
-        }
+        setActiveMembers((prev) => [...prev, memberId]);
+        thisActiveMembers = [...activeMembers, memberId];
       }
+      const exists = activeMembers.find((s) => s === memberId);
 
-      return prev;
-    });
-  };
-
-  console.log(splits, "SPLITS");
+      setSplits((prev) => {
+        if (exists) {
+          if (splitMode === SPLIT_MODE.EQUAL) {
+            return prev.map((s) => {
+              if (s.userId === memberId) {
+                return { ...s, splitPercentage: 0, splitAmount: 0 };
+              } else if (activeMembers.includes(s.userId)) {
+                return {
+                  ...s,
+                  splitPercentage: 100 / thisActiveMembers.length,
+                  splitAmount: totalAmount / thisActiveMembers.length,
+                };
+              }
+              return s;
+            });
+          } else {
+            return prev.map((s) => {
+              if (s.userId === memberId) {
+                return { ...s, splitPercentage: 0, splitAmount: 0 };
+              }
+              return s;
+            });
+          }
+        } else {
+          if (splitMode === SPLIT_MODE.EQUAL) {
+            return prev.map((s) => {
+              if (s.userId === memberId || activeMembers.includes(s.userId)) {
+                return {
+                  ...s,
+                  splitPercentage: 100 / thisActiveMembers.length,
+                  splitAmount: totalAmount / thisActiveMembers.length,
+                };
+              }
+              return s;
+            });
+          } else {
+            return prev.map((s) => {
+              if (s.userId === memberId) {
+                return { ...s, splitPercentage: 0, splitAmount: 0 };
+              }
+              return s;
+            });
+          }
+        }
+      });
+    },
+    [activeMembers, splitMode, totalAmount],
+  );
 
   return (
     <Modal
@@ -485,6 +464,7 @@ export default function AddExpenseModal({
                                 ),
                               )
                             }
+                            disabled={!activeMembers.includes(memberId)}
                           />
                           <span className={styles.percentSuffix}>%</span>
                         </div>
@@ -519,6 +499,7 @@ export default function AddExpenseModal({
                                 Math.max(0, parseFloat(e.target.value) || 0),
                               )
                             }
+                            disabled={!activeMembers.includes(memberId)}
                           />
                         </div>
                       </div>
