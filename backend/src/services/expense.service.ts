@@ -15,18 +15,15 @@ async function addExpense(data: IAddExpense) {
   let calculatedSplits: IExpenseSplit[] = [];
 
   if (data.splits && data.splits.length > 0) {
-    const totalRatio = data.splits.reduce((acc, s) => acc + s.splitRatio, 0);
-
     calculatedSplits = data.splits.map((split) => ({
       user_id: split.userId,
-      split_ratio: split.splitRatio,
-      share_amount: Number(
-        ((split.splitRatio / totalRatio) * data.totalAmount).toFixed(2),
-      ),
+      split_percentage: split.splitPercentage,
+      split_amount: split.splitAmount,
     }));
 
+    // Rounding adjustment logic (optional but good to keep if we double-check)
     const sumCalculated = calculatedSplits.reduce(
-      (acc, s) => acc + s.share_amount,
+      (acc, s) => acc + s.split_amount,
       0,
     );
     const diff = Number((data.totalAmount - sumCalculated).toFixed(2));
@@ -36,8 +33,8 @@ async function addExpense(data: IAddExpense) {
         (split) => split.user_id === data.paidBy,
       );
       if (findIndex !== -1) {
-        calculatedSplits[findIndex].share_amount = Number(
-          (calculatedSplits[findIndex].share_amount + diff).toFixed(2),
+        calculatedSplits[findIndex].split_amount = Number(
+          (calculatedSplits[findIndex].split_amount + diff).toFixed(2),
         );
       }
     }
@@ -50,21 +47,14 @@ async function updateExpense(id: string, data: IUpdateExpense) {
   let calculatedSplits: IExpenseSplit[] = [];
 
   if (data.splits && data.splits.length > 0 && data?.totalAmount) {
-    const totalRatio = data.splits.reduce((acc, s) => acc + s.splitRatio, 0);
-
     calculatedSplits = data.splits.map((split) => ({
       user_id: split.userId,
-      split_ratio: split.splitRatio,
-      share_amount: Number(
-        (
-          (split.splitRatio / totalRatio) *
-          (data?.totalAmount as number)
-        ).toFixed(2),
-      ),
+      split_percentage: split.splitPercentage,
+      split_amount: split.splitAmount as number,
     }));
 
     const sumCalculated = calculatedSplits.reduce(
-      (acc, s) => acc + s.share_amount,
+      (acc, s) => acc + s.split_amount,
       0,
     );
     const diff = Number((data?.totalAmount - sumCalculated).toFixed(2));
@@ -74,8 +64,8 @@ async function updateExpense(id: string, data: IUpdateExpense) {
         (split) => split.user_id === data.paidBy,
       );
       if (findIndex !== -1) {
-        calculatedSplits[findIndex].share_amount = Number(
-          (calculatedSplits[findIndex].share_amount + diff).toFixed(2),
+        calculatedSplits[findIndex].split_amount = Number(
+          (calculatedSplits[findIndex].split_amount + diff).toFixed(2),
         );
       }
     }

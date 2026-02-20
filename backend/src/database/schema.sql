@@ -51,13 +51,13 @@ CREATE TABLE expenses (
     FOREIGN KEY (paid_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
--- EXPENSE SPLITS (supports custom ratios like 12:44:44)
+-- EXPENSE SPLITS
 CREATE TABLE expense_splits (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     expense_id UUID NOT NULL,
     user_id UUID NOT NULL,
-    split_ratio INTEGER NOT NULL, -- for custom ratios like 12:44:44
-    share_amount DECIMAL(12,2) NOT NULL,
+    split_percentage DECIMAL(5,2) NOT NULL CHECK (split_percentage >= 0 AND split_percentage <= 100),
+    split_amount DECIMAL(12,2) NOT NULL CHECK (split_amount >= 0),
     FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
     CONSTRAINT unique_expense_user UNIQUE (expense_id, user_id)

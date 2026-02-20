@@ -45,7 +45,13 @@ export class ExpenseValidation {
             .array(
               z.object({
                 userId: z.string().uuid(),
-                splitRatio: z.number().int().positive(),
+                splitPercentage: z
+                  .number()
+                  .min(0, "Percentage must be at least 0")
+                  .max(100, "Percentage cannot exceed 100"),
+                splitAmount: z
+                  .number()
+                  .nonnegative("Amount cannot be negative"),
               }),
             )
             .optional(),
@@ -101,7 +107,13 @@ export class ExpenseValidation {
             .array(
               z.object({
                 userId: z.string().uuid(),
-                splitRatio: z.number().int().positive(),
+                splitPercentage: z
+                  .number()
+                  .min(0, "Percentage must be at least 0")
+                  .max(100, "Percentage cannot exceed 100"),
+                splitAmount: z
+                  .number()
+                  .nonnegative("Amount cannot be negative"),
               }),
             )
             .optional(),

@@ -5,8 +5,8 @@ import { object } from "zod";
 
 export interface IExpenseSplit {
   user_id: string;
-  split_ratio: number;
-  share_amount: number;
+  split_percentage: number;
+  split_amount: number;
 }
 
 async function createExpense({
@@ -38,10 +38,15 @@ async function createExpense({
     for (const split of splits) {
       await trx.raw(
         `
-          INSERT INTO expense_splits (id, expense_id, user_id, split_ratio, share_amount)
+          INSERT INTO expense_splits (id, expense_id, user_id, split_percentage, split_amount)
           VALUES (gen_random_uuid(), ?, ?, ?, ?)
         `,
-        [newExpense.id, split.user_id, split.split_ratio, split.share_amount],
+        [
+          newExpense.id,
+          split.user_id,
+          split.split_percentage,
+          split.split_amount,
+        ],
       );
     }
 
@@ -90,10 +95,15 @@ async function updateExpense({
       for (const split of splits) {
         await trx.raw(
           `
-            INSERT INTO expense_splits (id, expense_id, user_id, split_ratio, share_amount)
+            INSERT INTO expense_splits (id, expense_id, user_id, split_percentage, split_amount)
             VALUES (gen_random_uuid(), ?, ?, ?, ?)
           `,
-          [expenseId, split.user_id, split.split_ratio, split.share_amount],
+          [
+            expenseId,
+            split.user_id,
+            split.split_percentage,
+            split.split_amount,
+          ],
         );
       }
     }
@@ -111,8 +121,8 @@ async function getExpenseById(id: string) {
                  json_build_object(
                    'id', s.id,
                    'user_id', s.user_id,
-                   'split_ratio', s.split_ratio,
-                   'share_amount', s.share_amount,
+                   'split_percentage', s.split_percentage,
+                   'split_amount', s.split_amount,
                    'user', json_build_object(
                      'id', u.id,
                      'full_name', u.full_name,
@@ -135,36 +145,6 @@ async function getExpenseById(id: string) {
 }
 
 async function getGroupExpenses(groupId: string) {
-  // const result = await db.raw(
-  //   `
-  //     SELECT e.*,
-  //            COALESCE(
-  //              json_agg(
-  //                json_build_object(
-  //                  'id', s.id,
-  //                  'user_id', s.user_id,
-  //                  'split_ratio', s.split_ratio,
-  //                  'share_amount', s.share_amount,
-  //                  'user', json_build_object(
-  //                    'id', u.id,
-  //                    'full_name', u.full_name,
-  //                    'email', u.email,
-  //                    'avatar', u.avatar
-  //                  )
-  //                )
-  //              ) FILTER (WHERE s.id IS NOT NULL),
-  //              '[]'
-  //            ) as splits
-  //     FROM expenses e
-  //     LEFT JOIN expense_splits s ON e.id = s.expense_id
-  //     LEFT JOIN users u ON s.user_id = u.id
-  //     WHERE e.group_id = ?
-  //     GROUP BY e.id
-  //     ORDER BY e.expense_date DESC
-  //   `,
-  //   [groupId],
-  // );
-
   const result = await db.raw(
     `
     SELECT e.*,
