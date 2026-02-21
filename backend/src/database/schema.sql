@@ -79,15 +79,11 @@ CREATE TABLE payment_methods (
 -- MONTHLY SETTLEMENTS
 CREATE TABLE settlements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    expense_id UUID NOT NULL,
-    from_user UUID NOT NULL,
-    to_user UUID NOT NULL,
-    amount DECIMAL(12,2) NOT NULL,
+    expense_split_id UUID NOT NULL,
     status VARCHAR(10) DEFAULT 'pending', -- pending / paid
     proof_image JSONB, -- stores payment screenshot details
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE,
-    FOREIGN KEY (from_user) REFERENCES users(id) ON DELETE RESTRICT,
-    FOREIGN KEY (to_user) REFERENCES users(id) ON DELETE RESTRICT
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (expense_split_id) REFERENCES expense_splits(id) ON DELETE CASCADE
 );
 
