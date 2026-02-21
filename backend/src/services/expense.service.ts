@@ -40,6 +40,8 @@ async function addExpense(data: IAddExpense) {
     }
   }
 
+  delete data.splits;
+
   return await expenseDao.createExpense({ data, splits: calculatedSplits });
 }
 
