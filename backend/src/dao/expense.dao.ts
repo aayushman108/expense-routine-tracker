@@ -149,11 +149,10 @@ async function getGroupExpenses(groupId: string) {
     `
     SELECT e.*,
        COALESCE(
-         json_agg(
-           json_build_object(
-             'split', to_jsonb(s),
-             'user', to_jsonb(u)
-           )
+         jsonb_agg(
+          to_jsonb(s) || jsonb_build_object(
+            'user', to_jsonb(u)
+          )
          ) FILTER (WHERE s.id IS NOT NULL),
          '[]'
        ) AS splits
