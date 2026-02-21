@@ -144,33 +144,56 @@ async function getExpenseById(id: string) {
   return result.rows[0];
 }
 
-async function getGroupExpenses(groupId: string) {
+async function getGroupExpenses(
+  groupId: string,
+  limit: number,
+  offset: number,
+) {
   // The || operator merges JSON objects.
-  const result = await db.raw(
-    `
-    SELECT e.*,
-       COALESCE(
-         jsonb_agg(
-          to_jsonb(s) || jsonb_build_object(
-            'user', to_jsonb(u)
-          )
-         ) FILTER (WHERE s.id IS NOT NULL),
-         '[]'
-       ) AS splits
-    FROM expenses e
-    LEFT JOIN expense_splits s ON e.id = s.expense_id
-    LEFT JOIN users u ON s.user_id = u.id
-    WHERE e.group_id = ?
-    GROUP BY e.id
-    ORDER BY e.expense_date DESC
-    `,
+
+  const totalCount = await db.raw(
+    `SELECT COUNT(*) AS total_count
+     FROM expenses
+     WHERE group_id = ?`,
     [groupId],
   );
 
-  return result.rows;
+  const total = Number(totalCount.rows[0].total_count);
+
+  const dataResult = await db.raw(
+    `
+    SELECT e.*,
+       splits.data AS splits
+    FROM (
+      SELECT *
+      FROM expenses
+      WHERE group_id = ?
+      ORDER BY expense_date DESC
+      LIMIT ? OFFSET ?
+    ) e
+    LEFT JOIN LATERAL (
+      SELECT 
+        COALESCE(
+          jsonb_agg(
+            (to_jsonb(s) - ARRAY['expense_id', 'user_id']) || jsonb_build_object(
+              'user', to_jsonb(u)
+            )
+          ),
+          '[]'::jsonb
+        ) AS data
+      FROM expense_splits s
+      LEFT JOIN users u ON s.user_id = u.id
+      WHERE s.expense_id = e.id
+    ) splits ON true
+    ORDER BY e.expense_date DESC
+    `,
+    [groupId, limit, offset],
+  );
+
+  return { total, data: dataResult.rows };
 }
 
-async function getUserExpenses(userId: string) {
+async function getUserExpenses(userId: string, limit: number, offset: number) {
   const result = await db.raw(
     `
       SELECT e.*
@@ -179,8 +202,9 @@ async function getUserExpenses(userId: string) {
         SELECT expense_id FROM expense_splits WHERE user_id = ?
       )
       ORDER BY e.expense_date DESC
+      LIMIT ? OFFSET ?
     `,
-    [userId, userId],
+    [userId, userId, limit, offset],
   );
   return result.rows;
 }

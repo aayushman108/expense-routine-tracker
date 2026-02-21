@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { expenseService } from "../services/expense.service";
 import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccessResponse } from "../utils/successResponseHandler.utils";
+import { generatePaginationObj } from "src/utils";
 
 const createExpense = asyncHandler(async (req: Request, res: Response) => {
   const expense = await expenseService.addExpense({
@@ -39,16 +40,46 @@ const getExpense = asyncHandler(async (req: Request, res: Response) => {
 
 const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
   const { groupId } = req.params;
-  const expenses = await expenseService.getGroupExpenses(groupId);
+  const { page, limit } = req.query;
+  const pageNumber = Number(page || 1);
+  const pageLimit = Number(limit || 10);
+  const pageOffset = Number((pageNumber - 1) * pageLimit);
+
+  const expenses = await expenseService.getGroupExpenses(
+    groupId,
+    pageLimit,
+    pageOffset,
+  );
+
+  const { total, data } = expenses;
+
+  const pagination = generatePaginationObj({
+    total,
+    page: pageNumber,
+    limit: pageLimit,
+  });
   return sendSuccessResponse(res, {
-    data: expenses,
+    data: {
+      data,
+      pagination,
+    },
     message: "Group expenses fetched successfully",
   });
 });
 
 const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
-  const expenses = await expenseService.getPersonalExpenses(userId);
+
+  const { page, limit } = req.query;
+  const pageNumber = Number(page || 1);
+  const pageLimit = Number(limit || 10);
+  const pageOffset = Number((pageNumber - 1) * pageLimit);
+
+  const expenses = await expenseService.getPersonalExpenses(
+    userId,
+    pageLimit,
+    pageOffset,
+  );
   return sendSuccessResponse(res, {
     data: expenses,
     message: "User expenses fetched successfully",

@@ -84,12 +84,20 @@ async function getExpenseDetails(id: string) {
   return await expenseDao.getExpenseById(id);
 }
 
-async function getGroupExpenses(groupId: string) {
-  return await expenseDao.getGroupExpenses(groupId);
+async function getGroupExpenses(
+  groupId: string,
+  limit: number,
+  offset: number,
+) {
+  return await expenseDao.getGroupExpenses(groupId, limit, offset);
 }
 
-async function getPersonalExpenses(userId: string) {
-  return await expenseDao.getUserExpenses(userId);
+async function getPersonalExpenses(
+  userId: string,
+  limit: number,
+  offset: number,
+) {
+  return await expenseDao.getUserExpenses(userId, limit, offset);
 }
 
 async function deleteExpense(id: string) {
