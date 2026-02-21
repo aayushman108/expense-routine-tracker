@@ -145,6 +145,7 @@ async function getExpenseById(id: string) {
 }
 
 async function getGroupExpenses(groupId: string) {
+  // The || operator merges JSON objects.
   const result = await db.raw(
     `
     SELECT e.*,
