@@ -68,20 +68,30 @@ const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
-  const userId = (req as any).user?.id;
+  const userId = req.userId as string;
 
   const { page, limit } = req.query;
   const pageNumber = Number(page || 1);
   const pageLimit = Number(limit || 10);
   const pageOffset = Number((pageNumber - 1) * pageLimit);
 
-  const expenses = await expenseService.getPersonalExpenses(
+  const { total, data } = await expenseService.getPersonalExpenses(
     userId,
     pageLimit,
     pageOffset,
   );
+
+  const pagination = generatePaginationObj({
+    total,
+    page: pageNumber,
+    limit: pageLimit,
+  });
+
   return sendSuccessResponse(res, {
-    data: expenses,
+    data: {
+      data,
+      pagination,
+    },
     message: "User expenses fetched successfully",
   });
 });
