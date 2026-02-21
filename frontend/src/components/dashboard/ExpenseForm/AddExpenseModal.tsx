@@ -178,22 +178,25 @@ export default function AddExpenseModal({
         splitAmount: Number(s.splitAmount),
       }));
 
-    const payload = {
+    const body = {
       ...form,
       totalAmount: Number(form.totalAmount) || 0,
       splits: submissionSplits,
     };
 
-    await handleThunk(dispatch(createExpense(payload)), () => {
-      dispatch(addToast({ type: "success", message: "Expense added!" }));
-      onClose();
-      setForm((prev) => ({
-        ...prev,
-        description: "",
-        totalAmount: "",
-        expenseDate: new Date().toISOString().split("T")[0],
-      }));
-    });
+    await handleThunk(
+      dispatch(createExpense({ body, params: { groupId } })),
+      () => {
+        dispatch(addToast({ type: "success", message: "Expense added!" }));
+        onClose();
+        setForm((prev) => ({
+          ...prev,
+          description: "",
+          totalAmount: "",
+          expenseDate: new Date().toISOString().split("T")[0],
+        }));
+      },
+    );
   };
 
   const currencyOptions = Object.values(SUPPORTED_CURRENCIES).map((curr) => ({

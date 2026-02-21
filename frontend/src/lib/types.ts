@@ -112,10 +112,14 @@ export interface AuthResponse {
 }
 
 export interface CreateExpensePayload {
-  groupId?: string | null;
-  totalAmount: number;
-  description?: string;
-  expenseDate: string;
-  currency?: string;
-  splits: { userId: string; splitPercentage: number; splitAmount: number }[];
+  body: {
+    totalAmount: number;
+    description?: string;
+    expenseDate: string;
+    currency?: string;
+    splits: { userId: string; splitPercentage: number; splitAmount: number }[];
+  };
+  params: {
+    groupId?: string | null;
+  };
 }
