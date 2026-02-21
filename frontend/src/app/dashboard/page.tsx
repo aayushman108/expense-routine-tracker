@@ -41,9 +41,30 @@ export default function DashboardPage() {
   }, [dispatch]);
 
   const totalSpent = expenses.reduce(
-    (acc: number, curr: any) => acc + Number(curr.total_amount),
+    (acc: number, curr: any) =>
+      acc + Number(curr.user_amount || curr.total_amount),
     0,
   );
+
+  const owedToYou = expenses.reduce((total, exp) => {
+    if (!exp.settlements) return total;
+    return (
+      total +
+      exp.settlements
+        .filter((s) => s.to_user === user?.id && s.status === "pending")
+        .reduce((sum, s) => sum + Number(s.amount), 0)
+    );
+  }, 0);
+
+  const youOwe = expenses.reduce((total, exp) => {
+    if (!exp.settlements) return total;
+    return (
+      total +
+      exp.settlements
+        .filter((s) => s.from_user === user?.id && s.status === "pending")
+        .reduce((sum, s) => sum + Number(s.amount), 0)
+    );
+  }, 0);
 
   const stats = [
     {
@@ -54,19 +75,19 @@ export default function DashboardPage() {
     },
     {
       label: "Active Groups",
-      value: groups?.totalGroups,
+      value: groups?.totalGroups || 0,
       icon: <HiOutlineUserGroup />,
       color: "green",
     },
     {
       label: "Owed to You",
-      value: "रू 12,450",
+      value: `रू ${owedToYou.toLocaleString()}`,
       icon: <HiOutlineTrendingUp />,
       color: "orange",
     },
     {
       label: "You Owe",
-      value: "रू 3,200",
+      value: `रू ${youOwe.toLocaleString()}`,
       icon: <HiOutlineTrendingDown />,
       color: "red",
     },

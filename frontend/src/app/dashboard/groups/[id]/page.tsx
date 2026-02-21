@@ -9,6 +9,7 @@ import {
   HiOutlineUserAdd,
   HiOutlineCurrencyDollar,
   HiOutlineChartPie,
+  HiCheck,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
@@ -66,11 +67,26 @@ export default function GroupDetailsPage() {
     );
   }, [groupExpenses]);
 
-  const myContribution = useMemo(() => {
+  const netPosition = useMemo(() => {
     if (!user) return 0;
-    return groupExpenses
-      .filter((e) => e.paid_by === user.id)
-      .reduce((acc, curr) => acc + Number(curr.total_amount), 0);
+    let owedToMe = 0;
+    let iOwe = 0;
+
+    groupExpenses.forEach((exp) => {
+      exp.settlements?.forEach((s: any) => {
+        const toId = s.to_user?.id || s.to_user;
+        const fromId = s.from_user?.id || s.from_user;
+
+        if (toId === user.id && s.status === "pending") {
+          owedToMe += Number(s.amount);
+        }
+        if (fromId === user.id && s.status === "pending") {
+          iOwe += Number(s.amount);
+        }
+      });
+    });
+
+    return owedToMe - iOwe;
   }, [groupExpenses, user]);
 
   const getInitials = (name?: string) => {
@@ -192,7 +208,16 @@ export default function GroupDetailsPage() {
                         <span className={styles.month}>{month}</span>
                       </div>
                       <div className={styles.info}>
-                        <div className={styles.desc}>{expense.description}</div>
+                        <div className={styles.desc}>
+                          {expense.description}
+                          {expense.settlement_status && (
+                            <span
+                              className={`${styles.statusBadge} ${styles[expense.settlement_status]}`}
+                            >
+                              {expense.settlement_status}
+                            </span>
+                          )}
+                        </div>
                         <div className={styles.payer}>
                           {isPayer ? (
                             <span
@@ -204,7 +229,11 @@ export default function GroupDetailsPage() {
                               You
                             </span>
                           ) : (
-                            <span>{expense.payer?.fullName || "Member"}</span>
+                            <span>
+                              {expense.payer?.full_name ||
+                                expense.payer_name ||
+                                "Member"}
+                            </span>
                           )}{" "}
                           paid{" "}
                           <span
@@ -213,6 +242,7 @@ export default function GroupDetailsPage() {
                               color: "var(--color-primary)",
                             }}
                           >
+                            {expense.currency}{" "}
                             {Number(expense.total_amount).toLocaleString()}
                           </span>
                         </div>
@@ -252,31 +282,73 @@ export default function GroupDetailsPage() {
             </div>
           ) : (
             <div className={styles.settlements}>
-              {/* Dummy Data for Settlements - to be implemented */}
-              <div className="mb-6">
-                <h4 className="text-xs font-bold mb-4 text-tertiary uppercase tracking-wider flex items-center gap-2">
-                  January 2026
-                </h4>
-                <div className={styles.settlementCard}>
-                  <div className={styles.party}>
-                    <div className={styles.label}>OWES</div>
-                    <div className={styles.name}>Anil Sharma</div>
+              {groupExpenses.some((e: any) => e.settlements?.length > 0) ? (
+                groupExpenses
+                  .filter((e: any) => e.settlements?.length > 0)
+                  .map((expense: any) => (
+                    <div key={`exp-set-${expense.id}`} className="mb-6">
+                      <h4 className="text-xs font-bold mb-4 text-tertiary uppercase tracking-wider flex items-center gap-2">
+                        {expense.description} —{" "}
+                        {new Date(expense.expense_date).toLocaleDateString()}
+                      </h4>
+                      {expense.settlements.map((settlement: any) => (
+                        <div
+                          key={settlement.id}
+                          className={styles.settlementCard}
+                        >
+                          <div className={styles.party}>
+                            <div className={styles.label}>OWES</div>
+                            <div className={styles.name}>
+                              {settlement.from_user?.id === user?.id
+                                ? "You"
+                                : settlement.from_user?.full_name}
+                            </div>
+                          </div>
+                          <span className={styles.arrow}>
+                            <HiOutlineArrowRight />
+                          </span>
+                          <div className={styles.party}>
+                            <div className={styles.label}>TO</div>
+                            <div className={styles.name}>
+                              {settlement.to_user?.id === user?.id
+                                ? "You"
+                                : settlement.to_user?.full_name}
+                            </div>
+                          </div>
+                          <div className={styles.amountWrap}>
+                            <div className={styles.amount}>
+                              {expense.currency}{" "}
+                              {Number(settlement.amount).toLocaleString()}
+                            </div>
+                            {settlement.status === "pending" ? (
+                              settlement.from_user?.id === user?.id ? (
+                                <Button variant="primary" size="sm">
+                                  Pay Now
+                                </Button>
+                              ) : (
+                                <span className={styles.pendingBadge}>
+                                  Pending
+                                </span>
+                              )
+                            ) : (
+                              <span className={styles.paidBadge}>Settled</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))
+              ) : (
+                <div className={styles.emptyStateCard}>
+                  <div className={styles.icon}>
+                    <HiCheck />
                   </div>
-                  <span className={styles.arrow}>
-                    <HiOutlineArrowRight />
-                  </span>
-                  <div className={styles.party}>
-                    <div className={styles.label}>TO</div>
-                    <div className={styles.name}>Aayushman</div>
-                  </div>
-                  <div className={styles.amountWrap}>
-                    <div className={styles.amount}>रू 4,500</div>
-                    <Button variant="primary" size="sm">
-                      Pay Now
-                    </Button>
-                  </div>
+                  <p className={styles.title}>All settled up!</p>
+                  <p className={styles.subtext}>
+                    No pending settlements for this group at the moment.
+                  </p>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </main>
@@ -295,9 +367,17 @@ export default function GroupDetailsPage() {
                 </span>
               </div>
               <div className={styles.statsRow}>
-                <span className={styles.statLabel}>Your Share</span>
-                <span className={`${styles.statValue} ${styles.success}`}>
-                  रू {myContribution.toLocaleString()}
+                <span className={styles.statLabel}>Your Net Balance</span>
+                <span
+                  className={`${styles.statValue} ${
+                    netPosition > 0
+                      ? styles.success
+                      : netPosition < 0
+                        ? styles.danger
+                        : ""
+                  }`}
+                >
+                  {netPosition > 0 ? "+" : ""} रू {netPosition.toLocaleString()}
                 </span>
               </div>
               <div className={styles.createdInfo}>

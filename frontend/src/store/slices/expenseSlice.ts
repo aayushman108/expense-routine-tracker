@@ -25,7 +25,8 @@ export const fetchUserExpenses = createAsyncThunk<Expense[]>(
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await api.get("/expenses/user");
-      return data.data || data;
+      // data: { success, data: { data: Expense[], pagination: ... } }
+      return data.data?.data || data.data || data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(
@@ -40,7 +41,8 @@ export const fetchGroupExpenses = createAsyncThunk<Expense[], string>(
   async (groupId, { rejectWithValue }) => {
     try {
       const { data } = await api.get(`/expenses/group/${groupId}`);
-      return data.data || data;
+      // data: { success, data: { data: Expense[], pagination: ... } }
+      return data.data?.data || data.data || data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(
@@ -55,7 +57,7 @@ export const fetchExpenseById = createAsyncThunk<Expense, string>(
   async (expenseId, { rejectWithValue }) => {
     try {
       const { data } = await api.get(`/expenses/${expenseId}`);
-      return data.data || data;
+      return data.data?.data || data.data || data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(
@@ -73,7 +75,7 @@ export const createExpense = createAsyncThunk<Expense, CreateExpensePayload>(
         `/expenses/group/${payload.params.groupId}`,
         payload.body,
       );
-      return data.data || data;
+      return data.data?.data || data.data || data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(

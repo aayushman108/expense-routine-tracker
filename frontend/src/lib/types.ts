@@ -37,22 +37,25 @@ export interface Expense {
   id: string;
   group_id: string | null;
   paid_by: string;
-  total_amount: number;
+  total_amount: number | string;
   description?: string;
   expense_date: string;
   currency: string;
   created_at: string;
+  updated_at?: string;
   payer?: User;
   splits?: ExpenseSplit[];
+  settlements?: Settlement[];
+  settlement_status?: "pending" | "paid" | "personal";
 }
 
 export interface ExpenseSplit {
   id: string;
-  expense_id: string;
-  user_id: string;
-  split_ratio: number;
-  share_amount: number;
-  user?: User;
+  expense_id?: string;
+  user_id?: string;
+  split_percentage: number;
+  split_amount: number;
+  user: User;
 }
 
 export interface PaymentMethod {
@@ -68,12 +71,12 @@ export interface PaymentMethod {
 
 export interface Settlement {
   id: string;
-  group_id: string;
-  from_user: string;
-  to_user: string;
+  expense_id: string;
+  from_user: string | User;
+  to_user: string | User;
   amount: number;
-  settlement_month: string;
   status: "pending" | "paid";
+  proof_image?: { url: string; publicId: string } | null;
   created_at: string;
   from_user_details?: User;
   to_user_details?: User;
@@ -86,10 +89,14 @@ export interface ApiResponse<T = unknown> {
   data?: T;
 }
 
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  page: number;
-  limit: number;
-  total: number;
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 // ── Auth types ──
