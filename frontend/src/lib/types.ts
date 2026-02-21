@@ -44,8 +44,8 @@ export interface Expense {
   created_at: string;
   updated_at?: string;
   payer?: User;
+  payer_name?: string;
   splits?: ExpenseSplit[];
-  settlements?: Settlement[];
   settlement_status?: "pending" | "paid" | "personal";
 }
 
@@ -56,6 +56,7 @@ export interface ExpenseSplit {
   split_percentage: number;
   split_amount: number;
   user: User;
+  settlement?: Settlement | null;
 }
 
 export interface PaymentMethod {
@@ -71,15 +72,14 @@ export interface PaymentMethod {
 
 export interface Settlement {
   id: string;
-  expense_id: string;
-  from_user: string | User;
-  to_user: string | User;
+  expense_id?: string;
+  expense_split_id?: string;
+  from_user: User;
+  to_user: User;
   amount: number;
   status: "pending" | "paid";
   proof_image?: { url: string; publicId: string } | null;
   created_at: string;
-  from_user_details?: User;
-  to_user_details?: User;
 }
 
 // ── API Response types ──

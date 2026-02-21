@@ -17,12 +17,23 @@
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-xl);
   width: 90%;
-  max-width: 520px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &.sm {
+    max-width: 400px;
+  }
+
+  &.md {
+    max-width: 520px;
+  }
+
+  &.lg {
+    max-width: 680px;
+  }
 }
 
 .header {

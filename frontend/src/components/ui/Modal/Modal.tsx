@@ -11,6 +11,7 @@ interface ModalProps {
   title?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  size?: "sm" | "md" | "lg";
 }
 
 export default function Modal({
@@ -19,6 +20,7 @@ export default function Modal({
   title,
   children,
   footer,
+  size,
 }: ModalProps) {
   const handleEsc = useCallback(
     (e: KeyboardEvent) => {
@@ -42,7 +44,10 @@ export default function Modal({
 
   return createPortal(
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`${styles.modal} ${styles[size || "md"]}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {title && (
           <div className={styles.header}>
             <h2>{title}</h2>

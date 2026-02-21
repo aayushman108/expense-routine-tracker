@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
+import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
 import InviteUserModal from "@/components/dashboard/GroupMembers/InviteUserModal";
 import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
 import styles from "./group-details.module.scss";
@@ -42,6 +43,9 @@ export default function GroupDetailsPage() {
     "expenses",
   );
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
+    null,
+  );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 
@@ -202,7 +206,11 @@ export default function GroupDetailsPage() {
                   const isPayer = expense.paid_by === user?.id;
 
                   return (
-                    <div key={expense.id} className={styles.expenseCard}>
+                    <div
+                      key={expense.id}
+                      className={styles.expenseCard}
+                      onClick={() => setSelectedExpenseId(expense.id)}
+                    >
                       <div className={styles.date}>
                         <span className={styles.day}>{day}</span>
                         <span className={styles.month}>{month}</span>
@@ -473,6 +481,12 @@ export default function GroupDetailsPage() {
         onClose={() => setIsAddMemberModalOpen(false)}
         groupId={id as string}
         existingMemberIds={members.map((m: GroupMember) => m.user_id)}
+      />
+
+      <ExpenseDetailsModal
+        isOpen={!!selectedExpenseId}
+        onClose={() => setSelectedExpenseId(null)}
+        expenseId={selectedExpenseId}
       />
     </div>
   );

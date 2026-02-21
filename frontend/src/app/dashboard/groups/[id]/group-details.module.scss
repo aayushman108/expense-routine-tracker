@@ -216,6 +216,15 @@
   align-items: center;
   gap: $space-5;
   padding: $space-4 $space-6;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--color-primary-300);
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
 
   .date {
     @include flex-center;

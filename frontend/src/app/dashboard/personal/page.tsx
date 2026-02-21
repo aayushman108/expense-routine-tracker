@@ -16,6 +16,7 @@ import { fetchUserExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
+import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./personal.module.scss";
 import type { RootState } from "@/store";
@@ -27,6 +28,9 @@ export default function PersonalDetailsPage() {
     (s: RootState) => s.expenses,
   );
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     dispatch(fetchUserExpenses());
@@ -134,7 +138,11 @@ export default function PersonalDetailsPage() {
         <div className={styles.list}>
           {personalExpenses.length > 0 ? (
             personalExpenses.map((expense: any) => (
-              <div key={expense.id} className={styles.expenseItem}>
+              <div
+                key={expense.id}
+                className={styles.expenseItem}
+                onClick={() => setSelectedExpenseId(expense.id)}
+              >
                 <div className={styles.iconWrap}>
                   {getCategoryIcon(expense.description || "")}
                 </div>
@@ -174,6 +182,12 @@ export default function PersonalDetailsPage() {
       <AddExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
+      />
+
+      <ExpenseDetailsModal
+        isOpen={!!selectedExpenseId}
+        onClose={() => setSelectedExpenseId(null)}
+        expenseId={selectedExpenseId}
       />
     </div>
   );
