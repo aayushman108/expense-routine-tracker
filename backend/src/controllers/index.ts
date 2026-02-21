@@ -2,3 +2,4 @@ export * from "./auth.controller";
 export * from "./expense.controller";
 export * from "./group.controller";
 export * from "./user.controller";
+export * from "./settlement.controller";

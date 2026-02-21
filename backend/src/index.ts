@@ -1,6 +1,12 @@
 import express from "express";
 import cors from "cors";
-import { authRouter, expenseRouter, groupRouter, userRouter } from "./routes";
+import {
+  authRouter,
+  expenseRouter,
+  groupRouter,
+  userRouter,
+  settlementRouter,
+} from "./routes";
 import { errorHandler, verifyJWT } from "./middlewares";
 import cookieParser from "cookie-parser";
 import "./config/cloudinary.config";
@@ -44,6 +50,7 @@ app.use(verifyJWT);
 app.use("/api/expenses", expenseRouter);
 app.use("/api/groups", groupRouter);
 app.use("/api/users", userRouter);
+app.use("/api/settlements", settlementRouter);
 
 app.use(errorHandler);
 
