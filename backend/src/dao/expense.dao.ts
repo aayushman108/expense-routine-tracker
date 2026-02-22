@@ -1,7 +1,6 @@
 import { keysToSnakeCase } from "src/utils/caseConverter";
 import { db } from "../database/db";
 import { IAddExpense, IUpdateExpense } from "../services/expense.service";
-import { object } from "zod";
 
 export interface IExpenseSplit {
   user_id: string;
@@ -36,11 +35,10 @@ async function createExpense({
     const newExpense = expenseResult.rows[0];
 
     for (const split of splits) {
-      const splitResult = await trx.raw(
+      await trx.raw(
         `
           INSERT INTO expense_splits (id, expense_id, user_id, split_percentage, split_amount)
           VALUES (gen_random_uuid(), ?, ?, ?, ?)
-          RETURNING id
         `,
         [
           newExpense.id,
@@ -49,19 +47,6 @@ async function createExpense({
           split.split_amount,
         ],
       );
-
-      const splitId = splitResult.rows[0].id;
-
-      // Create a pending settlement for each person who is not the payer
-      if (split.user_id !== data.paidBy) {
-        await trx.raw(
-          `
-            INSERT INTO settlements (id, expense_split_id, status)
-            VALUES (gen_random_uuid(), ?, 'pending')
-          `,
-          [splitId],
-        );
-      }
     }
 
     return newExpense;
@@ -106,10 +91,7 @@ async function updateExpense({
       await trx.raw(`DELETE FROM expense_splits WHERE expense_id = ?`, [
         expenseId,
       ]);
-      // Also delete existing settlements for this expense to recreate them
-      await trx.raw(`DELETE FROM settlements WHERE expense_id = ?`, [
-        expenseId,
-      ]);
+      // Settlements are cascade-deleted through expense_splits (ON DELETE CASCADE)
 
       const currentExpense = await trx.raw(
         `SELECT group_id, paid_by FROM expenses WHERE id = ?`,
@@ -118,11 +100,10 @@ async function updateExpense({
       const { group_id, paid_by } = currentExpense.rows[0];
 
       for (const split of splits) {
-        const splitResult = await trx.raw(
+        await trx.raw(
           `
             INSERT INTO expense_splits (id, expense_id, user_id, split_percentage, split_amount)
             VALUES (gen_random_uuid(), ?, ?, ?, ?)
-            RETURNING id
           `,
           [
             expenseId,
@@ -131,19 +112,6 @@ async function updateExpense({
             split.split_amount,
           ],
         );
-
-        const splitId = splitResult.rows[0].id;
-
-        // Recreate pending settlement if it's a group expense
-        if (split.user_id !== paid_by) {
-          await trx.raw(
-            `
-              INSERT INTO settlements (id, expense_split_id, status)
-              VALUES (gen_random_uuid(), ?, 'pending')
-            `,
-            [splitId],
-          );
-        }
       }
     }
 
@@ -158,11 +126,11 @@ async function getExpenseById(id: string) {
              to_jsonb(p) AS payer,
              COALESCE(
                jsonb_agg(
-               to_jsonb(s) - ARRAY['expense_id', 'user_id'] || 
+               to_jsonb(s) - ARRAY['expense_id', 'user_id', 'settlement_id'] || 
                jsonb_build_object(
                    'user', to_jsonb(u),
                    'settlement', CASE WHEN st.id IS NOT NULL THEN
-                     to_jsonb(st) - ARRAY['expense_split_id']
+                     to_jsonb(st)
                    ELSE NULL END
                  )
                ) FILTER (WHERE s.id IS NOT NULL),
@@ -175,17 +143,19 @@ async function getExpenseById(id: string) {
       LEFT JOIN users p ON e.paid_by = p.id
       LEFT JOIN expense_splits s ON e.id = s.expense_id
       LEFT JOIN users u ON s.user_id = u.id
-      LEFT JOIN settlements st ON s.id = st.expense_split_id
+      LEFT JOIN settlements st ON s.settlement_id = st.id
       LEFT JOIN LATERAL (
         SELECT 
           CASE 
-            WHEN COUNT(*) = 0 THEN 'pending'
-            WHEN BOOL_AND(st_inner.status = 'paid') THEN 'paid'
+            WHEN COUNT(*) = 0 THEN 'confirmed'
+            WHEN BOOL_AND(COALESCE(st_inner.status = 'confirmed', FALSE)) THEN 'confirmed'
+            WHEN BOOL_AND(COALESCE(st_inner.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
             ELSE 'pending'
           END AS overall_status
         FROM expense_splits es_inner
-        JOIN settlements st_inner ON es_inner.id = st_inner.expense_split_id
+        LEFT JOIN settlements st_inner ON es_inner.settlement_id = st_inner.id
         WHERE es_inner.expense_id = e.id
+        AND es_inner.user_id != e.paid_by
       ) settlement_info ON true
       WHERE e.id = ?
       GROUP BY e.id, p.id, settlement_info.overall_status
@@ -229,10 +199,10 @@ async function getGroupExpenses(
       SELECT 
         COALESCE(
           jsonb_agg(
-            (to_jsonb(s) - ARRAY['expense_id', 'user_id']) || jsonb_build_object(
+            (to_jsonb(s) - ARRAY['expense_id', 'user_id', 'settlement_id']) || jsonb_build_object(
               'user', to_jsonb(u),
               'settlement', CASE WHEN st.id IS NOT NULL THEN
-              to_jsonb(st) - ARRAY['expense_split_id']
+              to_jsonb(st)
               ELSE NULL END
             )
           ),
@@ -240,19 +210,21 @@ async function getGroupExpenses(
         ) AS data
       FROM expense_splits s
       LEFT JOIN users u ON s.user_id = u.id
-      LEFT JOIN settlements st ON s.id = st.expense_split_id
+      LEFT JOIN settlements st ON s.settlement_id = st.id
       WHERE s.expense_id = e.id
     ) splits ON true
     LEFT JOIN LATERAL (
       SELECT 
         CASE 
-          WHEN COUNT(*) = 0 THEN 'pending'
-          WHEN BOOL_AND(st_inner.status = 'paid') THEN 'paid'
+          WHEN COUNT(*) = 0 THEN 'confirmed'
+          WHEN BOOL_AND(COALESCE(st_inner.status = 'confirmed', FALSE)) THEN 'confirmed'
+          WHEN BOOL_AND(COALESCE(st_inner.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
           ELSE 'pending'
         END AS overall_status
       FROM expense_splits es_inner
-      JOIN settlements st_inner ON es_inner.id = st_inner.expense_split_id
+      LEFT JOIN settlements st_inner ON es_inner.settlement_id = st_inner.id
       WHERE es_inner.expense_id = e.id
+      AND es_inner.user_id != e.paid_by
     ) settlement_info ON true
     ORDER BY e.expense_date DESC
     `,
@@ -307,7 +279,7 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
       SELECT 
         COALESCE(
           jsonb_agg(
-            (to_jsonb(s) - ARRAY['expense_id', 'user_id']) || jsonb_build_object(
+            (to_jsonb(s) - ARRAY['expense_id', 'user_id', 'settlement_id']) || jsonb_build_object(
               'user', to_jsonb(u),
               'settlement', CASE WHEN st.id IS NOT NULL THEN
                 jsonb_build_object(
@@ -323,20 +295,21 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
         ) AS data
       FROM expense_splits s
       LEFT JOIN users u ON s.user_id = u.id
-      LEFT JOIN settlements st ON s.id = st.expense_split_id
+      LEFT JOIN settlements st ON s.settlement_id = st.id
       WHERE s.expense_id = e.id
     ) splits ON true
     LEFT JOIN LATERAL (
       SELECT 
         CASE 
-          WHEN COUNT(*) = 0 THEN 'pending'
-          WHEN BOOL_AND(st.status = 'paid') THEN 'paid'
+          WHEN COUNT(*) = 0 THEN 'confirmed'
+          WHEN BOOL_AND(COALESCE(st.status = 'confirmed', FALSE)) THEN 'confirmed'
+          WHEN BOOL_AND(COALESCE(st.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
           ELSE 'pending'
         END AS overall_status,
-        COALESCE(SUM(es.split_amount) FILTER (WHERE e.paid_by = ? AND st.status = 'pending'), 0) AS total_others_pending,
+        COALESCE(SUM(es.split_amount) FILTER (WHERE e.paid_by = ? AND (st.id IS NULL OR st.status = 'pending')), 0) AS total_others_pending,
         COALESCE(SUM(es.split_amount) FILTER (WHERE es.user_id = ? AND st.status = 'paid'), 0) AS total_paid_by_me
       FROM expense_splits es
-      JOIN settlements st ON es.id = st.expense_split_id
+      LEFT JOIN settlements st ON es.settlement_id = st.id
       LEFT JOIN users fu ON es.user_id = fu.id
       WHERE es.expense_id = e.id
       AND (es.user_id = ? OR e.paid_by = ?)
@@ -344,18 +317,17 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
     ORDER BY e.expense_date DESC
     `,
     [
-      userId, // for user_amount calculation (payer case)
-      userId, // for my split lookup
-      userId, // for my split lookup
-      userId, // for others' pending debt to me
-      userId, // e.paid_by subquery
-      userId, // e.id in subquery
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
       limit,
       offset,
-      userId, // total_others_pending filter
-      userId, // total_paid_by_me filter
-      userId, // lateral join user filter
-      userId, // lateral join user filter
+      userId,
+      userId,
+      userId,
+      userId,
     ],
   );
 
@@ -367,21 +339,6 @@ async function deleteExpense(id: string) {
   return true;
 }
 
-async function updateSettlementStatus(
-  settlementId: string,
-  status: "pending" | "paid",
-  proofImage?: { url: string; publicId: string },
-) {
-  const result = await db.raw(
-    `UPDATE settlements 
-     SET status = ?, proof_image = ? 
-     WHERE id = ? 
-     RETURNING *`,
-    [status, proofImage ? JSON.stringify(proofImage) : null, settlementId],
-  );
-  return result.rows[0];
-}
-
 export const expenseDao = {
   createExpense,
   updateExpense,
@@ -389,5 +346,4 @@ export const expenseDao = {
   getGroupExpenses,
   getUserExpenses,
   deleteExpense,
-  updateSettlementStatus,
 };
