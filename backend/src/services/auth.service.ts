@@ -124,7 +124,8 @@ async function refreshAccessToken(refreshToken: string) {
       throw new NotFoundError("User not found");
     }
 
-    return jwtService.generateAccessToken(user);
+    const accessToken = jwtService.generateAccessToken(user);
+    return { accessToken, user: { ...user, password_hash: undefined } };
   } catch (error) {
     throw new UnAuthorizedError("Invalid or expired refresh token.");
   }

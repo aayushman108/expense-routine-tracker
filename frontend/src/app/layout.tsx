@@ -21,7 +21,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
-      <body>
+      <body suppressHydrationWarning>
         <AppProvider>
           {children}
           <ToastContainer />

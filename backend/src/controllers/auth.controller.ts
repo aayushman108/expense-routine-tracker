@@ -80,11 +80,12 @@ const refresh = asyncHandler(async (req: Request, res: Response) => {
 
   const refreshToken = cookies.jwt;
 
-  const accessToken = await authService.refreshAccessToken(refreshToken);
+  const { accessToken, user } =
+    await authService.refreshAccessToken(refreshToken);
 
   return sendSuccessResponse(res, {
     message: "Token refreshed successfully.",
-    data: { accessToken },
+    data: { accessToken, user },
     statusCode: HttpStatusCode.OK,
   });
 });
