@@ -5,6 +5,7 @@ import expenseReducer from "./slices/expenseSlice";
 import themeReducer from "./slices/themeSlice";
 import uiReducer from "./slices/uiSlice";
 import userReducer from "./slices/userSlice";
+import settlementReducer from "./slices/settlementSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     theme: themeReducer,
     ui: uiReducer,
     users: userReducer,
+    settlements: settlementReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

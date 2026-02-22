@@ -109,13 +109,13 @@ export default function Sidebar() {
         <div className={styles.userCard}>
           <div className={styles.avatar}>
             {user?.avatar?.url ? (
-              <img src={user.avatar.url} alt={user.fullName} />
+              <img src={user.avatar.url} alt={user.full_name} />
             ) : (
-              getInitials(user?.fullName)
+              getInitials(user?.full_name)
             )}
           </div>
           <div className={styles.userInfo}>
-            <div className={styles.userName}>{user?.fullName || "User"}</div>
+            <div className={styles.userName}>{user?.full_name || "User"}</div>
             <div className={styles.userEmail}>{user?.email || ""}</div>
           </div>
         </div>

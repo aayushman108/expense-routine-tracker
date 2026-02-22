@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  HiOutlineCash,
   HiOutlineCalendar,
   HiOutlineUserCircle,
   HiCheckCircle,
@@ -11,15 +10,11 @@ import {
   HiOutlineLightBulb,
   HiOutlineTruck,
   HiOutlineCreditCard,
-  HiOutlineLibrary,
-  HiOutlineGlobeAlt,
-  HiOutlineChevronDown,
   HiOutlineQrcode,
   HiOutlineDuplicate,
   HiCheck,
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
-import Button from "@/components/ui/Button/Button";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchExpenseById } from "@/store/slices/expenseSlice";
 import type { Expense, ExpenseSplit } from "@/lib/types";
@@ -184,13 +179,13 @@ export default function ExpenseDetailsModal({
             <div className={styles.sectionHeader}>
               <h3>Payment Source</h3>
               <span
-                className={`${styles.badge} ${styles.paid}`}
-                style={{
-                  background: "var(--color-success-light)",
-                  color: "var(--color-success)",
-                }}
+                className={`${styles.badge} ${styles[details.settlement_status || "pending"]}`}
               >
-                Fully Paid
+                {details.settlement_status === "confirmed"
+                  ? "Settled"
+                  : details.settlement_status === "paid"
+                    ? "Paid"
+                    : "Pending"}
               </span>
             </div>
             <div className={styles.payerCard}>
@@ -486,16 +481,6 @@ export default function ExpenseDetailsModal({
               })}
             </div>
           </section>
-
-          <div className={styles.footer}>
-            <Button variant="outline" onClick={onClose}>
-              Dismiss
-            </Button>
-            {details.settlement_status === "pending" &&
-              details.paid_by !== user?.id && (
-                <Button variant="primary">Settle Balance</Button>
-              )}
-          </div>
         </div>
       ) : (
         <div className={styles.loader}>

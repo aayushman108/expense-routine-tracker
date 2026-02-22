@@ -45,8 +45,10 @@ export interface Expense {
   updated_at?: string;
   payer?: User;
   payer_name?: string;
+  payer_avatar?: { url: string; publicId: string } | null;
   splits?: ExpenseSplit[];
-  settlement_status?: "pending" | "paid" | "personal";
+  settlement_status?: "pending" | "paid" | "confirmed" | "rejected";
+  user_amount?: number | string;
 }
 
 export interface ExpenseSplit {
@@ -72,14 +74,23 @@ export interface PaymentMethod {
 
 export interface Settlement {
   id: string;
-  expense_id?: string;
   expense_split_id?: string;
-  from_user: User;
-  to_user: User;
-  amount: number;
-  status: "pending" | "paid";
+  status: "pending" | "paid" | "settled";
   proof_image?: { url: string; publicId: string } | null;
   created_at: string;
+  updated_at?: string;
+}
+
+export interface GroupBalance {
+  from_user_id: string;
+  to_user_id: string;
+  total_amount: number;
+  from_user_name: string;
+  from_user_avatar?: { url: string; publicId: string } | null;
+  to_user_name: string;
+  to_user_avatar?: { url: string; publicId: string } | null;
+  status: "pending" | "paid" | "settled";
+  proof_image?: { url: string; publicId: string } | null;
 }
 
 // ── API Response types ──

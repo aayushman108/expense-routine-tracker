@@ -303,15 +303,17 @@
 
   .statusBadge {
     display: inline-flex;
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: $space-1 10px;
+    border-radius: $radius-sm;
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin-left: 8px;
     vertical-align: middle;
+    box-shadow: $shadow-sm;
 
-    &.paid {
+    &.confirmed {
       background: var(--color-success-light);
       color: var(--color-success);
     }
@@ -319,6 +321,23 @@
     &.pending {
       background: var(--color-warning-light);
       color: var(--color-warning);
+    }
+
+    &.paid {
+      background: var(--color-info-light);
+      color: var(--color-info);
+    }
+
+    &.rejected {
+      background: var(--color-danger-light);
+      color: var(--color-danger);
+    }
+
+    &.settled {
+      // Keep for backward compatibility or as alias for confirmed
+      background: var(--color-success-light);
+      color: var(--color-success);
+      opacity: 0.9;
     }
 
     &.personal {

@@ -47,23 +47,37 @@ export default function DashboardPage() {
   );
 
   const owedToYou = expenses.reduce((total, exp) => {
-    if (!exp.settlements) return total;
-    return (
-      total +
-      exp.settlements
-        .filter((s) => s.to_user === user?.id && s.status === "pending")
-        .reduce((sum, s) => sum + Number(s.amount), 0)
-    );
+    if (!exp.group_id || !exp.splits) return total;
+    // If I'm the payer, others' pending splits are owed to me
+    if (exp.paid_by === user?.id) {
+      return (
+        total +
+        exp.splits
+          .filter(
+            (s) =>
+              s.user?.id !== user?.id && s.settlement?.status === "pending",
+          )
+          .reduce((sum, s) => sum + Number(s.split_amount), 0)
+      );
+    }
+    return total;
   }, 0);
 
   const youOwe = expenses.reduce((total, exp) => {
-    if (!exp.settlements) return total;
-    return (
-      total +
-      exp.settlements
-        .filter((s) => s.from_user === user?.id && s.status === "pending")
-        .reduce((sum, s) => sum + Number(s.amount), 0)
-    );
+    if (!exp.group_id || !exp.splits) return total;
+    // If I'm NOT the payer, my pending split is what I owe
+    if (exp.paid_by !== user?.id) {
+      return (
+        total +
+        exp.splits
+          .filter(
+            (s) =>
+              s.user?.id === user?.id && s.settlement?.status === "pending",
+          )
+          .reduce((sum, s) => sum + Number(s.split_amount), 0)
+      );
+    }
+    return total;
   }, 0);
 
   const stats = [

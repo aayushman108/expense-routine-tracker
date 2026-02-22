@@ -10,7 +10,7 @@ export default function DashboardHeader() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
 
-  const firstName = user?.fullName?.split(" ")[0] || "there";
+  const firstName = user?.full_name?.split(" ")[0] || "there";
 
   return (
     <header className={styles.header}>

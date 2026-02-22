@@ -31,7 +31,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       setForm({
-        fullName: user.fullName || "",
+        fullName: user.full_name || "",
         email: user.email || "",
         phone: user.phone || "",
       });
@@ -78,9 +78,9 @@ export default function ProfilePage() {
           <div className={styles.avatarSection}>
             <div className={styles.avatar}>
               {user?.avatar?.url ? (
-                <img src={user.avatar.url} alt={user.fullName} />
+                <img src={user.avatar.url} alt={user.full_name} />
               ) : (
-                getInitials(user?.fullName)
+                getInitials(user?.full_name)
               )}
             </div>
             <button className={styles.editBtn} title="Upload New Avatar">
@@ -88,7 +88,7 @@ export default function ProfilePage() {
             </button>
           </div>
           <div className={styles.infoSection}>
-            <span className={styles.name}>{user?.fullName}</span>
+            <span className={styles.name}>{user?.full_name}</span>
             <span className={styles.email}>{user?.email}</span>
             <span className={styles.joined}>
               Member since{" "}

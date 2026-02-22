@@ -14,11 +14,16 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
+import {
+  fetchGroupBalances,
+  settleBulkAction,
+} from "@/store/slices/settlementSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
 import InviteUserModal from "@/components/dashboard/GroupMembers/InviteUserModal";
 import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
+import BulkSettlementModal from "@/components/dashboard/Settlement/BulkSettlementModal";
 import styles from "./group-details.module.scss";
 import {
   clearGroupDetails,
@@ -38,6 +43,11 @@ export default function GroupDetailsPage() {
   const { groupExpenses, isLoading: expensesLoading } = useAppSelector(
     (s) => s.expenses,
   );
+
+  const { groupBalances, isLoading: balancesLoading } = useAppSelector(
+    (s) => s.settlements,
+  );
+
   const { user } = useAppSelector((s) => s.auth);
   const [activeTab, setActiveTab] = useState<"expenses" | "settlements">(
     "expenses",
@@ -48,16 +58,24 @@ export default function GroupDetailsPage() {
   );
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [selectedBalance, setSelectedBalance] = useState<any | null>(null);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
       dispatch(fetchGroupDetailsAction(id as string));
       dispatch(fetchGroupExpenses(id as string));
+      dispatch(fetchGroupBalances(id as string));
     }
     return () => {
       dispatch(clearGroupDetails());
     };
   }, [id, dispatch]);
+
+  const handleOpenBulkModal = (balance: any) => {
+    setSelectedBalance(balance);
+    setIsBulkModalOpen(true);
+  };
 
   const members = useMemo(
     () => groupDetails?.data?.members || [],
@@ -76,22 +94,17 @@ export default function GroupDetailsPage() {
     let owedToMe = 0;
     let iOwe = 0;
 
-    groupExpenses.forEach((exp) => {
-      exp.settlements?.forEach((s: any) => {
-        const toId = s.to_user?.id || s.to_user;
-        const fromId = s.from_user?.id || s.from_user;
-
-        if (toId === user.id && s.status === "pending") {
-          owedToMe += Number(s.amount);
-        }
-        if (fromId === user.id && s.status === "pending") {
-          iOwe += Number(s.amount);
-        }
-      });
+    groupBalances.forEach((bal) => {
+      if (bal.to_user_id === user.id) {
+        owedToMe += Number(bal.total_amount);
+      }
+      if (bal.from_user_id === user.id) {
+        iOwe += Number(bal.total_amount);
+      }
     });
 
     return owedToMe - iOwe;
-  }, [groupExpenses, user]);
+  }, [groupBalances, user]);
 
   const getInitials = (name?: string) => {
     if (!name) return "?";
@@ -190,7 +203,7 @@ export default function GroupDetailsPage() {
               className={`${styles.tab} ${activeTab === "settlements" ? styles.active : ""}`}
               onClick={() => setActiveTab("settlements")}
             >
-              Monthly Settlements
+              Settlements
             </div>
           </div>
 
@@ -290,62 +303,84 @@ export default function GroupDetailsPage() {
             </div>
           ) : (
             <div className={styles.settlements}>
-              {groupExpenses.some((e: any) => e.settlements?.length > 0) ? (
-                groupExpenses
-                  .filter((e: any) => e.settlements?.length > 0)
-                  .map((expense: any) => (
-                    <div key={`exp-set-${expense.id}`} className="mb-6">
-                      <h4 className="text-xs font-bold mb-4 text-tertiary uppercase tracking-wider flex items-center gap-2">
-                        {expense.description} —{" "}
-                        {new Date(expense.expense_date).toLocaleDateString()}
-                      </h4>
-                      {expense.settlements.map((settlement: any) => (
-                        <div
-                          key={settlement.id}
-                          className={styles.settlementCard}
-                        >
-                          <div className={styles.party}>
-                            <div className={styles.label}>OWES</div>
-                            <div className={styles.name}>
-                              {settlement.from_user?.id === user?.id
-                                ? "You"
-                                : settlement.from_user?.full_name}
-                            </div>
-                          </div>
-                          <span className={styles.arrow}>
-                            <HiOutlineArrowRight />
-                          </span>
-                          <div className={styles.party}>
-                            <div className={styles.label}>TO</div>
-                            <div className={styles.name}>
-                              {settlement.to_user?.id === user?.id
-                                ? "You"
-                                : settlement.to_user?.full_name}
-                            </div>
-                          </div>
-                          <div className={styles.amountWrap}>
-                            <div className={styles.amount}>
-                              {expense.currency}{" "}
-                              {Number(settlement.amount).toLocaleString()}
-                            </div>
-                            {settlement.status === "pending" ? (
-                              settlement.from_user?.id === user?.id ? (
-                                <Button variant="primary" size="sm">
-                                  Pay Now
-                                </Button>
-                              ) : (
-                                <span className={styles.pendingBadge}>
-                                  Pending
-                                </span>
-                              )
-                            ) : (
-                              <span className={styles.paidBadge}>Settled</span>
-                            )}
-                          </div>
+              {balancesLoading ? (
+                <div className={styles.loaderContainer}>
+                  Loading balances...
+                </div>
+              ) : groupBalances.length > 0 ? (
+                groupBalances.map((balance: any, index: number) => {
+                  const currentUserId = user?.id?.toLowerCase();
+                  const fromUserId = balance.from_user_id?.toLowerCase();
+                  const toUserId = balance.to_user_id?.toLowerCase();
+
+                  const isFromUser = fromUserId === currentUserId;
+                  const isToUser = toUserId === currentUserId;
+
+                  return (
+                    <div
+                      key={`balance-${index}`}
+                      className={styles.settlementCard}
+                    >
+                      <div className={styles.party}>
+                        <div className={styles.label}>OWES</div>
+                        <div className={styles.name}>
+                          {isFromUser ? "You" : balance.from_user_name}
                         </div>
-                      ))}
+                      </div>
+                      <span className={styles.arrow}>
+                        <HiOutlineArrowRight />
+                      </span>
+                      <div className={styles.party}>
+                        <div className={styles.label}>TO</div>
+                        <div className={styles.name}>
+                          {isToUser ? "You" : balance.to_user_name}
+                        </div>
+                      </div>
+                      <div className={styles.amountWrap}>
+                        {/* DEBUG INFO: Remove later */}
+                        {/* <div style={{fontSize: '8px', opacity: 0.5}}>ME: {user?.id.slice(0,8)} | T: {balance.to_user_id.slice(0,8)} | F: {balance.from_user_id.slice(0,8)}</div> */}
+                        <div className={styles.amount}>
+                          रू {Number(balance.total_amount).toLocaleString()}
+                        </div>
+                        {balance.status === "paid" ? (
+                          isToUser ? (
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => handleOpenBulkModal(balance)}
+                            >
+                              Verify
+                            </Button>
+                          ) : (
+                            <Button variant="outline" size="sm" disabled>
+                              Awaiting Conf.
+                            </Button>
+                          )
+                        ) : (
+                          <>
+                            {isFromUser ? (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => handleOpenBulkModal(balance)}
+                              >
+                                Settle All
+                              </Button>
+                            ) : isToUser ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleOpenBulkModal(balance)}
+                              >
+                                Mark as Received
+                              </Button>
+                            ) : null}
+                          </>
+                        )}
+                      </div>
                     </div>
-                  ))
+                  );
+                })
               ) : (
                 <div className={styles.emptyStateCard}>
                   <div className={styles.icon}>
@@ -487,6 +522,13 @@ export default function GroupDetailsPage() {
         isOpen={!!selectedExpenseId}
         onClose={() => setSelectedExpenseId(null)}
         expenseId={selectedExpenseId}
+      />
+
+      <BulkSettlementModal
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        groupId={id as string}
+        balance={selectedBalance}
       />
     </div>
   );
