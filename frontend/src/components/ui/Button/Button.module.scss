@@ -33,12 +33,19 @@
 // ── Variants ──
 .primary {
   background: var(--gradient-primary);
-  color: var(--text-on-primary);
-  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+  font-weight: $font-weight-bold;
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+    filter: brightness(1.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   }
 }
 
@@ -49,17 +56,21 @@
 
   &:hover {
     background: var(--bg-hover);
-    border-color: var(--color-primary);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
   }
 }
 
 .outline {
   background: transparent;
   color: var(--color-primary);
-  border: 1px solid var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+  font-weight: $font-weight-bold;
 
   &:hover {
     background: var(--color-primary-50);
+    border-color: var(--color-primary-600);
+    transform: translateY(-1px);
   }
 }
 
@@ -76,27 +87,32 @@
 .danger {
   background: var(--color-danger);
   color: #fff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 
   &:hover {
-    opacity: 0.9;
+    filter: brightness(1.1);
     transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
   }
 }
 
 // ── Sizes ──
 .sm {
-  padding: $space-2 $space-3;
-  font-size: $font-size-xs;
+  padding: $space-3 $space-5;
+  font-size: $font-size-sm;
+  height: 40px;
 }
 
 .md {
-  padding: $space-3 $space-5;
-  font-size: $font-size-sm;
+  padding: $space-4 $space-6;
+  font-size: $font-size-base;
+  height: 48px;
 }
 
 .lg {
-  padding: $space-4 $space-8;
-  font-size: $font-size-base;
+  padding: $space-5 $space-10;
+  font-size: $font-size-lg;
+  height: 56px;
   border-radius: $radius-lg;
 }
 

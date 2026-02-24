@@ -8,6 +8,14 @@
   gap: $space-4;
   margin-bottom: $space-12;
 
+  &.fullWidth {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   &.center {
     text-align: center;
     align-items: center;

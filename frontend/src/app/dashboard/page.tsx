@@ -124,7 +124,7 @@ export default function DashboardPage() {
       </section>
 
       <section>
-        <SectionHeader title="Personal Tracking" align="between">
+        <SectionHeader title="Personal Tracking" align="between" fullWidth>
           <Link href="/dashboard/personal">
             <Button variant="outline" size="sm">
               View All
@@ -161,7 +161,7 @@ export default function DashboardPage() {
       </section>
 
       <section>
-        <SectionHeader title="Shared Groups" align="between">
+        <SectionHeader title="Shared Groups" align="between" fullWidth>
           <Button
             variant="primary"
             size="sm"

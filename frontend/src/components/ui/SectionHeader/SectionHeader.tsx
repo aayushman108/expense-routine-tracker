@@ -7,6 +7,7 @@ interface SectionHeaderProps {
   subtitle?: string;
   className?: string;
   align?: "center" | "left" | "between";
+  fullWidth?: boolean;
   children?: React.ReactNode;
 }
 
@@ -16,9 +17,15 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   subtitle,
   className = "",
   align = "center",
+  fullWidth = false,
   children,
 }) => {
-  const headerClasses = [styles.sectionHeader, styles[align], className]
+  const headerClasses = [
+    styles.sectionHeader,
+    styles[align],
+    fullWidth ? styles.fullWidth : "",
+    className,
+  ]
     .filter(Boolean)
     .join(" ");
 
