@@ -255,7 +255,7 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
        g.image as group_image,
        splits.data as splits,
        CASE 
-         WHEN e.group_id IS NULL THEN 'personal'
+         WHEN e.group_id IS NULL THEN NULL
          ELSE COALESCE(settlement_info.overall_status, 'pending')
        END AS settlement_status,
        CASE
