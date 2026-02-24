@@ -251,6 +251,8 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
     SELECT e.*,
        p.full_name as payer_name,
        p.avatar as payer_avatar,
+       g.name as group_name,
+       g.image as group_image,
        splits.data as splits,
        CASE 
          WHEN e.group_id IS NULL THEN 'personal'
@@ -259,11 +261,9 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
        CASE
          WHEN e.group_id IS NULL THEN e.total_amount
          WHEN e.paid_by = ? THEN 
-           (SELECT COALESCE(es.split_amount, 0) FROM expense_splits es WHERE es.expense_id = e.id AND es.user_id = ?) 
-           + COALESCE(settlement_info.total_others_pending, 0)
+           e.total_amount - COALESCE(settlement_info.total_received_by_me, 0)
          ELSE 
-           (SELECT COALESCE(es.split_amount, 0) FROM expense_splits es WHERE es.expense_id = e.id AND es.user_id = ?) 
-           - COALESCE(settlement_info.total_paid_by_me, 0)
+           COALESCE(settlement_info.total_paid_by_me, 0)
        END AS user_amount
     FROM (
       SELECT *
@@ -275,6 +275,7 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
       LIMIT ? OFFSET ?
     ) e
     LEFT JOIN users p ON e.paid_by = p.id
+    LEFT JOIN groups g ON e.group_id = g.id
     LEFT JOIN LATERAL (
       SELECT 
         COALESCE(
@@ -300,34 +301,37 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
     ) splits ON true
     LEFT JOIN LATERAL (
       SELECT 
+        -- Calculation for overall status (all splits)
         CASE 
           WHEN COUNT(*) = 0 THEN 'confirmed'
-          WHEN BOOL_AND(COALESCE(st.status = 'confirmed', FALSE)) THEN 'confirmed'
-          WHEN BOOL_AND(COALESCE(st.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
+          WHEN BOOL_AND(COALESCE(st_all.status = 'confirmed', FALSE)) THEN 'confirmed'
+          WHEN BOOL_AND(COALESCE(st_all.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
           ELSE 'pending'
         END AS overall_status,
-        COALESCE(SUM(es.split_amount) FILTER (WHERE e.paid_by = ? AND (st.id IS NULL OR st.status = 'pending')), 0) AS total_others_pending,
-        COALESCE(SUM(es.split_amount) FILTER (WHERE es.user_id = ? AND st.status = 'paid'), 0) AS total_paid_by_me
-      FROM expense_splits es
-      LEFT JOIN settlements st ON es.settlement_id = st.id
-      LEFT JOIN users fu ON es.user_id = fu.id
-      WHERE es.expense_id = e.id
-      AND (es.user_id = ? OR e.paid_by = ?)
+        -- Calculation for amount others have paid me (if I'm the payer)
+        COALESCE(SUM(es_all.split_amount) FILTER (
+          WHERE e.paid_by = ? AND es_all.user_id != ? AND st_all.status IN ('paid', 'confirmed')
+        ), 0) AS total_received_by_me,
+        -- Calculation for amount I have paid others (if I'm a spender)
+        COALESCE(SUM(es_all.split_amount) FILTER (
+          WHERE es_all.user_id = ? AND e.paid_by != ? AND st_all.status IN ('paid', 'confirmed')
+        ), 0) AS total_paid_by_me
+      FROM expense_splits es_all
+      LEFT JOIN settlements st_all ON es_all.settlement_id = st_all.id
+      WHERE es_all.expense_id = e.id
     ) settlement_info ON true
     ORDER BY e.expense_date DESC
     `,
     [
-      userId,
-      userId,
-      userId,
-      userId,
-      userId,
-      limit,
-      offset,
-      userId,
-      userId,
-      userId,
-      userId,
+      userId, // [1] CASE paid_by
+      userId, // [2] Subquery paid_by
+      userId, // [3] Subquery splits
+      limit, // [4] LIMIT
+      offset, // [5] OFFSET
+      userId, // [6] Lateral total_received_by_me (paid_by)
+      userId, // [7] Lateral total_received_by_me (user_id !=)
+      userId, // [8] Lateral total_paid_by_me (user_id)
+      userId, // [9] Lateral total_paid_by_me (paid_by !=)
     ],
   );
 

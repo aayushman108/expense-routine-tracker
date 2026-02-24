@@ -12,6 +12,9 @@ export type IAddExpense = ICreateExpenseSchema["body"] &
 export type IUpdateExpense = IUpdateExpenseSchema["body"];
 
 async function addExpense(data: IAddExpense) {
+  if (data.groupId === "personal") {
+    data.groupId = undefined;
+  }
   let calculatedSplits: IExpenseSplit[] = [];
 
   if (data.splits && data.splits.length > 0) {
