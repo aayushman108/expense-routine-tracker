@@ -169,14 +169,6 @@ export default function BulkSettlementModal({
                 {isYouOwe ? "You" : balance.from_user_name}
                 {isYouOwe && <span className={styles.meBadge}>(ME)</span>}
               </span>
-              {!isYouOwe && balance.from_user_email && (
-                <div className={styles.emailWrapper}>
-                  <HiOutlineMail />
-                  <span className={styles.email}>
-                    {balance.from_user_email}
-                  </span>
-                </div>
-              )}
             </div>
             <span className={styles.role}>Debtor</span>
           </div>
