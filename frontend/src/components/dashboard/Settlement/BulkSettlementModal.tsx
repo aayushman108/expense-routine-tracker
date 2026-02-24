@@ -10,6 +10,7 @@ import {
   HiOutlineCloudUpload,
   HiX,
   HiOutlineQrcode,
+  HiOutlineMail,
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
 import Button from "@/components/ui/Button/Button";
@@ -48,22 +49,8 @@ export default function BulkSettlementModal({
   const debtorId = balance.from_user_id?.toString();
   const creditorId = balance.to_user_id?.toString();
 
-  // Robust identity matching: Case-insensitive, trimmed, and handles nulls
-  const normalizedUser = user?.full_name?.trim()?.toLowerCase();
-  const normalizedDebtor = balance.from_user_name?.trim()?.toLowerCase();
-  const normalizedCreditor = balance.to_user_name?.trim()?.toLowerCase();
-
-  const isYouOwe =
-    debtorId?.toLowerCase() === currentUserId?.toLowerCase() ||
-    (!!normalizedUser &&
-      !!normalizedDebtor &&
-      normalizedUser === normalizedDebtor);
-
-  const isYouReceived =
-    creditorId?.toLowerCase() === currentUserId?.toLowerCase() ||
-    (!!normalizedUser &&
-      !!normalizedCreditor &&
-      normalizedUser === normalizedCreditor);
+  const isYouOwe = debtorId === currentUserId;
+  const isYouReceived = creditorId === currentUserId;
 
   console.log("Identity Presence Check:", {
     userExists: !!user,
@@ -177,10 +164,20 @@ export default function BulkSettlementModal({
                 getInitials(balance.from_user_name)
               )}
             </div>
-            <span className={styles.name}>
-              {isYouOwe ? "You" : balance.from_user_name}
-              {isYouOwe && <span className={styles.meBadge}>(ME)</span>}
-            </span>
+            <div className={styles.nameContainer}>
+              <span className={styles.name}>
+                {isYouOwe ? "You" : balance.from_user_name}
+                {isYouOwe && <span className={styles.meBadge}>(ME)</span>}
+              </span>
+              {!isYouOwe && balance.from_user_email && (
+                <div className={styles.emailWrapper}>
+                  <HiOutlineMail />
+                  <span className={styles.email}>
+                    {balance.from_user_email}
+                  </span>
+                </div>
+              )}
+            </div>
             <span className={styles.role}>Debtor</span>
           </div>
 
@@ -205,10 +202,12 @@ export default function BulkSettlementModal({
                 getInitials(balance.to_user_name)
               )}
             </div>
-            <span className={styles.name}>
-              {isYouReceived ? "You" : balance.to_user_name}
-              {isYouReceived && <span className={styles.meBadge}>(ME)</span>}
-            </span>
+            <div className={styles.nameContainer}>
+              <span className={styles.name}>
+                {isYouReceived ? "You" : balance.to_user_name}
+                {isYouReceived && <span className={styles.meBadge}>(ME)</span>}
+              </span>
+            </div>
             <span className={styles.role}>Creditor</span>
           </div>
         </div>
@@ -239,7 +238,7 @@ export default function BulkSettlementModal({
                 <p>
                   {isYouOwe
                     ? `Please pay via the account below and upload a screenshot of the transaction.`
-                    : `Please wait for ${balance.from_user_name} to pay and upload proof.`}
+                    : `Please wait for ${balance.from_user_name} (${balance.from_user_email}) to pay and upload proof.`}
                 </p>
               </div>
             </div>
@@ -250,7 +249,9 @@ export default function BulkSettlementModal({
         {isYouOwe && balance.status === "pending" && (
           <section className={styles.paymentSection}>
             <div className={styles.sectionHeader}>
-              <h3>Pay to {balance.to_user_name}</h3>
+              <h3>
+                Pay to {balance.to_user_name} ({balance.to_user_email})
+              </h3>
             </div>
 
             <div className={styles.tabs}>
@@ -396,8 +397,11 @@ export default function BulkSettlementModal({
         {!isYouOwe && balance.status === "pending" && (
           <div className={styles.infoBox}>
             <p>
-              Only <strong>{balance.from_user_name}</strong> can upload payment
-              proof.
+              Only{" "}
+              <strong>
+                {balance.from_user_name} ({balance.from_user_email})
+              </strong>{" "}
+              can upload payment proof.
             </p>
           </div>
         )}

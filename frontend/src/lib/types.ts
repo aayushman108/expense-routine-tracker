@@ -86,8 +86,10 @@ export interface GroupBalance {
   to_user_id: string;
   total_amount: number;
   from_user_name: string;
+  from_user_email: string;
   from_user_avatar?: { url: string; publicId: string } | null;
   to_user_name: string;
+  to_user_email: string;
   to_user_avatar?: { url: string; publicId: string } | null;
   status: "pending" | "paid" | "settled";
   proof_image?: { url: string; publicId: string } | null;
