@@ -48,10 +48,21 @@ export default function PersonalDetailsPage() {
       .filter((e) => e.group_id)
       .reduce((acc, curr) => acc + Number(curr.user_amount || 0), 0);
 
+    const settlementsReceived = expenses.reduce(
+      (acc, curr) => acc + Number(curr.total_received_by_me || 0),
+      0,
+    );
+    const settlementsPaid = expenses.reduce(
+      (acc, curr) => acc + Number(curr.total_paid_by_me || 0),
+      0,
+    );
+
     return {
       personal,
       groupOnly,
       total: personal + groupOnly,
+      settlementsReceived,
+      settlementsPaid,
     };
   }, [expenses, personalExpenses]);
 
@@ -187,7 +198,7 @@ export default function PersonalDetailsPage() {
               रू {calculations.groupOnly.toLocaleString()}
             </span>
             <span className={`${styles.cardSub} ${styles.secondary}`}>
-              Total of your shares in groups
+              Your shares in groups
             </span>
           </div>
         </Card>

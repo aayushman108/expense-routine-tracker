@@ -98,6 +98,10 @@
       color: var(--color-success);
     }
 
+    &.danger {
+      color: var(--color-danger);
+    }
+
     &.secondary {
       color: var(--text-tertiary);
     }

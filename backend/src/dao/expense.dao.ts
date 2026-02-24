@@ -264,7 +264,9 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
            e.total_amount - COALESCE(settlement_info.total_received_by_me, 0)
          ELSE 
            COALESCE(settlement_info.total_paid_by_me, 0)
-       END AS user_amount
+       END AS user_amount,
+       COALESCE(settlement_info.total_received_by_me, 0) AS total_received_by_me,
+       COALESCE(settlement_info.total_paid_by_me, 0) AS total_paid_by_me
     FROM (
       SELECT *
       FROM expenses e

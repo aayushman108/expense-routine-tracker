@@ -51,6 +51,8 @@ export interface Expense {
   splits?: ExpenseSplit[];
   settlement_status?: "pending" | "paid" | "confirmed" | "rejected";
   user_amount?: number | string;
+  total_received_by_me?: number | string;
+  total_paid_by_me?: number | string;
 }
 
 export interface ExpenseSplit {
