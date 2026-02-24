@@ -179,13 +179,15 @@ export default function ExpenseDetailsModal({
             <div className={styles.sectionHeader}>
               <h3>Payment Source</h3>
               <span
-                className={`${styles.badge} ${styles[details.settlement_status || "pending"]}`}
+                className={`${styles.badge} ${!details.group_id ? styles.personal : styles[details.settlement_status || "pending"]}`}
               >
-                {details.settlement_status === "confirmed"
-                  ? "Settled"
-                  : details.settlement_status === "paid"
-                    ? "Paid"
-                    : "Pending"}
+                {!details.group_id
+                  ? "Personal"
+                  : details.settlement_status === "confirmed"
+                    ? "Settled"
+                    : details.settlement_status === "paid"
+                      ? "Paid"
+                      : "Pending"}
               </span>
             </div>
             <div className={styles.payerCard}>

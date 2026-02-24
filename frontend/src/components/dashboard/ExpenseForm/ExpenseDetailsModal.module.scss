@@ -159,6 +159,11 @@ $transition-normal: $transition-base;
         background: var(--color-danger-light);
         color: var(--color-danger);
       }
+
+      &.personal {
+        background: var(--color-primary-100);
+        color: var(--color-primary);
+      }
     }
   }
 }

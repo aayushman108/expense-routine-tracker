@@ -170,33 +170,33 @@ export default function AddExpenseModal({
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
-    let submissionSplits = splits
-      .filter((s) => s.splitPercentage > 0)
-      .map((s) => ({
-        ...s,
-        splitPercentage: Number(s.splitPercentage),
-        splitAmount: Number(s.splitAmount),
-      }));
-
-    const body = {
+    const body: any = {
       ...form,
       totalAmount: Number(form.totalAmount) || 0,
-      splits: submissionSplits,
     };
 
-    await handleThunk(
-      dispatch(createExpense({ body, params: { groupId } })),
-      () => {
-        dispatch(addToast({ type: "success", message: "Expense added!" }));
-        onClose();
-        setForm((prev) => ({
-          ...prev,
-          description: "",
-          totalAmount: "",
-          expenseDate: new Date().toISOString().split("T")[0],
+    if (groupId) {
+      body.splits = splits
+        .filter((s) => s.splitPercentage > 0)
+        .map((s) => ({
+          ...s,
+          splitPercentage: Number(s.splitPercentage),
+          splitAmount: Number(s.splitAmount),
         }));
-      },
-    );
+    }
+
+    const params = groupId ? { groupId } : {};
+
+    await handleThunk(dispatch(createExpense({ body, params })), () => {
+      dispatch(addToast({ type: "success", message: "Expense added!" }));
+      onClose();
+      setForm((prev) => ({
+        ...prev,
+        description: "",
+        totalAmount: "",
+        expenseDate: new Date().toISOString().split("T")[0],
+      }));
+    });
   };
 
   const currencyOptions = Object.values(SUPPORTED_CURRENCIES).map((curr) => ({

@@ -46,6 +46,8 @@ export interface Expense {
   payer?: User;
   payer_name?: string;
   payer_avatar?: { url: string; publicId: string } | null;
+  group_name?: string;
+  group_image?: { url: string; publicId: string } | null;
   splits?: ExpenseSplit[];
   settlement_status?: "pending" | "paid" | "confirmed" | "rejected";
   user_amount?: number | string;

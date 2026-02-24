@@ -71,10 +71,10 @@ export const createExpense = createAsyncThunk<Expense, CreateExpensePayload>(
   "expenses/createExpense",
   async (payload, { rejectWithValue }) => {
     try {
-      const { data } = await api.post(
-        `/expenses/group/${payload.params.groupId}`,
-        payload.body,
-      );
+      const { groupId } = payload.params;
+      const endpoint = groupId ? `/expenses/group/${groupId}` : "/expenses";
+
+      const { data } = await api.post(endpoint, payload.body);
       return data.data?.data || data.data || data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
