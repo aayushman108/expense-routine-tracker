@@ -162,13 +162,20 @@ export default function DashboardPage() {
 
       <section>
         <SectionHeader title="Shared Groups" align="between" fullWidth>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsGroupModalOpen(true)}
-          >
-            <HiPlus /> Create Group
-          </Button>
+          <div className={styles.actions}>
+            <Link href="/dashboard/groups">
+              <Button variant="outline" size="sm">
+                View All
+              </Button>
+            </Link>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsGroupModalOpen(true)}
+            >
+              <HiPlus /> Create Group
+            </Button>
+          </div>
         </SectionHeader>
 
         {groupsLoading ? (

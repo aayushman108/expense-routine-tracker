@@ -177,3 +177,9 @@
     margin: 0 auto;
   }
 }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}

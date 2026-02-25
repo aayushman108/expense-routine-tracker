@@ -1,0 +1,226 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.page {
+  @include flex-column;
+  gap: $space-8;
+}
+
+.header {
+  @include flex-between;
+  align-items: flex-start;
+  gap: $space-6;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.titleArea {
+  flex: 1;
+  @include flex-column;
+  gap: $space-2;
+
+  .backBtn {
+    background: none;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    color: var(--text-tertiary);
+    font-size: $font-size-sm;
+    margin-bottom: $space-2;
+    cursor: pointer;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  h1 {
+    @include heading($font-size-3xl);
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  p {
+    @include body-text;
+    max-width: 600px;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+}
+
+.controls {
+  @include flex-between;
+  gap: $space-4;
+  margin-bottom: $space-2;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+
+  @include mobile-only {
+    max-width: none;
+  }
+
+  .searchIcon {
+    position: absolute;
+    left: $space-4;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input {
+    @include input-base;
+    padding-left: $space-10;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $space-6;
+
+  @include mobile-only {
+    grid-template-columns: 1fr;
+  }
+}
+
+.groupCard {
+  @include card;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  position: relative;
+
+  .image {
+    height: 140px;
+    background: var(--gradient-primary);
+    position: relative;
+    @include flex-center;
+    color: #fff;
+    font-size: $font-size-4xl;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  .cardDetails {
+    padding: $space-5;
+    flex: 1;
+    @include flex-column;
+    gap: $space-2;
+
+    .topRow {
+      @include flex-between;
+      margin-bottom: $space-1;
+    }
+
+    .groupName {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: var(--text-primary);
+    }
+
+    .roleBadge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: $radius-full;
+      background: var(--color-primary-50);
+      color: var(--color-primary);
+      font-weight: $font-weight-bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .description {
+      font-size: $font-size-sm;
+      color: var(--text-secondary);
+      @include truncate(2);
+      min-height: 2.8em;
+    }
+  }
+
+  .footer {
+    padding: $space-4 $space-5;
+    border-top: 1px solid var(--border-default);
+    background: var(--bg-tertiary);
+    @include flex-between;
+    font-size: $font-size-xs;
+    color: var(--text-tertiary);
+
+    .memberInfo {
+      display: flex;
+      align-items: center;
+      gap: $space-1;
+
+      svg {
+        font-size: $font-size-sm;
+      }
+    }
+
+    .dateLabel {
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+.emptyState {
+  @include card;
+  @include flex-center;
+  flex-direction: column;
+  padding: $space-16 $space-8;
+  text-align: center;
+  gap: $space-4;
+  color: var(--text-secondary);
+  border: 2px dashed var(--border-default);
+  background: transparent;
+
+  .emptyIcon {
+    font-size: $font-size-5xl;
+    color: var(--text-tertiary);
+    opacity: 0.3;
+    margin-bottom: $space-2;
+  }
+
+  h3 {
+    @include heading($font-size-xl);
+  }
+
+  p {
+    max-width: 360px;
+    margin: 0 auto;
+    @include body-text;
+  }
+}
