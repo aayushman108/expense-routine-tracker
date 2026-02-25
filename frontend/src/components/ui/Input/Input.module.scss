@@ -28,7 +28,6 @@
 
 .input {
   @include input-base;
-  height: 44px;
 
   &.hasIcon {
     padding-left: 42px;

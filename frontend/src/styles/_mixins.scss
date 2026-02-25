@@ -128,7 +128,7 @@
 // ── Input base ──
 @mixin input-base {
   width: 100%;
-  padding: $space-3 $space-4;
+  padding: $space-4 $space-4;
   font-family: $font-primary;
   font-size: $font-size-sm;
   color: var(--text-primary);

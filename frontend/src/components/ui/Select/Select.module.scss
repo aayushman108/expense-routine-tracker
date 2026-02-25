@@ -41,7 +41,6 @@
 // ── Trigger button (looks like the Input) ──
 .trigger {
   @include input-base;
-  height: 44px;
   display: flex;
   align-items: center;
   gap: $space-2;
