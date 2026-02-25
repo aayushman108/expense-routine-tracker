@@ -10,6 +10,10 @@ import {
   HiOutlineLightBulb,
   HiOutlineTruck,
   HiOutlineDotsVertical,
+  HiOutlineUserCircle,
+  HiOutlineChartBar,
+  HiOutlineArrowNarrowDown,
+  HiOutlineArrowNarrowUp,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchUserExpenses } from "@/store/slices/expenseSlice";
@@ -33,20 +37,93 @@ export default function PersonalDetailsPage() {
   const [activeTab, setActiveTab] = useState<"all" | "personal" | "groups">(
     "all",
   );
+  const { user } = useAppSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     dispatch(fetchUserExpenses());
   }, [dispatch]);
 
-  // Calculations
+  const groupedSummaries = useMemo(() => {
+    const groups: Record<
+      string,
+      {
+        id: string;
+        name: string;
+        totalGroupSpend: number;
+        myTotalShare: number;
+        iOweOthers: number;
+        othersOweMe: number;
+        expenses: any[];
+      }
+    > = {};
+
+    expenses
+      .filter((e) => e.group_id)
+      .forEach((expense) => {
+        const gId = expense.group_id as string;
+        if (!groups[gId]) {
+          groups[gId] = {
+            id: gId,
+            name: expense.group_name || "Unknown Group",
+            totalGroupSpend: 0,
+            myTotalShare: 0,
+            iOweOthers: 0,
+            othersOweMe: 0,
+            expenses: [],
+          };
+        }
+
+        groups[gId].expenses.push(expense);
+        groups[gId].totalGroupSpend += Number(expense.total_amount || 0);
+
+        // Find my share in this expense
+        const mySplit = expense.splits?.find(
+          (s: any) => s.user.id === user?.id || s.user_id === user?.id,
+        );
+        const myShare = Number(mySplit?.split_amount || 0);
+        groups[gId].myTotalShare += myShare;
+
+        const totalPaidByMe = Number(expense.total_paid_by_me || 0);
+        const totalReceivedByMe = Number(expense.total_received_by_me || 0);
+
+        if (expense.paid_by === user?.id) {
+          // Others owe me = (total_amount - my_share) - total_received_by_me
+          const othersOwe =
+            Number(expense.total_amount) - myShare - totalReceivedByMe;
+          groups[gId].othersOweMe += Math.max(0, othersOwe);
+        } else {
+          // I owe = my_share - total_paid_by_me
+          const iOwe = myShare - totalPaidByMe;
+          groups[gId].iOweOthers += Math.max(0, iOwe);
+        }
+      });
+
+    return Object.values(groups);
+  }, [expenses, user]);
+
+  // Calculations depends on groupedSummaries
   const calculations = useMemo(() => {
     const personal = personalExpenses.reduce(
-      (acc, curr) => acc + Number(curr.user_amount || curr.total_amount),
+      (acc, curr) => acc + Number(curr.total_amount || 0),
       0,
     );
-    const groupOnly = expenses
+
+    const actualGroupSpend = expenses
       .filter((e) => e.group_id)
-      .reduce((acc, curr) => acc + Number(curr.user_amount || 0), 0);
+      .reduce((acc, curr) => {
+        const mySplit = curr.splits?.find(
+          (s: any) => s.user.id === user?.id || s.user_id === user?.id,
+        );
+        const myShare = Number(mySplit?.split_amount || 0);
+
+        if (curr.paid_by === user?.id) {
+          // If I paid, my share is effectively spent cash
+          return acc + myShare;
+        } else {
+          // If somebody else paid, I only count what I've actually settled/paid back
+          return acc + Number(curr.total_paid_by_me || 0);
+        }
+      }, 0);
 
     const settlementsReceived = expenses.reduce(
       (acc, curr) => acc + Number(curr.total_received_by_me || 0),
@@ -57,39 +134,25 @@ export default function PersonalDetailsPage() {
       0,
     );
 
+    const totalIOwe = groupedSummaries.reduce(
+      (acc, g) => acc + g.iOweOthers,
+      0,
+    );
+    const totalOthersOweMe = groupedSummaries.reduce(
+      (acc, g) => acc + g.othersOweMe,
+      0,
+    );
+
     return {
       personal,
-      groupOnly,
-      total: personal + groupOnly,
+      groupOnly: actualGroupSpend,
+      total: personal + actualGroupSpend,
       settlementsReceived,
       settlementsPaid,
+      totalIOwe,
+      totalOthersOweMe,
     };
-  }, [expenses, personalExpenses]);
-
-  // Grouping group expenses by group_name
-  const groupedExpenses = useMemo(() => {
-    const groups: Record<
-      string,
-      { name: string; total: number; expenses: any[] }
-    > = {};
-
-    expenses
-      .filter((e) => e.group_id)
-      .forEach((expense) => {
-        const gId = expense.group_id as string;
-        if (!groups[gId]) {
-          groups[gId] = {
-            name: expense.group_name || "Unknown Group",
-            total: 0,
-            expenses: [],
-          };
-        }
-        groups[gId].expenses.push(expense);
-        groups[gId].total += Number(expense.user_amount || 0);
-      });
-
-    return Object.values(groups);
-  }, [expenses]);
+  }, [expenses, personalExpenses, user, groupedSummaries]);
 
   const getCategoryIcon = (desc: string) => {
     const d = (desc || "").toLowerCase();
@@ -102,34 +165,42 @@ export default function PersonalDetailsPage() {
     return <HiOutlineCurrencyDollar />;
   };
 
-  const renderExpenseItem = (expense: any) => (
-    <div
-      key={expense.id}
-      className={styles.expenseItem}
-      onClick={() => setSelectedExpenseId(expense.id)}
-    >
-      <div className={styles.iconWrap}>
-        {getCategoryIcon(expense.description || "")}
+  const renderExpenseItem = (expense: any) => {
+    const mySplit = expense.splits?.find(
+      (s: any) => s.user.id === user?.id || s.user_id === user?.id,
+    );
+    const amountToShow = expense.group_id
+      ? mySplit?.split_amount || 0
+      : expense.total_amount;
+
+    return (
+      <div
+        key={expense.id}
+        className={styles.expenseItem}
+        onClick={() => setSelectedExpenseId(expense.id)}
+      >
+        <div className={styles.iconWrap}>
+          {getCategoryIcon(expense.description || "")}
+        </div>
+        <div className={styles.info}>
+          <span className={styles.title}>
+            {expense.description || "Unnamed Expense"}
+          </span>
+          <span className={styles.meta}>
+            {new Date(expense.expense_date).toLocaleDateString()} •{" "}
+            {expense.currency}{" "}
+            {expense.group_id ? `• ${expense.group_name}` : "• Personal"}
+          </span>
+        </div>
+        <div className={styles.amount}>
+          रू {Number(amountToShow).toLocaleString()}
+        </div>
+        <Button variant="ghost" iconOnly>
+          <HiOutlineDotsVertical />
+        </Button>
       </div>
-      <div className={styles.info}>
-        <span className={styles.title}>
-          {expense.description || "Unnamed Expense"}
-        </span>
-        <span className={styles.meta}>
-          {new Date(expense.expense_date).toLocaleDateString()} •{" "}
-          {expense.currency}{" "}
-          {expense.group_id ? `• ${expense.group_name}` : "• Personal"}
-        </span>
-      </div>
-      <div className={styles.amount}>
-        रू{" "}
-        {Number(expense.user_amount || expense.total_amount).toLocaleString()}
-      </div>
-      <Button variant="ghost" iconOnly>
-        <HiOutlineDotsVertical />
-      </Button>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className={styles.page}>
@@ -166,12 +237,12 @@ export default function PersonalDetailsPage() {
       <div className={styles.summaryCards}>
         <Card gradient>
           <div className={styles.cardContent}>
-            <span className={styles.cardLabel}>Grand Total Spent</span>
+            <span className={styles.cardLabel}>Lifetime Spend</span>
             <span className={styles.cardValue}>
               रू {calculations.total.toLocaleString()}
             </span>
             <span className={`${styles.cardSub} ${styles.success}`}>
-              All personal and group splits
+              Personal + All Group Shares
             </span>
           </div>
         </Card>
@@ -181,24 +252,34 @@ export default function PersonalDetailsPage() {
             <span className={styles.cardValue}>
               रू {calculations.personal.toLocaleString()}
             </span>
-            <div className={styles.progressContainer}>
-              <div
-                className={styles.progressFill}
-                style={{
-                  width: `${(calculations.personal / (calculations.total || 1)) * 100}%`,
-                }}
-              />
-            </div>
+            <span className={`${styles.cardSub} ${styles.secondary}`}>
+              Non-group expenses
+            </span>
           </div>
         </Card>
         <Card>
           <div className={styles.cardContent}>
-            <span className={styles.cardLabel}>Group Spend</span>
+            <span className={styles.cardLabel}>Remaining to Pay</span>
             <span className={styles.cardValue}>
-              रू {calculations.groupOnly.toLocaleString()}
+              रू {calculations.totalIOwe.toLocaleString()}
             </span>
-            <span className={`${styles.cardSub} ${styles.secondary}`}>
-              Your shares in groups
+            <span
+              className={`${styles.cardSub} ${calculations.totalIOwe > 0 ? styles.danger : styles.secondary}`}
+            >
+              Total outstanding in groups
+            </span>
+          </div>
+        </Card>
+        <Card>
+          <div className={styles.cardContent}>
+            <span className={styles.cardLabel}>To Receive</span>
+            <span className={styles.cardValue}>
+              रू {calculations.totalOthersOweMe.toLocaleString()}
+            </span>
+            <span
+              className={`${styles.cardSub} ${calculations.totalOthersOweMe > 0 ? styles.success : styles.secondary}`}
+            >
+              Others owe you
             </span>
           </div>
         </Card>
@@ -250,20 +331,146 @@ export default function PersonalDetailsPage() {
               </div>
             )}
 
-            {(activeTab === "all" || activeTab === "groups") &&
-              groupedExpenses.map((group) => (
-                <div key={group.name} className={styles.groupSection}>
-                  <div className={styles.groupHeader}>
-                    <h3>{group.name}</h3>
-                    <span className={styles.groupTotal}>
-                      रू {group.total.toLocaleString()}
-                    </span>
+            {activeTab === "all" && (
+              <>
+                {groupedSummaries.length > 0 && (
+                  <div className={styles.groupSection}>
+                    <div className={styles.groupHeader}>
+                      <h3>Group Summaries</h3>
+                    </div>
+                    <div
+                      className={styles.groupSummaryGrid}
+                      style={{ marginTop: "1rem" }}
+                    >
+                      {groupedSummaries.map((group) => (
+                        <div key={group.id} className={styles.groupSummaryCard}>
+                          <div className={styles.cardHeader}>
+                            <div className={styles.groupInfoContainer}>
+                              <span className={styles.groupLabel}>
+                                Individual Summary
+                              </span>
+                              <h4 className={styles.groupName}>{group.name}</h4>
+                            </div>
+                            <div className={styles.groupIconWrap}>
+                              <HiOutlineShoppingBag />
+                            </div>
+                          </div>
+                          <div className={styles.statsContainer}>
+                            <div className={styles.statsGrid}>
+                              <div className={styles.statItem}>
+                                <div className={styles.statLabel}>
+                                  <HiOutlineShoppingBag /> Group Spend
+                                </div>
+                                <div className={styles.statValue}>
+                                  रू {group.totalGroupSpend.toLocaleString()}
+                                </div>
+                              </div>
+                              <div className={styles.statItem}>
+                                <div className={styles.statLabel}>
+                                  <HiOutlineChartBar /> My Share
+                                </div>
+                                <div
+                                  className={`${styles.statValue} ${styles.highlight}`}
+                                >
+                                  रू {group.myTotalShare.toLocaleString()}
+                                </div>
+                              </div>
+                              <div className={styles.statItem}>
+                                <div className={styles.statLabel}>
+                                  <HiOutlineArrowNarrowDown /> Remaining to Pay
+                                </div>
+                                <div
+                                  className={`${styles.statValue} ${group.iOweOthers > 0 ? styles.danger : ""}`}
+                                >
+                                  रू {group.iOweOthers.toLocaleString()}
+                                </div>
+                              </div>
+                              <div className={styles.statItem}>
+                                <div className={styles.statLabel}>
+                                  <HiOutlineArrowNarrowUp /> Remaining to
+                                  Receive
+                                </div>
+                                <div
+                                  className={`${styles.statValue} ${group.othersOweMe > 0 ? styles.success : ""}`}
+                                >
+                                  रू {group.othersOweMe.toLocaleString()}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className={styles.groupList}>
-                    {group.expenses.map(renderExpenseItem)}
-                  </div>
-                </div>
-              ))}
+                )}
+              </>
+            )}
+
+            {activeTab === "groups" && (
+              <div className={styles.groupSummaryGrid}>
+                {groupedSummaries.length > 0 ? (
+                  groupedSummaries.map((group) => (
+                    <div key={group.id} className={styles.groupSummaryCard}>
+                      <div className={styles.cardHeader}>
+                        <div className={styles.groupInfoContainer}>
+                          <span className={styles.groupLabel}>
+                            Financial Summary
+                          </span>
+                          <h4 className={styles.groupName}>{group.name}</h4>
+                        </div>
+                        <div className={styles.groupIconWrap}>
+                          <HiOutlineShoppingBag />
+                        </div>
+                      </div>
+                      <div className={styles.statsContainer}>
+                        <div className={styles.statsGrid}>
+                          <div className={styles.statItem}>
+                            <div className={styles.statLabel}>
+                              <HiOutlineShoppingBag /> Group Spend
+                            </div>
+                            <div className={styles.statValue}>
+                              रू {group.totalGroupSpend.toLocaleString()}
+                            </div>
+                          </div>
+                          <div className={styles.statItem}>
+                            <div className={styles.statLabel}>
+                              <HiOutlineUserCircle /> My Share
+                            </div>
+                            <div
+                              className={`${styles.statValue} ${styles.highlight}`}
+                            >
+                              रू {group.myTotalShare.toLocaleString()}
+                            </div>
+                          </div>
+                          <div className={styles.statItem}>
+                            <div className={styles.statLabel}>
+                              <HiOutlineArrowNarrowDown /> Remaining to Pay
+                            </div>
+                            <div
+                              className={`${styles.statValue} ${group.iOweOthers > 0 ? styles.danger : ""}`}
+                            >
+                              रू {group.iOweOthers.toLocaleString()}
+                            </div>
+                          </div>
+                          <div className={styles.statItem}>
+                            <div className={styles.statLabel}>
+                              <HiOutlineArrowNarrowUp /> Remaining to Receive
+                            </div>
+                            <div
+                              className={`${styles.statValue} ${group.othersOweMe > 0 ? styles.success : ""}`}
+                            >
+                              रू {group.othersOweMe.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className={styles.noData}>No group activities found.</p>
+                )}
+              </div>
+            )}
 
             {expenses.length === 0 && !isLoading && (
               <Card className={styles.emptyState}>

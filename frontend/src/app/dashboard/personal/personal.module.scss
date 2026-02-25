@@ -64,7 +64,7 @@
 
 .summaryCards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: $space-6;
 
   @include mobile-only {
@@ -262,4 +262,138 @@
   font-size: $font-size-sm;
   color: var(--text-tertiary);
   padding: $space-4;
+}
+
+.groupSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $space-6;
+}
+
+.groupSummaryCard {
+  @include card;
+  padding: 0; // Removing padding to manage sub-sections
+  @include flex-column;
+  gap: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  transition: all $transition-base;
+  overflow: hidden;
+  position: relative;
+  box-shadow: $shadow-sm;
+
+  &:hover {
+    border-color: var(--color-primary-300);
+    transform: translateY(-6px);
+    box-shadow: $shadow-xl;
+    background: var(--bg-tertiary);
+
+    .cardHeader {
+      background: linear-gradient(
+        to right,
+        var(--bg-tertiary),
+        var(--color-primary-50)
+      );
+    }
+
+    .groupIconWrap {
+      background: var(--color-primary);
+      color: white;
+      transform: scale(1.1) rotate(-5deg);
+    }
+  }
+
+  .cardHeader {
+    padding: $space-6;
+    @include flex-between;
+    align-items: center;
+    background: var(--bg-secondary);
+    transition: background $transition-base;
+
+    .groupInfoContainer {
+      @include flex-column;
+      gap: $space-1;
+
+      .groupLabel {
+        font-size: 10px;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+      }
+
+      .groupName {
+        font-size: $font-size-xl;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+    }
+
+    .groupIconWrap {
+      @include flex-center;
+      width: 48px;
+      height: 48px;
+      background: var(--bg-tertiary);
+      color: var(--color-primary);
+      border-radius: $radius-lg;
+      font-size: 24px;
+      transition: all $transition-base;
+    }
+  }
+
+  .statsContainer {
+    padding: $space-6;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid var(--border-default);
+
+    .statsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: $space-6;
+    }
+  }
+
+  .statItem {
+    @include flex-column;
+    gap: $space-2;
+
+    .statLabel {
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+
+      svg {
+        font-size: 14px;
+        opacity: 0.7;
+      }
+    }
+
+    .statValue {
+      font-size: $font-size-lg;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+
+      &.highlight {
+        color: var(--color-primary);
+      }
+
+      &.danger {
+        color: var(--color-danger);
+      }
+
+      &.success {
+        color: var(--color-success);
+      }
+    }
+  }
 }
