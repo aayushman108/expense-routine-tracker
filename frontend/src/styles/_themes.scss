@@ -1,15 +1,14 @@
-// ═══════════════════════════════════════════════════
 // THEME SYSTEM — Light & Dark CSS Custom Properties
 // ═══════════════════════════════════════════════════
 
-// Usage: Apply [data-theme="dark"] on <html> to toggle
+@use "variables" as *;
 
 :root,
 [data-theme="light"] {
   // ── Primary / Accent ──
-  --color-primary: #6366f1;
-  --color-primary-light: #818cf8;
-  --color-primary-dark: #4f46e5;
+  --color-primary: #{$landing-accent};
+  --color-primary-light: #{$landing-accent-light};
+  --color-primary-dark: #{$landing-accent-dark};
   --color-primary-50: #eef2ff;
   --color-primary-100: #e0e7ff;
   --color-primary-600: #4f46e5;
@@ -63,13 +62,12 @@
   --glass-blur: 16px;
 
   // ── Gradients ──
-  --gradient-primary: linear-gradient(
+  --gradient-primary: #{$landing-gradient};
+  --gradient-hero: linear-gradient(
     135deg,
-    #6366f1 0%,
-    #8b5cf6 50%,
-    #a78bfa 100%
+    #{$landing-accent-dark} 0%,
+    #{$landing-accent} 100%
   );
-  --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-card: linear-gradient(
     145deg,
     rgba(99, 102, 241, 0.05) 0%,
@@ -86,9 +84,9 @@
 
 [data-theme="dark"] {
   // ── Primary / Accent ──
-  --color-primary: #818cf8;
-  --color-primary-light: #a5b4fc;
-  --color-primary-dark: #6366f1;
+  --color-primary: #{$landing-accent-light};
+  --color-primary-light: #{$landing-accent};
+  --color-primary-dark: #{$landing-accent-dark};
   --color-primary-50: rgba(99, 102, 241, 0.1);
   --color-primary-100: rgba(99, 102, 241, 0.15);
   --color-primary-600: #6366f1;
@@ -142,17 +140,12 @@
   --glass-blur: 20px;
 
   // ── Gradients ──
-  --gradient-primary: linear-gradient(
-    135deg,
-    #6366f1 0%,
-    #8b5cf6 50%,
-    #a78bfa 100%
-  );
+  --gradient-primary: #{$landing-gradient};
   --gradient-hero: linear-gradient(
     135deg,
     #1e1b4b 0%,
-    #312e81 50%,
-    #4c1d95 100%
+    #{$landing-accent-dark} 50%,
+    #{$landing-accent} 100%
   );
   --gradient-card: linear-gradient(
     145deg,

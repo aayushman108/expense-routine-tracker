@@ -32,6 +32,18 @@ $line-height-tight: 1.2;
 $line-height-normal: 1.5;
 $line-height-relaxed: 1.75;
 
+// ── Brand Colors ──
+$landing-accent: #4f46e5;
+$landing-accent-light: #6366f1;
+$landing-accent-dark: #3730a3;
+
+$landing-gradient: linear-gradient(
+  135deg,
+  $landing-accent 0%,
+  #6366f1 50%,
+  #8b5cf6 100%
+);
+
 // ── Spacing ──
 $space-1: 0.25rem;
 $space-2: 0.5rem;
