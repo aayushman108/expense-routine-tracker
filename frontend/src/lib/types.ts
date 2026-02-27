@@ -1,3 +1,5 @@
+import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
+
 export interface User {
   id: string;
   full_name: string;
@@ -35,6 +37,7 @@ export interface GroupDetails extends Group {
 
 export interface Expense {
   id: string;
+  expense_type: EXPENSE_TYPE;
   group_id: string | null;
   paid_by: string;
   total_amount: number | string;
@@ -137,11 +140,12 @@ export interface AuthResponse {
 
 export interface CreateExpensePayload {
   body: {
+    expenseType: EXPENSE_TYPE;
     totalAmount: number;
     description?: string;
     expenseDate: string;
     currency?: string;
-    splits: { userId: string; splitPercentage: number; splitAmount: number }[];
+    splits?: { userId: string; splitPercentage: number; splitAmount: number }[];
   };
   params: {
     groupId?: string | null;

@@ -11,3 +11,8 @@ export enum SPLIT_MODE {
   PERCENTAGE = "percentage",
   AMOUNT = "amount",
 }
+
+export enum EXPENSE_TYPE {
+  PERSONAL = "personal",
+  GROUP = "group",
+}

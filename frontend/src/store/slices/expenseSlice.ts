@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
 import type { Expense, CreateExpensePayload } from "../../lib/types";
+import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
 
 interface ExpenseState {
   expenses: Expense[];
@@ -120,7 +121,9 @@ const expenseSlice = createSlice({
     builder.addCase(fetchUserExpenses.fulfilled, (state, action) => {
       state.isLoading = false;
       state.expenses = action.payload;
-      state.personalExpenses = action.payload.filter((e) => !e.group_id);
+      state.personalExpenses = action.payload.filter(
+        (e) => e.expense_type === EXPENSE_TYPE.PERSONAL,
+      );
     });
     builder.addCase(fetchUserExpenses.rejected, (state, action) => {
       state.isLoading = false;
@@ -148,7 +151,7 @@ const expenseSlice = createSlice({
     // Create
     builder.addCase(createExpense.fulfilled, (state, action) => {
       state.expenses.unshift(action.payload);
-      if (!action.payload.group_id) {
+      if (action.payload.expense_type === EXPENSE_TYPE.PERSONAL) {
         state.personalExpenses.unshift(action.payload);
       } else {
         state.groupExpenses.unshift(action.payload);

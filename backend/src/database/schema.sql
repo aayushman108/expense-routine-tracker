@@ -39,6 +39,8 @@ CREATE TABLE group_members (
 -- Expenses table
 CREATE TABLE expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    expense_type VARCHAR(20) NOT NULL
+    CHECK (expense_type IN ('personal','group')),
     group_id UUID NULL, -- NULL for personal expenses
     paid_by UUID NOT NULL,
     total_amount DECIMAL(12,2) NOT NULL,
@@ -48,8 +50,16 @@ CREATE TABLE expenses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
-    FOREIGN KEY (paid_by) REFERENCES users(id) ON DELETE RESTRICT
+    FOREIGN KEY (paid_by) REFERENCES users(id) ON DELETE RESTRICT,
+
+    CHECK (
+        (expense_type = 'personal' AND group_id IS NULL)
+        OR
+        (expense_type = 'group' AND group_id IS NOT NULL)
+    )
 );
+
+
 
 -- Expense Splits table
 CREATE TABLE expense_splits (

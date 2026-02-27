@@ -23,6 +23,7 @@ import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal"
 import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
 import styles from "./personal.module.scss";
 import type { RootState } from "@/store";
+import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
 
 export default function PersonalDetailsPage() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function PersonalDetailsPage() {
     > = {};
 
     expenses
-      .filter((e) => e.group_id)
+      .filter((e) => e.expense_type === EXPENSE_TYPE.GROUP)
       .forEach((expense) => {
         const gId = expense.group_id as string;
         if (!groups[gId]) {
@@ -109,7 +110,7 @@ export default function PersonalDetailsPage() {
     );
 
     const actualGroupSpend = expenses
-      .filter((e) => e.group_id)
+      .filter((e) => e.expense_type === EXPENSE_TYPE.GROUP)
       .reduce((acc, curr) => {
         const mySplit = curr.splits?.find(
           (s: any) => s.user.id === user?.id || s.user_id === user?.id,
@@ -169,9 +170,10 @@ export default function PersonalDetailsPage() {
     const mySplit = expense.splits?.find(
       (s: any) => s.user.id === user?.id || s.user_id === user?.id,
     );
-    const amountToShow = expense.group_id
-      ? mySplit?.split_amount || 0
-      : expense.total_amount;
+    const amountToShow =
+      expense.expense_type === EXPENSE_TYPE.GROUP
+        ? mySplit?.split_amount || 0
+        : expense.total_amount;
 
     return (
       <div
@@ -189,7 +191,9 @@ export default function PersonalDetailsPage() {
           <span className={styles.meta}>
             {new Date(expense.expense_date).toLocaleDateString()} •{" "}
             {expense.currency}{" "}
-            {expense.group_id ? `• ${expense.group_name}` : "• Personal"}
+            {expense.expense_type === EXPENSE_TYPE.GROUP
+              ? `• ${expense.group_name}`
+              : "• Personal"}
           </span>
         </div>
         <div className={styles.amount}>

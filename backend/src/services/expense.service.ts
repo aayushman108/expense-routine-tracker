@@ -3,6 +3,7 @@ import {
   ICreateExpenseSchema,
   IUpdateExpenseSchema,
 } from "@expense-tracker/shared/validationSchema";
+import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
 
 export type IAddExpense = ICreateExpenseSchema["body"] &
   ICreateExpenseSchema["params"] & {
@@ -12,19 +13,21 @@ export type IAddExpense = ICreateExpenseSchema["body"] &
 export type IUpdateExpense = IUpdateExpenseSchema["body"];
 
 async function addExpense(data: IAddExpense) {
-  if (data.groupId === "personal") {
-    data.groupId = undefined;
-  }
   let calculatedSplits: IExpenseSplit[] = [];
 
-  if (data.splits && data.splits.length > 0) {
+  // Personal expenses don't need splits or settlement tracking
+  if (
+    data.expenseType !== EXPENSE_TYPE.PERSONAL &&
+    data.splits &&
+    data.splits.length > 0
+  ) {
     calculatedSplits = data.splits.map((split) => ({
       user_id: split.userId,
       split_percentage: split.splitPercentage,
       split_amount: split.splitAmount,
     }));
 
-    // Rounding adjustment logic (optional but good to keep if we double-check)
+    // Rounding adjustment logic
     const sumCalculated = calculatedSplits.reduce(
       (acc, s) => acc + s.split_amount,
       0,

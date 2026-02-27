@@ -18,11 +18,12 @@ async function createExpense({
   return await db.transaction(async (trx) => {
     const expenseResult = await trx.raw(
       `
-        INSERT INTO expenses (id, group_id, paid_by, total_amount, description, expense_date, currency)
-        VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?)
+        INSERT INTO expenses (id, expense_type, group_id, paid_by, total_amount, description, expense_date, currency)
+        VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?)
         RETURNING *
       `,
       [
+        data.expenseType,
         data.groupId,
         data.paidBy,
         data.totalAmount,

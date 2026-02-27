@@ -3,6 +3,7 @@ import {
   requiredPreprocessor,
   optionalPreprocessor,
 } from "../utils/validationSchemaPreprocessor";
+import { EXPENSE_TYPE } from "../enum/general.enum";
 
 export class ExpenseValidation {
   static createExpenseSchema = z
@@ -11,6 +12,9 @@ export class ExpenseValidation {
         groupId: z.string().uuid().optional(),
       }),
       body: z.object({
+        expenseType: z
+          .enum([EXPENSE_TYPE.PERSONAL, EXPENSE_TYPE.GROUP])
+          .default(EXPENSE_TYPE.GROUP),
         description: z.preprocess(
           requiredPreprocessor,
           z
@@ -60,12 +64,33 @@ export class ExpenseValidation {
     })
     .superRefine((data, ctx) => {
       const groupId = data?.params?.groupId;
+      const expenseType = data?.body?.expenseType;
       const splits = data?.body?.splits;
-      if (groupId && (!splits || splits.length === 0)) {
+
+      if (expenseType === EXPENSE_TYPE.GROUP && !groupId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Group ID is required for group expenses",
+          path: ["params", "groupId"],
+        });
+      }
+
+      if (expenseType === EXPENSE_TYPE.PERSONAL && groupId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Group ID should not be provided for personal expenses",
+          path: ["params", "groupId"],
+        });
+      }
+
+      if (
+        expenseType === EXPENSE_TYPE.GROUP &&
+        (!splits || splits.length === 0)
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Splits are required for group expenses",
-          path: ["splits"],
+          path: ["body", "splits"],
         });
       }
     });
@@ -73,6 +98,9 @@ export class ExpenseValidation {
   static updateExpenseSchema = z.object({
     body: z
       .object({
+        expenseType: z
+          .enum([EXPENSE_TYPE.PERSONAL, EXPENSE_TYPE.GROUP])
+          .optional(),
         description: z.preprocess(
           optionalPreprocessor,
           z.string().min(1).optional().nullable(),

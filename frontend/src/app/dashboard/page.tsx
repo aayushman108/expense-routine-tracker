@@ -21,6 +21,7 @@ import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal"
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
+import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
@@ -47,7 +48,7 @@ export default function DashboardPage() {
   );
 
   const owedToYou = expenses.reduce((total, exp) => {
-    if (!exp.group_id || !exp.splits) return total;
+    if (exp.expense_type !== EXPENSE_TYPE.GROUP || !exp.splits) return total;
     // If I'm the payer, others' pending splits are owed to me
     if (exp.paid_by === user?.id) {
       return (
@@ -64,7 +65,7 @@ export default function DashboardPage() {
   }, 0);
 
   const youOwe = expenses.reduce((total, exp) => {
-    if (!exp.group_id || !exp.splits) return total;
+    if (exp.expense_type !== EXPENSE_TYPE.GROUP || !exp.splits) return total;
     // If I'm NOT the payer, my pending split is what I owe
     if (exp.paid_by !== user?.id) {
       return (

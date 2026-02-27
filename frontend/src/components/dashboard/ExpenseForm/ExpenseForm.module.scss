@@ -6,6 +6,38 @@
   gap: $space-5;
 }
 
+.expenseTypeToggle {
+  display: flex;
+  background: var(--bg-tertiary);
+  padding: $space-1;
+  border-radius: $radius-lg;
+  border: 1px solid var(--border-default);
+  margin-bottom: $space-2;
+
+  .typeBtn {
+    flex: 1;
+    padding: $space-2 $space-4;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+
+    &.active {
+      background: var(--bg-surface);
+      color: var(--color-primary);
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
