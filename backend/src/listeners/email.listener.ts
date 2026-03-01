@@ -49,6 +49,38 @@ appEmitter.on(
   },
 );
 
+// Expense verified email listener
+appEmitter.on(
+  EVENTS.EMAIL.EXPENSE_VERIFIED,
+  async (data: {
+    emails: string[];
+    payerName: string;
+    expenseDescription: string;
+    totalAmount: string;
+    currency: string;
+  }) => {
+    try {
+      // For simplicity, handle it in a loop for each email or sending directly
+      const sendPromises = data.emails.map((email) =>
+        sendMail({
+          email: email,
+          subject: `Expense Verified: ${data.expenseDescription}`,
+          template: "expenseVerified.ejs",
+          data: {
+            payerName: data.payerName,
+            expenseDescription: data.expenseDescription,
+            totalAmount: data.totalAmount,
+            currency: data.currency,
+          },
+        }),
+      );
+      await Promise.all(sendPromises);
+    } catch (error) {
+      console.error("Error sending expense verified email:", error);
+    }
+  },
+);
+
 export const initEmailListeners = () => {
   console.log("Email listeners initialized");
 };

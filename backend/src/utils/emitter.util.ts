@@ -8,5 +8,6 @@ export const EVENTS = {
   EMAIL: {
     SIGNUP: "email:signup",
     INVITE: "email:invite",
+    EXPENSE_VERIFIED: "email:expense_verified",
   },
 };
