@@ -30,6 +30,13 @@ export enum SPLIT_STATUS {
   REJECTED = "rejected",
 }
 
+export enum SETTLEMENT_STATUS {
+  PENDING = "pending",
+  PAID = "paid",
+  CONFIRMED = "confirmed",
+  REJECTED = "rejected",
+}
+
 /**
  * @description
  * if all split_status are verified then expense_status will be verified,

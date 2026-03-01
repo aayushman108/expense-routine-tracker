@@ -20,6 +20,11 @@ router.patch(
   validateRequest(ExpenseValidation.updateExpenseSchema),
   expenseController.updateExpense,
 );
+router.patch(
+  "/:id/split/:splitId/status",
+  validateRequest(ExpenseValidation.updateSplitStatusSchema),
+  expenseController.updateSplitStatus,
+);
 router.get("/user", expenseController.getUserExpenses);
 router.get("/group/:groupId", expenseController.getGroupExpenses);
 router.get("/:id", expenseController.getExpense);

@@ -3,7 +3,11 @@ import {
   requiredPreprocessor,
   optionalPreprocessor,
 } from "../utils/validationSchemaPreprocessor";
-import { EXPENSE_TYPE } from "../enum/general.enum";
+import {
+  EXPENSE_TYPE,
+  EXPENSE_STATUS,
+  SPLIT_STATUS,
+} from "../enum/general.enum";
 
 export class ExpenseValidation {
   static createExpenseSchema = z
@@ -15,6 +19,15 @@ export class ExpenseValidation {
         expenseType: z
           .enum([EXPENSE_TYPE.PERSONAL, EXPENSE_TYPE.GROUP])
           .default(EXPENSE_TYPE.GROUP),
+        expense_type: z
+          .enum([EXPENSE_TYPE.PERSONAL, EXPENSE_TYPE.GROUP])
+          .optional(),
+        expenseStatus: z
+          .enum([EXPENSE_STATUS.DRAFT, EXPENSE_STATUS.SUBMITTED])
+          .default(EXPENSE_STATUS.DRAFT),
+        expense_status: z
+          .enum([EXPENSE_STATUS.DRAFT, EXPENSE_STATUS.SUBMITTED])
+          .optional(),
         description: z.preprocess(
           requiredPreprocessor,
           z
@@ -27,6 +40,10 @@ export class ExpenseValidation {
             .number({ message: "Total amount is required" })
             .positive("Amount must be greater than 0"),
         ),
+        total_amount: z.preprocess(
+          optionalPreprocessor,
+          z.number().positive().optional(),
+        ),
         expenseDate: z.preprocess(
           requiredPreprocessor,
           z
@@ -35,7 +52,18 @@ export class ExpenseValidation {
               message: "Invalid date format",
             }),
         ),
+        expense_date: z.preprocess(
+          optionalPreprocessor,
+          z
+            .string()
+            .refine((val) => !isNaN(Date.parse(val)))
+            .optional(),
+        ),
         paidBy: z.preprocess(
+          optionalPreprocessor,
+          z.string().uuid().nullable(),
+        ),
+        paid_by: z.preprocess(
           optionalPreprocessor,
           z.string().uuid().nullable(),
         ),
@@ -101,6 +129,25 @@ export class ExpenseValidation {
         expenseType: z
           .enum([EXPENSE_TYPE.PERSONAL, EXPENSE_TYPE.GROUP])
           .optional(),
+        expense_type: z
+          .enum([EXPENSE_TYPE.PERSONAL, EXPENSE_TYPE.GROUP])
+          .optional(),
+        expenseStatus: z
+          .enum([
+            EXPENSE_STATUS.DRAFT,
+            EXPENSE_STATUS.SUBMITTED,
+            EXPENSE_STATUS.VERIFIED,
+            EXPENSE_STATUS.REJECTED,
+          ])
+          .optional(),
+        expense_status: z
+          .enum([
+            EXPENSE_STATUS.DRAFT,
+            EXPENSE_STATUS.SUBMITTED,
+            EXPENSE_STATUS.VERIFIED,
+            EXPENSE_STATUS.REJECTED,
+          ])
+          .optional(),
         description: z.preprocess(
           optionalPreprocessor,
           z.string().min(1).optional().nullable(),
@@ -113,7 +160,19 @@ export class ExpenseValidation {
             .optional()
             .nullable(),
         ),
+        total_amount: z.preprocess(
+          optionalPreprocessor,
+          z.number().positive().optional().nullable(),
+        ),
         expenseDate: z.preprocess(
+          optionalPreprocessor,
+          z
+            .string()
+            .refine((val) => !isNaN(Date.parse(val)))
+            .optional()
+            .nullable(),
+        ),
+        expense_date: z.preprocess(
           optionalPreprocessor,
           z
             .string()
@@ -126,6 +185,10 @@ export class ExpenseValidation {
           z.string().length(3).optional().nullable(),
         ),
         paidBy: z.preprocess(
+          optionalPreprocessor,
+          z.string().uuid().nullable(),
+        ),
+        paid_by: z.preprocess(
           optionalPreprocessor,
           z.string().uuid().nullable(),
         ),
@@ -157,6 +220,20 @@ export class ExpenseValidation {
           });
         }
       }),
+  });
+
+  static updateSplitStatusSchema = z.object({
+    params: z.object({
+      id: z.string().uuid(),
+      splitId: z.string().uuid(),
+    }),
+    body: z.object({
+      status: z.enum([
+        SPLIT_STATUS.PENDING,
+        SPLIT_STATUS.VERIFIED,
+        SPLIT_STATUS.REJECTED,
+      ]),
+    }),
   });
 }
 

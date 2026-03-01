@@ -1,3 +1,4 @@
+import { SETTLEMENT_STATUS } from "@expense-tracker/shared";
 import { db } from "../database/db";
 
 /**
@@ -17,6 +18,7 @@ export async function getGroupBalances(groupId: string) {
         WHERE e.group_id = ? 
           AND es.settlement_id IS NULL
           AND es.user_id != e.paid_by
+          AND e.expense_status = 'verified'
         GROUP BY es.user_id, e.paid_by
     ),
     netted_debts AS (
@@ -34,7 +36,7 @@ export async function getGroupBalances(groupId: string) {
         CASE WHEN net > 0 THEN u1 ELSE u2 END as from_user_id,
         CASE WHEN net > 0 THEN u2 ELSE u1 END as to_user_id,
         ABS(net) as total_amount,
-        'pending' as status,
+        ? as status,
         NULL::uuid as settlement_id,
         NULL::jsonb as proof_image,
         fu.full_name as from_user_name,
@@ -67,11 +69,17 @@ export async function getGroupBalances(groupId: string) {
     JOIN users fu ON s.from_user_id = fu.id
     JOIN users tu ON s.to_user_id = tu.id
     WHERE s.group_id = ? 
-      AND s.status IN ('pending', 'paid')
+      AND s.status IN (?, ?)
     ORDER BY status DESC, total_amount DESC
   `;
 
-  const result = await db.raw(query, [groupId, groupId]);
+  const result = await db.raw(query, [
+    groupId,
+    SETTLEMENT_STATUS.PENDING,
+    groupId,
+    SETTLEMENT_STATUS.PENDING,
+    SETTLEMENT_STATUS.PAID,
+  ]);
   return result.rows;
 }
 
@@ -94,6 +102,7 @@ export async function settleBulk(
       JOIN expenses e ON es.expense_id = e.id
       WHERE e.group_id = ? 
         AND es.settlement_id IS NULL
+        AND e.expense_status = 'verified'
         AND (
           (es.user_id = ? AND e.paid_by = ?) OR 
           (es.user_id = ? AND e.paid_by = ?)
@@ -124,7 +133,7 @@ export async function settleBulk(
         finalFrom,
         finalTo,
         finalAmount,
-        proofImage ? "paid" : "pending",
+        proofImage ? SETTLEMENT_STATUS.PAID : SETTLEMENT_STATUS.PENDING,
         proofImage ? JSON.stringify(proofImage) : null,
         proofImage ? new Date() : null,
       ],
@@ -143,6 +152,7 @@ export async function settleBulk(
         JOIN expenses e ON es.expense_id = e.id
         WHERE e.group_id = ? 
           AND es.settlement_id IS NULL
+          AND e.expense_status = 'verified'
           AND (
             (es.user_id = ? AND e.paid_by = ?) OR 
             (es.user_id = ? AND e.paid_by = ?)
@@ -164,17 +174,19 @@ export async function confirmBulk(
   fromUserId: string,
   toUserId: string,
   reviewedBy: string,
-  status: "confirmed" | "rejected" = "confirmed",
+  status:
+    | SETTLEMENT_STATUS.CONFIRMED
+    | SETTLEMENT_STATUS.REJECTED = SETTLEMENT_STATUS.CONFIRMED,
 ) {
   return await db.transaction(async (trx) => {
     // Find the most recent 'paid' settlement to act upon
     const findResult = await trx.raw(
       `
       SELECT id FROM settlements
-      WHERE group_id = ? AND from_user_id = ? AND to_user_id = ? AND status = 'paid'
+      WHERE group_id = ? AND from_user_id = ? AND to_user_id = ? AND status = ?
       ORDER BY created_at DESC LIMIT 1
     `,
-      [groupId, fromUserId, toUserId],
+      [groupId, fromUserId, toUserId, SETTLEMENT_STATUS.PAID],
     );
 
     if (findResult.rows.length === 0) {
@@ -193,7 +205,7 @@ export async function confirmBulk(
       [status, reviewedBy, settlementId],
     );
 
-    if (status === "rejected") {
+    if (status === SETTLEMENT_STATUS.REJECTED) {
       // If rejected, free the splits so they can be settled again
       await trx.raw(
         `UPDATE expense_splits SET settlement_id = NULL WHERE settlement_id = ?`,
@@ -207,14 +219,14 @@ export async function confirmBulk(
 
 export async function updateSettlementStatus(
   settlementId: string,
-  status: "pending" | "paid" | "confirmed" | "rejected",
+  status: SETTLEMENT_STATUS,
   proofImage?: { url: string; publicId: string },
 ) {
   const result = await db.raw(
     `
     UPDATE settlements 
     SET status = ?, proof_image = ?, updated_at = CURRENT_TIMESTAMP
-    ${status === "paid" ? ", paid_at = CURRENT_TIMESTAMP" : ""}
+    ${status === SETTLEMENT_STATUS.PAID ? ", paid_at = CURRENT_TIMESTAMP" : ""}
     WHERE id = ? 
     RETURNING *
   `,

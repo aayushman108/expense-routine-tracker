@@ -1,6 +1,11 @@
 import { keysToSnakeCase } from "src/utils/caseConverter";
 import { db } from "../database/db";
 import { IAddExpense, IUpdateExpense } from "../services/expense.service";
+import {
+  EXPENSE_STATUS,
+  SETTLEMENT_STATUS,
+  SPLIT_STATUS,
+} from "@expense-tracker/shared";
 
 export interface IExpenseSplit {
   user_id: string;
@@ -18,8 +23,8 @@ async function createExpense({
   return await db.transaction(async (trx) => {
     const expenseResult = await trx.raw(
       `
-        INSERT INTO expenses (id, expense_type, group_id, paid_by, total_amount, description, expense_date, currency)
-        VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO expenses (id, expense_type, group_id, paid_by, total_amount, description, expense_date, currency, expense_status)
+        VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?, COALESCE(?::expense_status_enum, ?::expense_status_enum))
         RETURNING *
       `,
       [
@@ -30,6 +35,8 @@ async function createExpense({
         data.description,
         data.expenseDate,
         data.currency,
+        data.expenseStatus,
+        EXPENSE_STATUS.DRAFT,
       ],
     );
 
@@ -138,7 +145,7 @@ async function getExpenseById(id: string) {
                '[]'::jsonb
              ) as splits,
              COALESCE(settlement_info.overall_status, 
-               CASE WHEN e.group_id IS NULL THEN 'personal' ELSE 'pending' END
+               CASE WHEN e.group_id IS NULL THEN 'personal' ELSE ? END
              ) AS settlement_status
       FROM expenses e
       LEFT JOIN users p ON e.paid_by = p.id
@@ -148,10 +155,10 @@ async function getExpenseById(id: string) {
       LEFT JOIN LATERAL (
         SELECT 
           CASE 
-            WHEN COUNT(*) = 0 THEN 'confirmed'
-            WHEN BOOL_AND(COALESCE(st_inner.status = 'confirmed', FALSE)) THEN 'confirmed'
-            WHEN BOOL_AND(COALESCE(st_inner.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
-            ELSE 'pending'
+            WHEN COUNT(*) = 0 THEN ?
+            WHEN BOOL_AND(COALESCE(st_inner.status = ?, FALSE)) THEN ?
+            WHEN BOOL_AND(COALESCE(st_inner.status IN (?, ?), FALSE)) THEN ?
+            ELSE ?
           END AS overall_status
         FROM expense_splits es_inner
         LEFT JOIN settlements st_inner ON es_inner.settlement_id = st_inner.id
@@ -161,13 +168,24 @@ async function getExpenseById(id: string) {
       WHERE e.id = ?
       GROUP BY e.id, p.id, settlement_info.overall_status
     `,
-    [id],
+    [
+      SETTLEMENT_STATUS.PENDING,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.PENDING,
+      id,
+    ],
   );
   return result.rows[0];
 }
 
 async function getGroupExpenses(
   groupId: string,
+  userId: string,
   limit: number,
   offset: number,
 ) {
@@ -176,8 +194,8 @@ async function getGroupExpenses(
   const totalCount = await db.raw(
     `SELECT COUNT(*) AS total_count
      FROM expenses
-     WHERE group_id = ?`,
-    [groupId],
+     WHERE group_id = ? AND (expense_status != 'draft' OR paid_by = ?)`,
+    [groupId, userId],
   );
 
   const total = Number(totalCount.rows[0].total_count);
@@ -187,11 +205,11 @@ async function getGroupExpenses(
     SELECT e.*,
        to_jsonb(p) AS payer,
        splits.data AS splits,
-       COALESCE(settlement_info.overall_status, 'pending') AS settlement_status
+       COALESCE(settlement_info.overall_status, ?) AS settlement_status
     FROM (
       SELECT *
       FROM expenses
-      WHERE group_id = ?
+      WHERE group_id = ? AND (expense_status != 'draft' OR paid_by = ?)
       ORDER BY expense_date DESC
       LIMIT ? OFFSET ?
     ) e
@@ -217,10 +235,10 @@ async function getGroupExpenses(
     LEFT JOIN LATERAL (
       SELECT 
         CASE 
-          WHEN COUNT(*) = 0 THEN 'confirmed'
-          WHEN BOOL_AND(COALESCE(st_inner.status = 'confirmed', FALSE)) THEN 'confirmed'
-          WHEN BOOL_AND(COALESCE(st_inner.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
-          ELSE 'pending'
+          WHEN COUNT(*) = 0 THEN ?
+          WHEN BOOL_AND(COALESCE(st_inner.status = ?, FALSE)) THEN ?
+          WHEN BOOL_AND(COALESCE(st_inner.status IN (?, ?), FALSE)) THEN ?
+          ELSE ?
         END AS overall_status
       FROM expense_splits es_inner
       LEFT JOIN settlements st_inner ON es_inner.settlement_id = st_inner.id
@@ -229,7 +247,20 @@ async function getGroupExpenses(
     ) settlement_info ON true
     ORDER BY e.expense_date DESC
     `,
-    [groupId, limit, offset],
+    [
+      SETTLEMENT_STATUS.PENDING,
+      groupId,
+      userId,
+      limit,
+      offset,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.PENDING,
+    ],
   );
 
   return { total, data: dataResult.rows };
@@ -239,8 +270,9 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
   const totalCount = await db.raw(
     `SELECT COUNT(*) AS total_count
      FROM expenses e
-     WHERE e.paid_by = ? OR e.id IN (
-       SELECT expense_id FROM expense_splits WHERE user_id = ?
+     WHERE e.paid_by = ? OR (
+       e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
+       AND e.expense_status != 'draft'
      )`,
     [userId, userId],
   );
@@ -257,7 +289,7 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
        splits.data as splits,
        CASE 
          WHEN e.group_id IS NULL THEN NULL
-         ELSE COALESCE(settlement_info.overall_status, 'pending')
+         ELSE COALESCE(settlement_info.overall_status, ?)
        END AS settlement_status,
        CASE
          WHEN e.group_id IS NULL THEN e.total_amount
@@ -271,8 +303,9 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
     FROM (
       SELECT *
       FROM expenses e
-      WHERE e.paid_by = ? OR e.id IN (
-        SELECT expense_id FROM expense_splits WHERE user_id = ?
+      WHERE e.paid_by = ? OR (
+        e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
+        AND e.expense_status != 'draft'
       )
       ORDER BY e.expense_date DESC
       LIMIT ? OFFSET ?
@@ -306,18 +339,18 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
       SELECT 
         -- Calculation for overall status (all splits)
         CASE 
-          WHEN COUNT(*) = 0 THEN 'confirmed'
-          WHEN BOOL_AND(COALESCE(st_all.status = 'confirmed', FALSE)) THEN 'confirmed'
-          WHEN BOOL_AND(COALESCE(st_all.status IN ('paid', 'confirmed'), FALSE)) THEN 'paid'
-          ELSE 'pending'
+          WHEN COUNT(*) = 0 THEN ?
+          WHEN BOOL_AND(COALESCE(st_all.status = ?, FALSE)) THEN ?
+          WHEN BOOL_AND(COALESCE(st_all.status IN (?, ?), FALSE)) THEN ?
+          ELSE ?
         END AS overall_status,
         -- Calculation for amount others have paid me (if I'm the payer)
         COALESCE(SUM(es_all.split_amount) FILTER (
-          WHERE e.paid_by = ? AND es_all.user_id != ? AND st_all.status IN ('paid', 'confirmed')
+          WHERE e.paid_by = ? AND es_all.user_id != ? AND st_all.status IN (?, ?)
         ), 0) AS total_received_by_me,
         -- Calculation for amount I have paid others (if I'm a spender)
         COALESCE(SUM(es_all.split_amount) FILTER (
-          WHERE es_all.user_id = ? AND e.paid_by != ? AND st_all.status IN ('paid', 'confirmed')
+          WHERE es_all.user_id = ? AND e.paid_by != ? AND st_all.status IN (?, ?)
         ), 0) AS total_paid_by_me
       FROM expense_splits es_all
       LEFT JOIN settlements st_all ON es_all.settlement_id = st_all.id
@@ -326,15 +359,27 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
     ORDER BY e.expense_date DESC
     `,
     [
+      SETTLEMENT_STATUS.PENDING,
       userId, // [1] CASE paid_by
       userId, // [2] Subquery paid_by
       userId, // [3] Subquery splits
       limit, // [4] LIMIT
       offset, // [5] OFFSET
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.PENDING,
       userId, // [6] Lateral total_received_by_me (paid_by)
       userId, // [7] Lateral total_received_by_me (user_id !=)
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.CONFIRMED,
       userId, // [8] Lateral total_paid_by_me (user_id)
       userId, // [9] Lateral total_paid_by_me (paid_by !=)
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.CONFIRMED,
     ],
   );
 
@@ -346,6 +391,74 @@ async function deleteExpense(id: string) {
   return true;
 }
 
+async function updateSplitStatus(
+  expenseId: string,
+  splitId: string,
+  splitStatus: SPLIT_STATUS,
+  userId: string,
+) {
+  return await db.transaction(async (trx) => {
+    // 0. Check if the expense is in DRAFT status
+    const currentExpense = await trx.raw(
+      `SELECT expense_status FROM expenses WHERE id = ?`,
+      [expenseId],
+    );
+
+    if (
+      !currentExpense.rows[0] ||
+      currentExpense.rows[0].expense_status === EXPENSE_STATUS.DRAFT
+    ) {
+      throw new Error("Only submitted expenses can be verified.");
+    }
+
+    // 1. Update the split_status
+    await trx.raw(
+      `
+        UPDATE expense_splits
+        SET split_status = ?::split_status_enum
+        WHERE id = ? AND expense_id = ? AND user_id = ?
+      `,
+      [splitStatus, splitId, expenseId, userId],
+    );
+
+    // 2. Recalculate expense_status
+    // if all split_status are verified then expense_status will be verified,
+    // if one or more split_status are rejected then expense_status will be rejected,
+    // if all split_status are mixed then expense_status will be submitted.
+    // However, if it's draft, maybe it stays draft? The comment says:
+    // "expense_status will be draft if the expense is not submitted yet"
+    // For now, if someone is verifying/rejecting logic, it's at least submitted.
+    const splitsResult = await trx.raw(
+      `SELECT split_status FROM expense_splits WHERE expense_id = ?`,
+      [expenseId],
+    );
+
+    const splits = splitsResult.rows;
+    let newExpenseStatus = EXPENSE_STATUS.SUBMITTED;
+
+    const allVerified = splits.every(
+      (s: any) => s.split_status === SPLIT_STATUS.VERIFIED,
+    );
+    const anyRejected = splits.some(
+      (s: any) => s.split_status === SPLIT_STATUS.REJECTED,
+    );
+
+    if (anyRejected) {
+      newExpenseStatus = EXPENSE_STATUS.REJECTED;
+    } else if (allVerified && splits.length > 0) {
+      newExpenseStatus = EXPENSE_STATUS.VERIFIED;
+    }
+
+    // 3. Update expense table
+    await trx.raw(
+      `UPDATE expenses SET expense_status = ?::expense_status_enum, updated_at = NOW() WHERE id = ?`,
+      [newExpenseStatus, expenseId],
+    );
+
+    return newExpenseStatus;
+  });
+}
+
 export const expenseDao = {
   createExpense,
   updateExpense,
@@ -353,4 +466,5 @@ export const expenseDao = {
   getGroupExpenses,
   getUserExpenses,
   deleteExpense,
+  updateSplitStatus,
 };

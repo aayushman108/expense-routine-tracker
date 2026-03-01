@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SETTLEMENT_STATUS } from "../enum/general.enum";
 
 export const updateSettlementStatusSchema = z.object({
   params: z.object({
@@ -6,7 +7,7 @@ export const updateSettlementStatusSchema = z.object({
   }),
   body: z
     .object({
-      status: z.enum(["pending", "paid"]),
+      status: z.enum([SETTLEMENT_STATUS.PENDING, SETTLEMENT_STATUS.PAID]),
       proofImage: z
         .object({
           url: z.string().url("Invalid image URL"),
@@ -16,7 +17,7 @@ export const updateSettlementStatusSchema = z.object({
     })
     .refine(
       (data) => {
-        if (data.status === "paid" && !data.proofImage) {
+        if (data.status === SETTLEMENT_STATUS.PAID && !data.proofImage) {
           return false;
         }
         return true;

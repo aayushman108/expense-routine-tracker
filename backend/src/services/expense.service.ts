@@ -3,7 +3,12 @@ import {
   ICreateExpenseSchema,
   IUpdateExpenseSchema,
 } from "@expense-tracker/shared/validationSchema";
-import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
+import {
+  EXPENSE_STATUS,
+  EXPENSE_TYPE,
+  SPLIT_STATUS,
+} from "@expense-tracker/shared";
+import { appEmitter, EVENTS } from "../utils/emitter.util";
 
 export type IAddExpense = ICreateExpenseSchema["body"] &
   ICreateExpenseSchema["params"] & {
@@ -92,10 +97,11 @@ async function getExpenseDetails(id: string) {
 
 async function getGroupExpenses(
   groupId: string,
+  userId: string,
   limit: number,
   offset: number,
 ) {
-  return await expenseDao.getGroupExpenses(groupId, limit, offset);
+  return await expenseDao.getGroupExpenses(groupId, userId, limit, offset);
 }
 
 async function getPersonalExpenses(
@@ -110,6 +116,42 @@ async function deleteExpense(id: string) {
   return await expenseDao.deleteExpense(id);
 }
 
+async function updateSplitStatus(
+  expenseId: string,
+  splitId: string,
+  splitStatus: SPLIT_STATUS,
+  userId: string,
+) {
+  const newExpenseStatus = await expenseDao.updateSplitStatus(
+    expenseId,
+    splitId,
+    splitStatus,
+    userId,
+  );
+
+  if (newExpenseStatus === EXPENSE_STATUS.VERIFIED) {
+    // We need to fetch expense details to send the email
+    const expense = await expenseDao.getExpenseById(expenseId);
+    if (expense) {
+      const splits =
+        typeof expense.splits === "string"
+          ? JSON.parse(expense.splits)
+          : expense.splits;
+      const emails = splits.map((s: any) => s.user.email).filter(Boolean);
+      const payerName = expense.payer?.full_name || "Someone";
+      appEmitter.emit(EVENTS.EMAIL.EXPENSE_VERIFIED, {
+        emails,
+        payerName,
+        expenseDescription: expense.description,
+        totalAmount: expense.total_amount,
+        currency: expense.currency || "NPR",
+      });
+    }
+  }
+
+  return newExpenseStatus;
+}
+
 export const expenseService = {
   addExpense,
   updateExpense,
@@ -117,4 +159,5 @@ export const expenseService = {
   getGroupExpenses,
   getPersonalExpenses,
   deleteExpense,
+  updateSplitStatus,
 };

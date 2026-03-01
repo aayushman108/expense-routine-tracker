@@ -47,6 +47,7 @@ const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
 
   const expenses = await expenseService.getGroupExpenses(
     groupId,
+    req.userId as string,
     pageLimit,
     pageOffset,
   );
@@ -104,6 +105,23 @@ const deleteExpense = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const updateSplitStatus = asyncHandler(async (req: Request, res: Response) => {
+  const { id: expenseId, splitId } = req.params;
+  const { status } = req.body;
+  const userId = req.userId as string; // or ensure only the assigned user can update it? For now, using req.userId
+
+  const newStatus = await expenseService.updateSplitStatus(
+    expenseId,
+    splitId,
+    status as any,
+    userId,
+  );
+
+  return sendSuccessResponse(res, {
+    message: `Split status updated successfully. Expense is now ${newStatus}.`,
+  });
+});
+
 export const expenseController = {
   createExpense,
   updateExpense,
@@ -111,4 +129,5 @@ export const expenseController = {
   getGroupExpenses,
   getUserExpenses,
   deleteExpense,
+  updateSplitStatus,
 };
