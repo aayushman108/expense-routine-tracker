@@ -13,7 +13,7 @@ import {
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
-import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
+import { fetchGroupExpenses, updateExpense } from "@/store/slices/expenseSlice";
 import {
   fetchGroupBalances,
   settleBulkAction,
@@ -29,6 +29,8 @@ import {
   clearGroupDetails,
   fetchGroupDetailsAction,
 } from "@/store/slices/groupSlice";
+import { SETTLEMENT_STATUS, EXPENSE_STATUS } from "@expense-tracker/shared";
+
 import type { GroupMember } from "@/lib/types";
 
 export default function GroupDetailsPage() {
@@ -71,6 +73,20 @@ export default function GroupDetailsPage() {
       dispatch(clearGroupDetails());
     };
   }, [id, dispatch]);
+
+  const handleUpdateStatus = async (expenseId: string, status: string) => {
+    try {
+      await dispatch(
+        updateExpense({
+          id: expenseId,
+          body: { expense_status: status as any },
+        }),
+      ).unwrap();
+      if (id) dispatch(fetchGroupExpenses(id as string));
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
 
   const handleOpenBulkModal = (balance: any) => {
     setSelectedBalance(balance);
@@ -230,14 +246,38 @@ export default function GroupDetailsPage() {
                       </div>
                       <div className={styles.info}>
                         <div className={styles.desc}>
-                          {expense.description}
-                          {expense.settlement_status && (
+                          <span className={styles.titleText}>
+                            {expense.description}
+                          </span>
+                          <div className={styles.tagsRow}>
                             <span
-                              className={`${styles.statusBadge} ${styles[expense.settlement_status]}`}
+                              className={`${styles.tag} ${styles[expense.expense_status]}`}
                             >
-                              {expense.settlement_status}
+                              STATUS - {expense.expense_status.toUpperCase()}
                             </span>
-                          )}
+                            {expense.expense_status === "verified" &&
+                              expense.settlement_status && (
+                                <span
+                                  className={`${styles.tag} ${styles[expense.settlement_status]}`}
+                                >
+                                  SETTLEMENT -{" "}
+                                  {expense.settlement_status === "personal"
+                                    ? "PRIVATE"
+                                    : expense.settlement_status.toUpperCase()}
+                                </span>
+                              )}
+                            {expense.expense_status === "draft" && (
+                              <button
+                                className={styles.inlineSubmitBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateStatus(expense.id, "submitted");
+                                }}
+                              >
+                                Submit Expense
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div className={styles.payer}>
                           {isPayer ? (
@@ -342,7 +382,7 @@ export default function GroupDetailsPage() {
                         <div className={styles.amount}>
                           रू {Number(balance.total_amount).toLocaleString()}
                         </div>
-                        {balance.status === "paid" ? (
+                        {balance.status === SETTLEMENT_STATUS.PAID ? (
                           isToUser ? (
                             <Button
                               variant="primary"

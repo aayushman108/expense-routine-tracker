@@ -22,7 +22,8 @@ import {
   SPLIT_MODE,
   SUPPORTED_CURRENCIES,
   EXPENSE_TYPE,
-} from "@expense-tracker/shared/enum/general.enum";
+  EXPENSE_STATUS,
+} from "@expense-tracker/shared";
 import { handleThunk } from "@/lib/utils";
 import { GroupMember } from "@/lib/types";
 
@@ -204,11 +205,15 @@ export default function AddExpenseModal({
     return 100;
   }, [splits, splitMode]);
 
-  const handleSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = async (
+    status: EXPENSE_STATUS = EXPENSE_STATUS.SUBMITTED,
+    e?: React.FormEvent,
+  ) => {
     e?.preventDefault();
 
     const body: any = {
       ...form,
+      expenseStatus: status,
       totalAmount: Number(form.totalAmount) || 0,
     };
 
@@ -309,13 +314,27 @@ export default function AddExpenseModal({
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => handleSubmit()}>
-            Add Expense
-          </Button>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <Button
+              variant="outline"
+              onClick={() => handleSubmit(EXPENSE_STATUS.DRAFT)}
+            >
+              Save as Draft
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => handleSubmit(EXPENSE_STATUS.SUBMITTED)}
+            >
+              Add Expense
+            </Button>
+          </div>
         </>
       }
     >
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form
+        className={styles.form}
+        onSubmit={(e) => handleSubmit(EXPENSE_STATUS.SUBMITTED, e)}
+      >
         <div className={styles.expenseTypeToggle}>
           <button
             type="button"

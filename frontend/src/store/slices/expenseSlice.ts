@@ -1,7 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
 import type { Expense, CreateExpensePayload } from "../../lib/types";
-import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
+import {
+  EXPENSE_TYPE,
+  SPLIT_STATUS,
+} from "@expense-tracker/shared/enum/general.enum";
 
 interface ExpenseState {
   expenses: Expense[];
@@ -101,6 +104,43 @@ export const deleteExpense = createAsyncThunk<string, string>(
   },
 );
 
+export const updateExpense = createAsyncThunk<
+  Expense,
+  { id: string; body: Partial<Expense> }
+>("expenses/updateExpense", async ({ id, body }, { rejectWithValue }) => {
+  try {
+    const { data } = await api.patch(`/expenses/${id}`, body);
+    return data.data?.data || data.data || data;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to update expense",
+    );
+  }
+});
+
+export const updateSplitStatus = createAsyncThunk<
+  string,
+  { expenseId: string; splitId: string; status: SPLIT_STATUS },
+  { rejectValue: string }
+>(
+  "expenses/updateSplitStatus",
+  async ({ expenseId, splitId, status }, { rejectWithValue }) => {
+    try {
+      const { data } = await api.patch(
+        `/expenses/${expenseId}/split/${splitId}/status`,
+        { status },
+      );
+      return data.message; // Controller returns message containing new status
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update split status",
+      );
+    }
+  },
+);
+
 const expenseSlice = createSlice({
   name: "expenses",
   initialState,
@@ -155,6 +195,29 @@ const expenseSlice = createSlice({
         state.personalExpenses.unshift(action.payload);
       } else {
         state.groupExpenses.unshift(action.payload);
+      }
+    });
+
+    // Update
+    builder.addCase(updateExpense.fulfilled, (state, action) => {
+      const updatedExpense = action.payload;
+      const index = state.expenses.findIndex((e) => e.id === updatedExpense.id);
+      if (index !== -1) {
+        state.expenses[index] = updatedExpense;
+      }
+      if (updatedExpense.expense_type === EXPENSE_TYPE.PERSONAL) {
+        const pIndex = state.personalExpenses.findIndex(
+          (e) => e.id === updatedExpense.id,
+        );
+        if (pIndex !== -1) state.personalExpenses[pIndex] = updatedExpense;
+      } else {
+        const gIndex = state.groupExpenses.findIndex(
+          (e) => e.id === updatedExpense.id,
+        );
+        if (gIndex !== -1) state.groupExpenses[gIndex] = updatedExpense;
+      }
+      if (state.currentExpense?.id === updatedExpense.id) {
+        state.currentExpense = updatedExpense;
       }
     });
 

@@ -16,9 +16,19 @@ import {
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchExpenseById } from "@/store/slices/expenseSlice";
+import {
+  fetchExpenseById,
+  updateSplitStatus,
+  updateExpense,
+} from "@/store/slices/expenseSlice";
+import {
+  SETTLEMENT_STATUS,
+  SPLIT_STATUS,
+  EXPENSE_STATUS,
+} from "@expense-tracker/shared";
 import type { Expense, ExpenseSplit } from "@/lib/types";
 import styles from "./ExpenseDetailsModal.module.scss";
+import { HiXCircle } from "react-icons/hi";
 
 interface ExpenseDetailsModalProps {
   isOpen: boolean;
@@ -59,6 +69,36 @@ export default function ExpenseDetailsModal({
         });
     }
   }, [isOpen, expenseId, dispatch]);
+
+  const handleUpdateSplitStatus = async (
+    splitId: string,
+    status: SPLIT_STATUS,
+  ) => {
+    if (!expenseId) return;
+    try {
+      await dispatch(
+        updateSplitStatus({ expenseId, splitId, status }),
+      ).unwrap();
+      // Refetch to get updated status and potentially updated overall expense status
+      const data = await dispatch(fetchExpenseById(expenseId)).unwrap();
+      setDetails(data);
+    } catch (error) {
+      console.error("Failed to update split status:", error);
+    }
+  };
+
+  const handleUpdateExpenseStatus = async (status: EXPENSE_STATUS) => {
+    if (!expenseId) return;
+    try {
+      await dispatch(
+        updateExpense({ id: expenseId, body: { expense_status: status } }),
+      ).unwrap();
+      const data = await dispatch(fetchExpenseById(expenseId)).unwrap();
+      setDetails(data);
+    } catch (error) {
+      console.error("Failed to update expense status:", error);
+    }
+  };
 
   const getInitials = (name?: string) => {
     if (!name) return "?";
@@ -156,10 +196,27 @@ export default function ExpenseDetailsModal({
       ) : details ? (
         <div className={styles.modalContent}>
           <div className={styles.header}>
-            <div className={styles.categoryIcon}>
-              {getCategoryIcon(details.description || "")}
+            <div className={styles.titleArea}>
+              <h2 className={styles.title}>{details.description}</h2>
+              <div className={styles.tagsRow}>
+                <span
+                  className={`${styles.tag} ${styles[details.expense_status]}`}
+                >
+                  STATUS - {details.expense_status.toUpperCase()}
+                </span>
+                {details.paid_by === user?.id &&
+                  details.expense_status === EXPENSE_STATUS.DRAFT && (
+                    <button
+                      className={styles.submitBtn}
+                      onClick={() =>
+                        handleUpdateExpenseStatus(EXPENSE_STATUS.SUBMITTED)
+                      }
+                    >
+                      Submit Expense
+                    </button>
+                  )}
+              </div>
             </div>
-            <h2 className={styles.title}>{details.description}</h2>
             <div className={styles.date}>
               <HiOutlineCalendar /> {formatDate(details.expense_date)}
             </div>
@@ -179,13 +236,13 @@ export default function ExpenseDetailsModal({
             <div className={styles.sectionHeader}>
               <h3>Payment Source</h3>
               <span
-                className={`${styles.badge} ${!details.group_id ? styles.personal : styles[details.settlement_status || "pending"]}`}
+                className={`${styles.badge} ${!details.group_id ? styles.personal : styles[details.settlement_status || SETTLEMENT_STATUS.PENDING]}`}
               >
                 {!details.group_id
                   ? "Personal"
-                  : details.settlement_status === "confirmed"
+                  : details.settlement_status === SETTLEMENT_STATUS.CONFIRMED
                     ? "Settled"
-                    : details.settlement_status === "paid"
+                    : details.settlement_status === SETTLEMENT_STATUS.PAID
                       ? "Paid"
                       : "Pending"}
               </span>
@@ -434,9 +491,23 @@ export default function ExpenseDetailsModal({
               {details.splits?.map((split: ExpenseSplit) => {
                 const isCurrentUser = split.user?.id === user?.id;
                 const isPayer = split.user?.id === details.paid_by;
-                const status = isPayer
-                  ? "payer"
-                  : split.settlement?.status || "pending";
+                const settlementStatus =
+                  split.settlement?.status || SETTLEMENT_STATUS.PENDING;
+                const isExpenseVerified =
+                  details.expense_status === EXPENSE_STATUS.VERIFIED;
+
+                // Determine badge properties based on split_status
+                const splitStatusClass =
+                  split.split_status === SPLIT_STATUS.REJECTED
+                    ? styles.splitRejected
+                    : split.split_status === SPLIT_STATUS.VERIFIED
+                      ? styles.splitVerified
+                      : styles.splitPending;
+
+                const splitStatusText = `STATUS · ${split.split_status.toUpperCase()}`;
+                const settlementStatusText = `SETTLEMENT · ${settlementStatus.toUpperCase()}`;
+                const settlementStatusClass =
+                  styles[settlementStatus] || styles.pending;
 
                 return (
                   <div key={split.id} className={styles.splitRow}>
@@ -451,32 +522,75 @@ export default function ExpenseDetailsModal({
                           getInitials(split.user?.full_name)
                         )}
                       </div>
-                      <span className={styles.name}>
-                        {isCurrentUser ? "You" : split.user?.full_name}
+                      <div className={styles.infoCol}>
+                        <span className={styles.name}>
+                          {isCurrentUser ? "You (Me)" : split.user?.full_name}
+                        </span>
+                        {isPayer && (
+                          <span className={styles.payerLabel}>Payer</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className={styles.right}>
+                      <span className={styles.amount}>
+                        {details.currency}{" "}
+                        {Number(split.split_amount).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
+                      <span className={styles.percentage}>
+                        Allocation: {split.split_percentage}%
                       </span>
                     </div>
 
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <div className={styles.right}>
-                        <span className={styles.amount}>
-                          {details.currency}{" "}
-                          {Number(split.split_amount).toLocaleString(
-                            undefined,
-                            { minimumFractionDigits: 2 },
-                          )}
-                        </span>
-                        <span className={styles.percentage}>
-                          Allocation: {split.split_percentage}%
-                        </span>
-                      </div>
+                    <div className={styles.statusArea}>
+                      {/* Always show Split Status */}
+                      <span
+                        className={`${styles.statusBadge} ${splitStatusClass}`}
+                      >
+                        {splitStatusText}
+                      </span>
 
-                      <div className={styles.statusArea}>
+                      {/* Show Settlement status only when all splits are verified and it's not the payer */}
+                      {isExpenseVerified && !isPayer && (
                         <span
-                          className={`${styles.statusBadge} ${styles[status]}`}
+                          className={`${styles.statusBadge} ${settlementStatusClass}`}
                         >
-                          {status === "payer" ? "Payer" : status}
+                          {settlementStatusText}
                         </span>
-                      </div>
+                      )}
+
+                      {isCurrentUser &&
+                        details.expense_status !== EXPENSE_STATUS.DRAFT &&
+                        split.split_status === SPLIT_STATUS.PENDING && (
+                          <div className={styles.splitActions}>
+                            <button
+                              className={`${styles.actionBtn} ${styles.verify}`}
+                              title="Verify Split"
+                              onClick={() =>
+                                handleUpdateSplitStatus(
+                                  split.id,
+                                  SPLIT_STATUS.VERIFIED,
+                                )
+                              }
+                            >
+                              <HiCheck />
+                            </button>
+                            <button
+                              className={`${styles.actionBtn} ${styles.reject}`}
+                              title="Reject Split"
+                              onClick={() =>
+                                handleUpdateSplitStatus(
+                                  split.id,
+                                  SPLIT_STATUS.REJECTED,
+                                )
+                              }
+                            >
+                              <HiXCircle />
+                            </button>
+                          </div>
+                        )}
                     </div>
                   </div>
                 );

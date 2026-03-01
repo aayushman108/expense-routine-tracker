@@ -1,4 +1,9 @@
-import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
+import {
+  EXPENSE_TYPE,
+  EXPENSE_STATUS,
+  SPLIT_STATUS,
+  SETTLEMENT_STATUS,
+} from "@expense-tracker/shared";
 
 export interface User {
   id: string;
@@ -44,6 +49,7 @@ export interface Expense {
   description?: string;
   expense_date: string;
   currency: string;
+  expense_status: EXPENSE_STATUS;
   created_at: string;
   updated_at?: string;
   payer?: User;
@@ -52,7 +58,7 @@ export interface Expense {
   group_name?: string;
   group_image?: { url: string; publicId: string } | null;
   splits?: ExpenseSplit[];
-  settlement_status?: "pending" | "paid" | "confirmed" | "rejected";
+  settlement_status?: SETTLEMENT_STATUS | "personal";
   user_amount?: number | string;
   total_received_by_me?: number | string;
   total_paid_by_me?: number | string;
@@ -64,6 +70,7 @@ export interface ExpenseSplit {
   user_id?: string;
   split_percentage: number;
   split_amount: number;
+  split_status: SPLIT_STATUS;
   user: User;
   settlement?: Settlement | null;
 }
@@ -82,7 +89,7 @@ export interface PaymentMethod {
 export interface Settlement {
   id: string;
   expense_split_id?: string;
-  status: "pending" | "paid" | "settled";
+  status: SETTLEMENT_STATUS;
   proof_image?: { url: string; publicId: string } | null;
   created_at: string;
   updated_at?: string;
@@ -98,7 +105,7 @@ export interface GroupBalance {
   to_user_name: string;
   to_user_email: string;
   to_user_avatar?: { url: string; publicId: string } | null;
-  status: "pending" | "paid" | "settled";
+  status: SETTLEMENT_STATUS;
   proof_image?: { url: string; publicId: string } | null;
 }
 

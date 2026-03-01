@@ -21,7 +21,7 @@ import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal"
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
-import { EXPENSE_TYPE } from "@expense-tracker/shared/enum/general.enum";
+import { EXPENSE_TYPE, SETTLEMENT_STATUS } from "@expense-tracker/shared";
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
@@ -56,7 +56,8 @@ export default function DashboardPage() {
         exp.splits
           .filter(
             (s) =>
-              s.user?.id !== user?.id && s.settlement?.status === "pending",
+              s.user?.id !== user?.id &&
+              s.settlement?.status === SETTLEMENT_STATUS.PENDING,
           )
           .reduce((sum, s) => sum + Number(s.split_amount), 0)
       );
@@ -73,7 +74,8 @@ export default function DashboardPage() {
         exp.splits
           .filter(
             (s) =>
-              s.user?.id === user?.id && s.settlement?.status === "pending",
+              s.user?.id === user?.id &&
+              s.settlement?.status === SETTLEMENT_STATUS.PENDING,
           )
           .reduce((sum, s) => sum + Number(s.split_amount), 0)
       );

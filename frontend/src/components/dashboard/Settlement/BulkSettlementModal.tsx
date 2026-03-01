@@ -19,6 +19,7 @@ import {
   settleBulkAction,
   confirmBulkAction,
 } from "@/store/slices/settlementSlice";
+import { SETTLEMENT_STATUS } from "@expense-tracker/shared";
 import type { GroupBalance } from "@/lib/types";
 import styles from "./BulkSettlementModal.module.scss";
 
@@ -64,7 +65,7 @@ export default function BulkSettlementModal({
   const handleConfirm = async () => {
     setIsSubmitting(true);
     try {
-      if (balance.status === "paid") {
+      if (balance.status === SETTLEMENT_STATUS.PAID) {
         await dispatch(
           confirmBulkAction({
             groupId,
@@ -206,7 +207,7 @@ export default function BulkSettlementModal({
 
         {/* Step 2: Guidance Box */}
         <div className={styles.guidanceBox}>
-          {balance.status === "paid" ? (
+          {balance.status === SETTLEMENT_STATUS.PAID ? (
             <div className={styles.verificationFlow}>
               <span className={styles.iconWrapper}>
                 <HiCheck />
@@ -238,7 +239,7 @@ export default function BulkSettlementModal({
         </div>
 
         {/* Step 3: Payment Details (Only for Debtor paying) */}
-        {isYouOwe && balance.status === "pending" && (
+        {isYouOwe && balance.status === SETTLEMENT_STATUS.PENDING && (
           <section className={styles.paymentSection}>
             <div className={styles.sectionHeader}>
               <h3>
@@ -386,7 +387,7 @@ export default function BulkSettlementModal({
           </section>
         )}
 
-        {!isYouOwe && balance.status === "pending" && (
+        {!isYouOwe && balance.status === SETTLEMENT_STATUS.PENDING && (
           <div className={styles.infoBox}>
             <p>
               Only{" "}
@@ -399,7 +400,7 @@ export default function BulkSettlementModal({
         )}
 
         {/* Step 4: Upload/Proof Area */}
-        {isYouOwe && balance.status === "pending" && (
+        {isYouOwe && balance.status === SETTLEMENT_STATUS.PENDING && (
           <section className={styles.uploadSection}>
             <div className={styles.sectionHeader}>
               <h3>Upload Receipt</h3>
@@ -435,7 +436,7 @@ export default function BulkSettlementModal({
           </section>
         )}
 
-        {balance.status === "paid" && balance.proof_image && (
+        {balance.status === SETTLEMENT_STATUS.PAID && balance.proof_image && (
           <section className={styles.uploadSection}>
             <div className={styles.sectionHeader}>
               <h3>View Proof</h3>
@@ -457,7 +458,7 @@ export default function BulkSettlementModal({
           </Button>
 
           {/* Action Button: Only show relevant action for the relevant user */}
-          {balance.status === "pending" ? (
+          {balance.status === SETTLEMENT_STATUS.PENDING ? (
             // Pending State: Only the Debtor can settle
             isYouOwe && (
               <Button
