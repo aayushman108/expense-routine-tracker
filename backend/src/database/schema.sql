@@ -82,8 +82,7 @@ CREATE TABLE expense_splits (
 CREATE TABLE payment_methods (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
-    provider VARCHAR(100) NOT NULL,
-    external_id VARCHAR(255),
+    provider VARCHAR(100) NOT NULL, --bank, khalti, e-sewa
     metadata JSONB,
     is_verified BOOLEAN DEFAULT FALSE,
     is_default BOOLEAN DEFAULT FALSE,
@@ -98,12 +97,12 @@ CREATE TABLE settlements (
     group_id UUID NOT NULL,
     from_user_id UUID NOT NULL,
     to_user_id UUID NOT NULL,
-    amount DECIMAL(12,2) NOT NULL CHECK (amount <> 0), -- amount can be positive or negative. if positive, from_user_id owes to_user_id. if negative, to_user_id owes from_user_id.
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending','paid','confirmed','rejected')), -- pending(by default), paid(by from_user_id), confirmed(by to_user_id/from_user_id) or rejected(by to_user_id/from_user_id), but the amount sign decides who owes whom.
+    amount DECIMAL(12,2) NOT NULL CHECK (amount <> 0), 
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending','paid','confirmed','rejected')), 
     proof_image JSONB NULL,
     paid_at TIMESTAMP NULL,
     reviewed_at TIMESTAMP NULL,
-    reviewed_by UUID NULL, -- will be to_user_id if amount is +ve or from_user_id if amount is -ve
+    reviewed_by UUID NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
