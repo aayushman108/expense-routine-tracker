@@ -380,18 +380,19 @@ export default function ExpenseDetailsModal({
                                     isKhalti ? styles.khalti : styles.esewa
                                   }`}
                                 >
-                                  <div className={styles.cardHeader}>
-                                    <div className={styles.providerLogo}>
-                                      {pm.provider.toUpperCase()}
+                                  <div className={styles.infoSide}>
+                                    <div className={styles.cardHeader}>
+                                      <div className={styles.providerLogo}>
+                                        {pm.provider.toUpperCase()}
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div className={styles.cardBody}>
-                                    <div className={styles.infoSide}>
+
+                                    <div className={styles.mainAccount}>
                                       <span className={styles.label}>
                                         Account ID
                                       </span>
-                                      <div className={styles.idRow}>
-                                        <span className={styles.value}>
+                                      <div className={styles.numberRow}>
+                                        <span className={styles.number}>
                                           {meta.phone || meta.username || "—"}
                                         </span>
                                         <button
@@ -410,22 +411,31 @@ export default function ExpenseDetailsModal({
                                           )}
                                         </button>
                                       </div>
-                                      <span className={styles.name}>
-                                        {meta.name ||
-                                          details.payer?.full_name ||
-                                          details.payer_name}
-                                      </span>
                                     </div>
-                                    <div className={styles.qrSide}>
-                                      <div className={styles.qrWrapper}>
-                                        {meta.qrCode ? (
-                                          <img src={meta.qrCode} alt="QR" />
-                                        ) : (
-                                          <HiOutlineQrcode />
-                                        )}
-                                        <div className={styles.qrOverlay}>
-                                          SCAN
-                                        </div>
+
+                                    <div className={styles.auxInfo}>
+                                      <div className={styles.item}>
+                                        <span className={styles.al}>
+                                          HOLDER
+                                        </span>
+                                        <span className={styles.av}>
+                                          {meta.name ||
+                                            details.payer?.full_name ||
+                                            details.payer_name}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className={styles.qrSide}>
+                                    <div className={styles.qrWrapper}>
+                                      {meta.qrCode ? (
+                                        <img src={meta.qrCode} alt="QR" />
+                                      ) : (
+                                        <HiOutlineQrcode />
+                                      )}
+                                      <div className={styles.qrOverlay}>
+                                        SCAN
                                       </div>
                                     </div>
                                   </div>

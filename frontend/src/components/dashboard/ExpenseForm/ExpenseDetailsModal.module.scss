@@ -476,15 +476,17 @@ $transition-normal: $transition-base;
 
 .modernWalletCard {
   border-radius: $radius-xl;
-  padding: $space-3 $space-6;
+  padding: $space-5 $space-6;
   color: white;
   position: relative;
   overflow: hidden;
   box-shadow: $shadow-xl;
   transition: transform $transition-base;
   display: flex;
-  flex-direction: column;
-  gap: $space-2;
+  flex-direction: row;
+  align-items: center;
+  gap: $space-4;
+  min-height: 200px;
 
   &:hover {
     transform: translateY(-4px);
@@ -519,65 +521,58 @@ $transition-normal: $transition-base;
     }
   }
 
-  .cardHeader {
+  .infoSide {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: $space-4;
+    min-width: 0;
     z-index: 1;
-    position: relative;
 
-    .providerLogo {
-      font-weight: 900;
-      font-size: $font-size-lg;
-      letter-spacing: -0.02em;
-      font-style: italic;
-      opacity: 0.9;
-    }
-  }
+    .cardHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-  .cardBody {
-    display: flex;
-    gap: $space-8;
-    align-items: center;
-    z-index: 1;
-    position: relative;
-    padding-bottom: $space-2;
-
-    @media (max-width: 500px) {
-      flex-direction: column;
-      text-align: center;
+      .providerLogo {
+        font-weight: 900;
+        font-size: $font-size-lg;
+        letter-spacing: -0.02em;
+        font-style: italic;
+        opacity: 0.9;
+      }
     }
 
-    .infoSide {
+    .mainAccount {
       display: flex;
       flex-direction: column;
-      gap: $space-1;
-      flex: 1;
-      min-width: 0;
+      gap: 2px;
 
       .label {
-        font-size: 10px;
+        font-size: 9px;
         text-transform: uppercase;
-        opacity: 0.7;
-        letter-spacing: 0.12em;
+        opacity: 0.5;
+        letter-spacing: 0.1em;
         font-weight: 700;
       }
 
-      .idRow {
+      .numberRow {
         display: flex;
         align-items: center;
         gap: $space-3;
 
-        .value {
+        .number {
           font-size: $font-size-xl;
-          font-weight: 800;
-          font-family: $font-mono;
+          font-family: inherit;
           letter-spacing: 1px;
+          font-weight: 700;
+          opacity: 1;
           @include truncate;
         }
 
         .copyBtn {
           opacity: 0.6;
+          visibility: visible;
           transition: all $transition-fast;
           background: rgba(255, 255, 255, 0.1);
           border: none;
@@ -595,69 +590,90 @@ $transition-normal: $transition-base;
           }
         }
       }
-
-      .name {
-        font-size: $font-size-md;
-        margin-top: $space-1;
-        opacity: 0.9;
-        font-weight: 600;
-      }
     }
 
-    .qrSide {
-      flex: 0 0 auto;
+    .auxInfo {
       display: flex;
-      justify-content: flex-end;
+      gap: $space-6;
+      align-items: center;
 
-      .qrWrapper {
-        width: 160px;
-        height: 160px;
-        background: white;
-        border-radius: $radius-xl;
+      .item {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+
+        .al {
+          font-size: 8px;
+          opacity: 0.4;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+
+        .av {
+          font-size: $font-size-sm;
+          font-weight: 600;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+  .qrSide {
+    flex: 0 0 auto;
+
+    .qrWrapper {
+      width: 152px;
+      height: 152px;
+      aspect-ratio: 1 / 1;
+      background: white;
+      border-radius: $radius-lg;
+      @include flex-center;
+      color: #000;
+      font-size: 100px;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      border: 4px solid white;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
+      }
+
+      .qrOverlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
         @include flex-center;
-        color: #000;
-        font-size: 110px;
-        position: relative;
-        box-shadow: $shadow-xl;
-        overflow: hidden;
+        opacity: 0;
+        transition: opacity $transition-fast;
 
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-
-        .qrOverlay {
-          position: absolute;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.6);
-          color: white;
-          font-size: 14px;
-          font-weight: 800;
-          @include flex-center;
-          opacity: 0;
-          transition: opacity $transition-fast;
-          border-radius: $radius-xl;
-        }
-
-        &:hover .qrOverlay {
+        &.visible {
           opacity: 1;
         }
       }
+
+      &:hover .qrOverlay {
+        opacity: 1;
+      }
     }
   }
+}
 
-  .noPm {
-    @include flex-center;
-    padding: $space-8;
-    background: var(--bg-primary);
-    border: 1px dashed var(--border-default);
-    border-radius: $radius-xl;
-    color: var(--text-tertiary);
-    font-size: $font-size-sm;
-    font-weight: $font-weight-medium;
-    text-align: center;
-  }
+.noPm {
+  @include flex-center;
+  padding: $space-8;
+  background: var(--bg-primary);
+  border: 1px dashed var(--border-default);
+  border-radius: $radius-xl;
+  color: var(--text-tertiary);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-align: center;
 }
 
 // ── Realistic Bank Card ──
@@ -670,16 +686,18 @@ $transition-normal: $transition-base;
 .bankCardModern {
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
   border-radius: $radius-xl;
-  padding: $space-4 $space-6;
+  padding: $space-5 $space-6;
   color: white;
   min-height: 200px;
   display: flex;
-  gap: $space-8;
+  flex-direction: row;
+  gap: $space-4;
   align-items: center;
   position: relative;
   box-shadow: $shadow-xl;
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
+  transition: transform $transition-base;
 
   &::after {
     content: "";
@@ -753,7 +771,7 @@ $transition-normal: $transition-base;
 
         .number {
           font-size: $font-size-xl;
-          font-family: $font-mono;
+          font-family: inherit;
           letter-spacing: 2px;
           font-weight: 700;
           opacity: 1;
@@ -808,21 +826,23 @@ $transition-normal: $transition-base;
     flex: 0 0 auto;
 
     .qrWrapper {
-      width: 150px;
-      height: 150px;
+      width: 152px;
+      height: 152px;
+      aspect-ratio: 1 / 1;
       background: white;
       border-radius: $radius-lg;
       @include flex-center;
       color: #000;
-      font-size: 110px;
-      box-shadow: $shadow-lg;
-      border: 6px solid white;
+      font-size: 100px;
       position: relative;
+      box-shadow: var(--shadow-lg);
+      border: 4px solid white;
       overflow: hidden;
 
       img {
         width: 100%;
         height: 100%;
+        aspect-ratio: 1 / 1;
         object-fit: contain;
       }
 
@@ -831,12 +851,15 @@ $transition-normal: $transition-base;
         inset: 0;
         background: rgba(0, 0, 0, 0.6);
         color: white;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 800;
         @include flex-center;
         opacity: 0;
         transition: opacity $transition-fast;
-        border-radius: $radius-md;
+
+        &.visible {
+          opacity: 1;
+        }
       }
 
       &:hover .qrOverlay {
