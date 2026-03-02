@@ -529,6 +529,7 @@ export default function PersonalDetailsPage() {
       <AddExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
+        expenseType={EXPENSE_TYPE.PERSONAL}
       />
 
       <ExpenseDetailsModal

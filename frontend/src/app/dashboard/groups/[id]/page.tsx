@@ -29,7 +29,7 @@ import {
   clearGroupDetails,
   fetchGroupDetailsAction,
 } from "@/store/slices/groupSlice";
-import { SETTLEMENT_STATUS, EXPENSE_STATUS } from "@expense-tracker/shared";
+import { SETTLEMENT_STATUS, EXPENSE_TYPE } from "@expense-tracker/shared";
 
 import type { GroupMember } from "@/lib/types";
 
@@ -542,6 +542,7 @@ export default function GroupDetailsPage() {
       <AddExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
+        expenseType={EXPENSE_TYPE.GROUP}
       />
 
       <InviteUserModal

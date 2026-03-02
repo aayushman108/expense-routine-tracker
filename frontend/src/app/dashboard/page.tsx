@@ -254,6 +254,7 @@ export default function DashboardPage() {
       <AddExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
+        expenseType={EXPENSE_TYPE.PERSONAL}
       />
     </div>
   );
