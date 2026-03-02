@@ -37,8 +37,24 @@ const shareGroup = async (userIdA: string, userIdB: string) => {
   return rows.length > 0;
 };
 
+const updateById = async (userId: string, data: any) => {
+  const { rows } = await db.raw(
+    `UPDATE users 
+     SET 
+       full_name = COALESCE(?, full_name),
+       phone = COALESCE(?, phone),
+       avatar = COALESCE(?, avatar),
+       updated_at = CURRENT_TIMESTAMP
+     WHERE id = ? 
+     RETURNING id, full_name, email, phone, avatar, updated_at`,
+    [data.full_name || null, data.phone || null, data.avatar || null, userId],
+  );
+  return rows[0];
+};
+
 export const userDao = {
   findByEmailOrName,
   findById,
   shareGroup,
+  updateById,
 };

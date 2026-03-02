@@ -19,7 +19,11 @@ import {
   HiOutlineQrcode,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { updateProfile, changePassword } from "@/store/slices/authSlice";
+import {
+  updateProfile,
+  changePassword,
+  uploadAvatar,
+} from "@/store/slices/authSlice";
 import {
   fetchPaymentMethods,
   createPaymentMethod,
@@ -230,6 +234,38 @@ export default function ProfilePage() {
       dispatch(
         addToast({ type: "error", message: "Failed to update profile." }),
       );
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        dispatch(
+          addToast({
+            type: "error",
+            message: "Avatar size should be less than 5MB",
+          }),
+        );
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const result = await dispatch(uploadAvatar(formData));
+      if (uploadAvatar.fulfilled.match(result)) {
+        dispatch(
+          addToast({
+            type: "success",
+            message: "Avatar updated successfully!",
+          }),
+        );
+      } else {
+        dispatch(
+          addToast({ type: "error", message: "Failed to upload avatar." }),
+        );
+      }
     }
   };
 
@@ -456,9 +492,15 @@ export default function ProfilePage() {
                     getInitials(user?.full_name)
                   )}
                 </div>
-                <button className={styles.editBtn} title="Upload New Avatar">
+                <label className={styles.editBtn} title="Upload New Avatar">
+                  <input
+                    type="file"
+                    className={styles.hiddenInput}
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                  />
                   <HiOutlineCamera />
-                </button>
+                </label>
               </div>
               <div className={styles.infoSection}>
                 <span className={styles.name}>{user?.full_name}</span>

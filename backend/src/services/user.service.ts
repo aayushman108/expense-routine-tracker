@@ -32,7 +32,12 @@ const getUserProfile = async (targetUserId: string, currentUserId: string) => {
   return { user: targetUser, paymentMethods };
 };
 
+const updateProfile = async (userId: string, data: any) => {
+  return await userDao.updateById(userId, data);
+};
+
 export const userService = {
   searchUser,
   getUserProfile,
+  updateProfile,
 };

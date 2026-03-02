@@ -51,7 +51,26 @@ const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const updateProfile = asyncHandler(async (req: Request, res: Response) => {
+  const currentUserId = req.userId;
+  if (!currentUserId) {
+    throw new NotFoundError("User ID not found in request");
+  }
+
+  const updatedProfile = await userService.updateProfile(
+    currentUserId,
+    req.body,
+  );
+
+  return sendSuccessResponse(res, {
+    message: "Profile updated successfully",
+    data: updatedProfile,
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
 export const userController = {
   searchUser,
   getUserProfile,
+  updateProfile,
 };

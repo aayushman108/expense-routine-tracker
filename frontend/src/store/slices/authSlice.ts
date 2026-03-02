@@ -115,6 +115,21 @@ export const updateProfile = createAsyncThunk<User, Partial<User>>(
   },
 );
 
+export const uploadAvatar = createAsyncThunk<User, FormData>(
+  "auth/uploadAvatar",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const { data } = await api.patch("/auth/upload-avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data.data || data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(error.response?.data?.message || "Upload failed");
+    }
+  },
+);
+
 export const changePassword = createAsyncThunk<
   { message: string },
   Record<string, string>
@@ -207,8 +222,31 @@ const authSlice = createSlice({
     });
 
     // Update profile
+    builder.addCase(updateProfile.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
     builder.addCase(updateProfile.fulfilled, (state, action) => {
       state.user = action.payload;
+      state.isLoading = false;
+    });
+    builder.addCase(updateProfile.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
+    });
+
+    // Upload avatar
+    builder.addCase(uploadAvatar.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(uploadAvatar.fulfilled, (state, action) => {
+      state.user = action.payload;
+      state.isLoading = false;
+    });
+    builder.addCase(uploadAvatar.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
     });
 
     // Change password
