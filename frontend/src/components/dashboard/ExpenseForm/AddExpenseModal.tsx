@@ -26,7 +26,7 @@ import {
   EXPENSE_STATUS,
 } from "@expense-tracker/shared";
 import { handleThunk } from "@/lib/utils";
-import { GroupMember, Expense } from "@/lib/types";
+import { GroupMember, Expense, CreateExpensePayload } from "@/lib/types";
 
 interface FormProps {
   onClose: () => void;
@@ -169,7 +169,7 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
             onClick={() => handleSubmit(EXPENSE_STATUS.DRAFT)}
             type="button"
           >
-            {expense ? "Save as Draft" : "Save as Draft"}
+            {expense ? "Update as Draft" : "Save as Draft"}
           </Button>
           <Button variant="primary" type="submit">
             {expense ? "Update Expense" : "Add Expense"}
@@ -352,7 +352,7 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
   ) => {
     e?.preventDefault();
 
-    const body: any = {
+    const body: CreateExpensePayload["body"] = {
       ...form,
       expenseStatus: status,
       totalAmount: Number(form.totalAmount) || 0,

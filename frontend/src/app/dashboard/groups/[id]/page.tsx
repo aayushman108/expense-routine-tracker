@@ -29,7 +29,11 @@ import {
   clearGroupDetails,
   fetchGroupDetailsAction,
 } from "@/store/slices/groupSlice";
-import { SETTLEMENT_STATUS, EXPENSE_TYPE } from "@expense-tracker/shared";
+import {
+  SETTLEMENT_STATUS,
+  EXPENSE_TYPE,
+  EXPENSE_STATUS,
+} from "@expense-tracker/shared";
 
 import type { GroupMember } from "@/lib/types";
 
@@ -74,12 +78,15 @@ export default function GroupDetailsPage() {
     };
   }, [id, dispatch]);
 
-  const handleUpdateStatus = async (expenseId: string, status: string) => {
+  const handleUpdateStatus = async (
+    expenseId: string,
+    status: EXPENSE_STATUS,
+  ) => {
     try {
       await dispatch(
         updateExpense({
           id: expenseId,
-          body: { expense_status: status as any },
+          body: { expenseStatus: status },
         }),
       ).unwrap();
       if (id) dispatch(fetchGroupExpenses(id as string));
@@ -271,7 +278,10 @@ export default function GroupDetailsPage() {
                                 className={styles.inlineSubmitBtn}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleUpdateStatus(expense.id, "submitted");
+                                  handleUpdateStatus(
+                                    expense.id,
+                                    EXPENSE_STATUS.SUBMITTED,
+                                  );
                                 }}
                               >
                                 Submit Expense

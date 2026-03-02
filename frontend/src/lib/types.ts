@@ -147,6 +147,7 @@ export interface AuthResponse {
 
 export interface CreateExpensePayload {
   body: {
+    expenseStatus: EXPENSE_STATUS;
     expenseType: EXPENSE_TYPE;
     totalAmount: number;
     description?: string;

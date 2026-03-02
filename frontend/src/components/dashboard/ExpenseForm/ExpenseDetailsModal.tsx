@@ -98,7 +98,7 @@ export default function ExpenseDetailsModal({
     if (!expenseId) return;
     try {
       await dispatch(
-        updateExpense({ id: expenseId, body: { expense_status: status } }),
+        updateExpense({ id: expenseId, body: { expenseStatus: status } }),
       ).unwrap();
       const data = await dispatch(fetchExpenseById(expenseId)).unwrap();
       setDetails(data);

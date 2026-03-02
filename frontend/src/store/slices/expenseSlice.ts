@@ -106,7 +106,7 @@ export const deleteExpense = createAsyncThunk<string, string>(
 
 export const updateExpense = createAsyncThunk<
   Expense,
-  { id: string; body: Partial<Expense> }
+  { id: string; body: Partial<CreateExpensePayload["body"]> }
 >("expenses/updateExpense", async ({ id, body }, { rejectWithValue }) => {
   try {
     const { data } = await api.patch(`/expenses/${id}`, body);
