@@ -156,12 +156,16 @@ async function getExpenseById(id: string) {
   const result = await db.raw(
     `
       SELECT e.*, 
-             to_jsonb(p) AS payer,
+             (to_jsonb(p) - 'password_hash') AS payer,
+             COALESCE(
+               (SELECT jsonb_agg(pm.*) FROM (SELECT * FROM payment_methods WHERE user_id = e.paid_by ORDER BY is_default DESC, created_at DESC) pm),
+               '[]'::jsonb
+             ) AS payer_payment_methods,
              COALESCE(
                jsonb_agg(
                to_jsonb(s) - ARRAY['expense_id', 'user_id', 'settlement_id'] || 
                jsonb_build_object(
-                   'user', to_jsonb(u),
+                   'user', (to_jsonb(u) - 'password_hash'),
                    'settlement', CASE WHEN st.id IS NOT NULL THEN
                      to_jsonb(st)
                    ELSE NULL END

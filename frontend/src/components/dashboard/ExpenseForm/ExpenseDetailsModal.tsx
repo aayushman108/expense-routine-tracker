@@ -169,37 +169,6 @@ export default function ExpenseDetailsModal({
     return <HiOutlineReceiptTax />;
   };
 
-  const dummyPaymentMethods = [
-    {
-      id: "1",
-      provider: "Khalti",
-      external_id: "9841234567",
-      is_default: true,
-      metadata: { qr_label: "Scan for Khalti" },
-    },
-    {
-      id: "2",
-      provider: "eSewa",
-      external_id: "9841234567",
-      is_default: false,
-      metadata: { qr_label: "Scan for eSewa" },
-    },
-    {
-      id: "3",
-      provider: "Bank Transfer",
-      external_id: "0012345678901",
-      is_default: false,
-      metadata: {
-        bank_name: "Nabil Bank Ltd.",
-        branch_name: "New Road, Kathmandu",
-        account_name:
-          details?.payer?.full_name || details?.payer_name || "Account Holder",
-        swift_code: "NABILNPKA",
-        qr_label: "Bank QR Payment",
-      },
-    },
-  ];
-
   return (
     <Modal
       isOpen={isOpen}
@@ -391,12 +360,16 @@ export default function ExpenseDetailsModal({
                     <div className={styles.tabContent}>
                       {activeTab === "wallets" ? (
                         <div className={styles.modernWallets}>
-                          {dummyPaymentMethods
-                            .filter(
+                          {details.payer_payment_methods
+                            ?.filter(
                               (pm) =>
                                 !pm.provider.toLowerCase().includes("bank"),
                             )
                             .map((pm) => {
+                              const meta = (pm.metadata || {}) as Record<
+                                string,
+                                string
+                              >;
                               const isKhalti = pm.provider
                                 .toLowerCase()
                                 .includes("khalti");
@@ -409,7 +382,7 @@ export default function ExpenseDetailsModal({
                                 >
                                   <div className={styles.cardHeader}>
                                     <div className={styles.providerLogo}>
-                                      {pm.provider}
+                                      {pm.provider.toUpperCase()}
                                     </div>
                                   </div>
                                   <div className={styles.cardBody}>
@@ -419,13 +392,13 @@ export default function ExpenseDetailsModal({
                                       </span>
                                       <div className={styles.idRow}>
                                         <span className={styles.value}>
-                                          {pm.external_id}
+                                          {meta.phone || meta.username || "—"}
                                         </span>
                                         <button
                                           className={styles.copyBtn}
                                           onClick={() =>
                                             copyToClipboard(
-                                              pm.external_id,
+                                              meta.phone || meta.username || "",
                                               pm.id,
                                             )
                                           }
@@ -438,13 +411,18 @@ export default function ExpenseDetailsModal({
                                         </button>
                                       </div>
                                       <span className={styles.name}>
-                                        {details.payer?.full_name ||
+                                        {meta.name ||
+                                          details.payer?.full_name ||
                                           details.payer_name}
                                       </span>
                                     </div>
                                     <div className={styles.qrSide}>
                                       <div className={styles.qrWrapper}>
-                                        <HiOutlineQrcode />
+                                        {meta.qrCode ? (
+                                          <img src={meta.qrCode} alt="QR" />
+                                        ) : (
+                                          <HiOutlineQrcode />
+                                        )}
                                         <div className={styles.qrOverlay}>
                                           SCAN
                                         </div>
@@ -454,84 +432,111 @@ export default function ExpenseDetailsModal({
                                 </div>
                               );
                             })}
+                          {(details.payer_payment_methods?.filter(
+                            (pm) => !pm.provider.toLowerCase().includes("bank"),
+                          ).length ?? 0) === 0 && (
+                            <div className={styles.noPm}>
+                              No wallet payment methods available.
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className={styles.modernBankWrapper}>
-                          {dummyPaymentMethods
-                            .filter((pm) =>
+                          {details.payer_payment_methods
+                            ?.filter((pm) =>
                               pm.provider.toLowerCase().includes("bank"),
                             )
-                            .map((pm) => (
-                              <div
-                                key={pm.id}
-                                className={styles.bankCardModern}
-                              >
-                                <div className={styles.infoSide}>
-                                  <div className={styles.bankHeader}>
-                                    <div className={styles.bankChip} />
-                                    <span className={styles.bankName}>
-                                      {pm.metadata.bank_name}
-                                    </span>
-                                  </div>
-
-                                  <div className={styles.mainAccount}>
-                                    <span className={styles.label}>
-                                      Account Number
-                                    </span>
-                                    <div className={styles.numberRow}>
-                                      <span className={styles.number}>
-                                        {pm.external_id.replace(
-                                          /(.{4})/g,
-                                          "$1 ",
-                                        )}
+                            .map((pm) => {
+                              const meta = (pm.metadata || {}) as Record<
+                                string,
+                                string
+                              >;
+                              return (
+                                <div
+                                  key={pm.id}
+                                  className={styles.bankCardModern}
+                                >
+                                  <div className={styles.infoSide}>
+                                    <div className={styles.bankHeader}>
+                                      <div className={styles.bankChip} />
+                                      <span className={styles.bankName}>
+                                        {meta.bankName}
                                       </span>
-                                      <button
-                                        className={styles.copyBtn}
-                                        onClick={() =>
-                                          copyToClipboard(pm.external_id, pm.id)
-                                        }
-                                      >
-                                        {copiedId === pm.id ? (
-                                          <HiCheck />
-                                        ) : (
-                                          <HiOutlineDuplicate />
-                                        )}
-                                      </button>
+                                    </div>
+
+                                    <div className={styles.mainAccount}>
+                                      <span className={styles.label}>
+                                        Account Number
+                                      </span>
+                                      <div className={styles.numberRow}>
+                                        <span className={styles.number}>
+                                          {meta.accountNumber?.replace(
+                                            /(.{4})/g,
+                                            "$1 ",
+                                          )}
+                                        </span>
+                                        <button
+                                          className={styles.copyBtn}
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              meta.accountNumber || "",
+                                              pm.id,
+                                            )
+                                          }
+                                        >
+                                          {copiedId === pm.id ? (
+                                            <HiCheck />
+                                          ) : (
+                                            <HiOutlineDuplicate />
+                                          )}
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    <div className={styles.auxInfo}>
+                                      <div className={styles.item}>
+                                        <span className={styles.al}>
+                                          HOLDER
+                                        </span>
+                                        <span className={styles.av}>
+                                          {meta.accountHolder}
+                                        </span>
+                                      </div>
+                                      {meta.info && (
+                                        <div className={styles.item}>
+                                          <span className={styles.al}>
+                                            INFO
+                                          </span>
+                                          <span className={styles.av}>
+                                            {meta.info}
+                                          </span>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
 
-                                  <div className={styles.auxInfo}>
-                                    <div className={styles.item}>
-                                      <span className={styles.al}>HOLDER</span>
-                                      <span className={styles.av}>
-                                        {pm.metadata.account_name}
-                                      </span>
-                                    </div>
-                                    <div className={styles.item}>
-                                      <span className={styles.al}>SWIFT</span>
-                                      <span className={styles.av}>
-                                        {pm.metadata.swift_code}
-                                      </span>
+                                  <div className={styles.qrSide}>
+                                    <div className={styles.qrWrapper}>
+                                      {meta.qrCode ? (
+                                        <img src={meta.qrCode} alt="QR" />
+                                      ) : (
+                                        <HiOutlineQrcode />
+                                      )}
+                                      <div className={styles.qrOverlay}>
+                                        SCAN
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-
-                                <div className={styles.qrSide}>
-                                  <div className={styles.qrWrapper}>
-                                    <HiOutlineQrcode />
-                                    <div className={styles.qrOverlay}>SCAN</div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          <div className={styles.bankAuxInfo}>
-                            <div className={styles.auxRow}>
-                              <span>Branch</span>
-                              <strong>
-                                {dummyPaymentMethods[2].metadata.branch_name}
-                              </strong>
+                              );
+                            })}
+                          {(details.payer_payment_methods?.filter((pm) =>
+                            pm.provider.toLowerCase().includes("bank"),
+                          ).length ?? 0) === 0 && (
+                            <div className={styles.noPm}>
+                              No bank payment methods available.
                             </div>
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>
