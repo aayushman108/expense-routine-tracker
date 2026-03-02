@@ -595,6 +595,20 @@
     display: flex;
     align-items: center;
     gap: $space-3;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all $transition-fast;
+    padding: $space-1;
+    border-radius: $radius-md;
+
+    &:hover {
+      background: var(--bg-hover, rgba(0, 0, 0, 0.04));
+      transform: translateX(4px);
+
+      .name {
+        color: var(--color-primary);
+      }
+    }
 
     .avatar {
       width: 32px;
@@ -624,6 +638,7 @@
         color: var(--text-primary);
         @include truncate;
         max-width: 140px;
+        transition: color $transition-fast;
       }
 
       .role {

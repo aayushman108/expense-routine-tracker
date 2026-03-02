@@ -11,6 +11,7 @@ import {
   HiOutlineChartPie,
   HiCheck,
 } from "react-icons/hi";
+import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import { fetchGroupExpenses, updateExpense } from "@/store/slices/expenseSlice";
@@ -493,7 +494,11 @@ export default function GroupDetailsPage() {
             <div className={styles.memberList}>
               {members.map((member: GroupMember) => (
                 <div key={member.id} className={styles.memberItem}>
-                  <div className={styles.memberInfo}>
+                  <Link
+                    href={`/dashboard/profile/${member.user?.id}`}
+                    className={styles.memberInfo}
+                    title={`View ${member.user?.full_name}'s profile`}
+                  >
                     <div className={styles.avatar}>
                       {member.user?.avatar?.url ? (
                         <img
@@ -521,7 +526,7 @@ export default function GroupDetailsPage() {
                       </div>
                       <div className={styles.role}>{member.role}</div>
                     </div>
-                  </div>
+                  </Link>
                   {/* Future: Net Balance for each member */}
                 </div>
               ))}

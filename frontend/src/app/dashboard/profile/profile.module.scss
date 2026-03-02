@@ -4,34 +4,81 @@
 .page {
   @include flex-column;
   gap: $space-8;
-  max-width: 800px;
   margin: 0 auto;
+  padding: $space-6;
+  position: relative;
+  min-height: calc(100vh - 100px);
+
+  @include mobile-only {
+    padding: $space-4;
+    gap: $space-6;
+  }
+
+  .leftColumn {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .rightColumn {
+    animation: fadeIn 0.6s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(
+      circle,
+      var(--color-primary-50) 0%,
+      transparent 70%
+    );
+    opacity: 0.3;
+    z-index: -1;
+    filter: blur(60px);
+  }
 }
 
 .header {
   margin-bottom: $space-4;
   h1 {
     @include heading($font-size-2xl);
+    @include mobile-only {
+      font-size: $font-size-xl;
+    }
   }
   p {
     @include body-text;
+    @include mobile-only {
+      font-size: $font-size-sm;
+    }
   }
 }
 
 .card {
   @include card;
   padding: $space-8;
+  border: 1px solid var(--border-subtle);
+  background: rgba(var(--bg-card-rgb), 0.8);
+  backdrop-filter: blur(10px);
+
+  @include mobile-only {
+    padding: $space-5 $space-4;
+  }
 }
 
 .profileHero {
   display: flex;
   align-items: center;
-  gap: $space-8;
-  margin-bottom: $space-10;
+  gap: $space-6;
+  margin-bottom: $space-8;
 
-  @include mobile-only {
+  @media (max-width: 1100px) {
     flex-direction: column;
     text-align: center;
+    gap: $space-4;
   }
 }
 
@@ -41,6 +88,13 @@
   .avatar {
     width: 120px;
     height: 120px;
+
+    @include mobile-only {
+      width: 90px;
+      height: 90px;
+      font-size: $font-size-2xl;
+    }
+
     border-radius: 50%;
     background: var(--gradient-primary);
     @include flex-center;
@@ -117,11 +171,444 @@
   margin-bottom: $space-6;
   padding-bottom: $space-3;
   border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+
+  svg {
+    font-size: $font-size-lg;
+    color: var(--color-primary);
+  }
+}
+
+.sectionHeader {
+  @include flex-between;
+  align-items: center;
+  margin-bottom: $space-6;
+  padding-bottom: $space-3;
+  border-bottom: 1px solid var(--border-default);
+
+  .sectionTitle {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.editIconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-md;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  @include flex-center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all $transition-fast;
+
+  &:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    background: rgba(99, 102, 241, 0.06);
+  }
+
+  svg {
+    font-size: $font-size-base;
+  }
+}
+
+// ── View Mode Details ──
+.detailsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-5;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+  margin-top: $space-6;
+
+  @include mobile-only {
+    grid-template-columns: 1fr;
+  }
+
+  .statItem {
+    @include flex-column;
+    gap: $space-1;
+    padding: $space-4;
+    background: rgba(var(--bg-elevated-rgb, 255, 255, 255), 0.5);
+    border-radius: $radius-md;
+    border: 1px solid var(--border-subtle);
+    transition: all $transition-fast;
+
+    &:hover {
+      background: rgba(var(--color-primary-rgb), 0.05);
+      border-color: var(--color-primary-200);
+      transform: scale(1.02);
+    }
+
+    .statLabel {
+      font-size: $font-size-xs;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .statValue {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: var(--color-primary);
+    }
+  }
+}
+
+.detailItem {
+  @include flex-column;
+  gap: $space-1;
+}
+
+.detailLabel {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  svg {
+    font-size: $font-size-sm;
+  }
+}
+
+.detailValue {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+  word-break: break-all;
+  padding-left: 0;
 }
 
 .footer {
-  @include flex-between;
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
   margin-top: $space-8;
   padding-top: $space-6;
   border-top: 1px solid var(--border-default);
+}
+
+.profileLayout {
+  display: grid;
+  grid-template-columns: 1fr 0.7fr;
+  gap: $space-8;
+  align-items: start;
+
+  // Higher threshold for two columns to account for sidebar presence
+  @media (max-width: 1350px) {
+    grid-template-columns: 1fr;
+    gap: $space-6;
+  }
+}
+
+.leftColumn,
+.rightColumn {
+  @include flex-column;
+  gap: $space-8;
+}
+
+// ── Payment Methods ──
+.paymentSection {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.paymentHeader {
+  @include flex-between;
+  align-items: center;
+
+  .sectionTitle {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.paymentGrid {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $space-4;
+
+  @include responsive(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pmCard {
+  @include card;
+  padding: $space-5 $space-6;
+  transition: all $transition-fast;
+  border: 1px solid var(--border-subtle);
+  background: rgba(var(--bg-card-rgb), 0.7);
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.pmCardTop {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  flex-wrap: wrap;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-3;
+  }
+}
+
+.pmIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-md;
+  @include flex-center;
+  color: #fff;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  flex-shrink: 0;
+}
+
+.pmInfo {
+  flex: 1;
+  @include flex-column;
+  gap: 2px;
+}
+
+.pmProvider {
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-base;
+  color: var(--text-primary);
+}
+
+.pmMetaRow {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  transition: all $transition-fast;
+
+  &:hover {
+    .copyBtn {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+.pmMeta {
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+}
+
+.copyBtn {
+  background: transparent;
+  border: none;
+  padding: 2px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  @include flex-center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-fast;
+  border-radius: $radius-sm;
+
+  &:hover {
+    color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  svg {
+    font-size: 0.9rem;
+  }
+}
+
+.pmBadges {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+
+  @include mobile-only {
+    width: 100%;
+    margin-top: $space-2;
+    order: 4; // Move to bottom on mobile if everything else wraps
+  }
+}
+
+.verifiedBadge,
+.defaultBadge {
+  font-size: 0.625rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+}
+
+.verifiedBadge {
+  color: var(--color-success);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.defaultBadge {
+  color: var(--color-primary);
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.pmActions {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  margin-top: $space-3;
+  padding-top: $space-3;
+  border-top: 1px solid var(--border-subtle, var(--border-default));
+}
+
+.pmActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  padding: 4px 10px;
+  border-radius: $radius-sm;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--bg-hover, rgba(0, 0, 0, 0.05));
+    color: var(--color-primary);
+  }
+
+  &.danger:hover {
+    color: var(--color-danger, #ef4444);
+    background: rgba(239, 68, 68, 0.08);
+  }
+
+  svg {
+    font-size: $font-size-sm;
+  }
+}
+
+// ── Empty State ──
+.emptyCard {
+  padding: $space-10;
+}
+
+.emptyState {
+  @include flex-column;
+  align-items: center;
+  gap: $space-4;
+  text-align: center;
+
+  svg {
+    font-size: 3rem;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: $font-size-sm;
+  }
+}
+
+// ── Modal Form ──
+.pmForm {
+  @include flex-column;
+  gap: $space-5;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+  margin-top: $space-4;
+  padding-top: $space-4;
+  border-top: 1px solid var(--border-default);
+}
+
+.deleteConfirm {
+  @include flex-column;
+  gap: $space-4;
+
+  p {
+    color: var(--text-secondary);
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+}
+
+.loadingState {
+  @include flex-center;
+  min-height: 400px;
+  color: var(--text-secondary);
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  @include card;
+}
+
+.backBtn {
+  margin-bottom: $space-4;
+  padding-left: 0;
+  color: var(--text-secondary);
+
+  &:hover {
+    color: var(--color-primary);
+    background: transparent;
+  }
+
+  svg {
+    font-size: $font-size-lg;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

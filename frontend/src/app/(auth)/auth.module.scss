@@ -130,6 +130,22 @@
   }
 }
 
+.forgotPassword {
+  margin-top: -$space-2;
+  text-align: right;
+  font-size: $font-size-xs;
+
+  a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+}
+
 .error {
   text-align: center;
   color: var(--color-danger);
@@ -141,12 +157,58 @@
 }
 
 .success {
-  text-align: center;
-  color: var(--color-success);
-  font-size: $font-size-sm;
-  padding: $space-3;
   background: var(--color-success-light);
   border-radius: $radius-md;
+}
+
+.successState {
+  text-align: center;
+  padding: $space-4;
+
+  .successIcon {
+    font-size: 4rem;
+    color: var(--color-success);
+    margin-bottom: $space-4;
+  }
+
+  h3 {
+    @include heading($font-size-xl);
+    margin-bottom: $space-2;
+  }
+
+  p {
+    @include body-text;
+    font-size: $font-size-sm;
+    margin-bottom: $space-8;
+  }
+
+  .backToLogin {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    color: var(--color-primary);
+    font-weight: $font-weight-semibold;
+    text-decoration: none;
+    transition: opacity $transition-fast;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  text-decoration: none;
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+  transition: color $transition-fast;
+
+  &:hover {
+    color: var(--color-primary);
+  }
 }
 
 .passwordHint {

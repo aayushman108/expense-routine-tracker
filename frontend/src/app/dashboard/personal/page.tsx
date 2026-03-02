@@ -53,7 +53,7 @@ export default function PersonalDetailsPage() {
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
       await dispatch(
-        updateExpense({ id, body: { expense_status: status as any } }),
+        updateExpense({ id, body: { expenseStatus: status as any } }),
       ).unwrap();
       dispatch(fetchUserExpenses());
     } catch (error) {

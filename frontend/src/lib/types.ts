@@ -79,11 +79,11 @@ export interface PaymentMethod {
   id: string;
   user_id: string;
   provider: string;
-  external_id?: string;
   metadata?: Record<string, unknown>;
   is_verified: boolean;
   is_default: boolean;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Settlement {

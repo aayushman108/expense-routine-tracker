@@ -98,6 +98,10 @@ export default function LoginPage() {
           <Button type="submit" fullWidth isLoading={isLoading}>
             Sign In
           </Button>
+
+          <div className={styles.forgotPassword}>
+            <Link href="/forgot-password">Forgot your password?</Link>
+          </div>
         </form>
 
         <div className={styles.footer}>

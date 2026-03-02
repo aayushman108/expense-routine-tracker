@@ -115,6 +115,21 @@ export const updateProfile = createAsyncThunk<User, Partial<User>>(
   },
 );
 
+export const changePassword = createAsyncThunk<
+  { message: string },
+  Record<string, string>
+>("auth/changePassword", async (payload, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post("/auth/change-password", payload);
+    return data;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to change password",
+    );
+  }
+});
+
 // ── Slice ──
 const authSlice = createSlice({
   name: "auth",
@@ -194,6 +209,19 @@ const authSlice = createSlice({
     // Update profile
     builder.addCase(updateProfile.fulfilled, (state, action) => {
       state.user = action.payload;
+    });
+
+    // Change password
+    builder.addCase(changePassword.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(changePassword.fulfilled, (state) => {
+      state.isLoading = false;
+    });
+    builder.addCase(changePassword.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
     });
   },
 });

@@ -6,6 +6,7 @@ import themeReducer from "./slices/themeSlice";
 import uiReducer from "./slices/uiSlice";
 import userReducer from "./slices/userSlice";
 import settlementReducer from "./slices/settlementSlice";
+import paymentMethodReducer from "./slices/paymentMethodSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     ui: uiReducer,
     users: userReducer,
     settlements: settlementReducer,
+    paymentMethods: paymentMethodReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

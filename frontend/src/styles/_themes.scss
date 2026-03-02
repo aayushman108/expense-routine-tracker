@@ -7,6 +7,7 @@
 [data-theme="light"] {
   // ── Primary / Accent ──
   --color-primary: #{$landing-accent};
+  --color-primary-rgb: 79, 70, 229;
   --color-primary-light: #{$landing-accent-light};
   --color-primary-dark: #{$landing-accent-dark};
   --color-primary-50: #eef2ff;
@@ -29,7 +30,9 @@
   --bg-secondary: #f8f9fc;
   --bg-tertiary: #f1f3f9;
   --bg-elevated: #ffffff;
+  --bg-elevated-rgb: 255, 255, 255;
   --bg-card: #ffffff;
+  --bg-card-rgb: 255, 255, 255;
   --bg-input: #f4f5f9;
   --bg-hover: rgba(99, 102, 241, 0.06);
   --bg-active: rgba(99, 102, 241, 0.1);
@@ -85,6 +88,7 @@
 [data-theme="dark"] {
   // ── Primary / Accent ──
   --color-primary: #{$landing-accent-light};
+  --color-primary-rgb: 99, 102, 241;
   --color-primary-light: #{$landing-accent};
   --color-primary-dark: #{$landing-accent-dark};
   --color-primary-50: rgba(99, 102, 241, 0.1);
@@ -107,7 +111,9 @@
   --bg-secondary: #111827;
   --bg-tertiary: #1e293b;
   --bg-elevated: #1a2236;
+  --bg-elevated-rgb: 26, 34, 54;
   --bg-card: #141b2d;
+  --bg-card-rgb: 20, 27, 45;
   --bg-input: #1e293b;
   --bg-hover: rgba(129, 140, 248, 0.08);
   --bg-active: rgba(129, 140, 248, 0.14);
