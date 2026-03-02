@@ -20,7 +20,7 @@ const createExpense = asyncHandler(async (req: Request, res: Response) => {
 
 const updateExpense = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const expense = await expenseService.updateExpense(id, {
+  const expense = await expenseService.updateExpense(id, req.userId as string, {
     ...req.body,
   });
   return sendSuccessResponse(res, {
@@ -99,7 +99,7 @@ const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
 
 const deleteExpense = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  await expenseService.deleteExpense(id);
+  await expenseService.deleteExpense(id, req.userId as string);
   return sendSuccessResponse(res, {
     message: "Expense deleted successfully",
   });

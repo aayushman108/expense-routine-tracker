@@ -56,7 +56,7 @@ async function addExpense(data: IAddExpense) {
   return await expenseDao.createExpense({ data, splits: calculatedSplits });
 }
 
-async function updateExpense(id: string, data: IUpdateExpense) {
+async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
   let calculatedSplits: IExpenseSplit[] = [];
 
   if (data.splits && data.splits.length > 0 && data?.totalAmount) {
@@ -73,8 +73,9 @@ async function updateExpense(id: string, data: IUpdateExpense) {
     const diff = Number((data?.totalAmount - sumCalculated).toFixed(2));
 
     if (diff !== 0) {
+      const paidBy = data.paidBy || userId;
       const findIndex = calculatedSplits.findIndex(
-        (split) => split.user_id === data.paidBy,
+        (split) => split.user_id === paidBy,
       );
       if (findIndex !== -1) {
         calculatedSplits[findIndex].split_amount = Number(
@@ -86,6 +87,7 @@ async function updateExpense(id: string, data: IUpdateExpense) {
 
   return await expenseDao.updateExpense({
     expenseId: id,
+    userId,
     data,
     splits: calculatedSplits,
   });
@@ -112,8 +114,8 @@ async function getPersonalExpenses(
   return await expenseDao.getUserExpenses(userId, limit, offset);
 }
 
-async function deleteExpense(id: string) {
-  return await expenseDao.deleteExpense(id);
+async function deleteExpense(id: string, userId: string) {
+  return await expenseDao.deleteExpense(id, userId);
 }
 
 async function updateSplitStatus(

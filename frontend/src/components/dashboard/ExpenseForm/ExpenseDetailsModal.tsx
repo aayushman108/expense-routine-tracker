@@ -13,18 +13,24 @@ import {
   HiOutlineQrcode,
   HiOutlineDuplicate,
   HiCheck,
+  HiPencil,
+  HiTrash,
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
+import Button from "@/components/ui/Button/Button";
+import AddExpenseModal from "./AddExpenseModal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchExpenseById,
   updateSplitStatus,
   updateExpense,
+  deleteExpense,
 } from "@/store/slices/expenseSlice";
 import {
   SETTLEMENT_STATUS,
   SPLIT_STATUS,
   EXPENSE_STATUS,
+  EXPENSE_TYPE,
 } from "@expense-tracker/shared";
 import type { Expense, ExpenseSplit } from "@/lib/types";
 import styles from "./ExpenseDetailsModal.module.scss";
@@ -47,6 +53,7 @@ export default function ExpenseDetailsModal({
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"wallets" | "bank">("wallets");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
 
   const copyToClipboard = (text: string, id: string) => {
@@ -97,6 +104,18 @@ export default function ExpenseDetailsModal({
       setDetails(data);
     } catch (error) {
       console.error("Failed to update expense status:", error);
+    }
+  };
+
+  const handleDeleteExpense = async () => {
+    if (!expenseId) return;
+    if (confirm("Are you sure you want to delete this expense?")) {
+      try {
+        await dispatch(deleteExpense(expenseId)).unwrap();
+        onClose();
+      } catch (error) {
+        console.error("Failed to delete expense:", error);
+      }
     }
   };
 
@@ -215,6 +234,56 @@ export default function ExpenseDetailsModal({
                       Submit Expense
                     </button>
                   )}
+                {details.paid_by === user?.id && (
+                  <div className={styles.actionButtons}>
+                    {/* Only show Edit/Delete based on status for group expenses */}
+                    {details.expense_type === EXPENSE_TYPE.PERSONAL ||
+                    (details.expense_status !== EXPENSE_STATUS.VERIFIED &&
+                      details.expense_status !== EXPENSE_STATUS.REJECTED) // Following "drafted and submitted state" literally, but REJECTED also probably shouldn't be deleted if strictly matching the requirement "submitted or draft"
+                      ? // Actually, let's re-read: "The group expense can only be deleted in drafted and submitted state, but when group expense is verified, the expense cannot be deleted."
+                        // So DRAFT and SUBMITTED are allowed.
+                        (details.expense_status === EXPENSE_STATUS.DRAFT ||
+                          details.expense_status ===
+                            EXPENSE_STATUS.SUBMITTED) && (
+                          <>
+                            <button
+                              className={styles.editBtn}
+                              onClick={() => setIsEditModalOpen(true)}
+                              title="Edit Expense"
+                            >
+                              <HiPencil />
+                            </button>
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={handleDeleteExpense}
+                              title="Delete Expense"
+                            >
+                              <HiTrash />
+                            </button>
+                          </>
+                        )
+                      : null}
+                    {/* Special case for personal expense: always show */}
+                    {details.expense_type === EXPENSE_TYPE.PERSONAL && (
+                      <>
+                        <button
+                          className={styles.editBtn}
+                          onClick={() => setIsEditModalOpen(true)}
+                          title="Edit Personal Expense"
+                        >
+                          <HiPencil />
+                        </button>
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={handleDeleteExpense}
+                          title="Delete Personal Expense"
+                        >
+                          <HiTrash />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <div className={styles.date}>
@@ -605,6 +674,22 @@ export default function ExpenseDetailsModal({
           </span>
           <span>No transaction data found.</span>
         </div>
+      )}
+      {isEditModalOpen && details && (
+        <AddExpenseModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            // Refetch details after edit
+            if (expenseId) {
+              dispatch(fetchExpenseById(expenseId))
+                .unwrap()
+                .then((data: Expense) => setDetails(data));
+            }
+          }}
+          expenseType={details.expense_type as EXPENSE_TYPE}
+          expense={details}
+        />
       )}
     </Modal>
   );

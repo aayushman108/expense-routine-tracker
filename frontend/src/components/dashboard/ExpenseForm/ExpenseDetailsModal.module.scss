@@ -133,6 +133,40 @@ $transition-normal: $transition-base;
       transform: translateY(0);
     }
   }
+
+  .actionButtons {
+    display: flex;
+    gap: $space-2;
+    margin-top: $space-3;
+    justify-content: center;
+
+    .editBtn,
+    .deleteBtn {
+      @include flex-center;
+      width: 38px;
+      height: 38px;
+      border-radius: $radius-full;
+      border: 1px solid var(--border-default);
+      background: var(--bg-primary);
+      color: var(--text-tertiary);
+      cursor: pointer;
+      transition: all $transition-fast;
+      font-size: $font-size-lg;
+
+      &:hover {
+        background: var(--bg-tertiary);
+        color: var(--color-primary);
+        border-color: var(--color-primary-light);
+        transform: translateY(-2px);
+        box-shadow: $shadow-sm;
+      }
+    }
+
+    .deleteBtn:hover {
+      color: var(--color-danger);
+      border-color: var(--color-danger-light);
+    }
+  }
 }
 
 .amountDisplay {

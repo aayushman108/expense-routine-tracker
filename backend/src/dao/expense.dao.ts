@@ -6,6 +6,7 @@ import {
   SETTLEMENT_STATUS,
   SPLIT_STATUS,
 } from "@expense-tracker/shared";
+import { NotFoundError, UnAuthorizedError } from "src/utils";
 
 export interface IExpenseSplit {
   user_id: string;
@@ -63,14 +64,38 @@ async function createExpense({
 
 async function updateExpense({
   expenseId,
+  userId,
   data,
   splits,
 }: {
   expenseId: string;
+  userId: string;
   data: IUpdateExpense;
   splits?: IExpenseSplit[];
 }) {
   return await db.transaction(async (trx) => {
+    // 1. Fetch current expense and check authorization
+    const currentExpenseResult = await trx.raw(
+      `SELECT expense_status, paid_by FROM expenses WHERE id = ?`,
+      [expenseId],
+    );
+
+    const currentExpense = currentExpenseResult.rows[0];
+
+    if (!currentExpense) {
+      throw new NotFoundError("Expense not found.");
+    }
+
+    if (currentExpense.paid_by !== userId) {
+      throw new UnAuthorizedError(
+        "You are not authorized to update this expense.",
+      );
+    }
+
+    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED) {
+      throw new Error("Verified expenses cannot be updated.");
+    }
+
     const snakeCaseData = keysToSnakeCase(data);
     delete (snakeCaseData as any).splits;
 
@@ -83,6 +108,14 @@ async function updateExpense({
       },
       {} as Record<string, any>,
     );
+
+    // If it was rejected and we are updating, reset to submitted unless explicitly draft
+    if (
+      currentExpense.expense_status === EXPENSE_STATUS.REJECTED &&
+      !updatePayload.expense_status
+    ) {
+      updatePayload.expense_status = EXPENSE_STATUS.SUBMITTED;
+    }
 
     if (Object.keys(updatePayload).length > 0) {
       const setClause = Object.keys(updatePayload)
@@ -99,13 +132,6 @@ async function updateExpense({
       await trx.raw(`DELETE FROM expense_splits WHERE expense_id = ?`, [
         expenseId,
       ]);
-      // Settlements are cascade-deleted through expense_splits (ON DELETE CASCADE)
-
-      const currentExpense = await trx.raw(
-        `SELECT group_id, paid_by FROM expenses WHERE id = ?`,
-        [expenseId],
-      );
-      const { group_id, paid_by } = currentExpense.rows[0];
 
       for (const split of splits) {
         await trx.raw(
@@ -386,9 +412,32 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
   return { total, data: dataResult.rows };
 }
 
-async function deleteExpense(id: string) {
-  await db.raw(`DELETE FROM expenses WHERE id = ?`, [id]);
-  return true;
+async function deleteExpense(id: string, userId: string) {
+  return await db.transaction(async (trx) => {
+    const currentExpenseResult = await trx.raw(
+      `SELECT expense_status, paid_by FROM expenses WHERE id = ?`,
+      [id],
+    );
+
+    const currentExpense = currentExpenseResult.rows[0];
+
+    if (!currentExpense) {
+      throw new NotFoundError("Expense not found.");
+    }
+
+    if (currentExpense.paid_by !== userId) {
+      throw new UnAuthorizedError(
+        "You are not authorized to delete this expense.",
+      );
+    }
+
+    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED) {
+      throw new Error("Verified expenses cannot be deleted.");
+    }
+
+    await trx.raw(`DELETE FROM expenses WHERE id = ?`, [id]);
+    return true;
+  });
 }
 
 async function updateSplitStatus(
