@@ -16,6 +16,7 @@ import {
   HiOutlineShieldCheck,
   HiOutlineLockClosed,
   HiOutlineDuplicate,
+  HiOutlineQrcode,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { updateProfile, changePassword } from "@/store/slices/authSlice";
@@ -63,41 +64,79 @@ function getProviderLabel(provider: string) {
 }
 
 // ── Metadata fields based on provider ──
-function getMetadataFields(provider: string) {
+interface MetadataField {
+  key: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+}
+
+function getMetadataFields(provider: string): MetadataField[] {
+  const commonFields = [{ key: "qrCode", label: "QR Code", type: "file" }];
+
   switch (provider) {
     case "khalti":
     case "esewa":
     case "fonepay":
     case "imepay":
       return [
-        { key: "phone", label: "Phone Number", placeholder: "98XXXXXXXX" },
-        { key: "name", label: "Account Name", placeholder: "Full name" },
+        {
+          key: "phone",
+          label: "Phone Number",
+          placeholder: "98XXXXXXXX",
+          type: "text",
+        },
+        {
+          key: "name",
+          label: "Account Name",
+          placeholder: "Full name",
+          type: "text",
+        },
+        ...commonFields,
       ];
     case "bank":
       return [
-        { key: "bankName", label: "Bank Name", placeholder: "e.g. NIC Asia" },
+        {
+          key: "bankName",
+          label: "Bank Name",
+          placeholder: "e.g. NIC Asia",
+          type: "text",
+        },
         {
           key: "accountNumber",
           label: "Account Number",
           placeholder: "Account number",
+          type: "text",
         },
         {
           key: "accountHolder",
           label: "Account Holder",
           placeholder: "Full name",
+          type: "text",
         },
+        ...commonFields,
       ];
     case "connectips":
       return [
-        { key: "bankName", label: "Bank Name", placeholder: "e.g. NIC Asia" },
+        {
+          key: "bankName",
+          label: "Bank Name",
+          placeholder: "e.g. NIC Asia",
+          type: "text",
+        },
         {
           key: "username",
           label: "Username",
           placeholder: "ConnectIPS username",
+          type: "text",
         },
+        ...commonFields,
       ];
     default:
-      return [{ key: "info", label: "Info", placeholder: "Details" }];
+      return [
+        { key: "info", label: "Info", placeholder: "Details", type: "text" },
+        ...commonFields,
+      ];
   }
 }
 
@@ -212,11 +251,17 @@ export default function ProfilePage() {
   };
 
   const handlePmProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPmForm((prev) => ({
-      ...prev,
-      provider: e.target.value,
-      metadata: {},
-    }));
+    setPmForm((prev) => {
+      const newMetadata: Record<string, string> = {};
+      if (prev.metadata.qrCode) {
+        newMetadata.qrCode = prev.metadata.qrCode;
+      }
+      return {
+        ...prev,
+        provider: e.target.value,
+        metadata: newMetadata,
+      };
+    });
   };
 
   const handlePmMetaChange = (key: string, value: string) => {
@@ -224,6 +269,27 @@ export default function ProfilePage() {
       ...prev,
       metadata: { ...prev.metadata, [key]: value },
     }));
+  };
+
+  const handleQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        dispatch(
+          addToast({
+            type: "error",
+            message: "Image size should be less than 2MB",
+          }),
+        );
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handlePmMetaChange("qrCode", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handlePmSubmit = async (e: React.FormEvent) => {
@@ -536,45 +602,28 @@ export default function ProfilePage() {
 
               {paymentMethods.map((pm) => {
                 const meta = (pm.metadata || {}) as Record<string, string>;
-                const providerColor =
-                  PROVIDER_COLORS[pm.provider] || "var(--color-primary)";
+                const isBank = pm.provider.toLowerCase().includes("bank");
+                const isKhalti = pm.provider.toLowerCase().includes("khalti");
 
-                return (
-                  <Card key={pm.id} className={styles.pmCard}>
-                    <div className={styles.pmCardTop}>
-                      <div
-                        className={styles.pmIcon}
-                        style={{ background: providerColor }}
-                      >
-                        {getProviderInitial(pm.provider)}
-                      </div>
-                      <div className={styles.pmInfo}>
-                        <span className={styles.pmProvider}>
-                          {getProviderLabel(pm.provider)}
-                        </span>
-                        {meta.bankName && (
-                          <div className={styles.pmMetaRow}>
-                            <span className={styles.pmMeta}>
-                              {meta.bankName}
-                            </span>
-                            <button
-                              className={styles.copyBtn}
-                              onClick={() =>
-                                handleCopyToClipboard(
-                                  meta.bankName,
-                                  "Bank Name",
-                                )
-                              }
-                              title="Copy Bank Name"
-                            >
-                              <HiOutlineDuplicate />
-                            </button>
-                          </div>
-                        )}
-                        {meta.accountNumber && (
-                          <div className={styles.pmMetaRow}>
-                            <span className={styles.pmMeta}>
-                              {meta.accountNumber}
+                if (isBank) {
+                  return (
+                    <div key={pm.id} className={styles.bankCardModern}>
+                      <div className={styles.infoSide}>
+                        <div className={styles.bankHeader}>
+                          <div className={styles.bankChip} />
+                          <span className={styles.bankName}>
+                            {meta.bankName}
+                          </span>
+                          {pm.is_default && (
+                            <span className={styles.defaultBadge}>Default</span>
+                          )}
+                        </div>
+
+                        <div className={styles.mainAccount}>
+                          <span className={styles.label}>Account Number</span>
+                          <div className={styles.numberRow}>
+                            <span className={styles.number}>
+                              {meta.accountNumber?.replace(/(.{4})/g, "$1 ")}
                             </span>
                             <button
                               className={styles.copyBtn}
@@ -584,128 +633,128 @@ export default function ProfilePage() {
                                   "Account Number",
                                 )
                               }
-                              title="Copy Account Number"
                             >
                               <HiOutlineDuplicate />
                             </button>
                           </div>
-                        )}
-                        {meta.phone && (
-                          <div className={styles.pmMetaRow}>
-                            <span className={styles.pmMeta}>{meta.phone}</span>
-                            <button
-                              className={styles.copyBtn}
-                              onClick={() =>
-                                handleCopyToClipboard(
-                                  meta.phone,
-                                  "Phone Number",
-                                )
-                              }
-                              title="Copy Phone Number"
-                            >
-                              <HiOutlineDuplicate />
-                            </button>
-                          </div>
-                        )}
-                        {meta.username && (
-                          <div className={styles.pmMetaRow}>
-                            <span className={styles.pmMeta}>
-                              {meta.username}
-                            </span>
-                            <button
-                              className={styles.copyBtn}
-                              onClick={() =>
-                                handleCopyToClipboard(meta.username, "Username")
-                              }
-                              title="Copy Username"
-                            >
-                              <HiOutlineDuplicate />
-                            </button>
-                          </div>
-                        )}
-                        {meta.accountHolder && (
-                          <div className={styles.pmMetaRow}>
-                            <span className={styles.pmMeta}>
+                        </div>
+
+                        <div className={styles.auxInfo}>
+                          <div className={styles.item}>
+                            <span className={styles.al}>HOLDER</span>
+                            <span className={styles.av}>
                               {meta.accountHolder}
                             </span>
+                          </div>
+                          <div className={styles.pmActionsOverlay}>
+                            <button onClick={() => openEditModal(pm)}>
+                              <HiOutlinePencil />
+                            </button>
                             <button
-                              className={styles.copyBtn}
-                              onClick={() =>
-                                handleCopyToClipboard(
-                                  meta.accountHolder,
-                                  "Account Holder",
-                                )
-                              }
-                              title="Copy Account Holder"
+                              className={styles.danger}
+                              onClick={() => setDeleteId(pm.id)}
                             >
-                              <HiOutlineDuplicate />
+                              <HiOutlineTrash />
                             </button>
                           </div>
-                        )}
-                        {meta.name && (
-                          <div className={styles.pmMetaRow}>
-                            <span className={styles.pmMeta}>{meta.name}</span>
-                            <button
-                              className={styles.copyBtn}
-                              onClick={() =>
-                                handleCopyToClipboard(meta.name, "Account Name")
-                              }
-                              title="Copy Account Name"
-                            >
-                              <HiOutlineDuplicate />
-                            </button>
-                          </div>
-                        )}
-                        {meta.info && (
-                          <div className={styles.pmMetaRow}>
-                            <span className={styles.pmMeta}>{meta.info}</span>
-                            <button
-                              className={styles.copyBtn}
-                              onClick={() =>
-                                handleCopyToClipboard(meta.info, "Details")
-                              }
-                              title="Copy Details"
-                            >
-                              <HiOutlineDuplicate />
-                            </button>
-                          </div>
-                        )}
+                        </div>
                       </div>
-                      <div className={styles.pmBadges}>
-                        {pm.is_verified && (
-                          <span className={styles.verifiedBadge}>Verified</span>
-                        )}
+
+                      <div className={styles.qrSide}>
+                        <div className={styles.qrWrapper}>
+                          {meta.qrCode ? (
+                            <img src={meta.qrCode} alt="QR" />
+                          ) : (
+                            <HiOutlineQrcode />
+                          )}
+                          {!meta.qrCode && (
+                            <div
+                              className={`${styles.qrOverlay} ${styles.visible}`}
+                            >
+                              NO QR
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={pm.id}
+                    className={`${styles.modernWalletCard} ${
+                      isKhalti ? styles.khalti : styles.esewa
+                    }`}
+                  >
+                    <div className={styles.infoSide}>
+                      <div className={styles.cardHeader}>
+                        <div className={styles.providerLogo}>
+                          {getProviderLabel(pm.provider)}
+                        </div>
                         {pm.is_default && (
                           <span className={styles.defaultBadge}>Default</span>
                         )}
                       </div>
+
+                      <div className={styles.mainAccount}>
+                        <span className={styles.label}>Account ID</span>
+                        <div className={styles.numberRow}>
+                          <span className={styles.number}>
+                            {meta.phone || meta.username}
+                          </span>
+                          <button
+                            className={styles.copyBtn}
+                            onClick={() =>
+                              handleCopyToClipboard(
+                                meta.phone || meta.username,
+                                "Account ID",
+                              )
+                            }
+                          >
+                            <HiOutlineDuplicate />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className={styles.auxInfo}>
+                        <div className={styles.item}>
+                          <span className={styles.al}>HOLDER</span>
+                          <span className={styles.av}>
+                            {meta.name || user?.full_name}
+                          </span>
+                        </div>
+                        <div className={styles.pmActionsOverlay}>
+                          <button onClick={() => openEditModal(pm)}>
+                            <HiOutlinePencil />
+                          </button>
+                          <button
+                            className={styles.danger}
+                            onClick={() => setDeleteId(pm.id)}
+                          >
+                            <HiOutlineTrash />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className={styles.pmActions}>
-                      {!pm.is_default && (
-                        <button
-                          className={styles.pmActionBtn}
-                          onClick={() => handleSetDefault(pm)}
-                          title="Set as default"
-                        >
-                          <HiOutlineStar /> Default
-                        </button>
-                      )}
-                      <button
-                        className={styles.pmActionBtn}
-                        onClick={() => openEditModal(pm)}
-                        title="Edit"
-                      >
-                        <HiOutlinePencil /> Edit
-                      </button>
-                      <button
-                        className={`${styles.pmActionBtn} ${styles.danger}`}
-                        onClick={() => setDeleteId(pm.id)}
-                        title="Delete"
-                      >
-                        <HiOutlineTrash /> Remove
-                      </button>
+
+                    <div className={styles.qrSide}>
+                      <div className={styles.qrWrapper}>
+                        {meta.qrCode ? (
+                          <img src={meta.qrCode} alt="QR" />
+                        ) : (
+                          <HiOutlineQrcode />
+                        )}
+                        {!meta.qrCode && (
+                          <div
+                            className={`${styles.qrOverlay} ${styles.visible}`}
+                          >
+                            NO QR
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </Card>
+                  </div>
                 );
               })}
             </div>
@@ -732,16 +781,49 @@ export default function ProfilePage() {
           />
 
           {pmForm.provider &&
-            metaFields.map((field) => (
-              <Input
-                key={field.key}
-                label={field.label}
-                name={field.key}
-                value={pmForm.metadata[field.key] || ""}
-                onChange={(e) => handlePmMetaChange(field.key, e.target.value)}
-                placeholder={field.placeholder}
-              />
-            ))}
+            metaFields.map((field) =>
+              field.type === "file" ? (
+                <div key={field.key} className={styles.qrUpload}>
+                  <label>{field.label}</label>
+                  <div className={styles.qrPreviewWrapper}>
+                    {pmForm.metadata.qrCode ? (
+                      <div className={styles.qrPreview}>
+                        <img src={pmForm.metadata.qrCode} alt="QR Preview" />
+                        <button
+                          type="button"
+                          className={styles.removeQr}
+                          onClick={() => handlePmMetaChange("qrCode", "")}
+                        >
+                          <HiOutlineX />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className={styles.qrPlaceholder}>
+                        <HiOutlineQrcode />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleQrUpload}
+                          className={styles.fileInput}
+                        />
+                        <span>Click to upload QR Code</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <Input
+                  key={field.key}
+                  label={field.label}
+                  name={field.key}
+                  value={pmForm.metadata[field.key] || ""}
+                  onChange={(e) =>
+                    handlePmMetaChange(field.key, e.target.value)
+                  }
+                  placeholder={field.placeholder}
+                />
+              ),
+            )}
 
           <label className={styles.checkboxLabel}>
             <input

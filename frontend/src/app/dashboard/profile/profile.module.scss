@@ -612,3 +612,467 @@
     transform: translateY(0);
   }
 }
+
+// ── Modern Wallet Card ──
+.modernWalletCard {
+  border-radius: $radius-xl;
+  padding: $space-5 $space-6;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  transition: transform $transition-base;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $space-4;
+  min-height: 200px;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &.khalti {
+    background: linear-gradient(135deg, #5c2d91 0%, #8c52ff 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 180px;
+      height: 180px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+  }
+
+  &.esewa {
+    background: linear-gradient(135deg, #60bb46 0%, #a2d149 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -20%;
+      right: -10%;
+      width: 150px;
+      height: 150px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      transform: rotate(45deg);
+    }
+  }
+
+  .infoSide {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    min-width: 0;
+    z-index: 1;
+
+    .cardHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .providerLogo {
+        font-weight: 900;
+        font-size: $font-size-lg;
+        letter-spacing: -0.02em;
+        font-style: italic;
+        opacity: 0.9;
+      }
+    }
+
+    .mainAccount {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .label {
+        font-size: 9px;
+        text-transform: uppercase;
+        opacity: 0.5;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+      }
+
+      .numberRow {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+
+        .number {
+          font-size: $font-size-xl;
+          font-family: inherit;
+          letter-spacing: 1px;
+          font-weight: 700;
+          opacity: 1;
+          @include truncate;
+        }
+
+        .copyBtn {
+          opacity: 0.6;
+          visibility: visible;
+          transition: all $transition-fast;
+          background: rgba(255, 255, 255, 0.1);
+          border: none;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          padding: 4px;
+          border-radius: 4px;
+          @include flex-center;
+
+          &:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+
+    .auxInfo {
+      display: flex;
+      gap: $space-6;
+      align-items: center;
+
+      .item {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+
+        .al {
+          font-size: 8px;
+          opacity: 0.4;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+
+        .av,
+        .name {
+          font-size: $font-size-sm;
+          font-weight: 600;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+}
+
+// ── Realistic Bank Card ──
+.bankCardModern {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  border-radius: $radius-xl;
+  padding: $space-5 $space-6;
+  color: white;
+  min-height: 200px;
+  display: flex;
+  flex-direction: row;
+  gap: $space-4;
+  align-items: center;
+  position: relative;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: transform $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .infoSide {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    min-width: 0;
+    z-index: 1;
+
+    .bankHeader {
+      display: flex;
+      align-items: center;
+      gap: $space-4;
+
+      .bankChip {
+        width: 40px;
+        height: 30px;
+        background: linear-gradient(135deg, #ffd700 0%, #f6e05e 100%);
+        border-radius: 4px;
+        flex-shrink: 0;
+        position: relative;
+        &::after {
+          content: "";
+          position: absolute;
+          inset: 4px;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          border-radius: 1px;
+        }
+      }
+
+      .bankName {
+        font-weight: 800;
+        font-size: $font-size-md;
+        opacity: 0.8;
+        letter-spacing: 0.05em;
+        @include truncate;
+      }
+    }
+
+    .mainAccount {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .label {
+        font-size: 9px;
+        text-transform: uppercase;
+        opacity: 0.5;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+      }
+
+      .numberRow {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+
+        .number {
+          font-size: $font-size-xl;
+          font-family: inherit;
+          letter-spacing: 2px;
+          font-weight: 700;
+          opacity: 1;
+        }
+
+        .copyBtn {
+          opacity: 0.6;
+          visibility: visible;
+          transition: all $transition-fast;
+          background: none;
+          border: none;
+          color: white;
+          cursor: pointer;
+          font-size: 16px;
+          padding: 4px;
+          border-radius: 4px;
+
+          &:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+
+    .auxInfo {
+      display: flex;
+      gap: $space-6;
+      align-items: center;
+
+      .item {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+
+        .al {
+          font-size: 8px;
+          opacity: 0.4;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+
+        .av {
+          font-size: $font-size-sm;
+          font-weight: 600;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+}
+
+.qrSide {
+  flex: 0 0 auto;
+  z-index: 1;
+
+  .qrWrapper {
+    width: 152px;
+    height: 152px;
+    aspect-ratio: 1 / 1;
+    background: white;
+    border-radius: $radius-lg;
+    @include flex-center;
+    color: #000;
+    font-size: 100px;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    border: 4px solid white;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+    }
+
+    .qrOverlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      @include flex-center;
+      opacity: 0;
+      transition: opacity $transition-fast;
+
+      &.visible {
+        opacity: 1;
+      }
+    }
+
+    &:hover .qrOverlay {
+      opacity: 1;
+    }
+  }
+}
+
+.pmActionsOverlay {
+  display: flex;
+  gap: $space-2;
+  margin-left: auto;
+
+  button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    @include flex-center;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: white;
+      color: var(--color-primary);
+      transform: scale(1.1);
+    }
+
+    &.danger:hover {
+      background: var(--color-danger);
+      border-color: var(--color-danger);
+      color: white;
+    }
+  }
+}
+
+// ── QR Upload UI ──
+.qrUpload {
+  @include flex-column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: var(--text-secondary);
+  }
+}
+
+.qrPreviewWrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.qrPreview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: $radius-lg;
+  border: 2px solid var(--color-primary);
+  overflow: hidden;
+  background: white;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .removeQr {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    @include flex-center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform $transition-fast;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.qrPlaceholder {
+  width: 100%;
+  height: 100%;
+  border: 2px dashed var(--border-default);
+  border-radius: $radius-lg;
+  @include flex-column;
+  @include flex-center;
+  gap: $space-2;
+  position: relative;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.04);
+    color: var(--color-primary);
+  }
+
+  svg {
+    font-size: 3rem;
+    opacity: 0.5;
+  }
+
+  span {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+
+  .fileInput {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}

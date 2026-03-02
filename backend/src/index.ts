@@ -36,13 +36,13 @@ app.use(
  * extended: true -> Uses qs library (supports rich parsing) (Supported structure: Strings, arrays, objects, nested objects)
  * eg. user[name]=Aayushman&user[age]=25
  */
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
 /**
  * It handles requests with the Content-Type: application/json header.
  * eg. {"name": "Aayushman", "age": 25}
  */
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);

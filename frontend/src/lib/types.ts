@@ -59,6 +59,7 @@ export interface Expense {
   group_image?: { url: string; publicId: string } | null;
   splits?: ExpenseSplit[];
   settlement_status?: SETTLEMENT_STATUS | "personal";
+  payer_payment_methods?: PaymentMethod[];
   user_amount?: number | string;
   total_received_by_me?: number | string;
   total_paid_by_me?: number | string;
