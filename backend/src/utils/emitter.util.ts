@@ -9,5 +9,6 @@ export const EVENTS = {
     SIGNUP: "email:signup",
     INVITE: "email:invite",
     EXPENSE_VERIFIED: "email:expense_verified",
+    FORGOT_PASSWORD: "email:forgot_password",
   },
 };

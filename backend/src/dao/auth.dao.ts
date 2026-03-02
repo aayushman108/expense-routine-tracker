@@ -56,7 +56,7 @@ const updateProfile = async (
     `UPDATE users 
        SET ${setClause}, updated_at = NOW() 
        WHERE id = ? 
-       RETURNING id, full_name, nickname, email, phone, avatar`,
+       RETURNING id, full_name, email, phone, avatar, created_at, updated_at`,
     values,
   );
 

@@ -20,6 +20,22 @@ authRouter.post(
   validateRequest(UserValidation.loginSchema),
   authController.login,
 );
+authRouter.post(
+  "/forgot-password",
+  validateRequest(UserValidation.forgotPasswordSchema),
+  authController.forgotPassword,
+);
+authRouter.post(
+  "/reset-password",
+  validateRequest(UserValidation.resetPasswordSchema),
+  authController.resetPassword,
+);
+authRouter.post(
+  "/change-password",
+  verifyJWT,
+  validateRequest(UserValidation.changePasswordSchema),
+  authController.changePassword,
+);
 authRouter.get("/refresh", authController.refresh);
 authRouter.get("/logout", verifyJWT, authController.logout);
 authRouter.patch("/update-profile", verifyJWT, authController.updateProfile);

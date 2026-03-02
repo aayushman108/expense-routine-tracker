@@ -81,6 +81,27 @@ appEmitter.on(
   },
 );
 
+// Forgot password email listener
+appEmitter.on(
+  EVENTS.EMAIL.FORGOT_PASSWORD,
+  async (data: { email: string; fullName: string; resetToken: string }) => {
+    try {
+      const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${data.resetToken}`;
+      await sendMail({
+        email: data.email,
+        subject: "Reset your password",
+        template: "forgotPassword.ejs",
+        data: {
+          username: data.fullName,
+          resetUrl,
+        },
+      });
+    } catch (error) {
+      console.error("Error sending forgot password email:", error);
+    }
+  },
+);
+
 export const initEmailListeners = () => {
   console.log("Email listeners initialized");
 };

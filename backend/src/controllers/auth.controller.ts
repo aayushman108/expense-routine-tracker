@@ -11,6 +11,9 @@ import { jwtService } from "../services/jwt.service";
 import {
   ILoginInput,
   ISignupInput,
+  IForgotPasswordInput,
+  IResetPasswordInput,
+  IChangePasswordInput,
 } from "@expense-tracker/shared/validationSchema";
 import { ENV } from "src/constants";
 
@@ -147,6 +150,41 @@ const uploadAvatar = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+  const result = await authService.forgotPassword(
+    req.body as IForgotPasswordInput,
+  );
+
+  return sendSuccessResponse(res, {
+    message: result.message,
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
+const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+  const result = await authService.resetPassword(
+    req.body as IResetPasswordInput,
+  );
+
+  return sendSuccessResponse(res, {
+    message: result.message,
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
+const changePassword = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const result = await authService.changePassword(
+    userId,
+    req.body as IChangePasswordInput,
+  );
+
+  return sendSuccessResponse(res, {
+    message: result.message,
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
 export const authController = {
   signup,
   verifyEmail,
@@ -155,4 +193,7 @@ export const authController = {
   logout,
   updateProfile,
   uploadAvatar,
+  forgotPassword,
+  resetPassword,
+  changePassword,
 };

@@ -4,3 +4,4 @@ import { userController } from "../controllers";
 export const userRouter = express.Router();
 
 userRouter.get("/", userController.searchUser);
+userRouter.get("/:id/profile", userController.getUserProfile);

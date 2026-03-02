@@ -6,6 +6,7 @@ import {
   groupRouter,
   userRouter,
   settlementRouter,
+  paymentMethodRouter,
 } from "./routes";
 import { errorHandler, verifyJWT } from "./middlewares";
 import cookieParser from "cookie-parser";
@@ -51,6 +52,7 @@ app.use("/api/expenses", expenseRouter);
 app.use("/api/groups", groupRouter);
 app.use("/api/users", userRouter);
 app.use("/api/settlements", settlementRouter);
+app.use("/api/payment-methods", paymentMethodRouter);
 
 app.use(errorHandler);
 

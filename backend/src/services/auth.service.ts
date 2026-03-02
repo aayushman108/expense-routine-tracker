@@ -2,7 +2,12 @@ import jwt, { Secret } from "jsonwebtoken";
 import fs from "fs";
 
 import bcrypt from "bcrypt";
-import { ConflictError, NotFoundError, UnAuthorizedError } from "../utils";
+import {
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  UnAuthorizedError,
+} from "../utils";
 import { appEmitter, EVENTS } from "../utils/emitter.util";
 import { authDao } from "../dao";
 import { jwtService } from "./jwt.service";
@@ -10,6 +15,9 @@ import { v2 as cloudinary } from "cloudinary";
 import {
   ILoginInput,
   ISignupInput,
+  IForgotPasswordInput,
+  IResetPasswordInput,
+  IChangePasswordInput,
 } from "@expense-tracker/shared/validationSchema";
 import { ENV } from "../constants";
 
@@ -89,7 +97,14 @@ async function createUser(user: ISignupInput) {
 
 async function comparePassword(password: string, hashedpasswordFromDb: string) {
   try {
-    return await bcrypt.compare(password, hashedpasswordFromDb);
+    const isPasswordMatched = await bcrypt.compare(
+      password,
+      hashedpasswordFromDb,
+    );
+    if (!isPasswordMatched) {
+      throw new UnAuthorizedError("Password is unmatched!!");
+    }
+    return isPasswordMatched;
   } catch (error) {
     throw new UnAuthorizedError("Password is unmatched!!");
   }
@@ -190,8 +205,79 @@ async function uploadAvatar(userId: string, filePath: string) {
 }
 
 async function updateProfile(userId: string, payload: Partial<ISignupInput>) {
-  const updatedUser = await authDao.updateProfile(userId, payload);
+  // Email is the source of truth for login — never allow it to be updated
+  const { email, password, ...safePayload } = payload as Record<string, any>;
+  const updatedUser = await authDao.updateProfile(userId, safePayload);
   return updatedUser;
+}
+
+async function forgotPassword(payload: IForgotPasswordInput) {
+  const user = await authDao.findByEmail(payload.email);
+  if (!user) {
+    throw new NotFoundError("No user found with this email address.");
+  }
+
+  const resetToken = jwt.sign(
+    { id: user.id },
+    (ENV.FORGOT_PASSWORD_SECRET + user.password_hash) as Secret,
+    { expiresIn: ENV.FORGOT_PASSWORD_TOKEN_EXPIRY },
+  );
+
+  appEmitter.emit(EVENTS.EMAIL.FORGOT_PASSWORD, {
+    email: user.email,
+    fullName: user.full_name,
+    resetToken,
+  });
+
+  return { message: "Password reset link sent to your email." };
+}
+
+async function resetPassword(payload: IResetPasswordInput) {
+  try {
+    const { id } = jwt.decode(payload.token) as { id: string };
+    const user = await authDao.findById(id);
+
+    if (!user) {
+      throw new NotFoundError("User not found.");
+    }
+
+    jwt.verify(
+      payload.token,
+      (ENV.FORGOT_PASSWORD_SECRET + user.password_hash) as Secret,
+    );
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(payload.password, salt);
+
+    await authDao.updateProfile(user.id, { passwordHash } as any);
+
+    return { message: "Password reset successful. You can now login." };
+  } catch (error) {
+    if (error instanceof NotFoundError) throw error;
+    throw new UnAuthorizedError("Invalid or expired reset token.");
+  }
+}
+
+async function changePassword(userId: string, payload: IChangePasswordInput) {
+  const user = await authDao.findById(userId);
+  if (!user) {
+    throw new NotFoundError("User not found.");
+  }
+
+  const isOldPasswordMatch = await comparePassword(
+    payload.oldPassword,
+    user.password_hash,
+  );
+  if (!isOldPasswordMatch) {
+    throw new BadRequestError("Old password does not match.");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash(payload.newPassword, salt);
+
+  await authDao.updateProfile(userId, { passwordHash } as any);
+
+  return { message: "Password changed successfully." };
 }
 
 export const authService = {
@@ -203,4 +289,7 @@ export const authService = {
   logout,
   uploadAvatar,
   updateProfile,
+  forgotPassword,
+  resetPassword,
+  changePassword,
 };

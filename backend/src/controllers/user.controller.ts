@@ -34,6 +34,24 @@ const searchUser = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
+  const currentUserId = req.userId;
+  if (!currentUserId) {
+    throw new NotFoundError("User ID not found in request");
+  }
+
+  const { id } = req.params;
+
+  const profile = await userService.getUserProfile(id, currentUserId);
+
+  return sendSuccessResponse(res, {
+    message: "User profile fetched successfully",
+    data: profile,
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
 export const userController = {
   searchUser,
+  getUserProfile,
 };

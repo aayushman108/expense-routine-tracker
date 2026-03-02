@@ -16,6 +16,29 @@ const findByEmailOrName = async (
   return rows;
 };
 
+const findById = async (userId: string) => {
+  const { rows } = await db.raw(
+    `SELECT id, full_name, email, phone, avatar, created_at, updated_at 
+     FROM users WHERE id = ? LIMIT 1`,
+    [userId],
+  );
+  return rows[0];
+};
+
+const shareGroup = async (userIdA: string, userIdB: string) => {
+  const { rows } = await db.raw(
+    `SELECT 1 FROM group_members gm1
+     JOIN group_members gm2 ON gm1.group_id = gm2.group_id
+     WHERE gm1.user_id = ? AND gm2.user_id = ?
+     AND gm1.left_at IS NULL AND gm2.left_at IS NULL
+     LIMIT 1`,
+    [userIdA, userIdB],
+  );
+  return rows.length > 0;
+};
+
 export const userDao = {
   findByEmailOrName,
+  findById,
+  shareGroup,
 };
