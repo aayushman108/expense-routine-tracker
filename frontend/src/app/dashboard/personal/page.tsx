@@ -76,7 +76,11 @@ export default function PersonalDetailsPage() {
     > = {};
 
     expenses
-      .filter((e) => e.expense_type === EXPENSE_TYPE.GROUP)
+      .filter(
+        (e) =>
+          e.expense_type === EXPENSE_TYPE.GROUP &&
+          e.expense_status === EXPENSE_STATUS.VERIFIED,
+      )
       .forEach((expense) => {
         const gId = expense.group_id as string;
         if (!groups[gId]) {
@@ -121,13 +125,16 @@ export default function PersonalDetailsPage() {
 
   // Calculations depends on groupedSummaries
   const calculations = useMemo(() => {
-    const personal = personalExpenses.reduce(
-      (acc, curr) => acc + Number(curr.total_amount || 0),
-      0,
-    );
+    const personal = personalExpenses
+      .filter((e) => e.expense_status === EXPENSE_STATUS.VERIFIED)
+      .reduce((acc, curr) => acc + Number(curr.total_amount || 0), 0);
 
     const actualGroupSpend = expenses
-      .filter((e) => e.expense_type === EXPENSE_TYPE.GROUP)
+      .filter(
+        (e) =>
+          e.expense_type === EXPENSE_TYPE.GROUP &&
+          e.expense_status === EXPENSE_STATUS.VERIFIED,
+      )
       .reduce((acc, curr) => {
         const mySplit = curr.splits?.find(
           (s: any) => s.user.id === user?.id || s.user_id === user?.id,

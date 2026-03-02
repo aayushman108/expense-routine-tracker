@@ -21,7 +21,11 @@ import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal"
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
-import { EXPENSE_TYPE, SETTLEMENT_STATUS } from "@expense-tracker/shared";
+import {
+  EXPENSE_TYPE,
+  SETTLEMENT_STATUS,
+  EXPENSE_STATUS,
+} from "@expense-tracker/shared";
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
@@ -41,14 +45,21 @@ export default function DashboardPage() {
     dispatch(fetchUserExpenses());
   }, [dispatch]);
 
-  const totalSpent = expenses.reduce(
-    (acc: number, curr: any) =>
-      acc + Number(curr.user_amount || curr.total_amount),
-    0,
-  );
+  const totalSpent = expenses
+    .filter((e) => e.expense_status === EXPENSE_STATUS.VERIFIED)
+    .reduce(
+      (acc: number, curr: any) =>
+        acc + Number(curr.user_amount || curr.total_amount),
+      0,
+    );
 
   const owedToYou = expenses.reduce((total, exp) => {
-    if (exp.expense_type !== EXPENSE_TYPE.GROUP || !exp.splits) return total;
+    if (
+      exp.expense_type !== EXPENSE_TYPE.GROUP ||
+      !exp.splits ||
+      exp.expense_status !== EXPENSE_STATUS.VERIFIED
+    )
+      return total;
     // If I'm the payer, others' pending splits are owed to me
     if (exp.paid_by === user?.id) {
       return (
@@ -66,7 +77,12 @@ export default function DashboardPage() {
   }, 0);
 
   const youOwe = expenses.reduce((total, exp) => {
-    if (exp.expense_type !== EXPENSE_TYPE.GROUP || !exp.splits) return total;
+    if (
+      exp.expense_type !== EXPENSE_TYPE.GROUP ||
+      !exp.splits ||
+      exp.expense_status !== EXPENSE_STATUS.VERIFIED
+    )
+      return total;
     // If I'm NOT the payer, my pending split is what I owe
     if (exp.paid_by !== user?.id) {
       return (
