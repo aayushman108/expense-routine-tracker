@@ -96,25 +96,24 @@ async function updateExpense({
       throw new Error("Verified expenses cannot be updated.");
     }
 
-    const snakeCaseData = keysToSnakeCase(data);
-    delete (snakeCaseData as any).splits;
+    const updatePayload = keysToSnakeCase(data);
 
-    const updatePayload = Object.entries(snakeCaseData).reduce(
-      (acc, [key, value]) => {
-        if (value !== undefined && value !== null) {
-          acc[key] = value;
-        }
-        return acc;
-      },
-      {} as Record<string, any>,
-    );
+    // Filter out undefined and null values
+    Object.keys(updatePayload).forEach((key) => {
+      if (
+        (updatePayload as any)[key] === undefined ||
+        (updatePayload as any)[key] === null
+      ) {
+        delete (updatePayload as any)[key];
+      }
+    });
 
     // If it was rejected and we are updating, reset to submitted unless explicitly draft
     if (
       currentExpense.expense_status === EXPENSE_STATUS.REJECTED &&
-      !updatePayload.expense_status
+      !(updatePayload as any).expense_status
     ) {
-      updatePayload.expense_status = EXPENSE_STATUS.SUBMITTED;
+      (updatePayload as any).expense_status = EXPENSE_STATUS.SUBMITTED;
     }
 
     if (Object.keys(updatePayload).length > 0) {

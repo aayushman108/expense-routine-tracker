@@ -9,6 +9,7 @@ import {
   SPLIT_STATUS,
 } from "@expense-tracker/shared";
 import { appEmitter, EVENTS } from "../utils/emitter.util";
+import { keysToSnakeCase } from "../utils/caseConverter";
 
 export type IAddExpense = ICreateExpenseSchema["body"] &
   ICreateExpenseSchema["params"] & {
@@ -59,7 +60,10 @@ async function addExpense(data: IAddExpense) {
 async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
   let calculatedSplits: IExpenseSplit[] = [];
 
-  if (data.splits && data.splits.length > 0 && data?.totalAmount) {
+  // 1. Calculate new splits if totalAmount or splits are changed
+  const totalAmount = data?.totalAmount;
+
+  if (data.splits && data.splits.length > 0 && totalAmount) {
     calculatedSplits = data.splits.map((split) => ({
       user_id: split.userId,
       split_percentage: split.splitPercentage,
@@ -70,10 +74,10 @@ async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
       (acc, s) => acc + s.split_amount,
       0,
     );
-    const diff = Number((data?.totalAmount - sumCalculated).toFixed(2));
+    const diff = Number((totalAmount - sumCalculated).toFixed(2));
 
     if (diff !== 0) {
-      const paidBy = data.paidBy || userId;
+      const paidBy = data?.paidBy ?? userId;
       const findIndex = calculatedSplits.findIndex(
         (split) => split.user_id === paidBy,
       );
@@ -84,6 +88,8 @@ async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
       }
     }
   }
+
+  delete data.splits;
 
   return await expenseDao.updateExpense({
     expenseId: id,

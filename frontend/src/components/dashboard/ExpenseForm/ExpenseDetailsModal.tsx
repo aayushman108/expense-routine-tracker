@@ -236,15 +236,13 @@ export default function ExpenseDetailsModal({
                   )}
                 {details.paid_by === user?.id && (
                   <div className={styles.actionButtons}>
-                    {/* Only show Edit/Delete based on status for group expenses */}
-                    {details.expense_type === EXPENSE_TYPE.PERSONAL ||
-                    (details.expense_status !== EXPENSE_STATUS.VERIFIED &&
-                      details.expense_status !== EXPENSE_STATUS.REJECTED) // Following "drafted and submitted state" literally, but REJECTED also probably shouldn't be deleted if strictly matching the requirement "submitted or draft"
-                      ? // Actually, let's re-read: "The group expense can only be deleted in drafted and submitted state, but when group expense is verified, the expense cannot be deleted."
-                        // So DRAFT and SUBMITTED are allowed.
-                        (details.expense_status === EXPENSE_STATUS.DRAFT ||
+                    {/* Only show Edit/Delete for non-verified group expenses */}
+                    {details.expense_type === EXPENSE_TYPE.GROUP &&
+                    details.expense_status !== EXPENSE_STATUS.VERIFIED
+                      ? (details.expense_status === EXPENSE_STATUS.DRAFT ||
+                          details.expense_status === EXPENSE_STATUS.SUBMITTED ||
                           details.expense_status ===
-                            EXPENSE_STATUS.SUBMITTED) && (
+                            EXPENSE_STATUS.REJECTED) && (
                           <>
                             <button
                               className={styles.editBtn}

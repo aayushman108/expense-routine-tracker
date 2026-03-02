@@ -231,7 +231,9 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
     { userId: string; splitPercentage: number; splitAmount: number }[]
   >([]);
 
-  const [splitMode, setSplitMode] = useState<SPLIT_MODE>(SPLIT_MODE.EQUAL);
+  const [splitMode, setSplitMode] = useState<SPLIT_MODE>(
+    expense ? SPLIT_MODE.AMOUNT : SPLIT_MODE.EQUAL,
+  );
 
   const totalAmount = Number(form.totalAmount) || 0;
 
@@ -245,15 +247,6 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
           splitAmount: Number(s.split_amount),
         })),
       );
-
-      // Try to guess the split mode
-      const allEqual = expense.splits.every(
-        (s: any, _: number, arr: any[]) =>
-          Math.abs(Number(s.split_percentage) - 100 / arr.length) < 0.1,
-      );
-      if (!allEqual) {
-        setSplitMode(SPLIT_MODE.AMOUNT); // Default to amount if not equal
-      }
     } else if (groupMembers.length > 0) {
       setSplits(
         groupMembers.map((m: GroupMember) => ({

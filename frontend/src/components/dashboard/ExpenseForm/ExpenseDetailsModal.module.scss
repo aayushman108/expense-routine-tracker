@@ -70,6 +70,7 @@ $transition-normal: $transition-base;
   .tagsRow {
     display: flex;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
@@ -137,7 +138,6 @@ $transition-normal: $transition-base;
   .actionButtons {
     display: flex;
     gap: $space-2;
-    margin-top: $space-3;
     justify-content: center;
 
     .editBtn,
