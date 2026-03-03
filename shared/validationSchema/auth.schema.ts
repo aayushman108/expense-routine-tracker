@@ -133,6 +133,25 @@ export class UserValidation {
         path: ["confirmPassword"],
       }),
   });
+
+  static updateProfileSchema = z.object({
+    body: z.object({
+      fullName: z.preprocess(
+        optionalPreprocessor,
+        z
+          .string({ message: "Full name is required" })
+          .min(1, { message: "Full name is required" })
+          .max(255, { message: "Full name must not exceed 255 characters" }),
+      ),
+      phone: z.preprocess(
+        optionalPreprocessor,
+        z
+          .string()
+          .max(20, { message: "Phone number must not exceed 20 characters" })
+          .nullable(),
+      ),
+    }),
+  });
 }
 
 export type ISignupInput = z.infer<
@@ -147,4 +166,7 @@ export type IResetPasswordInput = z.infer<
 >;
 export type IChangePasswordInput = z.infer<
   typeof UserValidation.changePasswordSchema.shape.body
+>;
+export type IUpdateProfileInput = z.infer<
+  typeof UserValidation.updateProfileSchema.shape.body
 >;

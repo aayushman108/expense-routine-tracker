@@ -1,31 +1,36 @@
+import { IUpdateProfileInput } from "@expense-tracker/shared";
 import { db } from "../database/db";
 
 const findByEmailOrName = async (
   query: string,
   excludeUserId: string,
   limit: number = 10,
-) => {
+): Promise<Auth.IUser[]> => {
   const { rows } = await db.raw(
-    `SELECT * 
-     FROM users 
+    `SELECT (to_jsonb(u) - 'password_hash') AS user 
+     FROM users u
      WHERE (email ILIKE ? OR full_name ILIKE ?) 
      AND id != ? 
      LIMIT ?`,
     [`%${query}%`, `%${query}%`, excludeUserId, limit],
   );
-  return rows;
+  return rows.map((row: { user: Auth.IUser }) => row.user);
 };
 
-const findById = async (userId: string) => {
+const findById = async (userId: string): Promise<Auth.IUser> => {
   const { rows } = await db.raw(
-    `SELECT id, full_name, email, phone, avatar, created_at, updated_at 
-     FROM users WHERE id = ? LIMIT 1`,
+    `SELECT (to_jsonb(u) - 'password_hash') AS user 
+     FROM users u
+     WHERE u.id = ? LIMIT 1`,
     [userId],
   );
-  return rows[0];
+  return rows[0]?.user;
 };
 
-const shareGroup = async (userIdA: string, userIdB: string) => {
+const shareGroup = async (
+  userIdA: string,
+  userIdB: string,
+): Promise<boolean> => {
   const { rows } = await db.raw(
     `SELECT 1 FROM group_members gm1
      JOIN group_members gm2 ON gm1.group_id = gm2.group_id
@@ -37,19 +42,21 @@ const shareGroup = async (userIdA: string, userIdB: string) => {
   return rows.length > 0;
 };
 
-const updateById = async (userId: string, data: any) => {
+const updateById = async (
+  userId: string,
+  data: IUpdateProfileInput,
+): Promise<Auth.IUser> => {
   const { rows } = await db.raw(
-    `UPDATE users 
+    `UPDATE users u
      SET 
-       full_name = COALESCE(?, full_name),
-       phone = COALESCE(?, phone),
-       avatar = COALESCE(?, avatar),
+       full_name = COALESCE(?, u.full_name),
+       phone = COALESCE(?, u.phone),
        updated_at = CURRENT_TIMESTAMP
-     WHERE id = ? 
-     RETURNING id, full_name, email, phone, avatar, updated_at`,
-    [data.full_name || null, data.phone || null, data.avatar || null, userId],
+     WHERE u.id = ? 
+     RETURNING (to_jsonb(u) - 'password_hash') AS user`,
+    [data.fullName, data.phone, userId],
   );
-  return rows[0];
+  return rows[0]?.user;
 };
 
 export const userDao = {
