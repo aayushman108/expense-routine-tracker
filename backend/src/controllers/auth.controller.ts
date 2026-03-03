@@ -120,7 +120,6 @@ const updateProfile = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.userId as string;
 
-    // Delegate the update logic to the service
     const updatedUser = await authService.updateProfile(
       userId,
       req.body as Partial<ISignupInput>,

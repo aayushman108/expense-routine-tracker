@@ -170,18 +170,15 @@ async function uploadAvatar(userId: string, filePath: string) {
   try {
     const user = await authDao.findById(userId);
 
-    // If the user already has an avatar in Cloudinary, delete it
     if (user?.avatar?.publicId) {
       await cloudinary.uploader.destroy(user.avatar.publicId);
     }
 
-    // Upload the new avatar to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(filePath, {
       folder: ENV.CLOUD_AVATAR_FOLDER,
       transformation: [{ width: 500, height: 500, crop: "limit" }],
     });
 
-    // Update the database with the new avatar object
     const avatar = {
       url: uploadResult.secure_url,
       publicId: uploadResult.public_id,
@@ -205,8 +202,7 @@ async function uploadAvatar(userId: string, filePath: string) {
 }
 
 async function updateProfile(userId: string, payload: Partial<ISignupInput>) {
-  // Email is the source of truth for login — never allow it to be updated
-  const { email, password, ...safePayload } = payload as Record<string, any>;
+  const { email, password, ...safePayload } = payload;
   const updatedUser = await authDao.updateProfile(userId, safePayload);
   return updatedUser;
 }
