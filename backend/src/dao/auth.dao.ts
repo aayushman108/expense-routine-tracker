@@ -20,16 +20,18 @@ const findById = async (userId: string): Promise<Auth.IUser> => {
   return rows[0];
 };
 
-const createUser = async (user: IRegisterUser): Promise<Auth.IUser> => {
+const createUser = async (
+  user: IRegisterUser,
+): Promise<Exclude<Auth.IUser, "password_hash">> => {
   const { fullName, email, phone, password, avatar } = user;
 
   const { rows } = await db.raw(
     `INSERT INTO users (id, full_name, email, phone, password_hash, avatar) 
        VALUES (gen_random_uuid(), ?, ?, ?, ?, ?) 
-       RETURNING *`,
+       RETURNING to_jsonb(users) - 'password_hash' AS user`,
     [fullName, email, phone, password, avatar ? JSON.stringify(avatar) : null],
   );
-  return rows[0];
+  return rows[0].user;
 };
 
 const verifyUser = async (email: string) => {
@@ -42,7 +44,7 @@ const updateProfile = async (
   updates: Partial<ISignupInput> & {
     avatar?: { url: string; publicId: string } | null;
   },
-) => {
+): Promise<Exclude<Auth.IUser, "password_hash"> | null> => {
   const updatedObj = keysToSnakeCase(updates);
 
   const keys = Object.keys(updatedObj);
@@ -63,11 +65,11 @@ const updateProfile = async (
     `UPDATE users 
        SET ${setClause}, updated_at = NOW() 
        WHERE id = ? 
-       RETURNING id, full_name, email, phone, avatar, created_at, updated_at`,
+       RETURNING to_jsonb(users) - 'password_hash' AS user`,
     values,
   );
 
-  return rows[0];
+  return rows[0].user;
 };
 
 export const authDao = {

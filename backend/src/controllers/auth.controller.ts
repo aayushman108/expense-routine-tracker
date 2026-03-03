@@ -39,11 +39,9 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
   const { user } = await authService.verifyEmailVerificationToken(req.body);
   const createdUser = await authService.createUser(user);
 
-  const modifiedUser = { ...createdUser, password_hash: undefined };
-
   return sendSuccessResponse(res, {
     message: "You are registered successfully.",
-    data: modifiedUser,
+    data: createdUser,
     statusCode: HttpStatusCode.CREATED,
   });
 });
