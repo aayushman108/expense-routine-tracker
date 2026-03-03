@@ -34,11 +34,6 @@ const createUser = async (
   return rows[0].user;
 };
 
-const verifyUser = async (email: string) => {
-  await db.raw("UPDATE users SET updated_at = NOW() WHERE email = ?", [email]);
-  return true;
-};
-
 const updateProfile = async (
   userId: string,
   updates: Partial<ISignupInput> & {
@@ -76,6 +71,5 @@ export const authDao = {
   findByEmail,
   findById,
   createUser,
-  verifyUser,
   updateProfile,
 };
