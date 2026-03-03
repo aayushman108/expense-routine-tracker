@@ -6,21 +6,21 @@ interface IRegisterUser extends ISignupInput {
   avatar?: { url: string; publicId: string } | null;
 }
 
-const findByEmail = async (email: string): Promise<any> => {
+const findByEmail = async (email: string): Promise<Auth.IUser> => {
   const { rows } = await db.raw("SELECT * FROM users WHERE email = ? LIMIT 1", [
     email,
   ]);
   return rows[0];
 };
 
-const findById = async (userId: string): Promise<any> => {
+const findById = async (userId: string): Promise<Auth.IUser> => {
   const { rows } = await db.raw("SELECT * FROM users WHERE id = ? LIMIT 1", [
     userId,
   ]);
   return rows[0];
 };
 
-const createUser = async (user: IRegisterUser) => {
+const createUser = async (user: IRegisterUser): Promise<Auth.IUser> => {
   const { fullName, email, phone, password, avatar } = user;
 
   const { rows } = await db.raw(
@@ -49,7 +49,14 @@ const updateProfile = async (
 
   if (keys.length === 0) return null;
 
-  const setClause = keys.map((key) => `${key} = ?`).join(", ");
+  const setClause = keys
+    .map((key) => {
+      if (key === "password") {
+        return `password_hash = ?`;
+      }
+      return `${key} = ?`;
+    })
+    .join(", ");
   const values = [...Object.values(updatedObj), userId];
 
   const { rows } = await db.raw(

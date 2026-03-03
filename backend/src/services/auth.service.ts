@@ -217,11 +217,7 @@ async function forgotPassword(payload: IForgotPasswordInput) {
     throw new NotFoundError("No user found with this email address.");
   }
 
-  const resetToken = jwt.sign(
-    { id: user.id },
-    (ENV.FORGOT_PASSWORD_SECRET + user.password_hash) as Secret,
-    { expiresIn: ENV.FORGOT_PASSWORD_TOKEN_EXPIRY },
-  );
+  const resetToken = jwtService.generateForgotPasswordToken(user);
 
   appEmitter.emit(EVENTS.EMAIL.FORGOT_PASSWORD, {
     email: user.email,
@@ -241,15 +237,12 @@ async function resetPassword(payload: IResetPasswordInput) {
       throw new NotFoundError("User not found.");
     }
 
-    jwt.verify(
-      payload.token,
-      (ENV.FORGOT_PASSWORD_SECRET + user.password_hash) as Secret,
-    );
+    jwtService.verifyForgotPasswordToken(payload.token, user);
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(payload.password, salt);
 
-    await authDao.updateProfile(user.id, { passwordHash } as any);
+    await authDao.updateProfile(user.id, { password: passwordHash });
 
     return { message: "Password reset successful. You can now login." };
   } catch (error) {
@@ -264,18 +257,12 @@ async function changePassword(userId: string, payload: IChangePasswordInput) {
     throw new NotFoundError("User not found.");
   }
 
-  const isOldPasswordMatch = await comparePassword(
-    payload.oldPassword,
-    user.password_hash,
-  );
-  if (!isOldPasswordMatch) {
-    throw new BadRequestError("Old password does not match.");
-  }
+  await comparePassword(payload.oldPassword, user.password_hash);
 
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(payload.newPassword, salt);
 
-  await authDao.updateProfile(userId, { passwordHash } as any);
+  await authDao.updateProfile(userId, { password: passwordHash });
 
   return { message: "Password changed successfully." };
 }
