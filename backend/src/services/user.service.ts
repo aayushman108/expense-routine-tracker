@@ -1,3 +1,4 @@
+import { IUpdateProfileInput } from "@expense-tracker/shared";
 import { userDao } from "../dao";
 import { paymentMethodDao } from "../dao/payment-method.dao";
 import { NotFoundError, ForbiddentError } from "../utils";
@@ -32,7 +33,7 @@ const getUserProfile = async (targetUserId: string, currentUserId: string) => {
   return { user: targetUser, paymentMethods };
 };
 
-const updateProfile = async (userId: string, data: any) => {
+const updateProfile = async (userId: string, data: IUpdateProfileInput) => {
   return await userDao.updateById(userId, data);
 };
 

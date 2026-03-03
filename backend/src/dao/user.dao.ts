@@ -59,9 +59,27 @@ const updateById = async (
   return rows[0]?.user;
 };
 
+const findByIdWithPaymentMethods = async (
+  userId: string,
+): Promise<{ user: Auth.IUser; paymentMethods: any[] } | null> => {
+  const { rows } = await db.raw(
+    `SELECT 
+       (to_jsonb(u) - 'password_hash') AS user,
+       COALESCE(
+         (SELECT json_agg(pm) FROM (SELECT * FROM payment_methods WHERE user_id = u.id ORDER BY is_default DESC, created_at DESC) pm),
+         '[]'::json
+       ) AS "paymentMethods"
+     FROM users u
+     WHERE u.id = ? LIMIT 1`,
+    [userId],
+  );
+  return rows[0] || null;
+};
+
 export const userDao = {
   findByEmailOrName,
   findById,
+  findByIdWithPaymentMethods,
   shareGroup,
   updateById,
 };
