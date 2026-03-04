@@ -12,14 +12,9 @@ import {
   HiOutlineCreditCard,
   HiOutlineX,
   HiOutlineShieldCheck,
-  HiOutlineLockClosed,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  updateProfile,
-  changePassword,
-  uploadAvatar,
-} from "@/store/slices/authSlice";
+import { updateProfile, uploadAvatar } from "@/store/slices/authSlice";
 import { fetchPaymentMethods } from "@/store/slices/paymentMethodSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import Button from "@/components/ui/Button/Button";
@@ -35,6 +30,7 @@ import { WalletCard } from "@/components/dashboard/WalletCard/WalletCard";
 import { PaymentDetailsForm } from "@/components/dashboard/PaymentDetailsForm/PaymentDetailsForm";
 import { FORM_MODE } from "@expense-tracker/shared";
 import { ChangePasswordForm } from "@/components/dashboard/ChangePasswordForm/ChangePasswordForm";
+import { handleThunk } from "@/lib/utils";
 
 interface MetadataField {
   key: string;
@@ -124,9 +120,7 @@ export default function ProfilePage() {
   );
 
   const [isEditing, setIsEditing] = useState(false);
-
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   useEffect(() => {
@@ -163,11 +157,6 @@ export default function ProfilePage() {
         );
       }
     }
-  };
-
-  // ── Payment method handlers ──
-  const openAddModal = () => {
-    setIsPaymentModalOpen(true);
   };
 
   const getInitials = (name?: string) => {
@@ -309,7 +298,11 @@ export default function ProfilePage() {
               <h3 className={styles.sectionTitle}>
                 <HiOutlineCreditCard /> Payment Methods
               </h3>
-              <Button variant="outline" size="sm" onClick={openAddModal}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsPaymentModalOpen(true)}
+              >
                 <HiOutlinePlus /> Add New
               </Button>
             </div>
@@ -320,7 +313,11 @@ export default function ProfilePage() {
                   <div className={styles.emptyState}>
                     <HiOutlineCreditCard />
                     <p>No payment methods added yet.</p>
-                    <Button variant="outline" size="sm" onClick={openAddModal}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsPaymentModalOpen(true)}
+                    >
                       <HiOutlinePlus size={18} /> Add Your First Payment Method
                     </Button>
                   </div>
@@ -400,17 +397,24 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await dispatch(updateProfile(form));
-    if (updateProfile.fulfilled.match(result)) {
-      dispatch(
-        addToast({ type: "success", message: "Profile updated successfully!" }),
-      );
-      closeEdit();
-    } else {
-      dispatch(
-        addToast({ type: "error", message: "Failed to update profile." }),
-      );
-    }
+
+    await handleThunk(
+      dispatch(updateProfile(form)),
+      () => {
+        dispatch(
+          addToast({
+            type: "success",
+            message: "Profile updated successfully!",
+          }),
+        );
+        closeEdit();
+      },
+      () => {
+        dispatch(
+          addToast({ type: "error", message: "Failed to update profile." }),
+        );
+      },
+    );
   };
 
   useEffect(() => {
