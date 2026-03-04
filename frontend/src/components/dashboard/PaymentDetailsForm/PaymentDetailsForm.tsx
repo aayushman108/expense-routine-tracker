@@ -183,6 +183,7 @@ export function PaymentDetailsForm({
         options={PROVIDER_OPTIONS}
         placeholder="Select a provider"
         required
+        listHeight={150}
       />
 
       {pmForm.provider &&

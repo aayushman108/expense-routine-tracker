@@ -23,6 +23,7 @@ interface SelectProps {
   disabled?: boolean;
   className?: string;
   id?: string;
+  listHeight?: string | number;
 }
 
 export default function Select({
@@ -38,6 +39,7 @@ export default function Select({
   value,
   onChange,
   disabled = false,
+  listHeight,
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -199,6 +201,7 @@ export default function Select({
             className={styles.dropdown}
             role="listbox"
             aria-labelledby={selectId}
+            style={listHeight ? { maxHeight: listHeight } : undefined}
           >
             {options.map((option, index) => {
               const isSelected = option.value === value;

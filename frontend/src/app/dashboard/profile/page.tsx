@@ -321,7 +321,7 @@ export default function ProfilePage() {
                     <HiOutlineCreditCard />
                     <p>No payment methods added yet.</p>
                     <Button variant="outline" size="sm" onClick={openAddModal}>
-                      <HiOutlinePlus /> Add Your First Payment Method
+                      <HiOutlinePlus size={18} /> Add Your First Payment Method
                     </Button>
                   </div>
                 </Card>
