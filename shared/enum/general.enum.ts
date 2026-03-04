@@ -1,3 +1,9 @@
+export enum FORM_MODE {
+  ADD = "add",
+  EDIT = "edit",
+  VIEW = "view",
+}
+
 export enum SUPPORTED_CURRENCIES {
   NPR = "NPR",
   USD = "USD",

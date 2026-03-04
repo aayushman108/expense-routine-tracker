@@ -1,0 +1,170 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.pmForm {
+  @include flex-column;
+  gap: $space-5;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+  margin-top: $space-4;
+  padding-top: $space-4;
+  border-top: 1px solid var(--border-default);
+}
+
+.deleteConfirm {
+  @include flex-column;
+  gap: $space-4;
+
+  p {
+    color: var(--text-secondary);
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+}
+
+.loadingState {
+  @include flex-center;
+  min-height: 400px;
+  color: var(--text-secondary);
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  @include card;
+}
+
+.backBtn {
+  margin-bottom: $space-4;
+  padding-left: 0;
+  color: var(--text-secondary);
+
+  &:hover {
+    color: var(--color-primary);
+    background: transparent;
+  }
+
+  svg {
+    font-size: $font-size-lg;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── QR Upload UI ──
+.qrUpload {
+  @include flex-column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: var(--text-secondary);
+  }
+}
+
+.qrPreviewWrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.qrPreview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: $radius-lg;
+  border: 2px solid var(--color-primary);
+  overflow: hidden;
+  background: white;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .removeQr {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    @include flex-center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform $transition-fast;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.qrPlaceholder {
+  width: 100%;
+  height: 100%;
+  border: 2px dashed var(--border-default);
+  border-radius: $radius-lg;
+  @include flex-column;
+  @include flex-center;
+  gap: $space-2;
+  position: relative;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.04);
+    color: var(--color-primary);
+  }
+
+  svg {
+    font-size: 3rem;
+    opacity: 0.5;
+  }
+
+  span {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+
+  .fileInput {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}

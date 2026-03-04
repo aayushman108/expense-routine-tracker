@@ -1,0 +1,315 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.modernWalletCard {
+  border-radius: $radius-xl;
+  padding: $space-5 $space-6;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  transition: transform $transition-base;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: $space-4;
+  min-height: 200px;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &.khalti {
+    background: linear-gradient(135deg, #5c2d91 0%, #8c52ff 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 180px;
+      height: 180px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+  }
+
+  &.esewa {
+    background: linear-gradient(135deg, #60bb46 0%, #a2d149 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -20%;
+      right: -10%;
+      width: 150px;
+      height: 150px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      transform: rotate(45deg);
+    }
+  }
+
+  &.bank {
+    background: linear-gradient(135deg, #1a73e8 0%, #64b5f6 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      top: -30%;
+      left: -10%;
+      width: 200px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 40px;
+      transform: rotate(-15deg);
+    }
+  }
+
+  &.fonepay {
+    background: linear-gradient(135deg, #e31837 0%, #ff5252 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      top: 10%;
+      right: -5%;
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      box-shadow: 40px 40px 0 rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  &.imepay {
+    background: linear-gradient(135deg, #00a4e4 0%, #40c4ff 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -10%;
+      left: 10%;
+      width: 160px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 100px;
+      transform: rotate(-45deg);
+    }
+  }
+
+  &.connectips {
+    background: linear-gradient(135deg, #004b87 0%, #0072bc 100%);
+    &::after {
+      content: "";
+      position: absolute;
+      top: -10%;
+      right: -10%;
+      width: 140px;
+      height: 140px;
+      border: 20px solid rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+    }
+  }
+
+  .infoSide {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    min-width: 0;
+    z-index: 1;
+
+    .cardHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .providerLogo {
+        font-weight: 900;
+        font-size: $font-size-lg;
+        letter-spacing: -0.02em;
+        font-style: italic;
+        opacity: 0.9;
+      }
+    }
+
+    .mainAccount {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .label {
+        font-size: 9px;
+        text-transform: uppercase;
+        opacity: 0.5;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+      }
+
+      .numberRow {
+        display: flex;
+        align-items: center;
+        gap: $space-3;
+
+        .number {
+          font-size: $font-size-xl;
+          font-family: inherit;
+          letter-spacing: 1px;
+          font-weight: 700;
+          opacity: 1;
+          @include truncate;
+        }
+
+        .copyBtn {
+          opacity: 0.6;
+          visibility: visible;
+          transition: all $transition-fast;
+          background: rgba(255, 255, 255, 0.1);
+          border: none;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          padding: 4px;
+          border-radius: 4px;
+          @include flex-center;
+
+          &:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+
+    .auxInfo {
+      display: flex;
+      gap: $space-6;
+      align-items: center;
+
+      .item {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+
+        .al {
+          font-size: 8px;
+          opacity: 0.4;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+
+        .av,
+        .name {
+          font-size: $font-size-sm;
+          font-weight: 600;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+}
+
+.qrSide {
+  flex: 0 0 auto;
+  z-index: 1;
+
+  .qrWrapper {
+    width: 152px;
+    height: 152px;
+    aspect-ratio: 1 / 1;
+    background: white;
+    border-radius: $radius-lg;
+    @include flex-center;
+    color: #000;
+    font-size: 100px;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    border: 4px solid white;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1/1;
+      object-fit: contain;
+    }
+
+    .qrOverlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      @include flex-center;
+      opacity: 0;
+      transition: opacity $transition-fast;
+
+      &.visible {
+        opacity: 1;
+      }
+    }
+
+    &:hover .qrOverlay {
+      opacity: 1;
+    }
+  }
+}
+
+.pmActionsOverlay {
+  display: flex;
+  gap: $space-2;
+  margin-left: auto;
+
+  button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    @include flex-center;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: white;
+      color: var(--color-primary);
+      transform: scale(1.1);
+    }
+
+    &.danger:hover {
+      background: var(--color-danger);
+      border-color: var(--color-danger);
+      color: white;
+    }
+  }
+}
+
+.defaultBadge {
+  font-size: 0.625rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: $radius-full;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+
+  &.khalti {
+    color: #5c2d91;
+  }
+  &.esewa {
+    color: #60bb46;
+  }
+  &.bank {
+    color: #1a73e8;
+  }
+  &.fonepay {
+    color: #e31837;
+  }
+  &.imepay {
+    color: #00a4e4;
+  }
+  &.connectips {
+    color: #004b87;
+  }
+}

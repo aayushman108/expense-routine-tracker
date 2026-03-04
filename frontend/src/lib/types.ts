@@ -4,6 +4,7 @@ import {
   SPLIT_STATUS,
   SETTLEMENT_STATUS,
 } from "@expense-tracker/shared";
+import { PAYMENT_METHOD_TYPE } from "@expense-tracker/shared/enum/payment.enum";
 
 export interface User {
   id: string;
@@ -79,7 +80,7 @@ export interface ExpenseSplit {
 export interface PaymentMethod {
   id: string;
   user_id: string;
-  provider: string;
+  provider: PAYMENT_METHOD_TYPE;
   metadata?: Record<string, unknown>;
   is_verified: boolean;
   is_default: boolean;

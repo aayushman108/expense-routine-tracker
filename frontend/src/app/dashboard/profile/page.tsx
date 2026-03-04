@@ -9,14 +9,10 @@ import {
   HiOutlineCheck,
   HiOutlinePlus,
   HiOutlinePencil,
-  HiOutlineTrash,
-  HiOutlineStar,
   HiOutlineCreditCard,
   HiOutlineX,
   HiOutlineShieldCheck,
   HiOutlineLockClosed,
-  HiOutlineDuplicate,
-  HiOutlineQrcode,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -24,50 +20,21 @@ import {
   changePassword,
   uploadAvatar,
 } from "@/store/slices/authSlice";
-import {
-  fetchPaymentMethods,
-  createPaymentMethod,
-  updatePaymentMethod,
-  deletePaymentMethod,
-} from "@/store/slices/paymentMethodSlice";
-import { fetchUserExpenses } from "@/store/slices/expenseSlice";
+import { fetchPaymentMethods } from "@/store/slices/paymentMethodSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import Card from "@/components/ui/Card/Card";
-import Select from "@/components/ui/Select/Select";
 import Modal from "@/components/ui/Modal/Modal";
 import styles from "./profile.module.scss";
 import type { RootState } from "@/store";
-import type { PaymentMethod } from "@/lib/types";
+import type { User } from "@/lib/types";
+import { PAYMENT_METHOD_TYPE } from "@expense-tracker/shared/enum/payment.enum";
+import { BankCard } from "@/components/dashboard/BankCard/BankCard";
+import { WalletCard } from "@/components/dashboard/WalletCard/WalletCard";
+import { PaymentDetailsForm } from "@/components/dashboard/PaymentDetailsForm/PaymentDetailsForm";
+import { FORM_MODE } from "@expense-tracker/shared";
 
-const PROVIDER_OPTIONS = [
-  { value: "khalti", label: "Khalti" },
-  { value: "esewa", label: "eSewa" },
-  { value: "bank", label: "Bank Transfer" },
-  { value: "fonepay", label: "FonePay" },
-  { value: "imepay", label: "IME Pay" },
-  { value: "connectips", label: "ConnectIPS" },
-];
-
-const PROVIDER_COLORS: Record<string, string> = {
-  khalti: "#5C2D91",
-  esewa: "#60BB46",
-  bank: "#1a73e8",
-  fonepay: "#E31837",
-  imepay: "#00A4E4",
-  connectips: "#004B87",
-};
-
-function getProviderInitial(provider: string) {
-  return (provider[0] || "?").toUpperCase();
-}
-
-function getProviderLabel(provider: string) {
-  return PROVIDER_OPTIONS.find((p) => p.value === provider)?.label || provider;
-}
-
-// ── Metadata fields based on provider ──
 interface MetadataField {
   key: string;
   label: string;
@@ -75,14 +42,16 @@ interface MetadataField {
   placeholder?: string;
 }
 
-function getMetadataFields(provider: string): MetadataField[] {
+export function getMetadataFields(
+  provider: PAYMENT_METHOD_TYPE,
+): MetadataField[] {
   const commonFields = [{ key: "qrCode", label: "QR Code", type: "file" }];
 
   switch (provider) {
-    case "khalti":
-    case "esewa":
-    case "fonepay":
-    case "imepay":
+    case PAYMENT_METHOD_TYPE.KHALTI:
+    case PAYMENT_METHOD_TYPE.ESEWA:
+    case PAYMENT_METHOD_TYPE.FONEPAY:
+    case PAYMENT_METHOD_TYPE.IMEPAY:
       return [
         {
           key: "phone",
@@ -98,7 +67,7 @@ function getMetadataFields(provider: string): MetadataField[] {
         },
         ...commonFields,
       ];
-    case "bank":
+    case PAYMENT_METHOD_TYPE.BANK:
       return [
         {
           key: "bankName",
@@ -120,7 +89,7 @@ function getMetadataFields(provider: string): MetadataField[] {
         },
         ...commonFields,
       ];
-    case "connectips":
+    case PAYMENT_METHOD_TYPE.CONNECTIPS:
       return [
         {
           key: "bankName",
@@ -152,9 +121,7 @@ export default function ProfilePage() {
   const { paymentMethods, isLoading: pmLoading } = useAppSelector(
     (s: RootState) => s.paymentMethods,
   );
-  const { expenses } = useAppSelector((s: RootState) => s.expenses);
 
-  // ── User form ──
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
@@ -163,16 +130,7 @@ export default function ProfilePage() {
 
   // ── Payment method modal ──
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingPM, setEditingPM] = useState<PaymentMethod | null>(null);
-  const [pmForm, setPmForm] = useState<{
-    provider: string;
-    metadata: Record<string, string>;
-    isDefault: boolean;
-  }>({
-    provider: "",
-    metadata: {},
-    isDefault: false,
-  });
+
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     oldPassword: "",
@@ -181,7 +139,6 @@ export default function ProfilePage() {
   });
 
   // ── Delete confirmation ──
-  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -214,10 +171,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     dispatch(fetchPaymentMethods());
-    dispatch(fetchUserExpenses());
   }, [dispatch]);
 
-  // ── User handlers ──
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -271,149 +226,7 @@ export default function ProfilePage() {
 
   // ── Payment method handlers ──
   const openAddModal = () => {
-    setEditingPM(null);
-    setPmForm({ provider: "", metadata: {}, isDefault: false });
     setIsModalOpen(true);
-  };
-
-  const openEditModal = (pm: PaymentMethod) => {
-    setEditingPM(pm);
-    setPmForm({
-      provider: pm.provider,
-      metadata: (pm.metadata as Record<string, string>) || {},
-      isDefault: pm.is_default,
-    });
-    setIsModalOpen(true);
-  };
-
-  const handlePmProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPmForm((prev) => {
-      const newMetadata: Record<string, string> = {};
-      if (prev.metadata.qrCode) {
-        newMetadata.qrCode = prev.metadata.qrCode;
-      }
-      return {
-        ...prev,
-        provider: e.target.value,
-        metadata: newMetadata,
-      };
-    });
-  };
-
-  const handlePmMetaChange = (key: string, value: string) => {
-    setPmForm((prev) => ({
-      ...prev,
-      metadata: { ...prev.metadata, [key]: value },
-    }));
-  };
-
-  const handleQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        dispatch(
-          addToast({
-            type: "error",
-            message: "Image size should be less than 2MB",
-          }),
-        );
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        handlePmMetaChange("qrCode", reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handlePmSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (editingPM) {
-      const result = await dispatch(
-        updatePaymentMethod({
-          id: editingPM.id,
-          provider: pmForm.provider,
-          metadata: pmForm.metadata,
-          isDefault: pmForm.isDefault,
-        }),
-      );
-      if (updatePaymentMethod.fulfilled.match(result)) {
-        dispatch(
-          addToast({
-            type: "success",
-            message: "Payment method updated!",
-          }),
-        );
-        setIsModalOpen(false);
-      } else {
-        dispatch(
-          addToast({
-            type: "error",
-            message: "Failed to update payment method.",
-          }),
-        );
-      }
-    } else {
-      const result = await dispatch(
-        createPaymentMethod({
-          provider: pmForm.provider,
-          metadata: pmForm.metadata,
-          isDefault: pmForm.isDefault,
-        }),
-      );
-      if (createPaymentMethod.fulfilled.match(result)) {
-        dispatch(
-          addToast({
-            type: "success",
-            message: "Payment method added!",
-          }),
-        );
-        setIsModalOpen(false);
-      } else {
-        dispatch(
-          addToast({
-            type: "error",
-            message: "Failed to add payment method.",
-          }),
-        );
-      }
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteId) return;
-    const result = await dispatch(deletePaymentMethod(deleteId));
-    if (deletePaymentMethod.fulfilled.match(result)) {
-      dispatch(
-        addToast({ type: "success", message: "Payment method removed." }),
-      );
-    } else {
-      dispatch(
-        addToast({
-          type: "error",
-          message: "Failed to delete payment method.",
-        }),
-      );
-    }
-    setDeleteId(null);
-  };
-
-  const handleSetDefault = async (pm: PaymentMethod) => {
-    if (pm.is_default) return;
-    const result = await dispatch(
-      updatePaymentMethod({ id: pm.id, isDefault: true }),
-    );
-    if (updatePaymentMethod.fulfilled.match(result)) {
-      dispatch(
-        addToast({
-          type: "success",
-          message: `${getProviderLabel(pm.provider)} set as default.`,
-        }),
-      );
-    }
   };
 
   const getInitials = (name?: string) => {
@@ -469,8 +282,6 @@ export default function ProfilePage() {
       addToast({ type: "success", message: `${label} copied to clipboard!` }),
     );
   };
-
-  const metaFields = getMetadataFields(pmForm.provider);
 
   return (
     <div className={styles.page}>
@@ -643,160 +454,23 @@ export default function ProfilePage() {
               )}
 
               {paymentMethods.map((pm) => {
-                const meta = (pm.metadata || {}) as Record<string, string>;
-                const isBank = pm.provider.toLowerCase().includes("bank");
-                const isKhalti = pm.provider.toLowerCase().includes("khalti");
+                const isBank = pm.provider === PAYMENT_METHOD_TYPE.BANK;
 
                 if (isBank) {
                   return (
-                    <div key={pm.id} className={styles.bankCardModern}>
-                      <div className={styles.infoSide}>
-                        <div className={styles.bankHeader}>
-                          <div className={styles.bankChip} />
-                          <span className={styles.bankName}>
-                            {meta.bankName}
-                          </span>
-                          {pm.is_default && (
-                            <span className={styles.defaultBadge}>Default</span>
-                          )}
-                        </div>
-
-                        <div className={styles.mainAccount}>
-                          <span className={styles.label}>Account Number</span>
-                          <div className={styles.numberRow}>
-                            <span className={styles.number}>
-                              {meta.accountNumber?.replace(/(.{4})/g, "$1 ")}
-                            </span>
-                            <button
-                              className={styles.copyBtn}
-                              onClick={() =>
-                                handleCopyToClipboard(
-                                  meta.accountNumber,
-                                  "Account Number",
-                                )
-                              }
-                            >
-                              <HiOutlineDuplicate />
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className={styles.auxInfo}>
-                          <div className={styles.item}>
-                            <span className={styles.al}>HOLDER</span>
-                            <span className={styles.av}>
-                              {meta.accountHolder}
-                            </span>
-                          </div>
-                          <div className={styles.pmActionsOverlay}>
-                            <button onClick={() => openEditModal(pm)}>
-                              <HiOutlinePencil />
-                            </button>
-                            <button
-                              className={styles.danger}
-                              onClick={() => setDeleteId(pm.id)}
-                            >
-                              <HiOutlineTrash />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className={styles.qrSide}>
-                        <div className={styles.qrWrapper}>
-                          {meta.qrCode ? (
-                            <img src={meta.qrCode} alt="QR" />
-                          ) : (
-                            <HiOutlineQrcode />
-                          )}
-                          {!meta.qrCode && (
-                            <div
-                              className={`${styles.qrOverlay} ${styles.visible}`}
-                            >
-                              NO QR
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <BankCard
+                      pm={pm}
+                      handleCopyToClipboard={handleCopyToClipboard}
+                    />
                   );
                 }
 
                 return (
-                  <div
-                    key={pm.id}
-                    className={`${styles.modernWalletCard} ${
-                      isKhalti ? styles.khalti : styles.esewa
-                    }`}
-                  >
-                    <div className={styles.infoSide}>
-                      <div className={styles.cardHeader}>
-                        <div className={styles.providerLogo}>
-                          {getProviderLabel(pm.provider)}
-                        </div>
-                        {pm.is_default && (
-                          <span className={styles.defaultBadge}>Default</span>
-                        )}
-                      </div>
-
-                      <div className={styles.mainAccount}>
-                        <span className={styles.label}>Account ID</span>
-                        <div className={styles.numberRow}>
-                          <span className={styles.number}>
-                            {meta.phone || meta.username}
-                          </span>
-                          <button
-                            className={styles.copyBtn}
-                            onClick={() =>
-                              handleCopyToClipboard(
-                                meta.phone || meta.username,
-                                "Account ID",
-                              )
-                            }
-                          >
-                            <HiOutlineDuplicate />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className={styles.auxInfo}>
-                        <div className={styles.item}>
-                          <span className={styles.al}>HOLDER</span>
-                          <span className={styles.av}>
-                            {meta.name || user?.full_name}
-                          </span>
-                        </div>
-                        <div className={styles.pmActionsOverlay}>
-                          <button onClick={() => openEditModal(pm)}>
-                            <HiOutlinePencil />
-                          </button>
-                          <button
-                            className={styles.danger}
-                            onClick={() => setDeleteId(pm.id)}
-                          >
-                            <HiOutlineTrash />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={styles.qrSide}>
-                      <div className={styles.qrWrapper}>
-                        {meta.qrCode ? (
-                          <img src={meta.qrCode} alt="QR" />
-                        ) : (
-                          <HiOutlineQrcode />
-                        )}
-                        {!meta.qrCode && (
-                          <div
-                            className={`${styles.qrOverlay} ${styles.visible}`}
-                          >
-                            NO QR
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <WalletCard
+                    pm={pm}
+                    user={user as User}
+                    handleCopyToClipboard={handleCopyToClipboard}
+                  />
                 );
               })}
             </div>
@@ -804,124 +478,17 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* ── Add / Edit Payment Method Modal ── */}
+      {/* ── Add Payment Method Modal ── */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingPM ? "Edit Payment Method" : "Add Payment Method"}
-        size="sm"
+        title={"Add Payment Method"}
+        size="md"
       >
-        <form onSubmit={handlePmSubmit} className={styles.pmForm}>
-          <Select
-            label="Provider"
-            name="provider"
-            value={pmForm.provider}
-            onChange={handlePmProviderChange}
-            options={PROVIDER_OPTIONS}
-            placeholder="Select a provider"
-            required
-          />
-
-          {pmForm.provider &&
-            metaFields.map((field) =>
-              field.type === "file" ? (
-                <div key={field.key} className={styles.qrUpload}>
-                  <label>{field.label}</label>
-                  <div className={styles.qrPreviewWrapper}>
-                    {pmForm.metadata.qrCode ? (
-                      <div className={styles.qrPreview}>
-                        <img src={pmForm.metadata.qrCode} alt="QR Preview" />
-                        <button
-                          type="button"
-                          className={styles.removeQr}
-                          onClick={() => handlePmMetaChange("qrCode", "")}
-                        >
-                          <HiOutlineX />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className={styles.qrPlaceholder}>
-                        <HiOutlineQrcode />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleQrUpload}
-                          className={styles.fileInput}
-                        />
-                        <span>Click to upload QR Code</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <Input
-                  key={field.key}
-                  label={field.label}
-                  name={field.key}
-                  value={pmForm.metadata[field.key] || ""}
-                  onChange={(e) =>
-                    handlePmMetaChange(field.key, e.target.value)
-                  }
-                  placeholder={field.placeholder}
-                />
-              ),
-            )}
-
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={pmForm.isDefault}
-              onChange={(e) =>
-                setPmForm((prev) => ({ ...prev, isDefault: e.target.checked }))
-              }
-            />
-            Set as default payment method
-          </label>
-
-          <div className={styles.modalFooter}>
-            <Button
-              variant="ghost"
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              isLoading={pmLoading}
-              disabled={!pmForm.provider}
-            >
-              {editingPM ? "Update" : "Add"} Payment Method
-            </Button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* ── Delete Confirmation Modal ── */}
-      <Modal
-        isOpen={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        title="Remove Payment Method"
-        size="sm"
-      >
-        <div className={styles.deleteConfirm}>
-          <p>
-            Are you sure you want to remove this payment method? This action
-            cannot be undone.
-          </p>
-          <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={() => setDeleteId(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="danger"
-              onClick={handleDelete}
-              isLoading={pmLoading}
-            >
-              <HiOutlineTrash /> Remove
-            </Button>
-          </div>
-        </div>
+        <PaymentDetailsForm
+          mode={FORM_MODE.ADD}
+          closeModal={() => setIsModalOpen(false)}
+        />
       </Modal>
 
       {/* ── Change Password Modal ── */}
