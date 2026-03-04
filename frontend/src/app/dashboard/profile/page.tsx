@@ -34,6 +34,7 @@ import { BankCard } from "@/components/dashboard/BankCard/BankCard";
 import { WalletCard } from "@/components/dashboard/WalletCard/WalletCard";
 import { PaymentDetailsForm } from "@/components/dashboard/PaymentDetailsForm/PaymentDetailsForm";
 import { FORM_MODE } from "@expense-tracker/shared";
+import { ChangePasswordForm } from "@/components/dashboard/ChangePasswordForm/ChangePasswordForm";
 
 interface MetadataField {
   key: string;
@@ -123,74 +124,14 @@ export default function ProfilePage() {
   );
 
   const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState({
-    fullName: "",
-    phone: "",
-  });
 
-  // ── Payment method modal ──
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  // ── Delete confirmation ──
-
-  useEffect(() => {
-    if (user) {
-      setForm({
-        fullName: user.full_name || "",
-        phone: user.phone || "",
-      });
-    }
-  }, [user]);
-
-  const startEditing = () => {
-    if (user) {
-      setForm({
-        fullName: user.full_name || "",
-        phone: user.phone || "",
-      });
-    }
-    setIsEditing(true);
-  };
-
-  const cancelEditing = () => {
-    if (user) {
-      setForm({
-        fullName: user.full_name || "",
-        phone: user.phone || "",
-      });
-    }
-    setIsEditing(false);
-  };
 
   useEffect(() => {
     dispatch(fetchPaymentMethods());
   }, [dispatch]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = await dispatch(updateProfile(form));
-    if (updateProfile.fulfilled.match(result)) {
-      dispatch(
-        addToast({ type: "success", message: "Profile updated successfully!" }),
-      );
-      setIsEditing(false);
-    } else {
-      dispatch(
-        addToast({ type: "error", message: "Failed to update profile." }),
-      );
-    }
-  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -226,7 +167,7 @@ export default function ProfilePage() {
 
   // ── Payment method handlers ──
   const openAddModal = () => {
-    setIsModalOpen(true);
+    setIsPaymentModalOpen(true);
   };
 
   const getInitials = (name?: string) => {
@@ -237,43 +178,6 @@ export default function ProfilePage() {
       .join("")
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPasswordForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      dispatch(
-        addToast({ type: "error", message: "New passwords do not match." }),
-      );
-      return;
-    }
-
-    const result = await dispatch(changePassword(passwordForm));
-    if (changePassword.fulfilled.match(result)) {
-      dispatch(
-        addToast({
-          type: "success",
-          message: "Password changed successfully!",
-        }),
-      );
-      setIsPasswordModalOpen(false);
-      setPasswordForm({
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } else {
-      dispatch(
-        addToast({
-          type: "error",
-          message: (result.payload as string) || "Failed to change password.",
-        }),
-      );
-    }
   };
 
   const handleCopyToClipboard = (text: string, label: string) => {
@@ -333,7 +237,7 @@ export default function ProfilePage() {
               {!isEditing && (
                 <button
                   className={styles.editIconBtn}
-                  onClick={startEditing}
+                  onClick={() => setIsEditing(true)}
                   title="Edit profile"
                 >
                   <HiOutlinePencil />
@@ -342,67 +246,37 @@ export default function ProfilePage() {
             </div>
 
             {isEditing ? (
-              // ... same form as before ...
-              <form onSubmit={handleSubmit}>
-                <div className={styles.formGrid}>
-                  <Input
-                    label="Full Name"
-                    name="fullName"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    icon={<HiOutlineUser />}
-                    placeholder="Enter full name"
-                    required
-                  />
-
-                  <Input
-                    label="Phone Number"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    icon={<HiOutlinePhone />}
-                    placeholder="+977 98XXXXXXXX"
-                  />
-                </div>
-
-                <div className={styles.footer}>
-                  <Button type="button" variant="ghost" onClick={cancelEditing}>
-                    <HiOutlineX /> Cancel
-                  </Button>
-                  <Button type="submit" isLoading={authLoading}>
-                    <HiOutlineCheck /> Save Changes
-                  </Button>
-                </div>
-              </form>
+              <EditProfileForm
+                user={user as User}
+                closeEdit={() => setIsEditing(false)}
+              />
             ) : (
-              <>
-                <div className={styles.detailsGrid}>
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>
-                      <HiOutlineUser /> Full Name
-                    </span>
-                    <span className={styles.detailValue}>
-                      {user?.full_name || "—"}
-                    </span>
-                  </div>
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>
-                      <HiOutlineMail /> Email Address
-                    </span>
-                    <span className={styles.detailValue}>
-                      {user?.email || "—"}
-                    </span>
-                  </div>
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>
-                      <HiOutlinePhone /> Phone Number
-                    </span>
-                    <span className={styles.detailValue}>
-                      {user?.phone || "—"}
-                    </span>
-                  </div>
+              <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>
+                    <HiOutlineUser /> Full Name
+                  </span>
+                  <span className={styles.detailValue}>
+                    {user?.full_name || "—"}
+                  </span>
                 </div>
-              </>
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>
+                    <HiOutlineMail /> Email Address
+                  </span>
+                  <span className={styles.detailValue}>
+                    {user?.email || "—"}
+                  </span>
+                </div>
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>
+                    <HiOutlinePhone /> Phone Number
+                  </span>
+                  <span className={styles.detailValue}>
+                    {user?.phone || "—"}
+                  </span>
+                </div>
+              </div>
             )}
           </Card>
 
@@ -459,6 +333,7 @@ export default function ProfilePage() {
                 if (isBank) {
                   return (
                     <BankCard
+                      key={pm.id}
                       pm={pm}
                       handleCopyToClipboard={handleCopyToClipboard}
                     />
@@ -467,6 +342,7 @@ export default function ProfilePage() {
 
                 return (
                   <WalletCard
+                    key={pm.id}
                     pm={pm}
                     user={user as User}
                     handleCopyToClipboard={handleCopyToClipboard}
@@ -480,14 +356,14 @@ export default function ProfilePage() {
 
       {/* ── Add Payment Method Modal ── */}
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
         title={"Add Payment Method"}
         size="md"
       >
         <PaymentDetailsForm
           mode={FORM_MODE.ADD}
-          closeModal={() => setIsModalOpen(false)}
+          closeModal={() => setIsPaymentModalOpen(false)}
         />
       </Modal>
 
@@ -498,52 +374,85 @@ export default function ProfilePage() {
         title="Change Password"
         size="sm"
       >
-        <form onSubmit={handlePasswordSubmit} className={styles.pmForm}>
-          <Input
-            label="Old Password"
-            name="oldPassword"
-            type="password"
-            value={passwordForm.oldPassword}
-            onChange={handlePasswordChange}
-            icon={<HiOutlineLockClosed />}
-            placeholder="••••••••"
-            required
-          />
-          <Input
-            label="New Password"
-            name="newPassword"
-            type="password"
-            value={passwordForm.newPassword}
-            onChange={handlePasswordChange}
-            icon={<HiOutlineLockClosed />}
-            placeholder="••••••••"
-            required
-          />
-          <Input
-            label="Confirm New Password"
-            name="confirmPassword"
-            type="password"
-            value={passwordForm.confirmPassword}
-            onChange={handlePasswordChange}
-            icon={<HiOutlineLockClosed />}
-            placeholder="••••••••"
-            required
-          />
-
-          <div className={styles.modalFooter}>
-            <Button
-              variant="ghost"
-              type="button"
-              onClick={() => setIsPasswordModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" isLoading={authLoading}>
-              Update Password
-            </Button>
-          </div>
-        </form>
+        <ChangePasswordForm closeModal={() => setIsPasswordModalOpen(false)} />
       </Modal>
     </div>
+  );
+}
+
+interface EditProfileFormProps {
+  user: User;
+  closeEdit: () => void;
+}
+
+export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
+  const dispatch = useAppDispatch();
+  const { isLoading: authLoading } = useAppSelector((s: RootState) => s.auth);
+
+  const [form, setForm] = useState({
+    fullName: "",
+    phone: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await dispatch(updateProfile(form));
+    if (updateProfile.fulfilled.match(result)) {
+      dispatch(
+        addToast({ type: "success", message: "Profile updated successfully!" }),
+      );
+      closeEdit();
+    } else {
+      dispatch(
+        addToast({ type: "error", message: "Failed to update profile." }),
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        fullName: user.full_name || "",
+        phone: user.phone || "",
+      });
+    }
+  }, [user]);
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className={styles.formGrid}>
+        <Input
+          label="Full Name"
+          name="fullName"
+          value={form.fullName}
+          onChange={handleChange}
+          icon={<HiOutlineUser />}
+          placeholder="Enter full name"
+          required
+        />
+
+        <Input
+          label="Phone Number"
+          name="phone"
+          value={form.phone}
+          onChange={handleChange}
+          icon={<HiOutlinePhone />}
+          placeholder="+977 98XXXXXXXX"
+        />
+      </div>
+
+      <div className={styles.footer}>
+        <Button type="button" variant="ghost" onClick={closeEdit}>
+          <HiOutlineX /> Cancel
+        </Button>
+        <Button type="submit" isLoading={authLoading}>
+          <HiOutlineCheck /> Save Changes
+        </Button>
+      </div>
+    </form>
   );
 }
