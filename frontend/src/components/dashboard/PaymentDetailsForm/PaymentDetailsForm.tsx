@@ -17,6 +17,7 @@ import { PaymentMethod } from "@/lib/types";
 import { FORM_MODE } from "@expense-tracker/shared";
 import { getMetadataFields } from "@/app/dashboard/profile/page";
 import { RootState } from "@/store";
+import { handleThunk } from "@/lib/utils";
 
 interface PaymentDetailsFormProps {
   pm?: PaymentMethod | null;
@@ -99,54 +100,60 @@ export function PaymentDetailsForm({
     e.preventDefault();
 
     if (mode === FORM_MODE.EDIT && pm) {
-      const result = await dispatch(
-        updatePaymentMethod({
-          id: pm.id,
-          provider: pmForm.provider,
-          metadata: pmForm.metadata,
-          isDefault: pmForm.isDefault,
-        }),
+      await handleThunk(
+        dispatch(
+          updatePaymentMethod({
+            id: pm.id,
+            provider: pmForm.provider,
+            metadata: pmForm.metadata,
+            isDefault: pmForm.isDefault,
+          }),
+        ),
+        () => {
+          dispatch(
+            addToast({
+              type: "success",
+              message: "Payment method updated!",
+            }),
+          );
+          closeModal();
+        },
+        () => {
+          dispatch(
+            addToast({
+              type: "error",
+              message: "Failed to update payment method.",
+            }),
+          );
+        },
       );
-      if (updatePaymentMethod.fulfilled.match(result)) {
-        dispatch(
-          addToast({
-            type: "success",
-            message: "Payment method updated!",
-          }),
-        );
-        closeModal();
-      } else {
-        dispatch(
-          addToast({
-            type: "error",
-            message: "Failed to update payment method.",
-          }),
-        );
-      }
     } else {
-      const result = await dispatch(
-        createPaymentMethod({
-          provider: pmForm.provider as PAYMENT_METHOD_TYPE,
-          metadata: pmForm.metadata,
-          isDefault: pmForm.isDefault,
-        }),
+      await handleThunk(
+        dispatch(
+          createPaymentMethod({
+            provider: pmForm.provider as PAYMENT_METHOD_TYPE,
+            metadata: pmForm.metadata,
+            isDefault: pmForm.isDefault,
+          }),
+        ),
+        () => {
+          dispatch(
+            addToast({
+              type: "success",
+              message: "Payment method added!",
+            }),
+          );
+          closeModal();
+        },
+        () => {
+          dispatch(
+            addToast({
+              type: "error",
+              message: "Failed to add payment method.",
+            }),
+          );
+        },
       );
-      if (createPaymentMethod.fulfilled.match(result)) {
-        dispatch(
-          addToast({
-            type: "success",
-            message: "Payment method added!",
-          }),
-        );
-        closeModal();
-      } else {
-        dispatch(
-          addToast({
-            type: "error",
-            message: "Failed to add payment method.",
-          }),
-        );
-      }
     }
   };
 
@@ -155,21 +162,6 @@ export function PaymentDetailsForm({
       PROVIDER_OPTIONS.find((p) => p.value === provider)?.label || provider
     );
   }
-
-  const handleSetDefault = async (pm: PaymentMethod) => {
-    if (pm.is_default) return;
-    const result = await dispatch(
-      updatePaymentMethod({ id: pm.id, isDefault: true }),
-    );
-    if (updatePaymentMethod.fulfilled.match(result)) {
-      dispatch(
-        addToast({
-          type: "success",
-          message: `${getProviderLabel(pm.provider)} set as default.`,
-        }),
-      );
-    }
-  };
 
   const metaFields = getMetadataFields(pmForm.provider as PAYMENT_METHOD_TYPE);
 

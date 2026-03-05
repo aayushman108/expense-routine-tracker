@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToast } from "@/store/slices/uiSlice";
 import { changePassword } from "@/store/slices/authSlice";
 import { RootState } from "@/store";
+import { handleThunk } from "@/lib/utils";
 
 interface ChangePasswordFormProps {
   closeModal: () => void;
@@ -35,28 +36,31 @@ export function ChangePasswordForm({ closeModal }: ChangePasswordFormProps) {
       return;
     }
 
-    const result = await dispatch(changePassword(passwordForm));
-    if (changePassword.fulfilled.match(result)) {
-      dispatch(
-        addToast({
-          type: "success",
-          message: "Password changed successfully!",
-        }),
-      );
-      closeModal();
-      setPasswordForm({
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } else {
-      dispatch(
-        addToast({
-          type: "error",
-          message: (result.payload as string) || "Failed to change password.",
-        }),
-      );
-    }
+    await handleThunk(
+      dispatch(changePassword(passwordForm)),
+      () => {
+        dispatch(
+          addToast({
+            type: "success",
+            message: "Password changed successfully!",
+          }),
+        );
+        closeModal();
+        setPasswordForm({
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      },
+      (error) => {
+        dispatch(
+          addToast({
+            type: "error",
+            message: (error as string) || "Failed to change password.",
+          }),
+        );
+      },
+    );
   };
 
   return (

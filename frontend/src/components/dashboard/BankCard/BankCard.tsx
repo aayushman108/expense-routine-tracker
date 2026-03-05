@@ -16,6 +16,7 @@ import { deletePaymentMethod } from "@/store/slices/paymentMethodSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import Button from "@/components/ui/Button/Button";
 import { RootState } from "@/store";
+import { handleThunk } from "@/lib/utils";
 
 interface BankCardProps {
   pm: PaymentMethod;
@@ -42,19 +43,22 @@ export function BankCard({ pm, handleCopyToClipboard }: BankCardProps) {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    const result = await dispatch(deletePaymentMethod(deleteId));
-    if (deletePaymentMethod.fulfilled.match(result)) {
-      dispatch(
-        addToast({ type: "success", message: "Payment method removed." }),
-      );
-    } else {
-      dispatch(
-        addToast({
-          type: "error",
-          message: "Failed to delete payment method.",
-        }),
-      );
-    }
+    await handleThunk(
+      dispatch(deletePaymentMethod(deleteId)),
+      () => {
+        dispatch(
+          addToast({ type: "success", message: "Payment method removed." }),
+        );
+      },
+      () => {
+        dispatch(
+          addToast({
+            type: "error",
+            message: "Failed to delete payment method.",
+          }),
+        );
+      },
+    );
     setDeleteId(null);
   };
 
