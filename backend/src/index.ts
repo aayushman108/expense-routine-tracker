@@ -69,6 +69,10 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("❌ Failed to connect to the database:", error);
+    if (error instanceof Error) {
+      console.error("Error Message:", error.message);
+      console.error("Error Stack:", error.stack);
+    }
     process.exit(1);
   }
 };

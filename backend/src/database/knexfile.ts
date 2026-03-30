@@ -23,7 +23,12 @@ const config: { [key: string]: Knex.Config } = {
 
   production: {
     client: "pg",
-    connection: ENV.DATABASE_URL,
+    connection: {
+      connectionString: ENV.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
     pool: {
       min: 2,
       max: 20,
