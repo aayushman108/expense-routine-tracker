@@ -182,12 +182,24 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const getMe = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const user = await authService.getMe(userId);
+
+  return sendSuccessResponse(res, {
+    message: "User fetched successfully",
+    data: user,
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
 export const authController = {
   signup,
   verifyEmail,
   login,
   refresh,
   logout,
+  getMe,
   updateProfile,
   uploadAvatar,
   forgotPassword,

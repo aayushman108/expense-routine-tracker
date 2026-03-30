@@ -88,6 +88,22 @@ export const refreshAuth = createAsyncThunk<AuthResponse>(
   },
 );
 
+export const getCurrentUser = createAsyncThunk<AuthResponse>(
+  "auth/getCurrentUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get("/auth/me");
+      const result = data.data || data;
+      return result;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch user",
+      );
+    }
+  },
+);
+
 export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
@@ -210,6 +226,21 @@ const authSlice = createSlice({
       state.isLoading = false;
     });
     builder.addCase(refreshAuth.rejected, (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.isLoading = false;
+    });
+
+    // Get current user
+    builder.addCase(getCurrentUser.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(getCurrentUser.fulfilled, (state, action) => {
+      state.user = action.payload.user || action.payload; // Handle both structures
+      state.isAuthenticated = true;
+      state.isLoading = false;
+    });
+    builder.addCase(getCurrentUser.rejected, (state) => {
       state.user = null;
       state.isAuthenticated = false;
       state.isLoading = false;

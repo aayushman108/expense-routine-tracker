@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
 import Header from "@/components/dashboard/Header/Header";
-import { refreshAuth } from "@/store/slices/authSlice";
+import { getCurrentUser } from "@/store/slices/authSlice";
 import { setSidebarOpen } from "@/store/slices/uiSlice";
 import styles from "./layout.module.scss";
 
@@ -23,15 +23,18 @@ export default function DashboardLayout({
   );
   const { sidebarOpen } = useAppSelector((s: RootState) => s.ui);
 
+  const authAttempted = useRef(false);
+  
   useEffect(() => {
     // Initial auth check
     const token = localStorage.getItem("accessToken");
     if (!token) {
       router.push("/login");
-    } else if (!isAuthenticated) {
-      dispatch(refreshAuth());
+    } else if (!isAuthenticated && !isLoading && !authAttempted.current) {
+      authAttempted.current = true;
+      dispatch(getCurrentUser());
     }
-  }, [isAuthenticated, dispatch, router]);
+  }, [isAuthenticated, isLoading, dispatch, router]);
 
   if (isLoading && !isAuthenticated) {
     return (

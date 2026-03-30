@@ -36,6 +36,7 @@ authRouter.post(
   validateRequest(UserValidation.changePasswordSchema),
   authController.changePassword,
 );
+authRouter.get("/me", verifyJWT, authController.getMe);
 authRouter.get("/refresh", authController.refresh);
 authRouter.get("/logout", verifyJWT, authController.logout);
 authRouter.patch("/update-profile", verifyJWT, authController.updateProfile);

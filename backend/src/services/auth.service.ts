@@ -263,6 +263,14 @@ async function changePassword(userId: string, payload: IChangePasswordInput) {
   return { message: "Password changed successfully." };
 }
 
+async function getMe(userId: string) {
+  const user = await authDao.findById(userId);
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+  return { ...user, password_hash: undefined };
+}
+
 export const authService = {
   signup,
   verifyEmailVerificationToken,
@@ -270,6 +278,7 @@ export const authService = {
   login,
   refreshAccessToken,
   logout,
+  getMe,
   uploadAvatar,
   updateProfile,
   forgotPassword,

@@ -25,7 +25,7 @@ export const verifyJWT = async (
     const user = await authDao.findById(decoded.id);
 
     if (!user) {
-      throw new NotFoundError("User not found");
+      throw new UnAuthorizedError("User not found");
     }
 
     req.userId = user.id;
