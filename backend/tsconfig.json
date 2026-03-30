@@ -8,6 +8,7 @@
     "rootDir": "..",
     "baseUrl": ".",
     "paths": {
+      "src/*": ["src/*"],
       "@expense-tracker/shared": ["../shared/index"],
       "@expense-tracker/shared/*": ["../shared/*"]
     }
