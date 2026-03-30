@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
@@ -24,19 +24,35 @@ export default function DashboardLayout({
   const { sidebarOpen } = useAppSelector((s: RootState) => s.ui);
 
   const authAttempted = useRef(false);
-  
+  // Initialize based on current Redux state
+  const [isInitializing, setIsInitializing] = useState(!isAuthenticated);
+
+  // Standard React pattern for syncing state during render to avoid cascading renders
+  if (isAuthenticated && isInitializing) {
+    setIsInitializing(false);
+  }
+
   useEffect(() => {
-    // Initial auth check
     const token = localStorage.getItem("accessToken");
+    
     if (!token) {
       router.push("/login");
-    } else if (!isAuthenticated && !isLoading && !authAttempted.current) {
-      authAttempted.current = true;
-      dispatch(getCurrentUser());
+      return;
+    }
+
+    if (!isAuthenticated) {
+      // If we haven't attempted to fetch the user yet, do it now
+      if (!isLoading && !authAttempted.current) {
+        authAttempted.current = true;
+        // isInitializing is already true from useState(!isAuthenticated)
+        dispatch(getCurrentUser()).then(() => {
+          setIsInitializing(false);
+        });
+      }
     }
   }, [isAuthenticated, isLoading, dispatch, router]);
 
-  if (isLoading && !isAuthenticated) {
+  if (isInitializing || (isLoading && !isAuthenticated)) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
