@@ -7,11 +7,10 @@ import {
   HiOutlineUserGroup,
   HiOutlineCurrencyDollar,
   HiOutlineCog,
-  HiOutlineLogout,
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
 } from "react-icons/hi";
-import { FiPieChart, FiUser } from "react-icons/fi";
+import { FiPieChart, FiUser, FiLogOut } from "react-icons/fi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { logoutUser } from "@/store/slices/authSlice";
 import { toggleSidebar } from "@/store/slices/uiSlice";
@@ -50,14 +49,14 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`${styles.sidebar} ${!sidebarOpen ? styles.collapsed : ""}`}
+      className={`${styles.sidebar} ${!sidebarOpen ? styles.collapsed : ""} ${sidebarOpen ? styles.mobileOpen : ""}`}
     >
       <div className={styles.logo}>
         <Link href="/dashboard">
           <div className={styles.logoIcon}>
             <FiPieChart />
           </div>
-          <span>SplitWise</span>
+          <span>Expensora</span>
         </Link>
         <button
           className={styles.collapseBtn}
@@ -96,10 +95,10 @@ export default function Sidebar() {
             </Link>
           ))}
           <button
-            className={styles.navItem}
+            className={`${styles.navItem} ${styles.logoutBtn}`}
             onClick={() => dispatch(logoutUser())}
           >
-            <HiOutlineLogout />
+            <FiLogOut />
             <span>Logout</span>
           </button>
         </div>

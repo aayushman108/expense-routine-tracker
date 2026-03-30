@@ -13,6 +13,10 @@
 
   @include mobile-only {
     padding: $space-4;
+    // Removed margin-left because the whole layout container is flex and sidebar is fixed 
+    // Wait, the layout uses flex: 1 for .main.
+    // If sidebar is position: fixed, .main needs the margin.
+    // Header is usually INSIDE .main or .layout.
   }
 }
 

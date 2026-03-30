@@ -18,7 +18,7 @@
   }
 
   @include mobile-only {
-    margin-left: 0;
+    margin-left: 72px; // Permanent rail space
   }
 }
 
@@ -38,12 +38,17 @@
   display: none;
 
   @include mobile-only {
-    display: block;
+    display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
     z-index: $z-overlay;
-    animation: fadeIn 0.2s ease;
+    animation: fadeIn 0.3s ease;
+
+    &.showOverlay {
+      display: block;
+    }
   }
 }
 

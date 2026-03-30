@@ -66,7 +66,7 @@ export default function LoginPage() {
             <div className={styles.logoIcon}>
               <FiPieChart />
             </div>
-            <span className={styles.logoText}>SplitWise</span>
+            <span className={styles.logoText}>Expensora</span>
           </Link>
           <h1 className={styles.title}>Welcome back</h1>
           <p className={styles.subtitle}>Sign in to manage your expenses</p>
