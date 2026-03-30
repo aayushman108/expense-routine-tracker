@@ -14,7 +14,7 @@ import {
   HiOutlineGlobe,
   HiCheckCircle,
 } from "react-icons/hi";
-import { FiArrowRight, FiStar } from "react-icons/fi";
+import { FiArrowRight } from "react-icons/fi";
 import LandingNavbar from "@/components/landing/Navbar";
 import Button from "@/components/ui/Button/Button";
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
@@ -64,41 +64,22 @@ const features = [
 const steps = [
   {
     num: "01",
-    title: "Log anything",
-    desc: "Track daily coffee, monthly rent, or shared trips in one clean interface.",
+    title: "Connect & Capture",
+    desc: "Record every transaction, from recurring rent to coffee runs, in one unified interface.",
   },
   {
     num: "02",
-    title: "Split with ease",
-    desc: "Create groups for shared costs and let us handle the complex math.",
+    title: "Calculate & Compute",
+    desc: "Select your split logic—equal, percentage, or itemized—and let our engine handle the rest.",
   },
   {
     num: "03",
-    title: "Settle monthly",
-    desc: "We calculate the simplest way to settle. Pay with your preferred method.",
+    title: "Simplify & Settle",
+    desc: "Generate optimized settlement paths and verify payments with digital receipts.",
   },
 ];
 
-const testimonials = [
-  {
-    quote:
-      "Finally, an expense tracker that actually understands how groups split bills. The settlement process is seamless.",
-    name: "Alex Thompson",
-    role: "Travel Enthusiast",
-  },
-  {
-    quote:
-      "The monthly settlement feature saved our friend group from so many awkward conversations.",
-    name: "Priya Adhikari",
-    role: "Travel Group Leader",
-  },
-  {
-    quote:
-      "Simple, clean, and does exactly what it promises. I use it for every trip now.",
-    name: "Rohan Thapa",
-    role: "Freelancer",
-  },
-];
+
 
 const floatingExpenses = [
   {
@@ -256,7 +237,7 @@ export default function LandingPage() {
           <h1 className={styles.heroTitle}>
             The smarter way to
             <br />
-            <span className={styles.gradient}>split expenses</span>
+            <span className={styles.gradient}>Expensora</span>
           </h1>
 
           <p className={styles.heroSub}>
@@ -297,8 +278,8 @@ export default function LandingPage() {
       <section id="features" className={styles.features}>
         <SectionHeader
           label="Features"
-          title="Everything you need, nothing you don't"
-          subtitle="A thoughtful set of tools designed to make shared finances simple."
+          title="Shared finances, decoded and simplified."
+          subtitle="Master your group spending with a precision-engineered ecosystem built for clarity, fairness, and zero friction."
         />
 
         <div className={styles.bentoGrid}>
@@ -319,15 +300,15 @@ export default function LandingPage() {
       <section className={styles.demo}>
         <div className={styles.demoInner}>
           <div className={styles.demoText}>
-            <span className={styles.demoLabel}>See it in action</span>
+            <span className={styles.demoLabel}>Experience Clarity</span>
             <h2 className={styles.demoTitle}>
               Fair splitting,
               <br />
-              <span className={styles.gradient}>visualized</span>
+              <span className={styles.gradient}>reimagined.</span>
             </h2>
             <p className={styles.demoSub}>
-              Add an expense, choose how to split, and everyone sees their share
-              in real time. Settling up is just one tap away.
+              From simple dinner splits to complex multi-currency group trips. 
+              Expensora handles the math so you can focus on the memories.
             </p>
             <ul className={styles.demoChecks}>
               <li>
@@ -344,50 +325,34 @@ export default function LandingPage() {
 
           <div className={styles.demoCard}>
             <div className={styles.demoHeader}>
-              <span className={styles.demoExpName}>Weekend Trip — Beach</span>
-              <span className={styles.demoExpTotal}>$450.00</span>
+              <span className={styles.demoExpName}>Expensora Flow</span>
+              <span className={styles.demoExpTotal}>रू 45,000</span>
             </div>
-            <div className={styles.demoDivider}>
-              <span>Split 3 ways</span>
-            </div>
-            <div className={styles.demoSplits}>
-              <div className={styles.splitRow}>
-                <div className={styles.avatar}>A</div>
-                <div className={styles.splitInfo}>
-                  <span className={styles.splitName}>Aayushman</span>
-                  <span className={styles.splitTag}>Paid $450.00</span>
-                </div>
-                <span className={styles.splitVal} data-type="positive">
-                  +$300.00
-                </span>
+            <div className={styles.demoFlowWrap}>
+              <div className={styles.flowParticipant}>
+                <div className={styles.flowAvatar}>A</div>
+                <span className={styles.flowName}>Aayushman</span>
+                <span className={styles.flowRole}>Debtor</span>
               </div>
-              <div className={styles.splitRow}>
-                <div className={`${styles.avatar} ${styles.avatarGreen}`}>
+
+              <div className={styles.flowConnector}>
+                <div className={styles.flowAmountBadge}>
+                  <HiOutlineCurrencyDollar />
+                  <span>रू 15,000</span>
+                </div>
+                <div className={styles.flowArrow} />
+              </div>
+
+              <div className={styles.flowParticipant}>
+                <div className={`${styles.flowAvatar} ${styles.avatarGreen}`}>
                   S
                 </div>
-                <div className={styles.splitInfo}>
-                  <span className={styles.splitName}>Shravan</span>
-                  <span className={styles.splitMeta}>Owes</span>
-                </div>
-                <span className={styles.splitVal} data-type="negative">
-                  -$150.00
-                </span>
-              </div>
-              <div className={styles.splitRow}>
-                <div className={`${styles.avatar} ${styles.avatarAmber}`}>
-                  N
-                </div>
-                <div className={styles.splitInfo}>
-                  <span className={styles.splitName}>Nikita</span>
-                  <span className={styles.splitMeta}>Owes</span>
-                </div>
-                <span className={styles.splitVal} data-type="negative">
-                  -$150.00
-                </span>
+                <span className={styles.flowName}>Shravan</span>
+                <span className={styles.flowRole}>Creditor</span>
               </div>
             </div>
             <button className={styles.demoBtn}>
-              Settle Up <FiArrowRight />
+              Settle Balance <FiArrowRight />
             </button>
           </div>
         </div>
@@ -397,8 +362,8 @@ export default function LandingPage() {
       <section id="how-it-works" className={styles.howItWorks}>
         <SectionHeader
           label="How It Works"
-          title="Up and running in minutes"
-          subtitle="No complicated setup. Three steps to financial clarity."
+          title="Zero to clarity in three simple steps."
+          subtitle="Onboard your entire group in seconds. Expensora handles the mathematical heavy lifting so you never have to."
         />
 
         <div className={styles.stepsGrid}>
@@ -416,14 +381,13 @@ export default function LandingPage() {
       <section className={styles.cta}>
         <div className={styles.ctaCard}>
           <h2 className={styles.ctaTitle}>
-            &ldquo;We track your group expenses &mdash;
+            &ldquo;We handle the finances —
             <br />
-            so you stay friends forever.&rdquo;
+            so you can handle the fun.&rdquo;
           </h2>
           <p className={styles.ctaSub}>
-            Simplify your personal budget and shared finances. Keep your
-            friendships stress-free with expert splitting and instant
-            settlements.
+            Join thousands of users simplifying their shared lives with 
+            crystal-clear tracking and effortless settlements.
           </p>
 
           <div className={styles.ctaFeatures}>
@@ -446,7 +410,7 @@ export default function LandingPage() {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <span className={styles.footerCopy}>
-            © 2026 SplitWise. Developed by Aayushman.
+            © 2026 Expensora. Developed by Aayushman.
           </span>
           <div className={styles.footerLinks}>
             <a href="#">Privacy</a>

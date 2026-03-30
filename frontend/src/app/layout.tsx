@@ -4,7 +4,7 @@ import AppProvider from "@/components/providers/AppProvider";
 import ToastContainer from "@/components/ui/Toast/Toast";
 
 export const metadata: Metadata = {
-  title: "SplitWise — Smart Expense Tracker",
+  title: "Expensora — Smart Expense Tracker",
   description:
     "Track personal and group expenses, split bills with custom ratios, and settle debts monthly. Built for roommates, trips, and teams.",
   keywords: [

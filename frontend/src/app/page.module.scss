@@ -305,14 +305,40 @@
   padding: $space-8;
   @include flex-column;
   gap: $space-4;
-  transition:
-    transform $transition-base,
-    box-shadow $transition-base,
-    border-color $transition-base;
-  min-height: 180px;
+  background: rgba(var(--bg-card-rgb), 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--border-default-rgb), 0.5);
+  transition: all $transition-base;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity $transition-base;
+  }
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px);
+    border-color: var(--color-primary-200);
+    box-shadow: var(--shadow-xl);
+    
+    &::before {
+      opacity: 1;
+    }
+
+    .bentoIcon {
+      transform: scale(1.1) rotate(5deg);
+      background: var(--color-primary);
+      color: #fff;
+    }
   }
 
   &.bentoLarge {
@@ -326,13 +352,14 @@
 
 .bentoIcon {
   @include flex-center;
-  width: 44px;
-  height: 44px;
-  border-radius: $radius-md;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
   background: var(--color-primary-50);
   color: var(--color-primary);
-  font-size: $font-size-xl;
+  font-size: $font-size-2xl;
   border: 1px solid var(--color-primary-100);
+  transition: all $transition-base;
 }
 
 .bentoTitle {
@@ -422,17 +449,138 @@
   }
 }
 
+.demoFlowWrap {
+  padding: $space-12 $space-8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-4;
+  position: relative;
+
+  @include mobile-only {
+    flex-direction: column;
+    gap: $space-8;
+  }
+}
+
+.flowParticipant {
+  @include flex-column;
+  align-items: center;
+  gap: $space-2;
+  min-width: 100px;
+}
+
+.flowAvatar {
+  @include flex-center;
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-full;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: $font-size-base;
+  font-weight: 800;
+  box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
+  
+  &.avatarGreen {
+    background: var(--color-success);
+    box-shadow: 0 8px 20px -6px rgba(var(--color-success-rgb), 0.4);
+  }
+}
+
+.flowName {
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  color: var(--text-primary);
+}
+
+.flowRole {
+  font-size: $font-size-xs;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.flowConnector {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-3;
+  position: relative;
+  min-width: 140px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border-default);
+    z-index: 0;
+  }
+
+  @include mobile-only {
+    min-width: auto;
+    width: 100%;
+    
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.flowAmountBadge {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  padding: $space-2 $space-4;
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+
+  svg {
+    font-size: $font-size-lg;
+  }
+}
+
+.flowArrow {
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid var(--border-default);
+  border-right: 2px solid var(--border-default);
+  transform: translateY(-50%) rotate(45deg);
+
+  @include mobile-only {
+    display: none;
+  }
+}
+
 // ── Demo card ──
 .demoCard {
   @include card;
   padding: 0;
   overflow: hidden;
-  background: var(--bg-card);
+  background: rgba(var(--bg-card-rgb), 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(var(--border-default-rgb), 0.6);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15), 0 18px 36px -18px rgba(0, 0, 0, 0.1);
 }
 
 .demoHeader {
-  padding: $space-6;
+  padding: $space-6 $space-8;
   @include flex-between;
+  background: rgba(var(--text-primary-rgb), 0.02);
   border-bottom: 1px solid var(--border-default);
 }
 
@@ -531,16 +679,22 @@
 
 .demoBtn {
   @include button-base;
-  width: calc(100% - $space-12);
-  margin: $space-4 $space-6 $space-6;
+  width: calc(100% - $space-16);
+  margin: $space-6 $space-8 $space-8;
   justify-content: center;
-  padding: $space-3;
-  border-radius: $radius-md;
+  padding: $space-4;
+  border-radius: 12px;
   background: var(--gradient-primary);
   color: #fff;
-  font-weight: $font-weight-bold;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  font-weight: 800;
+  font-size: $font-size-base;
+  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
   cursor: default;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

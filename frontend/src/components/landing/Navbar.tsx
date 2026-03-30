@@ -25,7 +25,7 @@ export default function LandingNavbar() {
           <div className={styles.logoIcon}>
             <FiPieChart />
           </div>
-          <span>SplitWise</span>
+          <span>Expensora</span>
         </Link>
 
         <div className={styles.navLinks}>
