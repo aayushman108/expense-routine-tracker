@@ -4,16 +4,67 @@ import AppProvider from "@/components/providers/AppProvider";
 import ToastContainer from "@/components/ui/Toast/Toast";
 
 export const metadata: Metadata = {
-  title: "Expensora — Smart Expense Tracker",
+  title: {
+    default: "Expensora | Smart Expense Tracker & Bill Splitter",
+    template: "%s | Expensora",
+  },
   description:
-    "Track personal and group expenses, split bills with custom ratios, and settle debts monthly. Built for roommates, trips, and teams.",
+    "Expensora is a smart expense tracker designed for individuals and groups. Track personal expenses, split bills with custom ratios, and settle debts monthly. Built for roommates, trips, and teams.",
   keywords: [
+    "Expensora",
     "expense tracker",
     "split bills",
     "group expenses",
-    "settlement",
+    "debt settlement",
+    "personal finance",
     "NPR",
+    "Next.js tracker",
+    "finance management",
   ],
+  authors: [{ name: "Aayushman Sharma" }],
+  creator: "Aayushman Sharma",
+  metadataBase: new URL("https://expensora.netlify.app"), // Replace with actual URL if known
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://expensora.netlify.app",
+    title: "Expensora | Smart Expense Tracker & Bill Splitter",
+    description:
+      "Expensora helps you track and split expenses with ease. Perfect for managing shared living costs, travel budgets, and personal finances.",
+    siteName: "Expensora",
+    images: [
+      {
+        url: "/expensora-home.png",
+        width: 1200,
+        height: 630,
+        alt: "Expensora App Preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Expensora | Smart Expense Tracker",
+    description:
+      "Efficiently track and manage your shared and individual expenses.",
+    images: ["/expensora-home.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -22,6 +73,30 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "Expensora",
+              url: "https://expensora.netlify.app",
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Web",
+              description:
+                "Smart expense tracker and bill splitter for groups and individuals.",
+              author: {
+                "@type": "Person",
+                name: "Aayushman Sharma",
+              },
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "NPR",
+              },
+            }),
+          }}
+        />
         <AppProvider>
           {children}
           <ToastContainer />
@@ -30,3 +105,4 @@ export default function RootLayout({
     </html>
   );
 }
+
