@@ -27,10 +27,17 @@ export async function sendMail(options: IMailOptions) {
   const templatePath = path.join(__dirname, "..", "emails", options.template);
   const cssPath = path.join(__dirname, "..", "emails", "style.css");
 
+  console.log(templatePath, cssPath, "one");
+  
+
   const html = await ejs.renderFile(templatePath, options.data);
   const css = fs.readFileSync(cssPath, "utf8");
 
+  console.log(html, css, "two")
+
   const inlinedHtml = juice.inlineContent(html, css);
+
+  console.log(inlinedHtml, "three")
 
   const mailOptions = {
     from: process.env.SMTP_USER,
@@ -38,6 +45,8 @@ export async function sendMail(options: IMailOptions) {
     subject: options.subject,
     html: inlinedHtml,
   };
+
+  console.log(mailOptions, "four")
 
   return await transporter.sendMail(mailOptions);
 }

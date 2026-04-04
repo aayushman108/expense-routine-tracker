@@ -16,6 +16,7 @@ appEmitter.on(
         },
       });
     } catch (error) {
+      console.log(error, "Email Error")
       console.error("Error sending signup email:", error);
     }
   },
