@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import path from "path";
 import ejs from "ejs";
 import fs from "fs";
@@ -6,25 +6,14 @@ import juice from "juice";
 import dotenv from "dotenv";
 dotenv.config();
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 interface IMailOptions {
   email: string;
   subject: string;
   template: string;
   data: { [key: string]: any };
 }
-
-export const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: process.env.SMTP_SECURE === "true", // true for port 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
 
 export async function sendMail(options: IMailOptions) {
   const templatePath = path.join(__dirname, "..", "emails", options.template);
@@ -35,13 +24,17 @@ export async function sendMail(options: IMailOptions) {
 
   const inlinedHtml = juice.inlineContent(html, css);
 
-  const mailOptions = {
-    from: process.env.SMTP_USER,
+  const { data, error } = await resend.emails.send({
+    from: process.env.RESEND_USER!,
     to: options.email,
     subject: options.subject,
     html: inlinedHtml,
-  };
+  });
 
+  if (error) {
+    throw new Error(`Failed to send email: ${error.message}`);
+  }
 
-  return await transporter.sendMail(mailOptions);
+  return data;
 }
+
