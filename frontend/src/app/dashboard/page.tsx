@@ -12,6 +12,7 @@ import {
   HiOutlineOfficeBuilding,
 } from "react-icons/hi";
 import { FiUsers } from "react-icons/fi";
+import { Expense, Group } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchMyGroupsAction } from "@/store/slices/groupSlice";
 import { fetchUserExpenses } from "@/store/slices/expenseSlice";
@@ -33,7 +34,7 @@ export default function DashboardPage() {
   const { groups, isLoading: groupsLoading } = useAppSelector(
     (s: RootState) => s.groups,
   );
-  const { expenses, isLoading: expensesLoading } = useAppSelector(
+  const { expenses } = useAppSelector(
     (s: RootState) => s.expenses,
   );
   const { user } = useAppSelector((s: RootState) => s.auth);
@@ -53,7 +54,7 @@ export default function DashboardPage() {
         e.expense_status === EXPENSE_STATUS.VERIFIED,
     )
     .reduce(
-      (acc: number, curr: any) =>
+      (acc: number, curr: Expense) =>
         acc + Number(curr.user_amount || curr.total_amount),
       0,
     );
@@ -104,6 +105,23 @@ export default function DashboardPage() {
     return total;
   }, 0);
 
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const monthlyPersonalSpend = expenses
+    .filter((e) => {
+      const d = new Date(e.expense_date);
+      return (
+        e.expense_type === EXPENSE_TYPE.PERSONAL &&
+        d.getMonth() === currentMonth &&
+        d.getFullYear() === currentYear
+      );
+    })
+    .reduce((acc, curr) => acc + Number(curr.total_amount), 0);
+
+  const netBalance = owedToYou - youOwe;
+
   const stats = [
     {
       label: "Total Expenses",
@@ -135,7 +153,7 @@ export default function DashboardPage() {
     <div className={styles.dashboard}>
       <section className={styles.statsGrid}>
         {stats.map((stat, idx) => (
-          <div key={idx} className={styles.statCard}>
+          <div key={idx} className={`${styles.statCard} ${styles[stat.color]}`}>
             <div className={`${styles.statIcon} ${styles[stat.color]}`}>
               {stat.icon}
             </div>
@@ -156,30 +174,93 @@ export default function DashboardPage() {
           </Link>
         </SectionHeader>
 
-        <div className={styles.grid}>
+        <div className={styles.personalTrackerGrid}>
           <Card
             clickable
             onClick={() => setIsExpenseModalOpen(true)}
-            className={styles.groupCard}
+            className={styles.featuredPersonalCard}
+            gradient
+            glass
           >
-            <div className={styles.image}>
-              <HiOutlineCurrencyDollar />
-            </div>
-            <div className={styles.details}>
-              <div className={styles.top}>
-                <span className={styles.name}>Private Ledger</span>
-                <span className={styles.badge}>Private</span>
+            <div className={styles.banner}>
+              <div className={styles.iconGlow}>
+                <HiOutlineCurrencyDollar />
               </div>
-              <p className={styles.desc}>
-                Track your private expenses, savings, and personal budget.
+              <div className={styles.titleInfo}>
+                <h3>Private Ledger</h3>
+                <span className={styles.typeTag}>Only You</span>
+              </div>
+            </div>
+
+            <div className={styles.mainStats}>
+              <div className={styles.statItem}>
+                <label>Monthly Spend</label>
+                <div className={styles.amountWrap}>
+                  <span className={styles.currency}>रू</span>
+                  <span className={styles.val}>
+                    {monthlyPersonalSpend.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+              <div className={styles.statItem}>
+                <label>Lifetime Total</label>
+                <div className={styles.amountWrap}>
+                  <span className={styles.currency}>रू</span>
+                  <span className={styles.val}>
+                    {totalSpent.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniFooter}>
+              <p className={styles.hint}>
+                Track your savings, bills, and individual lifestyle costs with
+                end-to-end privacy.
               </p>
+              <div className={styles.btnGroup}>
+                <Button variant="primary" size="sm" className={styles["btn-quick-add"]}>
+                  <HiPlus /> Quick Add
+                </Button>
+                <Link href="/dashboard/personal" onClick={(e) => e.stopPropagation()}>
+                  <Button variant="ghost" size="sm" className={styles["btn-ledger"]}>
+                    View Full Ledger
+                  </Button>
+                </Link>
+              </div>
             </div>
-            <div className={styles.footer}>
-              <span>Last updated: Recently</span>
-              <span className={styles.members}>
-                <FiUsers /> Only You
-              </span>
-            </div>
+          </Card>
+
+          <Card className={styles.summaryBox}>
+             <div className={styles.summaryHeader}>
+                <div className={styles.trendIcon}>
+                  <HiOutlineTrendingUp />
+                </div>
+                <h4>Financial Health</h4>
+             </div>
+             <div className={styles.summaryDesc}>
+                You have <strong>रू {owedToYou.toLocaleString()}</strong> to receive from friends and <strong>रू {youOwe.toLocaleString()}</strong> left to pay back.
+             </div>
+
+             <div className={styles.netBalanceBox}>
+                <label>Net Balance</label>
+                <div className={`${styles.netVal} ${netBalance >= 0 ? styles.positive : styles.negative}`}>
+                  {netBalance >= 0 ? "+" : "-"} रू {Math.abs(netBalance).toLocaleString()}
+                </div>
+             </div>
+
+             <div className={styles.progressSection}>
+                <div className={styles.progressBar}>
+                   <div 
+                     className={styles.progress} 
+                     style={{ width: `${(owedToYou / (owedToYou + youOwe || 1)) * 100}%` }}
+                   />
+                </div>
+                <div className={styles.progressLabels}>
+                   <span>Receivable</span>
+                   <span>Payable</span>
+                </div>
+             </div>
           </Card>
         </div>
       </section>
@@ -214,7 +295,7 @@ export default function DashboardPage() {
           </div>
         ) : groups?.totalGroups > 0 ? (
           <div className={styles.grid}>
-            {groups?.data?.map((group: any) => (
+            {groups?.data?.map((group: Group) => (
               <Link
                 key={group.id}
                 href={`/dashboard/groups/${group.id}`}

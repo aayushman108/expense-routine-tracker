@@ -33,6 +33,7 @@ export interface Group {
   description?: string;
   image?: { url: string; publicId: string } | null;
   created_by: string;
+  member_count?: number;
   created_at: string;
   updated_at: string;
 }
