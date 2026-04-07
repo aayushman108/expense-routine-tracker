@@ -6,11 +6,42 @@ import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
 import Button from "@/components/ui/Button/Button";
+import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/store/hooks";
+import { getCurrentUser } from "@/store/slices/authSlice";
+import { addToast } from "@/store/slices/uiSlice";
+import { handleThunk } from "@/lib/utils";
 import styles from "./Navbar.module.scss";
 
 export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const handleLoginClick = async () => {
+    const accessToken =
+      typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+
+    if (accessToken) {
+      const success = await handleThunk(
+        dispatch(getCurrentUser()),
+        () => {
+          router.push("/dashboard");
+        },
+        (error) => {
+          dispatch(
+            addToast({ type: "error", message: "Session expired. Please login again." }),
+          );
+          console.info("Session in localStorage is invalid or expired.", error);
+        }
+      );
+
+      if (success) return;
+    }
+
+    router.push("/login");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -34,11 +65,11 @@ export default function LandingNavbar() {
 
         <div className={styles.navActions}>
           <ThemeToggle />
-          <Link href="/login" className={styles.desktopBtn}>
-            <Button variant="ghost" size="sm">
+          <div className={styles.desktopBtn}>
+            <Button variant="ghost" size="sm" onClick={handleLoginClick}>
               Log in
             </Button>
-          </Link>
+          </div>
           <Link href="/signup" className={styles.desktopBtn}>
             <Button variant="primary" size="sm">
               Get Started
@@ -87,11 +118,16 @@ export default function LandingNavbar() {
             Pricing
           </a>
           <div className={styles.drawerActions}>
-            <Link href="/login" onClick={() => setMobileOpen(false)}>
+            <div
+              onClick={() => {
+                setMobileOpen(false);
+                handleLoginClick();
+              }}
+            >
               <Button variant="ghost" size="lg">
                 Log in
               </Button>
-            </Link>
+            </div>
             <Link href="/signup" onClick={() => setMobileOpen(false)}>
               <Button variant="primary" size="lg">
                 Get Started

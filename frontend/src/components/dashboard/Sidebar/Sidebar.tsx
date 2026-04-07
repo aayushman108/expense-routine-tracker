@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { handleThunk } from "@/lib/utils";
 import {
   HiOutlineHome,
   HiOutlineUserGroup,
@@ -33,6 +35,7 @@ const settingsNav = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { sidebarOpen } = useAppSelector((s) => s.ui);
@@ -96,7 +99,7 @@ export default function Sidebar() {
           ))}
           <button
             className={`${styles.navItem} ${styles.logoutBtn}`}
-            onClick={() => dispatch(logoutUser())}
+            onClick={() => handleThunk(dispatch(logoutUser()), () => router.push("/"))}
           >
             <FiLogOut />
             <span>Logout</span>
@@ -108,7 +111,13 @@ export default function Sidebar() {
         <div className={styles.userCard}>
           <div className={styles.avatar}>
             {user?.avatar?.url ? (
-              <img src={user.avatar.url} alt={user.full_name} />
+              <Image
+                src={user.avatar.url}
+                alt={user.full_name || "Avatar"}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className={styles.avatarImg}
+              />
             ) : (
               getInitials(user?.full_name)
             )}
