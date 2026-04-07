@@ -20,16 +20,14 @@ import { fetchUserExpenses, updateExpense } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
-import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
+import PersonalExpenseDetailsModal from "@/components/dashboard/ExpenseForm/PersonalExpenseDetailsModal";
 import styles from "./personal.module.scss";
+import { handleThunk } from "@/lib/utils";
 import type { RootState } from "@/store";
 import {
   EXPENSE_TYPE,
   EXPENSE_STATUS,
-  SETTLEMENT_STATUS,
 } from "@expense-tracker/shared";
-
-const STATUS_PREFIX = "Status -";
 
 export default function PersonalDetailsPage() {
   const router = useRouter();
@@ -47,18 +45,14 @@ export default function PersonalDetailsPage() {
   const { user } = useAppSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchUserExpenses());
+    handleThunk(dispatch(fetchUserExpenses()));
   }, [dispatch]);
 
   const handleUpdateStatus = async (id: string, status: string) => {
-    try {
-      await dispatch(
-        updateExpense({ id, body: { expenseStatus: status as any } }),
-      ).unwrap();
-      dispatch(fetchUserExpenses());
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
+    await handleThunk(
+      dispatch(updateExpense({ id, body: { expenseStatus: status as any } })),
+      () => handleThunk(dispatch(fetchUserExpenses())),
+    );
   };
 
   const groupedSummaries = useMemo(() => {
@@ -125,9 +119,11 @@ export default function PersonalDetailsPage() {
 
   // Calculations depends on groupedSummaries
   const calculations = useMemo(() => {
-    const personal = personalExpenses
-      .filter((e) => e.expense_status === EXPENSE_STATUS.VERIFIED)
-      .reduce((acc, curr) => acc + Number(curr.total_amount || 0), 0);
+    // Personal expenses always count — no status workflow
+    const personal = personalExpenses.reduce(
+      (acc, curr) => acc + Number(curr.total_amount || 0),
+      0,
+    );
 
     const actualGroupSpend = expenses
       .filter(
@@ -212,22 +208,24 @@ export default function PersonalDetailsPage() {
           <span className={styles.title}>
             {expense.description || "Unnamed Expense"}
           </span>
-          <div className={styles.tagsRow}>
-            <span className={`${styles.tag} ${styles[expense.expense_status]}`}>
-              STATUS - {expense.expense_status.toUpperCase()}
-            </span>
-            {expense.expense_status === "draft" && (
-              <button
-                className={styles.inlineSubmitBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleUpdateStatus(expense.id, "submitted");
-                }}
-              >
-                Submit Expense
-              </button>
-            )}
-          </div>
+          {expense.expense_type === EXPENSE_TYPE.GROUP && (
+            <div className={styles.tagsRow}>
+              <span className={`${styles.tag} ${styles[expense.expense_status]}`}>
+                STATUS - {expense.expense_status.toUpperCase()}
+              </span>
+              {expense.expense_status === "draft" && (
+                <button
+                  className={styles.inlineSubmitBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUpdateStatus(expense.id, "submitted");
+                  }}
+                >
+                  Submit Expense
+                </button>
+              )}
+            </div>
+          )}
           <span className={styles.meta}>
             {new Date(expense.expense_date).toLocaleDateString()} •{" "}
             {expense.currency}{" "}
@@ -539,7 +537,7 @@ export default function PersonalDetailsPage() {
         expenseType={EXPENSE_TYPE.PERSONAL}
       />
 
-      <ExpenseDetailsModal
+      <PersonalExpenseDetailsModal
         isOpen={!!selectedExpenseId}
         onClose={() => setSelectedExpenseId(null)}
         expenseId={selectedExpenseId}

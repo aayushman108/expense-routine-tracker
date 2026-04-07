@@ -312,6 +312,7 @@ $transition-normal: $transition-base;
     gap: $space-4;
 
     .avatar {
+      position: relative;
       width: 48px;
       height: 48px;
       border-radius: $radius-full;
@@ -621,6 +622,7 @@ $transition-normal: $transition-base;
     flex: 0 0 auto;
 
     .qrWrapper {
+      position: relative;
       width: 152px;
       height: 152px;
       aspect-ratio: 1 / 1;
@@ -826,6 +828,7 @@ $transition-normal: $transition-base;
     flex: 0 0 auto;
 
     .qrWrapper {
+      position: relative;
       width: 152px;
       height: 152px;
       aspect-ratio: 1 / 1;
@@ -920,6 +923,7 @@ $transition-normal: $transition-base;
     flex: 1;
 
     .miniAvatar {
+      position: relative;
       width: 40px;
       height: 40px;
       border-radius: 12px;

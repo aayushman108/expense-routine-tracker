@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   HiOutlineCalendar,
   HiOutlineUserCircle,
@@ -17,7 +18,6 @@ import {
   HiTrash,
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
-import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "./AddExpenseModal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -291,9 +291,11 @@ export default function ExpenseDetailsModal({
                 <div className={styles.userInfo}>
                   <div className={styles.avatar}>
                     {details.payer?.avatar?.url ? (
-                      <img
+                      <Image
                         src={details.payer.avatar.url}
-                        alt={details.payer.full_name}
+                        alt={details.payer.full_name || "Payer"}
+                        fill
+                        style={{ objectFit: "cover" }}
                       />
                     ) : (
                       getInitials(
@@ -430,7 +432,7 @@ export default function ExpenseDetailsModal({
                                   <div className={styles.qrSide}>
                                     <div className={styles.qrWrapper}>
                                       {meta.qrCode ? (
-                                        <img src={meta.qrCode} alt="QR" />
+                                        <Image src={meta.qrCode} alt="QR" fill style={{ objectFit: "contain" }} />
                                       ) : (
                                         <HiOutlineQrcode />
                                       )}
@@ -528,7 +530,7 @@ export default function ExpenseDetailsModal({
                                   <div className={styles.qrSide}>
                                     <div className={styles.qrWrapper}>
                                       {meta.qrCode ? (
-                                        <img src={meta.qrCode} alt="QR" />
+                                        <Image src={meta.qrCode} alt="QR" fill style={{ objectFit: "contain" }} />
                                       ) : (
                                         <HiOutlineQrcode />
                                       )}
@@ -596,9 +598,11 @@ export default function ExpenseDetailsModal({
                     <div className={styles.left}>
                       <div className={styles.miniAvatar}>
                         {split.user?.avatar?.url ? (
-                          <img
+                          <Image
                             src={split.user.avatar.url}
-                            alt={split.user.full_name}
+                            alt={split.user.full_name || "User"}
+                            fill
+                            style={{ objectFit: "cover" }}
                           />
                         ) : (
                           getInitials(split.user?.full_name)

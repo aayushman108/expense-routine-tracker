@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   HiOutlineUserGroup,
   HiOutlineClipboardList,
@@ -97,7 +98,13 @@ export default function CreateGroupModal({
         <div className={styles.imageUpload}>
           <div className={styles.preview}>
             {preview ? (
-              <img src={preview} alt="Preview" />
+              <Image
+                src={preview}
+                alt="Preview"
+                fill
+                unoptimized
+                style={{ objectFit: "cover" }}
+              />
             ) : (
               <div className={styles.placeholder}>
                 <HiOutlinePhotograph />

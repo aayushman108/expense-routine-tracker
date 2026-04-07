@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import {
   HiOutlineCurrencyDollar,
@@ -572,7 +573,12 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
                     </div>
                     <div className={styles.avatar}>
                       {member.user?.avatar?.url ? (
-                        <img src={member.user.avatar.url} alt="" />
+                        <Image
+                          src={member.user.avatar.url}
+                          alt={member.user.full_name || "User"}
+                          fill
+                          style={{ objectFit: "cover" }}
+                        />
                       ) : (
                         (member?.user?.full_name).charAt(0)
                       )}

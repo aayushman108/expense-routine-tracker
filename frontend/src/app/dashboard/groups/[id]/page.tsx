@@ -12,6 +12,7 @@ import {
   HiCheck,
 } from "react-icons/hi";
 import Link from "next/link";
+import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import { fetchGroupExpenses, updateExpense } from "@/store/slices/expenseSlice";
@@ -179,9 +180,11 @@ export default function GroupDetailsPage() {
           <div className={styles.groupInfo}>
             <div className={styles.groupImage}>
               {groupDetails.data.image?.url ? (
-                <img
+                <Image
                   src={groupDetails.data.image.url}
                   alt={groupDetails.data.name}
+                  fill
+                  style={{ objectFit: "cover" }}
                 />
               ) : (
                 <HiOutlineChartPie />
@@ -501,9 +504,11 @@ export default function GroupDetailsPage() {
                   >
                     <div className={styles.avatar}>
                       {member.user?.avatar?.url ? (
-                        <img
+                        <Image
                           src={member.user.avatar.url}
-                          alt={member.user?.full_name}
+                          alt={member.user?.full_name || "Member"}
+                          fill
+                          style={{ objectFit: "cover" }}
                         />
                       ) : (
                         getInitials(member.user?.full_name)

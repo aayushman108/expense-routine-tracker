@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   HiOutlineCash,
   HiOutlineArrowRight,
@@ -10,7 +11,6 @@ import {
   HiOutlineCloudUpload,
   HiX,
   HiOutlineQrcode,
-  HiOutlineMail,
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
 import Button from "@/components/ui/Button/Button";
@@ -157,9 +157,11 @@ export default function BulkSettlementModal({
           <div className={styles.userCard}>
             <div className={styles.avatar}>
               {balance.from_user_avatar?.url ? (
-                <img
+                <Image
                   src={balance.from_user_avatar.url}
-                  alt={balance.from_user_name}
+                  alt={balance.from_user_name || "User"}
+                  fill
+                  style={{ objectFit: "cover" }}
                 />
               ) : (
                 getInitials(balance.from_user_name)
@@ -187,9 +189,11 @@ export default function BulkSettlementModal({
           <div className={styles.userCard}>
             <div className={styles.avatar}>
               {balance.to_user_avatar?.url ? (
-                <img
+                <Image
                   src={balance.to_user_avatar.url}
-                  alt={balance.to_user_name}
+                  alt={balance.to_user_name || "User"}
+                  fill
+                  style={{ objectFit: "cover" }}
                 />
               ) : (
                 getInitials(balance.to_user_name)
@@ -423,10 +427,12 @@ export default function BulkSettlementModal({
               </label>
             ) : (
               <div className={styles.previewContainer}>
-                <img
+                <Image
                   src={previewUrl}
                   alt="Proof"
-                  className={styles.previewImage}
+                  fill
+                  unoptimized
+                  style={{ objectFit: "contain" }}
                 />
                 <button className={styles.removeBtn} onClick={removeImage}>
                   <HiX />
@@ -442,10 +448,11 @@ export default function BulkSettlementModal({
               <h3>View Proof</h3>
             </div>
             <div className={styles.previewContainer}>
-              <img
+              <Image
                 src={balance.proof_image.url}
                 alt="Proof"
-                className={styles.previewImage}
+                fill
+                style={{ objectFit: "contain" }}
               />
             </div>
           </section>

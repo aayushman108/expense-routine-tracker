@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   HiOutlineUser,
   HiOutlineMail,
@@ -191,7 +192,12 @@ export default function ProfilePage() {
               <div className={styles.avatarSection}>
                 <div className={styles.avatar}>
                   {user?.avatar?.url ? (
-                    <img src={user.avatar.url} alt={user.full_name} />
+                    <Image
+                      src={user.avatar.url}
+                      alt={user.full_name}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
                   ) : (
                     getInitials(user?.full_name)
                   )}

@@ -1,5 +1,6 @@
 import Select from "@/components/ui/Select/Select";
 import styles from "./PaymentDetailsForm.module.scss";
+import Image from "next/image";
 
 import { HiOutlineQrcode, HiOutlineX } from "react-icons/hi";
 import Input from "@/components/ui/Input/Input";
@@ -186,7 +187,13 @@ export function PaymentDetailsForm({
               <div className={styles.qrPreviewWrapper}>
                 {pmForm.metadata.qrCode ? (
                   <div className={styles.qrPreview}>
-                    <img src={pmForm.metadata.qrCode} alt="QR Preview" />
+                    <Image
+                      src={pmForm.metadata.qrCode}
+                      alt="QR Preview"
+                      fill
+                      unoptimized
+                      style={{ objectFit: "contain" }}
+                    />
                     <button
                       type="button"
                       className={styles.removeQr}

@@ -54,6 +54,11 @@ async function addExpense(data: IAddExpense) {
 
   delete data.splits;
 
+  // Personal expenses are auto-verified — no approval workflow needed
+  if (data.expenseType === EXPENSE_TYPE.PERSONAL) {
+    (data as any).expenseStatus = EXPENSE_STATUS.VERIFIED;
+  }
+
   return await expenseDao.createExpense({ data, splits: calculatedSplits });
 }
 

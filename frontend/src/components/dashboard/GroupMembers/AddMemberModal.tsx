@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import Image from "next/image";
 import {
   HiOutlineSearch,
   HiOutlineUserAdd,
@@ -199,7 +200,12 @@ export default function AddMemberModal({
                 <div className={styles.userInfo}>
                   <div className={styles.avatar}>
                     {user.avatar?.url ? (
-                      <img src={user.avatar.url} alt="" />
+                      <Image
+                        src={user.avatar.url}
+                        alt={user.full_name || "User"}
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
                     ) : (
                       getInitials(user.full_name)
                     )}

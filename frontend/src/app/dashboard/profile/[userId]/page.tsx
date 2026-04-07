@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import {
   HiOutlineUser,
@@ -151,9 +152,11 @@ export default function UserProfilePage() {
               <div className={styles.avatarSection}>
                 <div className={styles.avatar}>
                   {profileUser.avatar?.url ? (
-                    <img
+                    <Image
                       src={profileUser.avatar.url}
                       alt={profileUser.full_name}
+                      fill
+                      style={{ objectFit: "cover" }}
                     />
                   ) : (
                     getInitials(profileUser.full_name)

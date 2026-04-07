@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   HiOutlineUserGroup,
   HiOutlineCurrencyDollar,
@@ -46,7 +47,11 @@ export default function DashboardPage() {
   }, [dispatch]);
 
   const totalSpent = expenses
-    .filter((e) => e.expense_status === EXPENSE_STATUS.VERIFIED)
+    .filter(
+      (e) =>
+        e.expense_type === EXPENSE_TYPE.PERSONAL ||
+        e.expense_status === EXPENSE_STATUS.VERIFIED,
+    )
     .reduce(
       (acc: number, curr: any) =>
         acc + Number(curr.user_amount || curr.total_amount),
@@ -217,7 +222,12 @@ export default function DashboardPage() {
               >
                 <div className={styles.image}>
                   {group.image?.url ? (
-                    <img src={group.image.url} alt={group.name} />
+                    <Image
+                      src={group.image.url}
+                      alt={group.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
                   ) : (
                     <HiOutlineOfficeBuilding />
                   )}

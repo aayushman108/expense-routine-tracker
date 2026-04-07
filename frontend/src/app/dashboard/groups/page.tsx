@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   HiOutlineChevronLeft,
   HiOutlinePlus,
@@ -112,7 +113,12 @@ export default function GroupsPage() {
             >
               <div className={styles.image}>
                 {group.image?.url ? (
-                  <img src={group.image.url} alt={group.name} />
+                  <Image
+                    src={group.image.url}
+                    alt={group.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
                 ) : (
                   <HiOutlineOfficeBuilding />
                 )}
