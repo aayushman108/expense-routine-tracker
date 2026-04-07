@@ -6,9 +6,9 @@ import { generatePaginationObj } from "src/utils";
 
 const createExpense = asyncHandler(async (req: Request, res: Response) => {
   const expense = await expenseService.addExpense({
-    paidBy: req.userId,
     ...req.params,
     ...req.body,
+    paidBy: req.body?.paidBy ?? req.userId,
   });
 
   return sendSuccessResponse(res, {

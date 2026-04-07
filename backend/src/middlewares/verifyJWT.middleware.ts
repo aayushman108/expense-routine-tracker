@@ -28,6 +28,7 @@ export const verifyJWT = async (
       throw new UnAuthorizedError("User not found");
     }
 
+
     req.userId = user.id;
     next();
   } catch (err) {

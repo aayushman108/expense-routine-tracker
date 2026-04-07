@@ -30,7 +30,7 @@ async function createExpense({
       `,
       [
         data.expenseType,
-        data.groupId,
+        data.groupId || null,
         data.paidBy,
         data.totalAmount,
         data.description,
