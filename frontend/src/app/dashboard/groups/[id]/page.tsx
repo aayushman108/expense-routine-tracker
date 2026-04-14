@@ -10,6 +10,10 @@ import {
   HiOutlineCurrencyDollar,
   HiOutlineChartPie,
   HiCheck,
+  HiOutlineFilter,
+  HiOutlineCalendar,
+  HiOutlineX,
+  HiOutlineSearch,
 } from "react-icons/hi";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,7 +22,6 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchGroupExpenses, updateExpense } from "@/store/slices/expenseSlice";
 import {
   fetchGroupBalances,
-  settleBulkAction,
 } from "@/store/slices/settlementSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
@@ -26,6 +29,8 @@ import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetai
 import InviteUserModal from "@/components/dashboard/GroupMembers/InviteUserModal";
 import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
 import BulkSettlementModal from "@/components/dashboard/Settlement/BulkSettlementModal";
+import Pagination from "@/components/ui/Pagination/Pagination";
+import Select from "@/components/ui/Select/Select";
 import styles from "./group-details.module.scss";
 import {
   clearGroupDetails,
@@ -69,16 +74,74 @@ export default function GroupDetailsPage() {
   const [selectedBalance, setSelectedBalance] = useState<any | null>(null);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
+  // Filters state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(6);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [expenseStatus, setExpenseStatus] = useState("");
+  const [settlementStatus, setSettlementStatus] = useState("");
+  const [appliedFilters, setAppliedFilters] = useState({
+    startDate: "",
+    endDate: "",
+    expenseStatus: "",
+    settlementStatus: "",
+  });
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+
+  const { pagination } = useAppSelector((s) => s.expenses);
+
   useEffect(() => {
     if (id) {
       dispatch(fetchGroupDetailsAction(id as string));
-      dispatch(fetchGroupExpenses(id as string));
       dispatch(fetchGroupBalances(id as string));
     }
     return () => {
       dispatch(clearGroupDetails());
     };
   }, [id, dispatch]);
+
+  useEffect(() => {
+    if (id && activeTab === "expenses") {
+      dispatch(
+        fetchGroupExpenses({
+          groupId: id as string,
+          filters: {
+            page: currentPage,
+            limit,
+            startDate: appliedFilters.startDate || undefined,
+            endDate: appliedFilters.endDate || undefined,
+            expenseStatus: appliedFilters.expenseStatus || undefined,
+            settlementStatus: appliedFilters.settlementStatus || undefined,
+          },
+        }),
+      );
+    }
+  }, [id, dispatch, currentPage, limit, appliedFilters, activeTab]);
+
+  const handleApplyFilters = () => {
+    setAppliedFilters({
+      startDate,
+      endDate,
+      expenseStatus,
+      settlementStatus,
+    });
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setStartDate("");
+    setEndDate("");
+    setExpenseStatus("");
+    setSettlementStatus("");
+    setAppliedFilters({
+      startDate: "",
+      endDate: "",
+      expenseStatus: "",
+      settlementStatus: "",
+    });
+    setCurrentPage(1);
+  };
 
   const handleUpdateStatus = async (
     expenseId: string,
@@ -91,7 +154,14 @@ export default function GroupDetailsPage() {
           body: { expenseStatus: status },
         }),
       ).unwrap();
-      if (id) dispatch(fetchGroupExpenses(id as string));
+      if (id) {
+        dispatch(
+          fetchGroupExpenses({
+            groupId: id as string,
+            filters: { page: currentPage, limit, startDate, endDate },
+          }),
+        );
+      }
     } catch (error) {
       console.error("Failed to update status:", error);
     }
@@ -219,23 +289,120 @@ export default function GroupDetailsPage() {
 
       <div className={styles.contentGrid}>
         <main className={styles.mainColumn}>
-          <div className={styles.tabHeader}>
-            <div
-              className={`${styles.tab} ${activeTab === "expenses" ? styles.active : ""}`}
-              onClick={() => setActiveTab("expenses")}
-            >
-              <HiOutlineCurrencyDollar /> Expenses
+          <div className={`${styles.tabHeader} ${styles.expenseHeaderActions}`}>
+            <div className={styles.tabsWrapper}>
+              <div
+                className={`${styles.tab} ${activeTab === "expenses" ? styles.active : ""}`}
+                onClick={() => setActiveTab("expenses")}
+              >
+                <HiOutlineCurrencyDollar /> Expenses
+              </div>
+              <div
+                className={`${styles.tab} ${activeTab === "settlements" ? styles.active : ""}`}
+                onClick={() => setActiveTab("settlements")}
+              >
+                <HiCheck /> Settlements
+              </div>
             </div>
-            <div
-              className={`${styles.tab} ${activeTab === "settlements" ? styles.active : ""}`}
-              onClick={() => setActiveTab("settlements")}
-            >
-              <HiCheck /> Settlements
-            </div>
+
+            {activeTab === "expenses" && (
+              <div className={styles.filterActions}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={styles.filterToggleBtn}
+                  onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                >
+                  <HiOutlineFilter />
+                  {isFilterExpanded ? "Hide Filters" : "Filters"}
+                  {(startDate || endDate || expenseStatus || settlementStatus) && (
+                    <span className={styles.filterDot} />
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
 
+          {activeTab === "expenses" && isFilterExpanded && (
+            <div className={styles.filterBar}>
+              <div className={styles.filterGroup}>
+                <div className={styles.inputWrapper}>
+                  <label>From</label>
+                  <div className={styles.dateInput}>
+                    <HiOutlineCalendar />
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className={styles.inputWrapper}>
+                  <label>To</label>
+                  <div className={styles.dateInput}>
+                    <HiOutlineCalendar />
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <Select
+                  label="Expense Status"
+                  className={styles.filterSelectWrapper}
+                  placeholder="All Statuses"
+                  options={[
+                    { value: "draft", label: "Draft" },
+                    { value: "submitted", label: "Submitted" },
+                    { value: "verified", label: "Verified" },
+                    { value: "rejected", label: "Rejected" },
+                  ]}
+                  value={expenseStatus}
+                  onChange={(e) => setExpenseStatus(e.target.value)}
+                />
+
+                <Select
+                  label="Settlement"
+                  className={styles.filterSelectWrapper}
+                  placeholder="Overall Status"
+                  options={[
+                    { value: "pending", label: "Pending" },
+                    { value: "paid", label: "Paid" },
+                    { value: "confirmed", label: "Confirmed" },
+                  ]}
+                  value={settlementStatus}
+                  onChange={(e) => setSettlementStatus(e.target.value)}
+                />
+
+                <div className={styles.filterActions}>
+                  <Button
+                    size="sm"
+                    onClick={handleApplyFilters}
+                  >
+                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <HiOutlineSearch />
+                      Search
+                    </span>
+                  </Button>
+                  {(startDate || endDate || expenseStatus || settlementStatus) && (
+                    <button
+                      className={styles.clearFilters}
+                      onClick={handleClearFilters}
+                    >
+                      <HiOutlineX />
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === "expenses" ? (
-            <div className={styles.expenseList}>
+            <div className={styles.expenseSection}>
+              <div className={styles.expenseList}>
               {expensesLoading ? (
                 <div className={styles.loaderContainer}>
                   Loading expenses...
@@ -345,6 +512,18 @@ export default function GroupDetailsPage() {
                     Log First Expense
                   </Button>
                 </div>
+              )}
+              
+              </div>
+
+              {pagination && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={pagination.totalPages}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  totalResults={pagination.total}
+                  pageSize={limit}
+                />
               )}
             </div>
           ) : (

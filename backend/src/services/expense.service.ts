@@ -113,16 +113,41 @@ async function getGroupExpenses(
   userId: string,
   limit: number,
   offset: number,
+  startDate?: string,
+  endDate?: string,
+  expenseStatus?: string,
+  settlementStatus?: string,
 ) {
-  return await expenseDao.getGroupExpenses(groupId, userId, limit, offset);
+  return await expenseDao.getGroupExpenses(
+    groupId,
+    userId,
+    limit,
+    offset,
+    startDate,
+    endDate,
+    expenseStatus,
+    settlementStatus,
+  );
 }
 
 async function getPersonalExpenses(
   userId: string,
   limit: number,
   offset: number,
+  startDate?: string,
+  endDate?: string,
+  expenseStatus?: string,
+  settlementStatus?: string,
 ) {
-  return await expenseDao.getUserExpenses(userId, limit, offset);
+  return await expenseDao.getUserExpenses(
+    userId,
+    limit,
+    offset,
+    startDate,
+    endDate,
+    expenseStatus,
+    settlementStatus,
+  );
 }
 
 async function deleteExpense(id: string, userId: string) {

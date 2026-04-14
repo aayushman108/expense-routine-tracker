@@ -13,6 +13,12 @@ interface ExpenseState {
   currentExpense: Expense | null;
   isLoading: boolean;
   error: string | null;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  } | null;
 }
 
 const initialState: ExpenseState = {
@@ -22,39 +28,61 @@ const initialState: ExpenseState = {
   currentExpense: null,
   isLoading: false,
   error: null,
+  pagination: null,
 };
 
-export const fetchUserExpenses = createAsyncThunk<Expense[]>(
-  "expenses/fetchUserExpenses",
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await api.get("/expenses/user");
-      // data: { success, data: { data: Expense[], pagination: ... } }
-      return data.data?.data || data.data || data;
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch expenses",
-      );
-    }
-  },
-);
+export interface ExpenseFilters {
+  page?: number;
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+  expenseStatus?: string;
+  settlementStatus?: string;
+}
 
-export const fetchGroupExpenses = createAsyncThunk<Expense[], string>(
-  "expenses/fetchGroupExpenses",
-  async (groupId, { rejectWithValue }) => {
-    try {
-      const { data } = await api.get(`/expenses/group/${groupId}`);
-      // data: { success, data: { data: Expense[], pagination: ... } }
-      return data.data?.data || data.data || data;
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch group expenses",
-      );
+export const fetchUserExpenses = createAsyncThunk<
+  { data: Expense[]; pagination: any },
+  ExpenseFilters | undefined
+>("expenses/fetchUserExpenses", async (filters, { rejectWithValue }) => {
+  try {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value.toString());
+      });
     }
-  },
-);
+
+    const { data } = await api.get(`/expenses/user?${params.toString()}`);
+    return data.data; // { data: Expense[], pagination: ... }
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to fetch expenses",
+    );
+  }
+});
+
+export const fetchGroupExpenses = createAsyncThunk<
+  { data: Expense[]; pagination: any },
+  { groupId: string; filters?: ExpenseFilters }
+>("expenses/fetchGroupExpenses", async ({ groupId, filters }, { rejectWithValue }) => {
+  try {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value.toString());
+      });
+    }
+
+    const { data } = await api.get(`/expenses/group/${groupId}?${params.toString()}`);
+    return data.data; // { data: Expense[], pagination: ... }
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to fetch group expenses",
+    );
+  }
+});
 
 export const fetchExpenseById = createAsyncThunk<Expense, string>(
   "expenses/fetchExpenseById",
@@ -160,8 +188,9 @@ const expenseSlice = createSlice({
     });
     builder.addCase(fetchUserExpenses.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.expenses = action.payload;
-      state.personalExpenses = action.payload.filter(
+      state.expenses = action.payload.data;
+      state.pagination = action.payload.pagination;
+      state.personalExpenses = action.payload.data.filter(
         (e) => e.expense_type === EXPENSE_TYPE.PERSONAL,
       );
     });
@@ -176,7 +205,8 @@ const expenseSlice = createSlice({
     });
     builder.addCase(fetchGroupExpenses.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.groupExpenses = action.payload;
+      state.groupExpenses = action.payload.data;
+      state.pagination = action.payload.pagination;
     });
     builder.addCase(fetchGroupExpenses.rejected, (state, action) => {
       state.isLoading = false;

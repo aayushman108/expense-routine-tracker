@@ -217,14 +217,59 @@ async function getGroupExpenses(
   userId: string,
   limit: number,
   offset: number,
+  startDate?: string,
+  endDate?: string,
+  expenseStatus?: string,
+  settlementStatus?: string,
 ) {
   // The || operator merges JSON objects.
+
+  let whereClause = `WHERE group_id = ? AND (expense_status != 'draft' OR paid_by = ?)`;
+  const queryParams: any[] = [groupId, userId];
+
+  if (startDate) {
+    whereClause += ` AND expense_date >= ?`;
+    queryParams.push(startDate);
+  }
+
+  if (endDate) {
+    whereClause += ` AND expense_date <= ?`;
+    queryParams.push(endDate);
+  }
+
+  if (expenseStatus) {
+    whereClause += ` AND expense_status = ?`;
+    queryParams.push(expenseStatus);
+  }
+
+  if (settlementStatus) {
+    if (settlementStatus === "personal") {
+      whereClause += ` AND group_id IS NULL`;
+    } else {
+      whereClause += ` AND id IN (
+        SELECT es_filter.expense_id
+        FROM expense_splits es_filter
+        LEFT JOIN settlements st_filter ON es_filter.settlement_id = st_filter.id
+        JOIN expenses e_filter ON es_filter.expense_id = e_filter.id
+        WHERE es_filter.user_id != e_filter.paid_by
+        GROUP BY es_filter.expense_id
+        HAVING 
+          CASE 
+            WHEN COUNT(*) = 0 THEN '${SETTLEMENT_STATUS.CONFIRMED}'
+            WHEN BOOL_AND(COALESCE(st_filter.status = '${SETTLEMENT_STATUS.CONFIRMED}', FALSE)) THEN '${SETTLEMENT_STATUS.CONFIRMED}'
+            WHEN BOOL_AND(COALESCE(st_filter.status IN ('${SETTLEMENT_STATUS.CONFIRMED}', '${SETTLEMENT_STATUS.PAID}'), FALSE)) THEN '${SETTLEMENT_STATUS.PAID}'
+            ELSE '${SETTLEMENT_STATUS.PENDING}'
+          END = ?
+      )`;
+      queryParams.push(settlementStatus);
+    }
+  }
 
   const totalCount = await db.raw(
     `SELECT COUNT(*) AS total_count
      FROM expenses
-     WHERE group_id = ? AND (expense_status != 'draft' OR paid_by = ?)`,
-    [groupId, userId],
+     ${whereClause}`,
+    queryParams,
   );
 
   const total = Number(totalCount.rows[0].total_count);
@@ -238,7 +283,7 @@ async function getGroupExpenses(
     FROM (
       SELECT *
       FROM expenses
-      WHERE group_id = ? AND (expense_status != 'draft' OR paid_by = ?)
+      ${whereClause}
       ORDER BY expense_date DESC
       LIMIT ? OFFSET ?
     ) e
@@ -278,16 +323,15 @@ async function getGroupExpenses(
     `,
     [
       SETTLEMENT_STATUS.PENDING,
-      groupId,
-      userId,
+      ...queryParams,
       limit,
       offset,
+      SETTLEMENT_STATUS.CONFIRMED, // Result for COUNT(*) = 0 (payer-only group expense)
       SETTLEMENT_STATUS.CONFIRMED,
       SETTLEMENT_STATUS.CONFIRMED,
       SETTLEMENT_STATUS.CONFIRMED,
       SETTLEMENT_STATUS.PAID,
-      SETTLEMENT_STATUS.CONFIRMED,
-      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.PAID, // Result for mix of paid/confirmed
       SETTLEMENT_STATUS.PENDING,
     ],
   );
@@ -295,15 +339,60 @@ async function getGroupExpenses(
   return { total, data: dataResult.rows };
 }
 
-async function getUserExpenses(userId: string, limit: number, offset: number) {
+async function getUserExpenses(
+  userId: string,
+  limit: number,
+  offset: number,
+  startDate?: string,
+  endDate?: string,
+  expenseStatus?: string,
+  settlementStatus?: string,
+) {
+  let whereClause = `WHERE (e.paid_by = ? OR (
+       e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
+       AND e.expense_status != 'draft'
+     ))`;
+  const queryParams: any[] = [userId, userId];
+
+  if (startDate) {
+    whereClause += ` AND e.expense_date >= ?`;
+    queryParams.push(startDate);
+  }
+
+  if (endDate) {
+    whereClause += ` AND e.expense_date <= ?`;
+    queryParams.push(endDate);
+  }
+
+  if (expenseStatus) {
+    whereClause += ` AND e.expense_status = ?`;
+    queryParams.push(expenseStatus);
+  }
+
+  if (settlementStatus) {
+    whereClause += ` AND e.id IN (
+      SELECT es_filter.expense_id
+      FROM expense_splits es_filter
+      LEFT JOIN settlements st_filter ON es_filter.settlement_id = st_filter.id
+      JOIN expenses e_filter ON es_filter.expense_id = e_filter.id
+      WHERE es_filter.user_id != e_filter.paid_by
+      GROUP BY es_filter.expense_id
+      HAVING 
+        CASE 
+          WHEN COUNT(*) = 0 THEN '${SETTLEMENT_STATUS.CONFIRMED}'
+          WHEN BOOL_AND(COALESCE(st_filter.status = '${SETTLEMENT_STATUS.CONFIRMED}', FALSE)) THEN '${SETTLEMENT_STATUS.CONFIRMED}'
+          WHEN BOOL_AND(COALESCE(st_filter.status IN ('${SETTLEMENT_STATUS.CONFIRMED}', '${SETTLEMENT_STATUS.PAID}'), FALSE)) THEN '${SETTLEMENT_STATUS.PAID}'
+          ELSE '${SETTLEMENT_STATUS.PENDING}'
+        END = ?
+    )`;
+    queryParams.push(settlementStatus);
+  }
+
   const totalCount = await db.raw(
     `SELECT COUNT(*) AS total_count
      FROM expenses e
-     WHERE e.paid_by = ? OR (
-       e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
-       AND e.expense_status != 'draft'
-     )`,
-    [userId, userId],
+     ${whereClause}`,
+    queryParams,
   );
 
   const total = Number(totalCount.rows[0].total_count);
@@ -332,10 +421,7 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
     FROM (
       SELECT *
       FROM expenses e
-      WHERE e.paid_by = ? OR (
-        e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
-        AND e.expense_status != 'draft'
-      )
+      ${whereClause}
       ORDER BY e.expense_date DESC
       LIMIT ? OFFSET ?
     ) e
@@ -390,16 +476,15 @@ async function getUserExpenses(userId: string, limit: number, offset: number) {
     [
       SETTLEMENT_STATUS.PENDING,
       userId, // [1] CASE paid_by
-      userId, // [2] Subquery paid_by
-      userId, // [3] Subquery splits
+      ...queryParams, // [2, 3] Subquery filters
       limit, // [4] LIMIT
       offset, // [5] OFFSET
+      SETTLEMENT_STATUS.CONFIRMED, // Result for COUNT(*) = 0
       SETTLEMENT_STATUS.CONFIRMED,
       SETTLEMENT_STATUS.CONFIRMED,
       SETTLEMENT_STATUS.CONFIRMED,
       SETTLEMENT_STATUS.PAID,
-      SETTLEMENT_STATUS.CONFIRMED,
-      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.PAID, // Result for mix
       SETTLEMENT_STATUS.PENDING,
       userId, // [6] Lateral total_received_by_me (paid_by)
       userId, // [7] Lateral total_received_by_me (user_id !=)

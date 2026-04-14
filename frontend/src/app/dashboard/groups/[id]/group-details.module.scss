@@ -195,7 +195,165 @@
 .mainColumn {
   display: flex;
   flex-direction: column;
-  gap: $space-8;
+  gap: $space-4; // Reduced from $space-8
+}
+
+.expenseHeaderActions {
+  @include flex-between;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  margin-bottom: $space-3 !important;
+  width: 100%;
+
+  .tabsWrapper {
+    display: inline-flex;
+    gap: $space-2;
+    background: var(--bg-tertiary);
+    padding: 4px;
+    border-radius: $radius-xl;
+  }
+}
+
+.filterActions {
+  display: flex;
+  gap: $space-3;
+}
+
+.filterToggleBtn {
+  position: relative;
+  svg {
+    font-size: 1.1rem;
+  }
+
+  .filterDot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background: var(--color-danger);
+    border-radius: 50%;
+    border: 2px solid #fff;
+  }
+}
+
+.filterBar {
+  @include card;
+  padding: $space-3 $space-6; // Slightly reduced padding
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  margin-bottom: $space-2;
+  margin-top: -$space-1; // Slightly adjust to bring closer to tabs
+  animation: slideDown 0.3s ease-out;
+
+  .filterGroup {
+    display: flex;
+    align-items: flex-end;
+    gap: $space-6;
+    flex-wrap: wrap;
+  }
+
+  .inputWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+
+    label, .label {
+     font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: var(--text-primary);
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .filterSelectWrapper {
+    width: 200px;
+    gap: $space-2 !important;
+
+    // Override the custom Select component's trigger height for better fit
+    [class*="trigger"] {
+      height: 38px;
+      padding-top: 0;
+      padding-bottom: 0;
+      background: var(--bg-tertiary);
+    }
+  }
+
+  .filterActions {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+    margin-left: $space-2;
+    align-self: flex-end;
+    padding-bottom: 2px;
+  }
+
+  .dateInput, .filterSelect {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 $space-4;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-default);
+    border-radius: $radius-md;
+    transition: all $transition-base;
+    height: 38px;
+    
+
+    input, select {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: var(--text-primary);
+      width: 130px;
+      cursor: pointer;
+    }
+
+    &:focus-within, &:hover {
+      background: #fff;
+      border-color: var(--color-primary);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    }
+
+    svg {
+      color: var(--text-tertiary);
+      font-size: 1.1rem;
+    }
+  }
+
+  .filterSelect {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $space-3 center;
+    background-size: 1rem;
+    padding-right: $space-10;
+
+    select {
+      width: 100%;
+    }
+  }
+
+  .clearFilters {
+    @include flex-center;
+    gap: $space-2;
+    padding: $space-2 $space-4;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color $transition-fast;
+    height: 40px;
+
+    &:hover {
+      color: var(--color-danger);
+    }
+  }
 }
 
 .tabHeader {
@@ -232,6 +390,23 @@
     color: var(--color-primary);
     box-shadow: $shadow-sm;
   }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expenseSection {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2; // Further reduced from $space-4
 }
 
 // ── Expenses List ──

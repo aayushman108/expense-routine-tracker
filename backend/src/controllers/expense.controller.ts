@@ -40,7 +40,7 @@ const getExpense = asyncHandler(async (req: Request, res: Response) => {
 
 const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
   const { groupId } = req.params;
-  const { page, limit } = req.query;
+  const { page, limit, startDate, endDate, expenseStatus, settlementStatus } = req.query;
   const pageNumber = Number(page || 1);
   const pageLimit = Number(limit || 10);
   const pageOffset = Number((pageNumber - 1) * pageLimit);
@@ -50,6 +50,10 @@ const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
     req.userId as string,
     pageLimit,
     pageOffset,
+    startDate as string,
+    endDate as string,
+    expenseStatus as string,
+    settlementStatus as string,
   );
 
   const { total, data } = expenses;
@@ -71,7 +75,7 @@ const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
 const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId as string;
 
-  const { page, limit } = req.query;
+  const { page, limit, startDate, endDate, expenseStatus, settlementStatus } = req.query;
   const pageNumber = Number(page || 1);
   const pageLimit = Number(limit || 10);
   const pageOffset = Number((pageNumber - 1) * pageLimit);
@@ -80,6 +84,10 @@ const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
     userId,
     pageLimit,
     pageOffset,
+    startDate as string,
+    endDate as string,
+    expenseStatus as string,
+    settlementStatus as string,
   );
 
   const pagination = generatePaginationObj({
