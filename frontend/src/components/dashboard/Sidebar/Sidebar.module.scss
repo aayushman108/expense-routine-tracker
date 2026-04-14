@@ -90,6 +90,7 @@
       }
 
       .avatar {
+        position: relative;
         width: 44px;
         height: 44px;
         margin: 0;
@@ -127,6 +128,8 @@
     height: 36px;
     border-radius: $radius-md;
     background: var(--gradient-primary);
+    position: relative;
+    overflow: hidden;
     color: #fff;
     font-size: $font-size-md;
     flex-shrink: 0;

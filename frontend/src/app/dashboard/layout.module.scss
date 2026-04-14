@@ -12,6 +12,7 @@
   margin-left: 260px;
   @include flex-column;
   transition: margin-left $transition-base;
+  position: relative;
 
   &.collapsed {
     margin-left: 72px;
@@ -27,6 +28,7 @@
   padding: $space-8;
   overflow-y: auto;
   @include styled-scrollbar;
+  position: relative;
 
   @include mobile-only {
     padding: $space-4;
