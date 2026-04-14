@@ -190,7 +190,7 @@ export default function GroupDetailsPage() {
                 <HiOutlineChartPie />
               )}
             </div>
-            <div>
+            <div className={styles.textDetails}>
               <h1>{groupDetails.data.name}</h1>
               <p>
                 {groupDetails.data.description ||
@@ -224,13 +224,13 @@ export default function GroupDetailsPage() {
               className={`${styles.tab} ${activeTab === "expenses" ? styles.active : ""}`}
               onClick={() => setActiveTab("expenses")}
             >
-              Expenses
+              <HiOutlineCurrencyDollar /> Expenses
             </div>
             <div
               className={`${styles.tab} ${activeTab === "settlements" ? styles.active : ""}`}
               onClick={() => setActiveTab("settlements")}
             >
-              Settlements
+              <HiCheck /> Settlements
             </div>
           </div>
 
@@ -251,58 +251,70 @@ export default function GroupDetailsPage() {
                       className={styles.expenseCard}
                       onClick={() => setSelectedExpenseId(expense.id)}
                     >
-                      <div className={styles.date}>
-                        <span className={styles.day}>{day}</span>
-                        <span className={styles.month}>{month}</span>
-                      </div>
-                      <div className={styles.info}>
-                        <div className={styles.desc}>
-                          <span className={styles.titleText}>
-                            {expense.description}
+                      <div className={styles.cardHeader}>
+                        <div className={styles.amountSection}>
+                          <span className={styles.currency}>
+                            {expense.currency}
                           </span>
-                          <div className={styles.tagsRow}>
-                            <span
-                              className={`${styles.tag} ${styles[expense.expense_status]}`}
-                            >
-                              STATUS - {expense.expense_status.toUpperCase()}
-                            </span>
-                            {expense.expense_status === "verified" &&
-                              expense.settlement_status && (
-                                <span
-                                  className={`${styles.tag} ${styles[expense.settlement_status]}`}
-                                >
-                                  SETTLEMENT -{" "}
-                                  {expense.settlement_status === "personal"
-                                    ? "PRIVATE"
-                                    : expense.settlement_status.toUpperCase()}
-                                </span>
-                              )}
-                            {expense.expense_status === "draft" && (
-                              <button
-                                className={styles.inlineSubmitBtn}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleUpdateStatus(
-                                    expense.id,
-                                    EXPENSE_STATUS.SUBMITTED,
-                                  );
-                                }}
-                              >
-                                Submit Expense
-                              </button>
-                            )}
-                          </div>
+                          <span className={styles.amountValue}>
+                            {Number(expense.total_amount).toLocaleString()}
+                          </span>
                         </div>
-                        <div className={styles.payer}>
-                          {isPayer ? (
-                            <span
-                              style={{
-                                color: "var(--color-primary)",
-                                fontWeight: 500,
+                        <div className={styles.date}>
+                          <span className={styles.day}>{day}</span>
+                          <span className={styles.month}>{month}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.cardBody}>
+                        <span className={styles.titleText}>
+                          {expense.description}
+                        </span>
+                        <div className={styles.tagsRow}>
+                          <span
+                            className={`${styles.tag} ${styles[expense.expense_status]}`}
+                          >
+                            Expense: {expense.expense_status.toUpperCase()}
+                          </span>
+                          {expense.expense_status === "verified" &&
+                            expense.settlement_status && (
+                              <span
+                                className={`${styles.tag} ${styles[expense.settlement_status]}`}
+                              >
+                                Settlement:{" "}
+                                {expense.settlement_status === "personal"
+                                  ? "PRIVATE"
+                                  : expense.settlement_status.toUpperCase()}
+                              </span>
+                            )}
+                          {expense.expense_status === "draft" && (
+                            <button
+                              className={styles.inlineSubmitBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateStatus(
+                                  expense.id,
+                                  EXPENSE_STATUS.SUBMITTED,
+                                );
                               }}
                             >
-                              You
-                            </span>
+                              Submit
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className={styles.cardFooter}>
+                        <span className={styles.dateBadge}>
+                          {new Date(expense.expense_date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                        <span className={styles.payer}>
+                          {isPayer ? (
+                            <span className={styles.payerHighlight}>You</span>
                           ) : (
                             <span>
                               {expense.payer?.full_name ||
@@ -310,28 +322,8 @@ export default function GroupDetailsPage() {
                                 "Member"}
                             </span>
                           )}{" "}
-                          paid{" "}
-                          <span
-                            style={{
-                              fontWeight: 600,
-                              color: "var(--color-primary)",
-                            }}
-                          >
-                            {expense.currency}{" "}
-                            {Number(expense.total_amount).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className={styles.amount}>
-                        <div className={styles.value}>
-                          {expense.currency}{" "}
-                          {Number(expense.total_amount).toLocaleString()}
-                        </div>
-                        <div className={styles.status}>
-                          {expense.splits?.length
-                            ? `Split by ${expense.splits.length}`
-                            : "Unsplit"}
-                        </div>
+                          paid
+                        </span>
                       </div>
                     </div>
                   );
@@ -391,8 +383,6 @@ export default function GroupDetailsPage() {
                         </div>
                       </div>
                       <div className={styles.amountWrap}>
-                        {/* DEBUG INFO: Remove later */}
-                        {/* <div style={{fontSize: '8px', opacity: 0.5}}>ME: {user?.id.slice(0,8)} | T: {balance.to_user_id.slice(0,8)} | F: {balance.from_user_id.slice(0,8)}</div> */}
                         <div className={styles.amount}>
                           रू {Number(balance.total_amount).toLocaleString()}
                         </div>
@@ -454,16 +444,14 @@ export default function GroupDetailsPage() {
           {/* Stats Section */}
           <section className={styles.sidebarSection}>
             <h3>Group Overview</h3>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              <div className={styles.statsRow}>
+            <div className={styles.statsContainer}>
+              <div className={styles.statBox}>
                 <span className={styles.statLabel}>Total Spending</span>
                 <span className={styles.statValue}>
                   रू {totalGroupSpend.toLocaleString()}
                 </span>
               </div>
-              <div className={styles.statsRow}>
+              <div className={styles.statBox}>
                 <span className={styles.statLabel}>Your Net Balance</span>
                 <span
                   className={`${styles.statValue} ${
@@ -477,14 +465,14 @@ export default function GroupDetailsPage() {
                   {netPosition > 0 ? "+" : ""} रू {netPosition.toLocaleString()}
                 </span>
               </div>
-              <div className={styles.createdInfo}>
-                <span className={styles.label}>Created</span>
-                <span className={styles.value}>
-                  {formatDate(groupDetails.data.created_at).month}{" "}
-                  {formatDate(groupDetails.data.created_at).day},{" "}
-                  {formatDate(groupDetails.data.created_at).year}
-                </span>
-              </div>
+            </div>
+            <div className={styles.createdInfo}>
+              <span className={styles.label}>Created:</span>
+              <span className={styles.value}>
+                {formatDate(groupDetails.data.created_at).month}{" "}
+                {formatDate(groupDetails.data.created_at).day},{" "}
+                {formatDate(groupDetails.data.created_at).year}
+              </span>
             </div>
           </section>
 
@@ -518,21 +506,15 @@ export default function GroupDetailsPage() {
                       <div className={styles.name}>
                         {member.user?.full_name}
                         {user?.id === member.user?.id && (
-                          <span
-                            style={{
-                              color: "var(--color-primary)",
-                              fontSize: "0.75rem",
-                              marginLeft: "0.25rem",
-                            }}
-                          >
+                          <span className={styles.meBadge}>
                             (You)
                           </span>
                         )}
                       </div>
+                      <div className={styles.email}>{member.user?.email}</div>
                       <div className={styles.role}>{member.role}</div>
                     </div>
                   </Link>
-                  {/* Future: Net Balance for each member */}
                 </div>
               ))}
             </div>
@@ -543,13 +525,7 @@ export default function GroupDetailsPage() {
                 size="sm"
                 onClick={() => setIsAddMemberModalOpen(true)}
               >
-                <span
-                  style={{
-                    marginRight: "0.25rem",
-                    fontSize: "1.125rem",
-                    display: "flex",
-                  }}
-                >
+                <span style={{ display: "flex", marginRight: "0.5rem" }}>
                   <HiOutlineUserAdd />
                 </span>{" "}
                 Add Member

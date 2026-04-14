@@ -9,7 +9,6 @@ import {
   HiOutlineShoppingBag,
   HiOutlineLightBulb,
   HiOutlineTruck,
-  HiOutlineDotsVertical,
   HiOutlineUserCircle,
   HiOutlineChartBar,
   HiOutlineArrowNarrowDown,
@@ -195,23 +194,37 @@ export default function PersonalDetailsPage() {
         ? mySplit?.split_amount || 0
         : expense.total_amount;
 
+    const isGroup = expense.expense_type === EXPENSE_TYPE.GROUP;
+
     return (
       <div
         key={expense.id}
         className={styles.expenseItem}
         onClick={() => setSelectedExpenseId(expense.id)}
       >
-        <div className={styles.iconWrap}>
-          {getCategoryIcon(expense.description || "")}
+        <div className={styles.cardHeader}>
+          <div className={styles.amountSection}>
+            <span className={styles.currency}>रू</span>
+            <span className={styles.amountValue}>
+              {Number(amountToShow).toLocaleString()}
+            </span>
+          </div>
+          <span className={`${styles.typeBadge} ${isGroup ? styles.group : styles.personal}`}>
+            {isGroup ? "Group" : "Personal"}
+          </span>
         </div>
-        <div className={styles.info}>
+
+        <div className={styles.cardBody}>
+          <div className={styles.iconWrap}>
+            {getCategoryIcon(expense.description || "")}
+          </div>
           <span className={styles.title}>
             {expense.description || "Unnamed Expense"}
           </span>
-          {expense.expense_type === EXPENSE_TYPE.GROUP && (
+          {isGroup && (
             <div className={styles.tagsRow}>
               <span className={`${styles.tag} ${styles[expense.expense_status]}`}>
-                STATUS - {expense.expense_status.toUpperCase()}
+                Expense: {expense.expense_status.toUpperCase()}
               </span>
               {expense.expense_status === "draft" && (
                 <button
@@ -221,25 +234,25 @@ export default function PersonalDetailsPage() {
                     handleUpdateStatus(expense.id, "submitted");
                   }}
                 >
-                  Submit Expense
+                  Submit
                 </button>
               )}
             </div>
           )}
-          <span className={styles.meta}>
-            {new Date(expense.expense_date).toLocaleDateString()} •{" "}
-            {expense.currency}{" "}
-            {expense.expense_type === EXPENSE_TYPE.GROUP
-              ? `• ${expense.group_name}`
-              : "• Personal"}
+        </div>
+
+        <div className={styles.cardFooter}>
+          <span className={styles.date}>
+            {new Date(expense.expense_date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
           </span>
+          {isGroup && (
+            <span className={styles.groupName}>{expense.group_name}</span>
+          )}
         </div>
-        <div className={styles.amount}>
-          रू {Number(amountToShow).toLocaleString()}
-        </div>
-        <Button variant="ghost" iconOnly>
-          <HiOutlineDotsVertical />
-        </Button>
       </div>
     );
   };
