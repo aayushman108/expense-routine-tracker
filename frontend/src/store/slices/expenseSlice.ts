@@ -11,6 +11,14 @@ interface ExpenseState {
   personalExpenses: Expense[];
   groupExpenses: Expense[];
   currentExpense: Expense | null;
+  summary: {
+    lifetimeSpend: number;
+    currentMonthSpend: number;
+    personalSpend: number;
+    groupSpend: number;
+    remainingToPay: number;
+    remainingToReceive: number;
+  } | null;
   isLoading: boolean;
   error: string | null;
   pagination: {
@@ -26,6 +34,7 @@ const initialState: ExpenseState = {
   personalExpenses: [],
   groupExpenses: [],
   currentExpense: null,
+  summary: null,
   isLoading: false,
   error: null,
   pagination: null,
@@ -61,6 +70,21 @@ export const fetchUserExpenses = createAsyncThunk<
     );
   }
 });
+
+export const fetchUserSummary = createAsyncThunk<ExpenseState["summary"], void>(
+  "expenses/fetchUserSummary",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get("/expenses/user/summary");
+      return data.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch summary",
+      );
+    }
+  },
+);
 
 export const fetchGroupExpenses = createAsyncThunk<
   { data: Expense[]; pagination: any },
@@ -197,6 +221,11 @@ const expenseSlice = createSlice({
     builder.addCase(fetchUserExpenses.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload as string;
+    });
+
+    // User summary
+    builder.addCase(fetchUserSummary.fulfilled, (state, action) => {
+      state.summary = action.payload;
     });
 
     // Group expenses

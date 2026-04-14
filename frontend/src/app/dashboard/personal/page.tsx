@@ -15,7 +15,7 @@ import {
   HiOutlineArrowNarrowUp,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchUserExpenses, updateExpense } from "@/store/slices/expenseSlice";
+import { fetchUserExpenses, updateExpense, fetchUserSummary } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
@@ -31,7 +31,7 @@ import {
 export default function PersonalDetailsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { expenses, personalExpenses, isLoading } = useAppSelector(
+  const { expenses, personalExpenses, summary, isLoading } = useAppSelector(
     (s: RootState) => s.expenses,
   );
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -45,12 +45,16 @@ export default function PersonalDetailsPage() {
 
   useEffect(() => {
     handleThunk(dispatch(fetchUserExpenses()));
+    handleThunk(dispatch(fetchUserSummary()));
   }, [dispatch]);
 
   const handleUpdateStatus = async (id: string, status: string) => {
     await handleThunk(
       dispatch(updateExpense({ id, body: { expenseStatus: status as any } })),
-      () => handleThunk(dispatch(fetchUserExpenses())),
+      () => {
+        handleThunk(dispatch(fetchUserExpenses()));
+        handleThunk(dispatch(fetchUserSummary()));
+      },
     );
   };
 
@@ -116,63 +120,18 @@ export default function PersonalDetailsPage() {
     return Object.values(groups);
   }, [expenses, user]);
 
-  // Calculations depends on groupedSummaries
+  // This is still useful for section-specific totals if needed, 
+  // but the main cards now come from the API.
   const calculations = useMemo(() => {
-    // Personal expenses always count — no status workflow
-    const personal = personalExpenses.reduce(
-      (acc, curr) => acc + Number(curr.total_amount || 0),
-      0,
-    );
-
-    const actualGroupSpend = expenses
-      .filter(
-        (e) =>
-          e.expense_type === EXPENSE_TYPE.GROUP &&
-          e.expense_status === EXPENSE_STATUS.VERIFIED,
-      )
-      .reduce((acc, curr) => {
-        const mySplit = curr.splits?.find(
-          (s: any) => s.user.id === user?.id || s.user_id === user?.id,
-        );
-        const myShare = Number(mySplit?.split_amount || 0);
-
-        if (curr.paid_by === user?.id) {
-          // If I paid, my share is effectively spent cash
-          return acc + myShare;
-        } else {
-          // If somebody else paid, I only count what I've actually settled/paid back
-          return acc + Number(curr.total_paid_by_me || 0);
-        }
-      }, 0);
-
-    const settlementsReceived = expenses.reduce(
-      (acc, curr) => acc + Number(curr.total_received_by_me || 0),
-      0,
-    );
-    const settlementsPaid = expenses.reduce(
-      (acc, curr) => acc + Number(curr.total_paid_by_me || 0),
-      0,
-    );
-
-    const totalIOwe = groupedSummaries.reduce(
-      (acc, g) => acc + g.iOweOthers,
-      0,
-    );
-    const totalOthersOweMe = groupedSummaries.reduce(
-      (acc, g) => acc + g.othersOweMe,
-      0,
-    );
-
     return {
-      personal,
-      groupOnly: actualGroupSpend,
-      total: personal + actualGroupSpend,
-      settlementsReceived,
-      settlementsPaid,
-      totalIOwe,
-      totalOthersOweMe,
+      personal: summary?.personalSpend || 0,
+      total: summary?.lifetimeSpend || 0,
+      currentMonthTotal: summary?.currentMonthSpend || 0,
+      totalIOwe: summary?.remainingToPay || 0,
+      totalOthersOweMe: summary?.remainingToReceive || 0,
+      groupOnly: summary?.groupSpend || 0,
     };
-  }, [expenses, personalExpenses, user, groupedSummaries]);
+  }, [summary]);
 
   const getCategoryIcon = (desc: string) => {
     const d = (desc || "").toLowerCase();
@@ -199,60 +158,100 @@ export default function PersonalDetailsPage() {
     return (
       <div
         key={expense.id}
-        className={styles.expenseItem}
+        className={`${styles.expenseItem} ${!isGroup ? styles.personalCard : ""}`}
         onClick={() => setSelectedExpenseId(expense.id)}
       >
-        <div className={styles.cardHeader}>
-          <div className={styles.amountSection}>
-            <span className={styles.currency}>रू</span>
-            <span className={styles.amountValue}>
-              {Number(amountToShow).toLocaleString()}
-            </span>
-          </div>
-          <span className={`${styles.typeBadge} ${isGroup ? styles.group : styles.personal}`}>
-            {isGroup ? "Group" : "Personal"}
-          </span>
-        </div>
-
-        <div className={styles.cardBody}>
-          <div className={styles.iconWrap}>
-            {getCategoryIcon(expense.description || "")}
-          </div>
-          <span className={styles.title}>
-            {expense.description || "Unnamed Expense"}
-          </span>
-          {isGroup && (
-            <div className={styles.tagsRow}>
-              <span className={`${styles.tag} ${styles[expense.expense_status]}`}>
-                Expense: {expense.expense_status.toUpperCase()}
+        {!isGroup ? (
+          <>
+            <div className={styles.personalBadgeRow}>
+              <span className={styles.personalBadge}>
+                <span className={styles.dot} /> Personal
               </span>
-              {expense.expense_status === "draft" && (
-                <button
-                  className={styles.inlineSubmitBtn}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleUpdateStatus(expense.id, "submitted");
-                  }}
-                >
-                  Submit
-                </button>
-              )}
+              <span className={styles.categoryLabel}>{expense.category || "General"}</span>
             </div>
-          )}
-        </div>
+            
+            <div className={styles.cardMain}>
+              <div className={styles.categoryIconWrap}>
+                {getCategoryIcon(expense.description || "")}
+              </div>
+              <div className={styles.amountWrap}>
+                <span className={styles.currency}>रू</span>
+                <span className={styles.amountValue}>
+                  {Number(amountToShow).toLocaleString()}
+                </span>
+              </div>
+            </div>
 
-        <div className={styles.cardFooter}>
-          <span className={styles.date}>
-            {new Date(expense.expense_date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </span>
-          {isGroup && (
-            <span className={styles.groupName}>{expense.group_name}</span>
-          )}
-        </div>
+            <div className={styles.contentWrap}>
+              <h4 className={styles.expenseTitle}>
+                {expense.description || "Unnamed Expense"}
+              </h4>
+              <p className={styles.expenseDate}>
+                {new Date(expense.expense_date).toLocaleDateString("en-US", {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </p>
+            </div>
+
+            <div className={styles.cardAction}>
+              <span>Tap for details</span>
+              <div className={styles.arrow}>→</div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.cardHeader}>
+              <div className={styles.amountSection}>
+                <span className={styles.currency}>रू</span>
+                <span className={styles.amountValue}>
+                  {Number(amountToShow).toLocaleString()}
+                </span>
+              </div>
+              <span className={`${styles.typeBadge} ${styles.group}`}>
+                Group
+              </span>
+            </div>
+
+            <div className={styles.cardBody}>
+              <div className={styles.iconWrap}>
+                {getCategoryIcon(expense.description || "")}
+              </div>
+              <span className={styles.title}>
+                {expense.description || "Unnamed Expense"}
+              </span>
+              <div className={styles.tagsRow}>
+                <span className={`${styles.tag} ${styles[expense.expense_status]}`}>
+                  Expense: {expense.expense_status.toUpperCase()}
+                </span>
+                {expense.expense_status === "draft" && (
+                  <button
+                    className={styles.inlineSubmitBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateStatus(expense.id, "submitted");
+                    }}
+                  >
+                    Submit
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.cardFooter}>
+              <span className={styles.date}>
+                {new Date(expense.expense_date).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+              <span className={styles.groupName}>{expense.group_name}</span>
+            </div>
+          </>
+        )}
       </div>
     );
   };
@@ -303,12 +302,37 @@ export default function PersonalDetailsPage() {
         </Card>
         <Card>
           <div className={styles.cardContent}>
+            <span className={styles.cardLabel}>Current Month Spend</span>
+            <span className={styles.cardValue}>
+              रू {calculations.currentMonthTotal.toLocaleString()}
+            </span>
+            <span className={`${styles.cardSub} ${styles.success}`}>
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+        </Card>
+        <Card>
+          <div className={styles.cardContent}>
             <span className={styles.cardLabel}>Personal Spend</span>
             <span className={styles.cardValue}>
               रू {calculations.personal.toLocaleString()}
             </span>
             <span className={`${styles.cardSub} ${styles.secondary}`}>
               Non-group expenses
+            </span>
+          </div>
+        </Card>
+        <Card>
+          <div className={styles.cardContent}>
+            <span className={styles.cardLabel}>Group Spend</span>
+            <span className={styles.cardValue}>
+              रू {calculations.groupOnly.toLocaleString()}
+            </span>
+            <span className={`${styles.cardSub} ${styles.secondary}`}>
+              Your verified group shares
             </span>
           </div>
         </Card>

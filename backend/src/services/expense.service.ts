@@ -190,12 +190,17 @@ async function updateSplitStatus(
   return newExpenseStatus;
 }
 
+async function getUserSummary(userId: string) {
+  return await expenseDao.getUserSummary(userId);
+}
+
 export const expenseService = {
   addExpense,
   updateExpense,
   getExpenseDetails,
   getGroupExpenses,
   getPersonalExpenses,
+  getUserSummary,
   deleteExpense,
   updateSplitStatus,
 };

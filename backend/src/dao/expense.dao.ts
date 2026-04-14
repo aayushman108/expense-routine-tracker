@@ -461,11 +461,11 @@ async function getUserExpenses(
         END AS overall_status,
         -- Calculation for amount others have paid me (if I'm the payer)
         COALESCE(SUM(es_all.split_amount) FILTER (
-          WHERE e.paid_by = ? AND es_all.user_id != ? AND st_all.status IN (?, ?)
+          WHERE e.paid_by = ? AND es_all.user_id != ? AND st_all.status = ?
         ), 0) AS total_received_by_me,
         -- Calculation for amount I have paid others (if I'm a spender)
         COALESCE(SUM(es_all.split_amount) FILTER (
-          WHERE es_all.user_id = ? AND e.paid_by != ? AND st_all.status IN (?, ?)
+          WHERE es_all.user_id = ? AND e.paid_by != ? AND st_all.status = ?
         ), 0) AS total_paid_by_me
       FROM expense_splits es_all
       LEFT JOIN settlements st_all ON es_all.settlement_id = st_all.id
@@ -488,11 +488,9 @@ async function getUserExpenses(
       SETTLEMENT_STATUS.PENDING,
       userId, // [6] Lateral total_received_by_me (paid_by)
       userId, // [7] Lateral total_received_by_me (user_id !=)
-      SETTLEMENT_STATUS.PAID,
       SETTLEMENT_STATUS.CONFIRMED,
       userId, // [8] Lateral total_paid_by_me (user_id)
       userId, // [9] Lateral total_paid_by_me (paid_by !=)
-      SETTLEMENT_STATUS.PAID,
       SETTLEMENT_STATUS.CONFIRMED,
     ],
   );
@@ -596,12 +594,98 @@ async function updateSplitStatus(
   });
 }
 
+async function getUserSummary(userId: string) {
+  const result = await db.raw(
+    `
+    WITH user_expenses AS (
+      SELECT 
+        e.id,
+        e.expense_type,
+        e.expense_status,
+        e.total_amount,
+        e.expense_date,
+        e.paid_by,
+        CASE 
+          WHEN e.expense_type = 'personal' THEN e.total_amount
+          ELSE COALESCE(es.split_amount, 0)
+        END as user_share,
+        CASE
+          WHEN e.expense_type = 'group' AND e.paid_by != ? THEN
+            COALESCE(es.split_amount, 0) - COALESCE(
+              (SELECT SUM(es_inner.split_amount) 
+               FROM expense_splits es_inner 
+               JOIN settlements st ON es_inner.settlement_id = st.id 
+               WHERE es_inner.expense_id = e.id AND es_inner.user_id = ? AND st.status = ?), 0
+            )
+          ELSE 0
+        END as i_owe,
+        CASE
+          WHEN e.expense_type = 'group' AND e.paid_by = ? THEN
+            (e.total_amount - COALESCE(es.split_amount, 0)) - COALESCE(
+              (SELECT SUM(es_inner.split_amount) 
+               FROM expense_splits es_inner 
+               JOIN settlements st ON es_inner.settlement_id = st.id 
+               WHERE es_inner.expense_id = e.id AND es_inner.user_id != e.paid_by AND st.status = ?), 0
+            )
+          ELSE 0
+        END as others_owe
+      FROM expenses e
+      LEFT JOIN expense_splits es ON e.id = es.expense_id AND es.user_id = ?
+      WHERE e.paid_by = ? OR e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
+    )
+    SELECT
+      -- Lifetime Spend (Personal + Verified Group Shares)
+      COALESCE(SUM(user_share) FILTER (WHERE expense_type = 'personal' OR (expense_type = 'group' AND expense_status = 'verified')), 0) as lifetime_spend,
+
+      -- Current Month Spend
+      COALESCE(SUM(user_share) FILTER (
+        WHERE (expense_type = 'personal' OR (expense_type = 'group' AND expense_status = 'verified'))
+        AND date_trunc('month', expense_date) = date_trunc('month', CURRENT_DATE)
+      ), 0) as current_month_spend,
+
+      -- Personal Spend
+      COALESCE(SUM(user_share) FILTER (WHERE expense_type = 'personal'), 0) as personal_spend,
+
+      -- Spend in Groups (All time, verified)
+      COALESCE(SUM(user_share) FILTER (WHERE expense_type = 'group' AND expense_status = 'verified'), 0) as group_spend,
+
+      -- Remaining to Pay (I owe others)
+      COALESCE(SUM(i_owe) FILTER (WHERE expense_type = 'group' AND expense_status = 'verified'), 0) as remaining_to_pay,
+
+      -- Remaining to Receive (Others owe me)
+      COALESCE(SUM(others_owe) FILTER (WHERE expense_type = 'group' AND expense_status = 'verified'), 0) as remaining_to_receive
+    FROM user_expenses
+    `,
+    [
+      userId,
+      userId,
+      SETTLEMENT_STATUS.CONFIRMED,
+      userId,
+      SETTLEMENT_STATUS.CONFIRMED,
+      userId,
+      userId,
+      userId,
+    ],
+  );
+
+  const row = result.rows[0];
+  return {
+    lifetimeSpend: Number(row.lifetime_spend || 0),
+    currentMonthSpend: Number(row.current_month_spend || 0),
+    personalSpend: Number(row.personal_spend || 0),
+    groupSpend: Number(row.group_spend || 0),
+    remainingToPay: Number(row.remaining_to_pay || 0),
+    remainingToReceive: Number(row.remaining_to_receive || 0),
+  };
+}
+
 export const expenseDao = {
   createExpense,
   updateExpense,
   getExpenseById,
   getGroupExpenses,
   getUserExpenses,
+  getUserSummary,
   deleteExpense,
   updateSplitStatus,
 };

@@ -105,6 +105,16 @@ const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const getSummary = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const summary = await expenseService.getUserSummary(userId);
+
+  return sendSuccessResponse(res, {
+    data: summary,
+    message: "User summary fetched successfully",
+  });
+});
+
 const deleteExpense = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await expenseService.deleteExpense(id, req.userId as string);
@@ -136,6 +146,7 @@ export const expenseController = {
   getExpense,
   getGroupExpenses,
   getUserExpenses,
+  getSummary,
   deleteExpense,
   updateSplitStatus,
 };

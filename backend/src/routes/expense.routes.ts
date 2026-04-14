@@ -26,6 +26,7 @@ router.patch(
   expenseController.updateSplitStatus,
 );
 router.get("/user", expenseController.getUserExpenses);
+router.get("/user/summary", expenseController.getSummary);
 router.get("/group/:groupId", expenseController.getGroupExpenses);
 router.get("/:id", expenseController.getExpense);
 router.delete("/:id", expenseController.deleteExpense);
