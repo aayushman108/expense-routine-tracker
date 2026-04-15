@@ -792,8 +792,7 @@
 .previewContainer {
   position: relative;
   width: 100%;
-  height: auto;
-  max-height: 400px;
+  height: 300px;
   border-radius: $radius-xl;
   overflow: hidden;
   border: 1px solid var(--border-default);

@@ -432,6 +432,7 @@ export default function BulkSettlementModal({
                   alt="Proof"
                   fill
                   unoptimized
+                  className={styles.previewImage}
                   style={{ objectFit: "contain" }}
                 />
                 <button className={styles.removeBtn} onClick={removeImage}>
@@ -449,9 +450,15 @@ export default function BulkSettlementModal({
             </div>
             <div className={styles.previewContainer}>
               <Image
-                src={balance.proof_image.url}
+                src={
+                  typeof balance.proof_image === "string"
+                    ? JSON.parse(balance.proof_image).url
+                    : balance.proof_image.url
+                }
                 alt="Proof"
                 fill
+                unoptimized
+                className={styles.previewImage}
                 style={{ objectFit: "contain" }}
               />
             </div>
