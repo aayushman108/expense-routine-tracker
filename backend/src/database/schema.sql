@@ -10,6 +10,19 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Payment Methods table
+CREATE TABLE payment_methods (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    provider VARCHAR(100) NOT NULL, --bank, khalti, e-sewa
+    metadata JSONB,
+    is_verified BOOLEAN DEFAULT FALSE,
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Groups table
 CREATE TABLE groups (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -78,18 +91,6 @@ CREATE TABLE expense_splits (
     CONSTRAINT unique_expense_user UNIQUE (expense_id, user_id)
 );
 
--- Payment Methods table
-CREATE TABLE payment_methods (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
-    provider VARCHAR(100) NOT NULL, --bank, khalti, e-sewa
-    metadata JSONB,
-    is_verified BOOLEAN DEFAULT FALSE,
-    is_default BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
 
 -- Settlements table
 CREATE TABLE settlements (

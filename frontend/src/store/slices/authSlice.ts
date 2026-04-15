@@ -1,4 +1,4 @@
-import api from "../../lib/api";
+import api, { cancelAllRequests } from "../../lib/api";
 import {
   AuthResponse,
   LoginPayload,
@@ -108,6 +108,7 @@ export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
+      cancelAllRequests();
       await api.get("/auth/logout");
       localStorage.removeItem("accessToken");
     } catch (err: unknown) {
