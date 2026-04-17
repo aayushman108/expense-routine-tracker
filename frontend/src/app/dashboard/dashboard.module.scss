@@ -1,502 +1,320 @@
 @use "../../styles/variables" as *;
 @use "../../styles/mixins" as *;
 
+// ═══════════════════════════════════════════════════
+// DASHBOARD — High-Density Operational cockpit
+// ═══════════════════════════════════════════════════
+
 .dashboard {
   @include flex-column;
-  gap: $space-10;
+  gap: $space-6;
+  padding-bottom: $space-10;
 }
 
-.statsGrid {
+// ── Animations ──
+@keyframes pulseGlow {
+  0% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+  100% { opacity: 0.3; transform: scale(1); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// ── Compact Infrastructure Stats ──
+.stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: $space-6;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: $space-4;
 }
 
 .statCard {
-  @include card;
-  display: flex;
-  align-items: center;
-  gap: $space-5;
-  padding: $space-6;
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-light);
+  padding: $space-5;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--border-light) !important;
-  transition: $transition-spring;
-  background: var(--bg-card);
+  transition: all $transition-base;
+  animation: slideIn 0.4s ease-out forwards;
+  box-shadow: var(--shadow-sm);
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg) !important;
-    border-color: var(--color-primary-100) !important;
+    border-color: var(--color-primary-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 
-    .statIcon {
-      transform: scale(1.1) rotate(5deg);
-    }
+    .statIcon { transform: scale(1.05); opacity: 0.6; }
+    .statGlow { opacity: 0.25; }
   }
+
+  &.blue { --theme-color: var(--color-primary); }
+  &.green { --theme-color: var(--color-success); }
+  &.yellow { --theme-color: var(--color-warning); }
+  &.red { --theme-color: var(--color-danger); }
+}
+
+.statGlow {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, var(--theme-color) 0%, transparent 70%);
+  opacity: 0.1;
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.statHeader {
+  @include flex-between;
+  align-items: flex-start;
+  margin-bottom: $space-4;
+}
+
+.statInfo { @include flex-column; gap: $space-1; }
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  @include flex-center;
+  background: color-mix(in srgb, var(--theme-color) 15%, transparent);
+  color: var(--theme-color);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  transition: all $transition-base;
+
+  .statCard:hover & {
+    transform: scale(1.05);
+    background: color-mix(in srgb, var(--theme-color) 25%, transparent);
+  }
+}
+
+// ── Refined Private Ledger ──
+.personalOverview {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  gap: $space-4;
+
+  @include mobile-only { grid-template-columns: 1fr; }
+}
+
+.personalCard {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: $space-8;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all $transition-base;
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    border-color: var(--color-primary-600);
+    box-shadow: var(--shadow-md);
+    .cardGlow { transform: scale(1.05); opacity: 0.4; }
+  }
+}
+
+.cardGlow {
+  position: absolute;
+  top: -30%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  opacity: 0.1;
+}
+
+.cardHeader {
+  @include flex-column;
+  gap: 4px;
+  margin-bottom: $space-6;
+  p { font-family: $font-mono; font-size: 10px; font-weight: 700; color: var(--color-primary-600); letter-spacing: 0.2em; }
+  h2 { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; margin: 0; }
+}
+
+.mainStats { display: flex; align-items: center; gap: $space-10; margin: $space-6 0; }
+
+.statDivider { width: 1px; height: 40px; background: var(--border-light); }
+
+.mainStat {
+  @include flex-column;
+  gap: 4px;
+  flex: 1;
+  .mainStatLabel { font-family: $font-mono; font-size: 10px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.05em; }
+  .mainStatValue {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    h3 { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin: 0; }
+    .labelIndicator { font-size: 10px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; }
+  }
+}
+
+.btnRow { display: flex; gap: $space-3; margin-top: $space-6; }
+
+.quickEntryBtn { height: 38px !important; padding: 0 $space-5 !important; font-size: 13px !important; }
+.ledgerBtn { height: 38px !important; background: var(--bg-hover) !important; color: var(--text-secondary) !important; font-size: 13px !important; border-color: var(--border-light) !important; }
+
+.chartSection {
+  width: 100%;
+}
+
+// ── Scaled-Down Financial Health ──
+.healthCard {
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: $space-6;
+  @include flex-column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.healthTitleContainer {
+  display: flex; align-items: center; gap: 8px;
+  h3 { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin: 0; }
+  .pulse { width: 8px; height: 8px; background: var(--color-success); border-radius: 50%; animation: pulseGlow 2s infinite; }
+}
+
+.healthHeader { p { color: var(--text-secondary); font-size: 12px; margin-top: 2px; } }
+
+.healthMain { padding: $space-4 0; }
+
+.balanceCircle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  @include flex-center;
+  margin: 0 auto;
+  
+  .balanceRing {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid var(--border-light);
+    border-top: 3px solid var(--color-success);
+    rotate: -45deg;
+  }
+}
+
+.balanceContent {
+  text-align: center;
+  .balanceLabel { font-family: $font-mono; font-size: 9px; color: var(--text-tertiary); margin-bottom: 2px; }
+  .balanceValue { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); }
+}
+
+.fullReport {
+  height: 38px !important;
+  font-size: 12px !important;
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+  border-radius: 10px !important;
+  padding: 0 $space-4 !important;
+  justify-content: space-between !important;
+  svg { font-size: 1rem; }
+}
+
+// ── Compact Operational Group Cards ──
+.groupSection { margin-top: $space-4; }
+
+.sectionActions {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+}
+
+.groupGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $space-5;
+}
+
+.groupItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all $transition-base;
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+
+  &:hover {
+    border-color: var(--color-primary-600);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    
+    .groupTitle h4 { color: var(--color-primary-600); }
+  }
+}
+
+.groupBanner {
+  height: 120px;
+  background: var(--bg-tertiary);
+  position: relative;
+  @include flex-center;
+  overflow: hidden;
 
   &::after {
     content: "";
     position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 140px;
-    height: 140px;
-    border-radius: $radius-full;
-    filter: blur(45px);
-    opacity: 0.12;
-    z-index: 0;
-    transition: $transition-slow;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%);
+    z-index: 2;
+    opacity: 0.1;
   }
 
-  &:hover::after {
-    opacity: 0.2;
-    transform: scale(1.2);
-  }
-
-  &.blue::after { background: var(--color-info); }
-  &.green::after { background: var(--color-success); }
-  &.orange::after { background: var(--color-warning); }
-  &.red::after { background: var(--color-danger); }
-
-  .statIcon {
-    @include flex-center;
-    width: 54px;
-    height: 54px;
-    border-radius: $radius-lg;
-    font-size: $font-size-2xl;
-    position: relative;
-    z-index: 1;
-    transition: $transition-base;
-    box-shadow: $shadow-sm;
-
-    &.blue {
-      background: var(--color-info-light);
-      color: var(--color-info);
-    }
-    &.green {
-      background: var(--color-success-light);
-      color: var(--color-success);
-    }
-    &.orange {
-      background: var(--color-warning-light);
-      color: var(--color-warning);
-    }
-    &.red {
-      background: var(--color-danger-light);
-      color: var(--color-danger);
-    }
-  }
-
-  .statInfo {
-    @include flex-column;
-    position: relative;
-    z-index: 1;
-
-    .statLabel {
-      font-size: 10px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      font-weight: $font-weight-extrabold;
-      letter-spacing: 0.08em;
-      margin-bottom: $space-1;
-    }
-
-    .statValue {
-      font-size: $font-size-xl;
-      font-weight: $font-weight-extrabold;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
-    }
-  }
+  svg { font-size: 3rem; color: var(--text-tertiary); position: relative; z-index: 3; opacity: 0.2; }
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: $space-6;
-
-  @include mobile-only {
-    grid-template-columns: 1fr;
-  }
-}
-
-.groupCard {
-  @include card;
-  padding: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  .image {
-    height: 140px;
-    background: var(--gradient-primary);
-    position: relative;
-    @include flex-center;
-    color: #fff;
-    font-size: $font-size-4xl;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  .details {
-    padding: $space-5;
-    flex: 1;
-    @include flex-column;
-    gap: $space-2;
-
-    .top {
-      @include flex-between;
-      margin-bottom: $space-1;
-    }
-
-    .name {
-      font-size: $font-size-lg;
-      font-weight: $font-weight-bold;
-      color: var(--text-primary);
-    }
-
-    .badge {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: $radius-full;
-      background: var(--bg-tertiary);
-      color: var(--text-secondary);
-      font-weight: $font-weight-semibold;
-      text-transform: uppercase;
-    }
-
-    .desc {
-      font-size: $font-size-sm;
-      color: var(--text-secondary);
-      @include truncate(2);
-      min-height: 2.8em;
-    }
-  }
-
-  .footer {
-    padding: $space-4 $space-5;
-    border-top: 1px solid var(--border-default);
-    background: var(--bg-tertiary);
-    @include flex-between;
-    font-size: $font-size-xs;
-    color: var(--text-tertiary);
-
-    .members {
-      display: flex;
-      align-items: center;
-      gap: $space-1;
-
-      svg {
-        font-size: $font-size-sm;
-      }
-    }
-  }
-}
-
-.emptyState {
-  @include card;
-  @include flex-center;
-  flex-direction: column;
-  padding: $space-16;
-  text-align: center;
-  gap: $space-4;
-  color: var(--text-secondary);
-  border: 2px dashed var(--border-default);
-  background: transparent;
-
-  .icon {
-    font-size: $font-size-5xl;
-    color: var(--text-tertiary);
-    opacity: 0.5;
-  }
-
-  h3 {
-    @include heading($font-size-lg);
-  }
-
-  p {
-    max-width: 320px;
-    margin: 0 auto;
-  }
-}
-
-.personalTrackerGrid {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: $space-6;
-  margin-bottom: $space-10;
-
-  @include mobile-only {
-    grid-template-columns: 1fr;
-  }
-}
-
-.featuredPersonalCard {
-  @include card;
-  padding: $space-8 !important;
-  background: var(--gradient-hero) !important;
-  color: white !important;
-  display: flex;
-  flex-direction: column;
-  gap: $space-8;
-  position: relative;
-  overflow: hidden;
-  border: none !important;
-  box-shadow: var(--shadow-xl) !important;
-
-  // Make sure all text inside is white or very close
-  h3, label, span, p {
-    color: white !important;
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -20%;
-    right: -10%;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.15) 0%,
-      transparent 70%
-    );
-    pointer-events: none;
-  }
-
-  .banner {
-    display: flex;
-    align-items: center;
-    gap: $space-4;
-
-    .iconGlow {
-      @include flex-center;
-      width: 56px;
-      height: 56px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(8px);
-      border-radius: $radius-xl;
-      font-size: $font-size-2xl;
-      color: white;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
-    }
-
-    .titleInfo {
-      @include flex-column;
-      
-      h3 {
-        margin: 0;
-        font-size: $font-size-xl;
-        font-weight: $font-weight-extrabold;
-        letter-spacing: -0.02em;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      .typeTag {
-        font-size: 10px;
-        text-transform: uppercase;
-        font-weight: $font-weight-bold;
-        letter-spacing: 0.1em;
-        opacity: 0.9;
-      }
-    }
-  }
-
-  .mainStats {
-    display: flex;
-    gap: $space-12;
-
-    @include mobile-only {
-      gap: $space-6;
-    }
-
-    .statItem {
-      @include flex-column;
-      gap: $space-1;
-
-      label {
-        font-size: $font-size-xs;
-        text-transform: uppercase;
-        font-weight: $font-weight-bold;
-        letter-spacing: 0.05em;
-        opacity: 0.85;
-      }
-
-      .amountWrap {
-        display: flex;
-        align-items: baseline;
-        gap: $space-1;
-
-        .currency {
-          font-size: $font-size-sm;
-          font-weight: $font-weight-bold;
-        }
-
-        .val {
-          font-size: $font-size-3xl;
-          font-weight: $font-weight-extrabold;
-          line-height: 1;
-        }
-      }
-    }
-  }
-
-  .miniFooter {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: $space-6;
-
-    .hint {
-      font-size: $font-size-sm;
-      opacity: 0.85;
-      line-height: $line-height-relaxed;
-      max-width: 440px;
-      margin: 0;
-    }
-
-    .btnGroup {
-      display: flex;
-      gap: $space-3;
-
-      .btn-quick-add {
-        background: white !important;
-        color: var(--color-primary) !important;
-        border: none !important;
-        font-weight: $font-weight-bold;
-        
-        &:hover {
-          background: #f8f9fc !important;
-          transform: translateY(-1px);
-        }
-      }
-
-      .btn-ledger {
-        background: rgba(255, 255, 255, 0.15) !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        backdrop-filter: blur(4px);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.25) !important;
-        }
-      }
-    }
-  }
-}
-
-.summaryBox {
-  @include card;
-  display: flex;
-  flex-direction: column;
-  padding: $space-8 !important;
-  border: 1px solid var(--border-default) !important;
-  justify-content: space-between;
-
-  .summaryHeader {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    margin-bottom: $space-1;
-
-    .trendIcon {
-      @include flex-center;
-      width: 40px;
-      height: 40px;
-      background: var(--color-primary-50);
-      border-radius: $radius-md;
-      font-size: $font-size-lg;
-      color: var(--color-primary);
-    }
-
-    h4 {
-      margin: 0;
-      font-size: $font-size-md;
-      font-weight: $font-weight-bold;
-      color: var(--text-primary);
-    }
-  }
-
-  .summaryDesc {
-    font-size: $font-size-sm;
-    color: var(--text-secondary);
-    line-height: $line-height-relaxed;
-
-    strong {
-      color: var(--text-primary);
-      font-weight: $font-weight-bold;
-    }
-  }
-
-  .netBalanceBox {
-    @include flex-column;
-    gap: $space-1;
-    padding: $space-4;
-    background: var(--bg-secondary);
-    border-radius: $radius-lg;
-    border: 1px solid var(--border-light);
-
-    label {
-      font-size: 10px;
-      text-transform: uppercase;
-      font-weight: $font-weight-bold;
-      color: var(--text-tertiary);
-      letter-spacing: 0.05em;
-    }
-
-    .netVal {
-      font-size: $font-size-2xl;
-      font-weight: $font-weight-extrabold;
-
-      &.positive { color: var(--color-success); }
-      &.negative { color: var(--color-danger); }
-    }
-  }
-
-  .progressSection {
-    @include flex-column;
-    gap: $space-3;
-
-    .progressBar {
-      height: 10px;
-      background: var(--bg-tertiary);
-      border-radius: $radius-full;
-      overflow: hidden;
-      position: relative;
-      border: 1px solid var(--border-light);
-
-      .progress {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        background: var(--color-primary);
-        border-radius: $radius-full;
-        transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-    }
-
-    .progressLabels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      font-weight: $font-weight-extrabold;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      letter-spacing: 0.05em;
-      opacity: 0.7;
-    }
-  }
-}
-
-.actions {
-  display: flex;
-  align-items: center;
+.groupBody {
+  padding: $space-4 $space-5;
+  @include flex-column;
   gap: $space-3;
 }
 
+.groupTop {
+  @include flex-between;
+  align-items: flex-start;
+  h4 { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0; transition: color 0.3s ease; }
+  .activeBadge { font-family: $font-mono; font-size: 9px; padding: 2px 6px; background: var(--color-success-light); color: var(--color-success); border: 1px solid var(--border-light); border-radius: 4px; text-transform: uppercase; }
+}
+
+.groupMeta {
+  display: flex; gap: $space-3;
+  span { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); font-weight: 600; svg { font-size: 0.9rem; color: var(--color-primary); } }
+}
+
+.groupFooter {
+  padding: $space-2 $space-5;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-light);
+  @include flex-between;
+  span { font-family: $font-mono; font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.05em; }
+}
+
+.skeletonCard { height: 220px; border-radius: 12px; background: var(--skeleton-base); }

@@ -1,6 +1,10 @@
 @use "../../../styles/variables" as *;
 @use "../../../styles/mixins" as *;
 
+// ═══════════════════════════════════════════════════
+// SIDEBAR — Clean Enterprise Navigator
+// ═══════════════════════════════════════════════════
+
 .sidebar {
   position: fixed;
   top: 0;
@@ -8,159 +12,44 @@
   bottom: 0;
   width: 260px;
   background: var(--bg-card);
-  border-right: 1px solid var(--border-default);
+  border-right: 1px solid var(--border-light);
   @include flex-column;
   z-index: $z-sticky;
-  transition:
-    transform $transition-base,
-    width $transition-base;
-  overflow: hidden;
+  transition: width $transition-base;
+
+  &.collapsed { width: 72px; }
 
   @include mobile-only {
-    z-index: $z-overlay + 10;
-    width: 280px;
-  }
-
-  &.collapsed {
     width: 72px;
-
-    .logo {
-      padding: $space-6 0;
-      justify-content: center;
-
-      span {
-        display: none !important;
-      }
-
-      .collapseBtn {
-        display: none;
-      }
-    }
-
-    .nav {
-      padding: $space-4 0;
-    }
-
-    .navItem {
-      justify-content: center;
-      padding: $space-3 0;
-      gap: 0;
-
-      &.logoutBtn {
-        display: flex;
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        background: rgba(239, 68, 68, 0.05);
-        padding: 0;
-        margin: $space-4 auto;
-        width: 44px;
-        height: 44px;
-        border-radius: $radius-full;
-        justify-content: center;
-        align-items: center;
-
-        &:hover {
-          background: rgba(239, 68, 68, 0.1);
-        }
-      }
-
-      span {
-        display: none !important;
-      }
-
-      svg {
-        margin: 0;
-      }
-    }
-
-    .navLabel {
-      display: none !important;
-    }
-
-    .userSection {
-      padding: $space-4 0;
-    }
-
-    .userCard {
-      justify-content: center;
-      padding: $space-2 0;
-      gap: 0;
-
-      .userInfo {
-        display: none !important;
-      }
-
-      .avatar {
-        position: relative;
-        width: 44px;
-        height: 44px;
-        margin: 0;
-      }
-    }
-  }
-
-  @include mobile-only {
-    transform: translateX(0); // Visible by default as rail
-    width: 72px; // Start as rail on mobile
-    transition: width $transition-base;
-
-    &.mobileOpen {
-      width: 280px; // Expand to full drawer width
-      z-index: $z-overlay + 10;
-    }
+    &.mobileOpen { width: 280px; }
   }
 }
 
 .logo {
   @include flex-between;
   padding: $space-6;
-  border-bottom: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-light);
 
   a {
     display: flex;
     align-items: center;
     gap: $space-3;
     text-decoration: none;
+    span {
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: $font-size-lg;
+    }
   }
 
   .logoIcon {
     @include flex-center;
-    width: 36px;
-    height: 36px;
-    border-radius: $radius-md;
-    background: var(--gradient-primary);
-    position: relative;
-    overflow: hidden;
+    width: 30px;
+    height: 30px;
+    background: var(--color-primary);
+    border-radius: 6px;
     color: #fff;
-    font-size: $font-size-md;
     flex-shrink: 0;
-  }
-
-  span {
-    font-size: $font-size-lg;
-    font-weight: $font-weight-bold;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    white-space: nowrap;
-  }
-}
-
-.collapseBtn {
-  @include flex-center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: var(--bg-tertiary);
-  border-radius: $radius-md;
-  color: var(--text-secondary);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all $transition-fast;
-
-  &:hover {
-    background: var(--bg-hover);
-    color: var(--color-primary);
   }
 }
 
@@ -171,18 +60,13 @@
   @include styled-scrollbar;
 }
 
-.navSection {
-  margin-bottom: $space-6;
-}
-
 .navLabel {
-  font-size: $font-size-xs;
-  font-weight: $font-weight-semibold;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: $space-2 $space-3;
-  margin-bottom: $space-2;
+  letter-spacing: 0.1em;
+  padding: $space-4 $space-3 $space-4;
 }
 
 .navItem {
@@ -190,114 +74,82 @@
   align-items: center;
   gap: $space-3;
   padding: $space-3 $space-4;
-  border-radius: $radius-md;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text-secondary);
-  cursor: pointer;
-  transition: all $transition-fast;
+  transition: all 0.2s ease;
   text-decoration: none;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+  position: relative;
 
-  svg {
-    font-size: $font-size-lg;
-    flex-shrink: 0;
-  }
+  svg { font-size: 1.1rem; }
 
   &:hover {
+    color: var(--text-primary);
     background: var(--bg-hover);
-    color: var(--color-primary);
   }
 
   &.active {
     background: var(--color-primary-50);
     color: var(--color-primary);
-    font-weight: $font-weight-semibold;
-
-    &::before {
+    font-weight: 600;
+    
+    &::after {
       content: "";
       position: absolute;
       left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      height: 16px;
       width: 3px;
-      height: 20px;
-      border-radius: 0 2px 2px 0;
       background: var(--color-primary);
+      border-radius: 0 4px 4px 0;
     }
   }
 
-  position: relative;
-
   &.logoutBtn {
-    margin-top: $space-10;
-    margin-bottom: $space-2;
-    background: rgba(239, 68, 68, 0.05); // Softest danger
+    margin-top: $space-8;
     color: var(--color-danger);
-    border: 1px solid rgba(239, 68, 68, 0.1);
-
-    &:hover {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--color-danger);
-      border-color: rgba(239, 68, 68, 0.3);
-      transform: translateY(-1px);
-    }
+    font-weight: 600;
+    &:hover { background: var(--color-danger-light); }
   }
 }
 
 .userSection {
   padding: $space-4;
-  border-top: 1px solid var(--border-default);
+  border-top: 1px solid var(--border-light);
 }
 
 .userCard {
   display: flex;
   align-items: center;
   gap: $space-3;
+  background: var(--bg-tertiary);
   padding: $space-3;
-  border-radius: $radius-md;
-  transition: background $transition-fast;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--bg-hover);
-  }
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
 }
 
 .avatar {
   position: relative;
-  width: 38px;
-  height: 38px;
-  border-radius: $radius-full;
-  background: var(--gradient-primary);
+  width: 32px;
+  height: 32px;
+  background: var(--bg-secondary);
+  border-radius: 50%;
   @include flex-center;
-  color: #fff;
-  font-weight: $font-weight-extrabold;
-  font-size: $font-size-sm;
-  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-weight: 700;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
-  border: 2px solid var(--bg-card);
-
-  .avatarImg {
-    object-fit: cover;
-  }
+  flex-shrink: 0;
 }
 
-.userInfo {
-  flex: 1;
-  min-width: 0;
+.userName { color: var(--text-primary); font-weight: 600; font-size: 13px; }
+.userEmail { color: var(--text-tertiary); font-size: 11px; }
 
-  .userName {
-    font-size: $font-size-sm;
-    font-weight: $font-weight-semibold;
-    color: var(--text-primary);
-    @include truncate;
-  }
-
-  .userEmail {
-    font-size: $font-size-xs;
-    color: var(--text-tertiary);
-    @include truncate;
-  }
+.collapseBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 0.2s;
+  &:hover { color: var(--text-primary); }
 }

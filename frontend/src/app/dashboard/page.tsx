@@ -11,16 +11,16 @@ import {
   HiPlus,
   HiOutlineOfficeBuilding,
 } from "react-icons/hi";
-import { FiUsers } from "react-icons/fi";
+import { FiUsers, FiClock } from "react-icons/fi";
 import { Expense, Group } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchMyGroupsAction } from "@/store/slices/groupSlice";
 import { fetchUserExpenses } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
-import Card from "@/components/ui/Card/Card";
 import CreateGroupModal from "@/components/dashboard/GroupModals/CreateGroupModal";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
+import MonthlyExpenditureChart from "@/components/dashboard/Charts/MonthlyExpenditureChart";
 import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
 import {
@@ -66,7 +66,6 @@ export default function DashboardPage() {
       exp.expense_status !== EXPENSE_STATUS.VERIFIED
     )
       return total;
-    // If I'm the payer, others' pending splits are owed to me
     if (exp.paid_by === user?.id) {
       return (
         total +
@@ -89,7 +88,6 @@ export default function DashboardPage() {
       exp.expense_status !== EXPENSE_STATUS.VERIFIED
     )
       return total;
-    // If I'm NOT the payer, my pending split is what I owe
     if (exp.paid_by !== user?.id) {
       return (
         total +
@@ -123,246 +121,157 @@ export default function DashboardPage() {
   const netBalance = owedToYou - youOwe;
 
   const stats = [
-    {
-      label: "Total Expenses",
-      value: `रू ${totalSpent.toLocaleString()}`,
-      icon: <HiOutlineCurrencyDollar />,
-      color: "blue",
-    },
-    {
-      label: "Active Groups",
-      value: groups?.totalGroups || 0,
-      icon: <HiOutlineUserGroup />,
-      color: "green",
-    },
-    {
-      label: "Owed to You",
-      value: `रू ${owedToYou.toLocaleString()}`,
-      icon: <HiOutlineTrendingUp />,
-      color: "orange",
-    },
-    {
-      label: "You Owe",
-      value: `रू ${youOwe.toLocaleString()}`,
-      icon: <HiOutlineTrendingDown />,
-      color: "red",
-    },
+    { label: "Total Asset Flow", value: `रू ${totalSpent.toLocaleString()}`, trend: "+12.4%", icon: <HiOutlineCurrencyDollar />, color: "blue" },
+    { label: "Operational Groups", value: groups?.totalGroups || 0, trend: "Stable", icon: <HiOutlineUserGroup />, color: "green" },
+    { label: "Accounts Receivable", value: `रू ${owedToYou.toLocaleString()}`, trend: "+रू 2.1k", icon: <HiOutlineTrendingUp />, color: "yellow" },
+    { label: "Accounts Payable", value: `रू ${youOwe.toLocaleString()}`, trend: "-रू 1.2k", icon: <HiOutlineTrendingDown />, color: "red" },
   ];
 
   return (
     <div className={styles.dashboard}>
-      <section className={styles.statsGrid}>
+      {/* ── Infrastructure Stats ── */}
+      <section className={styles.stats}>
         {stats.map((stat, idx) => (
           <div key={idx} className={`${styles.statCard} ${styles[stat.color]}`}>
-            <div className={`${styles.statIcon} ${styles[stat.color]}`}>
-              {stat.icon}
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statLabel}>{stat.label}</span>
-              <span className={styles.statValue}>{stat.value}</span>
+            <div className={styles.statGlow}></div>
+            <div className={styles.statHeader}>
+              <div className={styles.statInfo}>
+                <span className={styles.statLabel}>{stat.label}</span>
+                <span className={styles.statValue}>{stat.value}</span>
+              </div>
+              <div className={styles.iconWrapper}>
+                {stat.icon}
+              </div>
             </div>
           </div>
         ))}
       </section>
 
-      <section>
-        <SectionHeader title="Personal Tracking" align="between" fullWidth>
-          <Link href="/dashboard/personal">
-            <Button variant="outline" size="sm">
-              View All
-            </Button>
-          </Link>
-        </SectionHeader>
-
-        <div className={styles.personalTrackerGrid}>
-          <Card
-            clickable
-            onClick={() => setIsExpenseModalOpen(true)}
-            className={styles.featuredPersonalCard}
-            gradient
-            glass
-          >
-            <div className={styles.banner}>
-              <div className={styles.iconGlow}>
-                <HiOutlineCurrencyDollar />
-              </div>
-              <div className={styles.titleInfo}>
-                <h3>Private Ledger</h3>
-                <span className={styles.typeTag}>Only You</span>
-              </div>
+      {/* ── Primary Assets ── */}
+      <section className={styles.personalOverview}>
+        <div className={styles.personalCard} onClick={() => setIsExpenseModalOpen(true)}>
+          <div className={styles.cardGlow}></div>
+          <div className={styles.personalContent}>
+            <div className={styles.cardHeader}>
+              <p>SECURE_PERSONAL_SESSION</p>
+              <h2>Private Ledger</h2>
             </div>
-
+            
             <div className={styles.mainStats}>
-              <div className={styles.statItem}>
-                <label>Monthly Spend</label>
-                <div className={styles.amountWrap}>
-                  <span className={styles.currency}>रू</span>
-                  <span className={styles.val}>
-                    {monthlyPersonalSpend.toLocaleString()}
-                  </span>
+              <div className={styles.mainStat}>
+                <span className={styles.mainStatLabel}>30D_CYCLE_SPEND</span>
+                <div className={styles.mainStatValue}>
+                  <h3>रू {monthlyPersonalSpend.toLocaleString()}</h3>
+                  <span className={styles.labelIndicator}>Current</span>
                 </div>
               </div>
-              <div className={styles.statItem}>
-                <label>Lifetime Total</label>
-                <div className={styles.amountWrap}>
-                  <span className={styles.currency}>रू</span>
-                  <span className={styles.val}>
-                    {totalSpent.toLocaleString()}
-                  </span>
+              <div className={styles.statDivider}></div>
+              <div className={styles.mainStat}>
+                <span className={styles.mainStatLabel}>AGGREGATE_ASSETS</span>
+                <div className={styles.mainStatValue}>
+                  <h3>रू {totalSpent.toLocaleString()}</h3>
+                  <span className={styles.labelIndicator}>Lifetime</span>
                 </div>
               </div>
             </div>
 
-            <div className={styles.miniFooter}>
-              <p className={styles.hint}>
-                Track your savings, bills, and individual lifestyle costs with
-                end-to-end privacy.
-              </p>
-              <div className={styles.btnGroup}>
-                <Button variant="primary" size="sm" className={styles["btn-quick-add"]}>
-                  <HiPlus /> Quick Add
-                </Button>
-                <Link href="/dashboard/personal" onClick={(e) => e.stopPropagation()}>
-                  <Button variant="ghost" size="sm" className={styles["btn-ledger"]}>
-                    View Full Ledger
-                  </Button>
-                </Link>
-              </div>
+            <div className={styles.btnRow}>
+              <Button variant="primary" size="md" className={styles.quickEntryBtn} onClick={(e) => {
+                e.stopPropagation();
+                setIsExpenseModalOpen(true);
+              }}>
+                <HiPlus /> Quick Entry
+              </Button>
+              <Link href="/dashboard/personal" onClick={(e) => e.stopPropagation()}>
+                <Button variant="outline" size="md" className={styles.ledgerBtn}>Full Ledger Analysis</Button>
+              </Link>
             </div>
-          </Card>
+          </div>
+        </div>
 
-          <Card className={styles.summaryBox}>
-             <div className={styles.summaryHeader}>
-                <div className={styles.trendIcon}>
-                  <HiOutlineTrendingUp />
-                </div>
-                <h4>Financial Health</h4>
+        <div className={styles.healthCard}>
+          <div className={styles.healthHeader}>
+             <div className={styles.healthTitleContainer}>
+              <h3>Financial Health</h3>
+              <div className={styles.pulse}></div>
              </div>
-             <div className={styles.summaryDesc}>
-                You have <strong>रू {owedToYou.toLocaleString()}</strong> to receive from friends and <strong>रू {youOwe.toLocaleString()}</strong> left to pay back.
-             </div>
+            <p>Liquidity position across all settlement channels.</p>
+          </div>
 
-             <div className={styles.netBalanceBox}>
-                <label>Net Balance</label>
-                <div className={`${styles.netVal} ${netBalance >= 0 ? styles.positive : styles.negative}`}>
-                  {netBalance >= 0 ? "+" : "-"} रू {Math.abs(netBalance).toLocaleString()}
-                </div>
-             </div>
-
-             <div className={styles.progressSection}>
-                <div className={styles.progressBar}>
-                   <div 
-                     className={styles.progress} 
-                     style={{ width: `${(owedToYou / (owedToYou + youOwe || 1)) * 100}%` }}
-                   />
-                </div>
-                <div className={styles.progressLabels}>
-                   <span>Receivable</span>
-                   <span>Payable</span>
-                </div>
-             </div>
-          </Card>
+          <div className={styles.healthMain}>
+            <div className={styles.balanceCircle}>
+               <div className={styles.balanceRing}></div>
+               <div className={styles.balanceContent}>
+                  <p className={styles.balanceLabel}>NET_LIQUIDITY</p>
+                  <h4 className={styles.balanceValue}>
+                    {netBalance >= 0 ? "+" : "-"}रू {Math.abs(netBalance).toLocaleString()}
+                  </h4>
+               </div>
+            </div>
+          </div>
+          
+          <Button variant="ghost" className={styles.fullReport}>
+            <span>Generate Audit Report</span>
+            <HiOutlineTrendingUp />
+          </Button>
         </div>
       </section>
 
-      <section>
-        <SectionHeader title="Shared Groups" align="between" fullWidth>
-          <div className={styles.actions}>
-            <Link href="/dashboard/groups">
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
-            </Link>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsGroupModalOpen(true)}
-            >
-              <HiPlus /> Create Group
-            </Button>
+      {/* ── Transaction Intelligence ── */}
+      <section className={styles.chartSection}>
+        <MonthlyExpenditureChart />
+      </section>
+
+      {/* ── Operational Groups ── */}
+      <section className={styles.groupSection}>
+        <SectionHeader title="Operational Groups" align="between" fullWidth>
+          <div className={styles.sectionActions}>
+             <Link href="/dashboard/groups"><Button variant="outline" size="sm">View All</Button></Link>
+             <Button variant="primary" size="sm" onClick={() => setIsGroupModalOpen(true)}>
+                <HiPlus /> Create Group
+             </Button>
           </div>
         </SectionHeader>
 
         {groupsLoading ? (
-          <div className={styles.grid}>
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className={styles.groupCard}
-                style={{ background: "var(--bg-tertiary)", height: "280px" }}
-              ></div>
-            ))}
-          </div>
-        ) : groups?.totalGroups > 0 ? (
-          <div className={styles.grid}>
-            {groups?.data?.map((group: Group) => (
-              <Link
-                key={group.id}
-                href={`/dashboard/groups/${group.id}`}
-                className={styles.groupCard}
-              >
-                <div className={styles.image}>
-                  {group.image?.url ? (
-                    <Image
-                      src={group.image.url}
-                      alt={group.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <HiOutlineOfficeBuilding />
-                  )}
-                </div>
-                <div className={styles.details}>
-                  <div className={styles.top}>
-                    <span className={styles.name}>{group.name}</span>
-                    {group.created_by === user?.id && (
-                      <span className={styles.badge}>Admin</span>
-                    )}
-                  </div>
-                  <p className={styles.desc}>
-                    {group.description || "No description provided."}
-                  </p>
-                </div>
-                <div className={styles.footer}>
-                  <span>
-                    Created {new Date(group.created_at).toLocaleDateString()}
-                  </span>
-                  <span className={styles.members}>
-                    <FiUsers /> {group.member_count || 1}{" "}
-                    {group.member_count === 1 ? "Member" : "Members"}
-                  </span>
-                </div>
-              </Link>
-            ))}
+          <div className={styles.groupGrid}>
+            {[1, 2, 3].map((i) => <div key={i} className={styles.skeletonCard} />)}
           </div>
         ) : (
-          <div className={styles.emptyState}>
-            <span>
-              <HiOutlineUserGroup />
-            </span>
-            <h3>No groups yet</h3>
-            <p>
-              Create a group to start splitting expenses with friends, family,
-              or colleagues.
-            </p>
-            <Button variant="primary" onClick={() => setIsGroupModalOpen(true)}>
-              Create Your First Group
-            </Button>
+          <div className={styles.groupGrid}>
+             {groups?.data?.map((group: Group) => (
+                <Link key={group.id} href={`/dashboard/groups/${group.id}`} className={styles.groupItem}>
+                   <div className={styles.groupBanner}>
+                      {group.image?.url ? (
+                        <Image src={group.image.url} alt={group.name} fill />
+                      ) : (
+                        <HiOutlineOfficeBuilding />
+                      )}
+                   </div>
+                   <div className={styles.groupBody}>
+                      <div className={styles.groupTop}>
+                        <div className={styles.groupTitle}>
+                          <h4>{group.name}</h4>
+                        </div>
+                        <span className={styles.activeBadge}>Operational</span>
+                      </div>
+                      <div className={styles.groupMeta}>
+                        <span><FiUsers /> {group.member_count || 1} Members</span>
+                        <span><FiClock /> Active</span>
+                      </div>
+                   </div>
+                   <div className={styles.groupFooter}>
+                      <span>PROTOCOL_ID: {group.id.slice(-8)}</span>
+                      <span>SETTLE_READY</span>
+                   </div>
+                </Link>
+             ))}
           </div>
         )}
       </section>
 
-      <CreateGroupModal
-        isOpen={isGroupModalOpen}
-        onClose={() => setIsGroupModalOpen(false)}
-      />
-
-      <AddExpenseModal
-        isOpen={isExpenseModalOpen}
-        onClose={() => setIsExpenseModalOpen(false)}
-        expenseType={EXPENSE_TYPE.PERSONAL}
-      />
+      <CreateGroupModal isOpen={isGroupModalOpen} onClose={() => setIsGroupModalOpen(false)} />
+      <AddExpenseModal isOpen={isExpenseModalOpen} onClose={() => setIsExpenseModalOpen(false)} expenseType={EXPENSE_TYPE.PERSONAL} />
     </div>
   );
 }

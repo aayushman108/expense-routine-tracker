@@ -1,10 +1,31 @@
 @use "../../styles/variables" as *;
 @use "../../styles/mixins" as *;
 
+// ═══════════════════════════════════════════════════
+// DASHBOARD SHELL — Technical Blueprint
+// ═══════════════════════════════════════════════════
+
 .layout {
   display: flex;
   min-height: 100vh;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+
+  // 🌌 Sub-surface Blueprint Grid
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(var(--border-light) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+  }
 }
 
 .main {
@@ -13,19 +34,20 @@
   @include flex-column;
   transition: margin-left $transition-base;
   position: relative;
+  z-index: 1;
 
   &.collapsed {
     margin-left: 72px;
   }
 
   @include mobile-only {
-    margin-left: 72px; // Permanent rail space
+    margin-left: 72px; 
   }
 }
 
 .content {
   flex: 1;
-  padding: $space-8;
+  padding: $space-6;
   overflow-y: auto;
   @include styled-scrollbar;
   position: relative;
@@ -35,30 +57,16 @@
   }
 }
 
-// ── Mobile overlay ──
 .overlay {
   display: none;
-
   @include mobile-only {
-    display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
     z-index: $z-overlay;
-    animation: fadeIn 0.3s ease;
-
     &.showOverlay {
       display: block;
     }
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
