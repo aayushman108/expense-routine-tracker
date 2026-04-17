@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
-import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
-import Button from "@/components/ui/Button/Button";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/store/hooks";
 import { getCurrentUser } from "@/store/slices/authSlice";
@@ -60,20 +58,17 @@ export default function LandingNavbar() {
         <div className={styles.navLinks}>
           <a href="#features">Features</a>
           <a href="#how-it-works">How it works</a>
-          <a href="#pricing">Pricing</a>
+          <a href="#use-cases">Use Cases</a>
         </div>
 
         <div className={styles.navActions}>
-          <ThemeToggle />
           <div className={styles.desktopBtn}>
-            <Button variant="ghost" size="sm" onClick={handleLoginClick}>
+            <button className={styles.loginBtn} onClick={handleLoginClick}>
               Log in
-            </Button>
+            </button>
           </div>
-          <Link href="/signup" className={styles.desktopBtn}>
-            <Button variant="primary" size="sm">
-              Get Started
-            </Button>
+          <Link href="/signup" className={`${styles.getStartedBtn} ${styles.desktopBtn}`}>
+            Get Started
           </Link>
           <button
             className={`${styles.mobileMenuBtn} ${mobileOpen ? styles.hide : ""}`}
@@ -114,24 +109,25 @@ export default function LandingNavbar() {
           <a href="#how-it-works" onClick={() => setMobileOpen(false)}>
             How it works
           </a>
-          <a href="#pricing" onClick={() => setMobileOpen(false)}>
-            Pricing
+          <a href="#use-cases" onClick={() => setMobileOpen(false)}>
+            Use Cases
           </a>
           <div className={styles.drawerActions}>
-            <div
+            <button
+              className={styles.drawerLoginBtn}
               onClick={() => {
                 setMobileOpen(false);
                 handleLoginClick();
               }}
             >
-              <Button variant="ghost" size="lg">
-                Log in
-              </Button>
-            </div>
-            <Link href="/signup" onClick={() => setMobileOpen(false)}>
-              <Button variant="primary" size="lg">
-                Get Started
-              </Button>
+              Log in
+            </button>
+            <Link
+              href="/signup"
+              className={styles.drawerGetStartedBtn}
+              onClick={() => setMobileOpen(false)}
+            >
+              Get Started
             </Link>
           </div>
         </div>

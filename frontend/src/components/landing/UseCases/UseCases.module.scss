@@ -1,0 +1,177 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+// ═══════════════════════════════════════════════════
+// USE CASES — Scenario Log
+// ═══════════════════════════════════════════════════
+
+.useCases {
+  position: relative;
+  background: $bg-primary;
+  padding: $space-32 $container-padding;
+  overflow: hidden;
+
+  // 📏 Section Divider (Subtle Metadata)
+  &::before {
+    content: "[ 04 / SCENARIO_LOG ]";
+    position: absolute;
+    top: $space-8;
+    left: $container-padding;
+    font-family: $font-mono;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.1); 
+    letter-spacing: 0.2em;
+  }
+}
+
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient($grid-subtle 1px, transparent 1px),
+    linear-gradient(90deg, $grid-subtle 1px, transparent 1px);
+  background-size: 80px 80px; 
+  pointer-events: none;
+  z-index: 1;
+
+  // 🎭 Focal Point Mask: Invisible -> Visible -> Invisible
+  mask-image: linear-gradient(
+    to bottom, 
+    transparent 0%, 
+    black 40%, 
+    black 60%, 
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom, 
+    transparent 0%, 
+    black 40%, 
+    black 60%, 
+    transparent 100%
+  );
+}
+
+.useCasesInner {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: left;
+  margin-bottom: $space-24;
+  max-width: 800px;
+}
+
+.sectionEyebrow {
+  font-family: $font-mono;
+  color: #6366f1;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: $space-4;
+  display: block;
+}
+
+.sectionTitle {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+// ── Scenario Cards ──
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+
+  @include mobile-only {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  background: #111222;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: $space-12;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 21px;
+    padding: 1.5px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), transparent, rgba(236, 72, 153, 0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-12px);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.6);
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.cardIcon {
+  font-size: 48px;
+  margin-bottom: $space-2;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+}
+
+.cardTitle {
+  font-size: $font-size-2xl;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.cardDesc {
+  font-size: $font-size-base;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.cardFooter {
+  margin-top: auto;
+  padding-top: $space-8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cardTag {
+  font-family: $font-mono;
+  font-size: 11px;
+  color: #6366f1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cardArrow {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+.card:hover .cardArrow {
+  transform: translateX(8px);
+  color: #818cf8;
+}

@@ -37,6 +37,12 @@ $landing-accent: #4f46e5;
 $landing-accent-light: #6366f1;
 $landing-accent-dark: #3730a3;
 
+// ── Theme Backgrounds ──
+$bg-primary: #0d0e1b;
+$bg-elevated: #111222;
+$grid-subtle: rgba(255, 255, 255, 0.03);
+$grid-bold: rgba(255, 255, 255, 0.06);
+
 $landing-gradient: linear-gradient(
   135deg,
   $landing-accent 0%,
@@ -57,6 +63,8 @@ $space-12: 3rem;
 $space-16: 4rem;
 $space-20: 5rem;
 $space-24: 6rem;
+$space-32: 8rem;
+$space-40: 10rem;
 
 // ── Radius ──
 $radius-sm: 6px;

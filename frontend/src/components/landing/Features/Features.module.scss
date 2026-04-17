@@ -1,0 +1,179 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+// ═══════════════════════════════════════════════════
+// FEATURES — Unified Dark Section
+// ═══════════════════════════════════════════════════
+
+.features {
+  position: relative;
+  background: $bg-elevated;
+  padding: $space-32 $container-padding;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient($grid-subtle 1px, transparent 1px),
+    linear-gradient(90deg, $grid-subtle 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.featuresInner {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: $space-24;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sectionEyebrow {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: $space-4;
+}
+
+.sectionTitle {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+  margin-bottom: $space-6;
+
+  span {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.sectionSub {
+  font-size: $font-size-lg;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+// ── Bento Grid ──
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+
+  @include mobile-only {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  background: rgba(13, 14, 27, 0.5); // Slightly darker than section
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: $space-10;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+
+  &:hover {
+    transform: translateY(-8px);
+    border-color: rgba(99, 102, 241, 0.3);
+    background: rgba(13, 14, 27, 0.8);
+  }
+}
+
+.cardWide {
+  grid-column: span 2;
+  @include mobile-only { grid-column: span 1; }
+}
+
+.cardGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x) var(--mouse-y),
+    rgba(99, 102, 241, 0.08),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card:hover .cardGlow {
+  opacity: 1;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.cardIcon {
+  width: 52px;
+  height: 52px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #818cf8;
+  font-size: 26px;
+}
+
+.cardTag {
+  font-size: 10px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+}
+
+.cardContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.cardTitle {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.cardDesc {
+  font-size: $font-size-base;
+  color: #94a3b8;
+  line-height: 1.6;
+}
