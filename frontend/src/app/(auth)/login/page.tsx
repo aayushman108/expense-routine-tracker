@@ -8,7 +8,8 @@ import { useGSAP } from "@gsap/react";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loginUser, clearError } from "@/store/slices/authSlice";
+import { loginUser, clearError, getCurrentUser } from "@/store/slices/authSlice";
+import { handleThunk } from "@/lib/utils";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
@@ -49,9 +50,11 @@ export default function LoginPage() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(loginUser(form));
+    await handleThunk(dispatch(loginUser(form)), () => {
+      dispatch(getCurrentUser());
+    });
   };
 
   return (

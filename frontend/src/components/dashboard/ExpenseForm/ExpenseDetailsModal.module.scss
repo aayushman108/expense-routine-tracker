@@ -71,8 +71,7 @@ $transition-normal: $transition-base;
   .tagsRow {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
     margin-top: 10px;
   }
@@ -151,16 +150,27 @@ $transition-normal: $transition-base;
 
       &:hover {
         background: var(--bg-tertiary);
-        color: var(--color-primary);
-        border-color: var(--color-primary-light);
         transform: translateY(-2px);
         box-shadow: $shadow-sm;
       }
     }
 
-    .deleteBtn:hover {
+    .editBtn {
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+      &:hover {
+        color: var(--bg-primary);
+        background: var(--color-primary);
+      }
+    }
+
+    .deleteBtn {
       color: var(--color-danger);
-      border-color: var(--color-danger-light);
+      border-color: var(--color-danger);
+      &:hover {
+        color: var(--bg-primary);
+        background: var(--color-danger);
+      }
     }
   }
 }

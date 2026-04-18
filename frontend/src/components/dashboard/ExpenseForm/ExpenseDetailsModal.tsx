@@ -1,18 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import {
   HiOutlineCalendar,
   HiOutlineUserCircle,
-  HiCheckCircle,
-  HiOutlineReceiptTax,
-  HiOutlineShoppingBag,
-  HiOutlineLightBulb,
-  HiOutlineTruck,
-  HiOutlineCreditCard,
-  HiOutlineQrcode,
-  HiOutlineDuplicate,
   HiCheck,
   HiPencil,
   HiTrash,
@@ -20,6 +12,7 @@ import {
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
 import Button from "@/components/ui/Button/Button";
+import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import AddExpenseModal from "./AddExpenseModal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -27,6 +20,7 @@ import {
   updateSplitStatus,
   updateExpense,
   deleteExpense,
+  fetchGroupExpenses,
 } from "@/store/slices/expenseSlice";
 import {
   SETTLEMENT_STATUS,
@@ -34,7 +28,8 @@ import {
   EXPENSE_STATUS,
   EXPENSE_TYPE,
 } from "@expense-tracker/shared";
-import type { Expense, ExpenseSplit } from "@/lib/types";
+import type { ExpenseSplit } from "@/lib/types";
+import { handleThunk } from "@/lib/utils";
 import styles from "./ExpenseDetailsModal.module.scss";
 
 interface ExpenseDetailsModalProps {
@@ -49,75 +44,80 @@ export default function ExpenseDetailsModal({
   expenseId,
 }: ExpenseDetailsModalProps) {
   const dispatch = useAppDispatch();
-  const [details, setDetails] = useState<Expense | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"wallets" | "bank">("wallets");
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [submittingAction, setSubmittingAction] = useState<string | null>(null);
   const { user } = useAppSelector((state) => state.auth);
+  const {
+    currentExpense: details,
+    isDetailsLoading,
+    isSubmitting,
+  } = useAppSelector((state) => state.expenses);
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
+  const fetchExpenseDetails = useCallback(() => {
+    if (!isOpen || !expenseId) return;
+    handleThunk(dispatch(fetchExpenseById(expenseId)));
+  }, [isOpen, expenseId, dispatch]);
 
   useEffect(() => {
-    if (isOpen && expenseId) {
-      setLoading(true);
-      dispatch(fetchExpenseById(expenseId))
-        .unwrap()
-        .then((data: Expense) => {
-          setDetails(data);
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    }
-  }, [isOpen, expenseId, dispatch]);
+    fetchExpenseDetails();
+  }, [fetchExpenseDetails]);
 
   const handleUpdateSplitStatus = async (
     splitId: string,
     status: SPLIT_STATUS,
   ) => {
     if (!expenseId) return;
-    try {
-      await dispatch(
-        updateSplitStatus({ expenseId, splitId, status }),
-      ).unwrap();
-      // Refetch to get updated status and potentially updated overall expense status
-      const data = await dispatch(fetchExpenseById(expenseId)).unwrap();
-      setDetails(data);
-    } catch (error) {
-      console.error("Failed to update split status:", error);
-    }
+    setSubmittingAction(`${splitId}-${status}`);
+    await handleThunk(
+      dispatch(updateSplitStatus({ expenseId, splitId, status })),
+      () => {
+        fetchExpenseDetails();
+        setSubmittingAction(null);
+      },
+      (error) => {
+        console.error("Failed to update split status:", error);
+        setSubmittingAction(null);
+      },
+    );
   };
 
   const handleUpdateExpenseStatus = async (status: EXPENSE_STATUS) => {
     if (!expenseId) return;
-    try {
-      await dispatch(
+    setSubmittingAction(`${expenseId}-${status}`);
+    await handleThunk(
+      dispatch(
         updateExpense({ id: expenseId, body: { expenseStatus: status } }),
-      ).unwrap();
-      const data = await dispatch(fetchExpenseById(expenseId)).unwrap();
-      setDetails(data);
-    } catch (error) {
-      console.error("Failed to update expense status:", error);
-    }
+      ),
+      () => {
+        fetchExpenseDetails();
+        setSubmittingAction(null);
+      },
+      (error) => {
+        setSubmittingAction(null);
+        console.error("Failed to update expense status:", error);
+      },
+    );
   };
 
   const handleDeleteExpense = async () => {
     if (!expenseId) return;
-    if (confirm("Are you sure you want to delete this expense?")) {
-      try {
-        await dispatch(deleteExpense(expenseId)).unwrap();
+    setSubmittingAction(`${expenseId}-delete`);
+    await handleThunk(
+      dispatch(deleteExpense(expenseId)),
+      () => {
+        setIsDeleteConfirmOpen(false);
+        if (details?.group_id) {
+          dispatch(fetchGroupExpenses({ groupId: details?.group_id }));
+        }
+        setSubmittingAction(null);
         onClose();
-      } catch (error) {
+      },
+      (error) => {
+        setSubmittingAction(null);
         console.error("Failed to delete expense:", error);
-      }
-    }
+      },
+    );
   };
 
   const getInitials = (name?: string) => {
@@ -141,34 +141,7 @@ export default function ExpenseDetailsModal({
     });
   };
 
-  const getCategoryIcon = (desc: string) => {
-    const d = desc.toLowerCase();
-    if (
-      d.includes("food") ||
-      d.includes("eat") ||
-      d.includes("grocer") ||
-      d.includes("dinner") ||
-      d.includes("lunch")
-    )
-      return <HiOutlineShoppingBag />;
-    if (
-      d.includes("bill") ||
-      d.includes("rent") ||
-      d.includes("electric") ||
-      d.includes("wifi")
-    )
-      return <HiOutlineLightBulb />;
-    if (
-      d.includes("travel") ||
-      d.includes("uber") ||
-      d.includes("petrol") ||
-      d.includes("taxi")
-    )
-      return <HiOutlineTruck />;
-    if (d.includes("pay") || d.includes("card") || d.includes("subscription"))
-      return <HiOutlineCreditCard />;
-    return <HiOutlineReceiptTax />;
-  };
+  const isOwner = details?.paid_by === user?.id;
 
   return (
     <Modal
@@ -177,12 +150,28 @@ export default function ExpenseDetailsModal({
       title="Expense Breakdown"
       size="lg"
       footer={
-        <Button variant="ghost" onClick={onClose}>
-          Close
-        </Button>
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Close
+          </Button>
+          {isOwner && details?.expense_status === EXPENSE_STATUS.DRAFT && (
+            <Button
+              variant="primary"
+              onClick={() =>
+                handleUpdateExpenseStatus(EXPENSE_STATUS.SUBMITTED)
+              }
+              isLoading={
+                submittingAction === `${expenseId}-${EXPENSE_STATUS.SUBMITTED}`
+              }
+              disabled={isSubmitting}
+            >
+              Submit Expense
+            </Button>
+          )}
+        </>
       }
     >
-      {loading ? (
+      {isDetailsLoading ? (
         <div className={styles.loader}>
           <div className={styles.spinner} />
           <span>Fetching transaction details...</span>
@@ -198,63 +187,26 @@ export default function ExpenseDetailsModal({
                 >
                   STATUS - {details.expense_status.toUpperCase()}
                 </span>
-                {details.paid_by === user?.id &&
-                  details.expense_status === EXPENSE_STATUS.DRAFT && (
-                    <button
-                      className={styles.submitBtn}
-                      onClick={() =>
-                        handleUpdateExpenseStatus(EXPENSE_STATUS.SUBMITTED)
-                      }
-                    >
-                      Submit Expense
-                    </button>
-                  )}
-                {details.paid_by === user?.id && (
+                {isOwner && (
                   <div className={styles.actionButtons}>
-                    {/* Only show Edit/Delete for non-verified group expenses */}
-                    {details.expense_type === EXPENSE_TYPE.GROUP &&
-                    details.expense_status !== EXPENSE_STATUS.VERIFIED
-                      ? (details.expense_status === EXPENSE_STATUS.DRAFT ||
-                          details.expense_status === EXPENSE_STATUS.SUBMITTED ||
-                          details.expense_status ===
-                            EXPENSE_STATUS.REJECTED) && (
-                          <>
-                            <button
-                              className={styles.editBtn}
-                              onClick={() => setIsEditModalOpen(true)}
-                              title="Edit Expense"
-                            >
-                              <HiPencil />
-                            </button>
-                            <button
-                              className={styles.deleteBtn}
-                              onClick={handleDeleteExpense}
-                              title="Delete Expense"
-                            >
-                              <HiTrash />
-                            </button>
-                          </>
-                        )
-                      : null}
-                    {/* Special case for personal expense: always show */}
-                    {details.expense_type === EXPENSE_TYPE.PERSONAL && (
+                    {details?.expense_status !== EXPENSE_STATUS.VERIFIED ? (
                       <>
                         <button
                           className={styles.editBtn}
                           onClick={() => setIsEditModalOpen(true)}
-                          title="Edit Personal Expense"
+                          title="Edit Expense"
                         >
                           <HiPencil />
                         </button>
                         <button
                           className={styles.deleteBtn}
-                          onClick={handleDeleteExpense}
-                          title="Delete Personal Expense"
+                          onClick={() => setIsDeleteConfirmOpen(true)}
+                          title="Delete Expense"
                         >
                           <HiTrash />
                         </button>
                       </>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </div>
@@ -278,22 +230,17 @@ export default function ExpenseDetailsModal({
             <div className={styles.sectionHeader}>
               <h3>Payment Source</h3>
               <span
-                className={`${styles.badge} ${!details.group_id ? styles.personal : styles[details.settlement_status || SETTLEMENT_STATUS.PENDING]}`}
+                className={`${styles.badge} ${styles[details?.settlement_status || SETTLEMENT_STATUS.PENDING]}`}
               >
-                {!details.group_id
-                  ? "Personal"
-                  : details.settlement_status === SETTLEMENT_STATUS.CONFIRMED
-                    ? "Settled"
-                    : details.settlement_status === SETTLEMENT_STATUS.PAID
-                      ? "Paid"
-                      : "Pending"}
+                {details?.settlement_status === SETTLEMENT_STATUS.CONFIRMED
+                  ? "Settled"
+                  : details?.settlement_status === SETTLEMENT_STATUS.PAID
+                    ? "Paid"
+                    : "Pending"}
               </span>
             </div>
             <div className={styles.payerCard}>
-              <div
-                className={styles.mainInfo}
-                onClick={() => setIsPaymentOpen(!isPaymentOpen)}
-              >
+              <div className={styles.mainInfo}>
                 <div className={styles.userInfo}>
                   <div className={styles.avatar}>
                     {details.payer?.avatar?.url ? (
@@ -313,254 +260,18 @@ export default function ExpenseDetailsModal({
                     <span className={styles.name}>
                       {details.paid_by === user?.id
                         ? "You (Original Payer)"
-                        : details.payer?.full_name || details.payer_name}
+                        : details?.payer?.full_name || details.payer_name}
                     </span>
-                    <span className={styles.sub}>
-                      {details.paid_by === user?.id
-                        ? "You covered this full expense"
-                        : isPaymentOpen
-                          ? "Click to hide settlement details"
-                          : "View settlement & payment info"}
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.rightSide}>
-                  {details.paid_by !== user?.id && (
-                    <div className={styles.paymentBadge}>
-                      <HiOutlineQrcode />
-                      <span>
-                        {isPaymentOpen ? "Hide Details" : "Payment Details"}
+                    {isOwner ? (
+                      <span className={styles.sub}>
+                        You covered this full expense
                       </span>
-                    </div>
-                  )}
-                  <div className={styles.checkIcon}>
-                    <HiCheckCircle />
+                    ) : (
+                      <span className={styles.sub}>{details.payer?.email}</span>
+                    )}
                   </div>
                 </div>
               </div>
-
-              {details.paid_by !== user?.id && (
-                <div
-                  className={`${styles.paymentCollapse} ${
-                    isPaymentOpen ? styles.open : ""
-                  }`}
-                >
-                  <div className={styles.collapseInner}>
-                    <div className={styles.tabs}>
-                      <div
-                        className={`${styles.tab} ${
-                          activeTab === "wallets" ? styles.active : ""
-                        }`}
-                        onClick={() => setActiveTab("wallets")}
-                      >
-                        Wallets
-                      </div>
-                      <div
-                        className={`${styles.tab} ${
-                          activeTab === "bank" ? styles.active : ""
-                        }`}
-                        onClick={() => setActiveTab("bank")}
-                      >
-                        Bank Account
-                      </div>
-                    </div>
-
-                    <div className={styles.tabContent}>
-                      {activeTab === "wallets" ? (
-                        <div className={styles.modernWallets}>
-                          {details.payer_payment_methods
-                            ?.filter(
-                              (pm) =>
-                                !pm.provider.toLowerCase().includes("bank"),
-                            )
-                            .map((pm) => {
-                              const meta = (pm.metadata || {}) as Record<
-                                string,
-                                string
-                              >;
-                              const isKhalti = pm.provider
-                                .toLowerCase()
-                                .includes("khalti");
-                              return (
-                                <div
-                                  key={pm.id}
-                                  className={`${styles.modernWalletCard} ${
-                                    isKhalti ? styles.khalti : styles.esewa
-                                  }`}
-                                >
-                                  <div className={styles.infoSide}>
-                                    <div className={styles.cardHeader}>
-                                      <div className={styles.providerLogo}>
-                                        {pm.provider.toUpperCase()}
-                                      </div>
-                                    </div>
-
-                                    <div className={styles.mainAccount}>
-                                      <span className={styles.label}>
-                                        Account ID
-                                      </span>
-                                      <div className={styles.numberRow}>
-                                        <span className={styles.number}>
-                                          {meta.phone || meta.username || "—"}
-                                        </span>
-                                        <button
-                                          className={styles.copyBtn}
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              meta.phone || meta.username || "",
-                                              pm.id,
-                                            )
-                                          }
-                                        >
-                                          {copiedId === pm.id ? (
-                                            <HiCheck />
-                                          ) : (
-                                            <HiOutlineDuplicate />
-                                          )}
-                                        </button>
-                                      </div>
-                                    </div>
-
-                                    <div className={styles.auxInfo}>
-                                      <div className={styles.item}>
-                                        <span className={styles.al}>
-                                          HOLDER
-                                        </span>
-                                        <span className={styles.av}>
-                                          {meta.name ||
-                                            details.payer?.full_name ||
-                                            details.payer_name}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className={styles.qrSide}>
-                                    <div className={styles.qrWrapper}>
-                                      {meta.qrCode ? (
-                                        <Image src={meta.qrCode} alt="QR" fill style={{ objectFit: "contain" }} />
-                                      ) : (
-                                        <HiOutlineQrcode />
-                                      )}
-                                      <div className={styles.qrOverlay}>
-                                        SCAN
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          {(details.payer_payment_methods?.filter(
-                            (pm) => !pm.provider.toLowerCase().includes("bank"),
-                          ).length ?? 0) === 0 && (
-                            <div className={styles.noPm}>
-                              No wallet payment methods available.
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className={styles.modernBankWrapper}>
-                          {details.payer_payment_methods
-                            ?.filter((pm) =>
-                              pm.provider.toLowerCase().includes("bank"),
-                            )
-                            .map((pm) => {
-                              const meta = (pm.metadata || {}) as Record<
-                                string,
-                                string
-                              >;
-                              return (
-                                <div
-                                  key={pm.id}
-                                  className={styles.bankCardModern}
-                                >
-                                  <div className={styles.infoSide}>
-                                    <div className={styles.bankHeader}>
-                                      <div className={styles.bankChip} />
-                                      <span className={styles.bankName}>
-                                        {meta.bankName}
-                                      </span>
-                                    </div>
-
-                                    <div className={styles.mainAccount}>
-                                      <span className={styles.label}>
-                                        Account Number
-                                      </span>
-                                      <div className={styles.numberRow}>
-                                        <span className={styles.number}>
-                                          {meta.accountNumber?.replace(
-                                            /(.{4})/g,
-                                            "$1 ",
-                                          )}
-                                        </span>
-                                        <button
-                                          className={styles.copyBtn}
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              meta.accountNumber || "",
-                                              pm.id,
-                                            )
-                                          }
-                                        >
-                                          {copiedId === pm.id ? (
-                                            <HiCheck />
-                                          ) : (
-                                            <HiOutlineDuplicate />
-                                          )}
-                                        </button>
-                                      </div>
-                                    </div>
-
-                                    <div className={styles.auxInfo}>
-                                      <div className={styles.item}>
-                                        <span className={styles.al}>
-                                          HOLDER
-                                        </span>
-                                        <span className={styles.av}>
-                                          {meta.accountHolder}
-                                        </span>
-                                      </div>
-                                      {meta.info && (
-                                        <div className={styles.item}>
-                                          <span className={styles.al}>
-                                            INFO
-                                          </span>
-                                          <span className={styles.av}>
-                                            {meta.info}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className={styles.qrSide}>
-                                    <div className={styles.qrWrapper}>
-                                      {meta.qrCode ? (
-                                        <Image src={meta.qrCode} alt="QR" fill style={{ objectFit: "contain" }} />
-                                      ) : (
-                                        <HiOutlineQrcode />
-                                      )}
-                                      <div className={styles.qrOverlay}>
-                                        SCAN
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          {(details.payer_payment_methods?.filter((pm) =>
-                            pm.provider.toLowerCase().includes("bank"),
-                          ).length ?? 0) === 0 && (
-                            <div className={styles.noPm}>
-                              No bank payment methods available.
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </section>
 
@@ -578,7 +289,7 @@ export default function ExpenseDetailsModal({
               </span>
             </div>
             <div className={styles.splitsContainer}>
-              {details.splits?.map((split: ExpenseSplit) => {
+              {details?.splits?.map((split: ExpenseSplit) => {
                 const isCurrentUser = split.user?.id === user?.id;
                 const isPayer = split.user?.id === details.paid_by;
                 const settlementStatus =
@@ -654,11 +365,12 @@ export default function ExpenseDetailsModal({
                       )}
 
                       {isCurrentUser &&
-                        details.expense_status !== EXPENSE_STATUS.DRAFT &&
-                        split.split_status === SPLIT_STATUS.PENDING && (
+                        details?.expense_status !== EXPENSE_STATUS.DRAFT &&
+                        split?.split_status === SPLIT_STATUS.PENDING && (
                           <div className={styles.splitActions}>
-                            <button
-                              className={`${styles.actionBtn} ${styles.verify}`}
+                            <Button
+                              size="sm"
+                              variant="primary"
                               title="Verify Split"
                               onClick={() =>
                                 handleUpdateSplitStatus(
@@ -666,12 +378,18 @@ export default function ExpenseDetailsModal({
                                   SPLIT_STATUS.VERIFIED,
                                 )
                               }
+                              isLoading={
+                                submittingAction ===
+                                `${split.id}-${SPLIT_STATUS.VERIFIED}`
+                              }
+                              disabled={isSubmitting}
                             >
                               <HiCheck />
                               <span>Verify</span>
-                            </button>
-                            <button
-                              className={`${styles.actionBtn} ${styles.reject}`}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
                               title="Reject Split"
                               onClick={() =>
                                 handleUpdateSplitStatus(
@@ -679,10 +397,15 @@ export default function ExpenseDetailsModal({
                                   SPLIT_STATUS.REJECTED,
                                 )
                               }
+                              isLoading={
+                                submittingAction ===
+                                `${split.id}-${SPLIT_STATUS.REJECTED}`
+                              }
+                              disabled={isSubmitting}
                             >
                               <HiXCircle />
                               <span>Reject</span>
-                            </button>
+                            </Button>
                           </div>
                         )}
                     </div>
@@ -705,17 +428,23 @@ export default function ExpenseDetailsModal({
           isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
-            // Refetch details after edit
             if (expenseId) {
-              dispatch(fetchExpenseById(expenseId))
-                .unwrap()
-                .then((data: Expense) => setDetails(data));
+              fetchExpenseDetails();
             }
           }}
           expenseType={details.expense_type as EXPENSE_TYPE}
           expense={details}
         />
       )}
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={handleDeleteExpense}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense? This action cannot be undone."
+        confirmText="Delete"
+        isLoading={submittingAction === `${expenseId}-delete`}
+      />
     </Modal>
   );
 }

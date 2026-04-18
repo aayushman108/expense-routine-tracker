@@ -20,6 +20,8 @@ interface ExpenseState {
     remainingToReceive: number;
   } | null;
   isLoading: boolean;
+  isDetailsLoading: boolean;
+  isSubmitting: boolean;
   error: string | null;
   pagination: {
     total: number;
@@ -36,6 +38,8 @@ const initialState: ExpenseState = {
   currentExpense: null,
   summary: null,
   isLoading: false,
+  isDetailsLoading: false,
+  isSubmitting: false,
   error: null,
   pagination: null,
 };
@@ -89,24 +93,29 @@ export const fetchUserSummary = createAsyncThunk<ExpenseState["summary"], void>(
 export const fetchGroupExpenses = createAsyncThunk<
   { data: Expense[]; pagination: any },
   { groupId: string; filters?: ExpenseFilters }
->("expenses/fetchGroupExpenses", async ({ groupId, filters }, { rejectWithValue }) => {
-  try {
-    const params = new URLSearchParams();
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, value.toString());
-      });
-    }
+>(
+  "expenses/fetchGroupExpenses",
+  async ({ groupId, filters }, { rejectWithValue }) => {
+    try {
+      const params = new URLSearchParams();
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value) params.append(key, value.toString());
+        });
+      }
 
-    const { data } = await api.get(`/expenses/group/${groupId}?${params.toString()}`);
-    return data.data; // { data: Expense[], pagination: ... }
-  } catch (err: unknown) {
-    const error = err as { response?: { data?: { message?: string } } };
-    return rejectWithValue(
-      error.response?.data?.message || "Failed to fetch group expenses",
-    );
-  }
-});
+      const { data } = await api.get(
+        `/expenses/group/${groupId}?${params.toString()}`,
+      );
+      return data.data; // { data: Expense[], pagination: ... }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch group expenses",
+      );
+    }
+  },
+);
 
 export const fetchExpenseById = createAsyncThunk<Expense, string>(
   "expenses/fetchExpenseById",
@@ -243,8 +252,16 @@ const expenseSlice = createSlice({
     });
 
     // Fetch by ID
+    builder.addCase(fetchExpenseById.pending, (state) => {
+      state.isDetailsLoading = true;
+    });
     builder.addCase(fetchExpenseById.fulfilled, (state, action) => {
+      state.isDetailsLoading = false;
       state.currentExpense = action.payload;
+    });
+    builder.addCase(fetchExpenseById.rejected, (state, action) => {
+      state.isDetailsLoading = false;
+      state.error = action.payload as string;
     });
 
     // Create
@@ -257,38 +274,37 @@ const expenseSlice = createSlice({
       }
     });
 
-    // Update
-    builder.addCase(updateExpense.fulfilled, (state, action) => {
-      const updatedExpense = action.payload;
-      const index = state.expenses.findIndex((e) => e.id === updatedExpense.id);
-      if (index !== -1) {
-        state.expenses[index] = updatedExpense;
-      }
-      if (updatedExpense.expense_type === EXPENSE_TYPE.PERSONAL) {
-        const pIndex = state.personalExpenses.findIndex(
-          (e) => e.id === updatedExpense.id,
-        );
-        if (pIndex !== -1) state.personalExpenses[pIndex] = updatedExpense;
-      } else {
-        const gIndex = state.groupExpenses.findIndex(
-          (e) => e.id === updatedExpense.id,
-        );
-        if (gIndex !== -1) state.groupExpenses[gIndex] = updatedExpense;
-      }
-      if (state.currentExpense?.id === updatedExpense.id) {
-        state.currentExpense = updatedExpense;
-      }
+    // Update expense
+    builder.addCase(updateExpense.fulfilled, (state) => {
+      state.isSubmitting = false;
+    });
+    builder.addCase(updateExpense.pending, (state) => {
+      state.isSubmitting = true;
+    });
+    builder.addCase(updateExpense.rejected, (state) => {
+      state.isSubmitting = false;
+    });
+
+    // Update split status
+    builder.addCase(updateSplitStatus.pending, (state) => {
+      state.isSubmitting = true;
+    });
+    builder.addCase(updateSplitStatus.fulfilled, (state) => {
+      state.isSubmitting = false;
+    });
+    builder.addCase(updateSplitStatus.rejected, (state) => {
+      state.isSubmitting = false;
     });
 
     // Delete
-    builder.addCase(deleteExpense.fulfilled, (state, action) => {
-      state.expenses = state.expenses.filter((e) => e.id !== action.payload);
-      state.personalExpenses = state.personalExpenses.filter(
-        (e) => e.id !== action.payload,
-      );
-      state.groupExpenses = state.groupExpenses.filter(
-        (e) => e.id !== action.payload,
-      );
+    builder.addCase(deleteExpense.pending, (state) => {
+      state.isSubmitting = true;
+    });
+    builder.addCase(deleteExpense.fulfilled, (state) => {
+      state.isSubmitting = false;
+    });
+    builder.addCase(deleteExpense.rejected, (state) => {
+      state.isSubmitting = false;
     });
   },
 });

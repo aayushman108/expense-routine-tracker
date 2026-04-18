@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import {
@@ -36,6 +36,8 @@ interface FormProps {
 
 const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
   const dispatch = useAppDispatch();
+  const [submittingAction, setSubmittingAction] = useState<string | null>(null);
+  const { isSubmitting } = useAppSelector((state: RootState) => state.expenses);
 
   const [form, setForm] = useState({
     expenseType: EXPENSE_TYPE.PERSONAL,
@@ -59,6 +61,7 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
     e?: React.FormEvent,
   ) => {
     e?.preventDefault();
+    setSubmittingAction(status);
 
     const body: any = {
       ...form,
@@ -70,25 +73,32 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
       await handleThunk(
         dispatch(updateExpense({ id: expense.id, body })),
         () => {
+          setSubmittingAction(null);
           dispatch(
             addToast({ type: "success", message: "Personal expense updated!" }),
           );
           onClose();
         },
+        () => setSubmittingAction(null),
       );
     } else {
-      await handleThunk(dispatch(createExpense({ body, params: {} })), () => {
-        dispatch(
-          addToast({ type: "success", message: "Personal expense added!" }),
-        );
-        onClose();
-        setForm((prev) => ({
-          ...prev,
-          description: "",
-          totalAmount: "",
-          expenseDate: new Date().toISOString().split("T")[0],
-        }));
-      });
+      await handleThunk(
+        dispatch(createExpense({ body, params: {} })),
+        () => {
+          setSubmittingAction(null);
+          dispatch(
+            addToast({ type: "success", message: "Personal expense added!" }),
+          );
+          onClose();
+          setForm((prev) => ({
+            ...prev,
+            description: "",
+            totalAmount: "",
+            expenseDate: new Date().toISOString().split("T")[0],
+          }));
+        },
+        () => setSubmittingAction(null),
+      );
     }
   };
 
@@ -155,7 +165,12 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
       </div>
 
       <div className={styles.modalFooter}>
-        <Button variant="ghost" onClick={onClose} type="button">
+        <Button
+          variant="ghost"
+          onClick={onClose}
+          type="button"
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -163,10 +178,17 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
             variant="outline"
             onClick={() => handleSubmit(EXPENSE_STATUS.DRAFT)}
             type="button"
+            isLoading={submittingAction === EXPENSE_STATUS.DRAFT}
+            disabled={isSubmitting}
           >
             {expense ? "Update as Draft" : "Save as Draft"}
           </Button>
-          <Button variant="primary" type="submit">
+          <Button
+            variant="primary"
+            type="submit"
+            isLoading={submittingAction === EXPENSE_STATUS.SUBMITTED}
+            disabled={isSubmitting}
+          >
             {expense ? "Update Expense" : "Add Expense"}
           </Button>
         </div>
@@ -182,11 +204,11 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
 
   const { groupDetails } = useAppSelector((s: RootState) => s.groups);
   const { user } = useAppSelector((s: RootState) => s.auth);
+  const [submittingAction, setSubmittingAction] = useState<string | null>(null);
+  const { isSubmitting } = useAppSelector((s: RootState) => s.expenses);
 
   const currentGroupFromContext = groupDetails.data;
 
-  // Use splits from expense if available, but only for user IDs.
-  // We'll recalculate splitAmounts/Percentages based on the mode.
   const initialActiveMembers = useMemo(() => {
     if (expense?.splits && expense.splits.length > 0) {
       return expense.splits
@@ -232,9 +254,12 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
 
   const totalAmount = Number(form.totalAmount) || 0;
 
-  // Initial split calculation
-  useEffect(() => {
+  const [hasInitializedSplits, setHasInitializedSplits] = useState(false);
+
+  // Initialize splits on first render or when groupMembers are loaded
+  if (!hasInitializedSplits) {
     if (expense?.splits && expense.splits.length > 0) {
+      setHasInitializedSplits(true);
       setSplits(
         expense.splits.map((s: any) => ({
           userId: s.user?.id || s.user_id,
@@ -243,21 +268,58 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
         })),
       );
     } else if (groupMembers.length > 0) {
+      const initialAmount = Number(form.totalAmount) || 0;
+      setHasInitializedSplits(true);
       setSplits(
         groupMembers.map((m: GroupMember) => ({
           userId: m.user_id,
           splitPercentage: 100 / groupMembers.length,
-          splitAmount: totalAmount / groupMembers.length,
+          splitAmount: initialAmount / groupMembers.length,
         })),
       );
     }
-  }, [expense, groupMembers, totalAmount]);
+  }
+
+  const recalculateEqualSplits = useCallback(
+    (members: string[], amount: number) => {
+      setSplits((prev) =>
+        prev.map((s) => ({
+          ...s,
+          splitPercentage: members.includes(s.userId)
+            ? members.length
+              ? 100 / members.length
+              : 0
+            : 0,
+          splitAmount: members.includes(s.userId)
+            ? members.length
+              ? amount / members.length
+              : 0
+            : 0,
+        })),
+      );
+    },
+    [],
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "totalAmount") {
+      const newAmount = Number(value) || 0;
+      if (splitMode === SPLIT_MODE.EQUAL) {
+        recalculateEqualSplits(activeMembers, newAmount);
+      } else if (splitMode === SPLIT_MODE.PERCENTAGE) {
+        setSplits((prev) =>
+          prev.map((s) => ({
+            ...s,
+            splitAmount: (s.splitPercentage * newAmount) / 100,
+          })),
+        );
+      }
+    }
   };
 
   const handleSplitChange = useCallback(
@@ -279,50 +341,30 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
             s.userId === userId
               ? {
                   ...s,
-                  splitPercentage: (value * 100) / totalAmount,
+                  splitPercentage: totalAmount
+                    ? (value * 100) / totalAmount
+                    : 0,
                   splitAmount: value,
                 }
               : s,
           );
         } else {
-          return prev.map((s) => {
-            return {
-              ...s,
-              splitPercentage: 100 / activeMembers.length,
-              splitAmount: totalAmount / activeMembers.length,
-            };
-          });
+          return prev;
         }
       });
     },
     [activeMembers, splitMode, totalAmount],
   );
 
-  const handleSetSplits = useCallback(() => {
-    // Only auto-recalculate if it's EQUAL mode
-    if (splitMode === SPLIT_MODE.EQUAL) {
-      setSplits((prev) => {
-        return prev.map((s) => {
-          if (activeMembers.includes(s.userId)) {
-            return {
-              ...s,
-              splitPercentage: 100 / activeMembers.length,
-              splitAmount: totalAmount / activeMembers.length,
-            };
-          } else {
-            return { ...s, splitPercentage: 0, splitAmount: 0 };
-          }
-        });
-      });
-    }
-  }, [totalAmount, splitMode, activeMembers]);
-
-  // We should only trigger handleSetSplits when activeMembers or totalAmount changes AND we are in EQUAL mode
-  useEffect(() => {
-    if (splitMode === SPLIT_MODE.EQUAL) {
-      handleSetSplits();
-    }
-  }, [splitMode, activeMembers, totalAmount, handleSetSplits]);
+  const handleSplitModeChange = useCallback(
+    (mode: SPLIT_MODE) => {
+      setSplitMode(mode);
+      if (mode === SPLIT_MODE.EQUAL) {
+        recalculateEqualSplits(activeMembers, totalAmount);
+      }
+    },
+    [activeMembers, totalAmount, recalculateEqualSplits],
+  );
 
   const totalAssigned = useMemo(() => {
     if (splitMode === SPLIT_MODE.AMOUNT) {
@@ -346,6 +388,7 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
     e?: React.FormEvent,
   ) => {
     e?.preventDefault();
+    setSubmittingAction(status);
 
     const body: CreateExpensePayload["body"] = {
       ...form,
@@ -370,25 +413,32 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
       await handleThunk(
         dispatch(updateExpense({ id: expense.id, body })),
         () => {
+          setSubmittingAction(null);
           dispatch(
             addToast({ type: "success", message: "Group expense updated!" }),
           );
           onClose();
         },
+        () => setSubmittingAction(null),
       );
     } else {
-      await handleThunk(dispatch(createExpense({ body, params })), () => {
-        dispatch(
-          addToast({ type: "success", message: "Group expense added!" }),
-        );
-        onClose();
-        setForm((prev) => ({
-          ...prev,
-          description: "",
-          totalAmount: "",
-          expenseDate: new Date().toISOString().split("T")[0],
-        }));
-      });
+      await handleThunk(
+        dispatch(createExpense({ body, params })),
+        () => {
+          setSubmittingAction(null);
+          dispatch(
+            addToast({ type: "success", message: "Group expense added!" }),
+          );
+          onClose();
+          setForm((prev) => ({
+            ...prev,
+            description: "",
+            totalAmount: "",
+            expenseDate: new Date().toISOString().split("T")[0],
+          }));
+        },
+        () => setSubmittingAction(null),
+      );
     }
   };
 
@@ -419,21 +469,10 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
       }
 
       if (splitMode === SPLIT_MODE.EQUAL) {
-        setSplits((prev) => {
-          return prev.map((s) => {
-            if (thisActiveMembers.includes(s.userId)) {
-              return {
-                ...s,
-                splitPercentage: 100 / thisActiveMembers.length,
-                splitAmount: totalAmount / thisActiveMembers.length,
-              };
-            }
-            return { ...s, splitPercentage: 0, splitAmount: 0 };
-          });
-        });
+        recalculateEqualSplits(thisActiveMembers, totalAmount);
       }
     },
-    [activeMembers, splitMode, totalAmount],
+    [activeMembers, splitMode, totalAmount, recalculateEqualSplits],
   );
 
   return (
@@ -505,21 +544,21 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
                 <button
                   type="button"
                   className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.EQUAL ? styles.modeActive : ""}`}
-                  onClick={() => setSplitMode(SPLIT_MODE.EQUAL)}
+                  onClick={() => handleSplitModeChange(SPLIT_MODE.EQUAL)}
                 >
                   Equal
                 </button>
                 <button
                   type="button"
                   className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.PERCENTAGE ? styles.modeActive : ""}`}
-                  onClick={() => setSplitMode(SPLIT_MODE.PERCENTAGE)}
+                  onClick={() => handleSplitModeChange(SPLIT_MODE.PERCENTAGE)}
                 >
                   By %
                 </button>
                 <button
                   type="button"
                   className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.AMOUNT ? styles.modeActive : ""}`}
-                  onClick={() => setSplitMode(SPLIT_MODE.AMOUNT)}
+                  onClick={() => handleSplitModeChange(SPLIT_MODE.AMOUNT)}
                 >
                   By Amount
                 </button>
@@ -611,7 +650,10 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
                                 memberId,
                                 Math.max(
                                   0,
-                                  Math.min(100, parseFloat(e.target.value) || 0),
+                                  Math.min(
+                                    100,
+                                    parseFloat(e.target.value) || 0,
+                                  ),
                                 ),
                               )
                             }
@@ -738,7 +780,12 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
       </div>
 
       <div className={styles.modalFooter}>
-        <Button variant="ghost" onClick={onClose} type="button">
+        <Button
+          variant="ghost"
+          onClick={onClose}
+          type="button"
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -746,10 +793,17 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
             variant="outline"
             onClick={() => handleSubmit(EXPENSE_STATUS.DRAFT)}
             type="button"
+            isLoading={submittingAction === EXPENSE_STATUS.DRAFT}
+            disabled={isSubmitting}
           >
             {expense ? "Update as Draft" : "Save as Draft"}
           </Button>
-          <Button variant="primary" type="submit">
+          <Button
+            variant="primary"
+            type="submit"
+            isLoading={submittingAction === EXPENSE_STATUS.SUBMITTED}
+            disabled={isSubmitting}
+          >
             {expense ? "Update Expense" : "Add Expense"}
           </Button>
         </div>
