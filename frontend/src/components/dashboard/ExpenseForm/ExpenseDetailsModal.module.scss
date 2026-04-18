@@ -1,16 +1,15 @@
-@use "../../../styles/variables" as *;
 @use "../../../styles/mixins" as *;
 
 $transition-normal: $transition-base;
 
 .modalContent {
-  padding: $space-5;
+  padding: $space-6;
   display: flex;
   flex-direction: column;
-  gap: $space-5;
+  gap: $space-6;
   width: 100%;
   background: var(--bg-primary);
-  border-radius: $radius-2xl;
+  border-radius: $radius-lg;
   position: relative;
   overflow: hidden;
 }
@@ -24,39 +23,41 @@ $transition-normal: $transition-base;
   margin-top: $space-2;
 
   .categoryIcon {
-    width: 80px;
-    height: 80px;
-    background: var(--bg-tertiary);
-    border-radius: $radius-2xl;
+    width: 72px;
+    height: 72px;
+    background: var(--bg-secondary);
+    border-radius: $radius-md;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: $font-size-4xl;
-    color: var(--color-primary);
-    box-shadow: $shadow-lg;
-    border: 1px solid var(--border-default);
+    font-size: $font-size-3xl;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
     margin-bottom: $space-2;
     transition: transform $transition-base;
 
     &:hover {
-      transform: scale(1.05) rotate(5deg);
+      transform: scale(1.02);
     }
   }
 
   .title {
-    @include heading($font-size-2xl);
+    font-size: $font-size-xl;
+    font-weight: 800;
     margin: 0;
     color: var(--text-primary);
+    letter-spacing: -0.02em;
   }
 
   .date {
     display: flex;
     align-items: center;
-    gap: $space-2;
-    font-size: $font-size-sm;
+    gap: $space-1;
+    font-size: 11px;
     color: var(--text-tertiary);
-    background: var(--bg-tertiary);
-    padding: $space-1 $space-4;
+    background: var(--bg-secondary);
+    padding: 2px 10px;
     border-radius: $radius-full;
   }
 
@@ -79,55 +80,50 @@ $transition-normal: $transition-base;
   .tag {
     display: inline-flex;
     align-items: center;
-    padding: 4px 14px;
-    border-radius: 100px;
-    font-size: 10px;
-    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     white-space: nowrap;
-    border: 1px solid transparent;
+    border: 1px solid var(--border-light);
 
     &.draft {
-      background: #f1f5f9;
-      color: #64748b;
-      border-color: #e2e8f0;
+      background: var(--bg-tertiary);
+      color: var(--text-tertiary);
     }
     &.submitted {
-      background: #eef2ff;
-      color: #4f46e5;
-      border-color: #e0e7ff;
+      background: rgba(99, 102, 241, 0.1);
+      color: #818cf8;
+      border-color: rgba(99, 102, 241, 0.2);
     }
     &.verified {
-      background: #f0fdf4;
-      color: #16a34a;
-      border-color: #dcfce7;
+      background: var(--color-success-light);
+      color: var(--color-success);
     }
     &.rejected {
-      background: #fef2f2;
-      color: #dc2626;
-      border-color: #fee2e2;
+      background: var(--color-danger-light);
+      color: var(--color-danger);
     }
   }
 
   .submitBtn {
-    padding: 8px 24px;
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    color: white;
+    padding: 6px 16px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
     border: none;
     border-radius: $radius-full;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+    transition: all $transition-base;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-      filter: brightness(1.1);
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
 
     &:active {
@@ -172,51 +168,36 @@ $transition-normal: $transition-base;
 .amountDisplay {
   @include flex-center;
   flex-direction: column;
-  padding: $space-5 $space-6;
-  background: var(--bg-tertiary);
-  border-radius: $radius-2xl;
-  border: 1px solid var(--border-default);
+  padding: $space-6 $space-8;
+  background: var(--bg-secondary);
+  border-radius: $radius-md;
+  border: 1px solid var(--border-light);
   width: 100%;
-  // Glassmorphism feel
-  backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
 
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-primary-300),
-      transparent
-    );
-  }
-
   .label {
-    font-size: $font-size-xs;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    font-weight: $font-weight-bold;
+    font-weight: 800;
     color: var(--text-tertiary);
     margin-bottom: $space-2;
   }
 
   .value {
-    font-size: $font-size-4xl;
-    font-weight: 800;
+    font-size: $font-size-3xl;
+    font-weight: 900;
     color: var(--text-primary);
     @include flex-center;
     gap: $space-2;
+    letter-spacing: -0.05em;
 
     .currency {
-      font-size: $font-size-xl;
-      color: var(--color-primary);
-      opacity: 0.8;
+      font-size: $font-size-lg;
+      color: var(--text-tertiary);
+      font-weight: 700;
+      opacity: 0.4;
     }
   }
 }
@@ -232,17 +213,18 @@ $transition-normal: $transition-base;
     align-items: center;
 
     h3 {
-      font-size: $font-size-xs;
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-weight: 700;
+      letter-spacing: 0.12em;
+      font-weight: 800;
       color: var(--text-tertiary);
+      opacity: 0.8;
     }
 
     .badge {
-      font-size: 10px;
-      padding: 2px 10px;
-      border-radius: $radius-full;
+      font-size: 9px;
+      padding: 1px 8px;
+      border-radius: 4px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -283,111 +265,112 @@ $transition-normal: $transition-base;
   display: flex;
   flex-direction: column;
   padding: 0;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-default);
-  transition: all $transition-fast;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: $radius-md;
+  transition: all $transition-base;
   overflow: hidden;
 
   &:hover {
-    border-color: var(--color-primary-light);
-    box-shadow: $shadow-lg, $shadow-glow;
-    background: var(--bg-elevated);
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
   }
 
   .mainInfo {
     @include flex-between;
     padding: $space-4 $space-6;
     cursor: pointer;
-    transition: all $transition-fast;
+    transition: all $transition-base;
     outline: none;
 
     &:hover {
-      background: var(--bg-surface-hover);
-    }
-  }
-
-  .userInfo {
-    display: flex;
-    align-items: center;
-    gap: $space-4;
-
-    .avatar {
-      position: relative;
-      width: 48px;
-      height: 48px;
-      border-radius: $radius-full;
-      background: var(--color-primary);
-      color: white;
-      @include flex-center;
-      font-weight: $font-weight-bold;
-      font-size: $font-size-md;
-      overflow: hidden;
-      box-shadow: $shadow-sm;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+      background: var(--bg-hover);
     }
 
-    .details {
-      display: flex;
-      flex-direction: column;
-
-      .name {
-        font-weight: $font-weight-bold;
-        color: var(--text-primary);
-      }
-
-      .sub {
-        font-size: $font-size-xs;
-        color: var(--text-tertiary);
-        display: flex;
-        align-items: center;
-        gap: $space-1;
-      }
-    }
-  }
-
-  .rightSide {
-    display: flex;
-    align-items: center;
-    gap: $space-4;
-
-    .paymentBadge {
+    .userInfo {
       display: flex;
       align-items: center;
-      gap: $space-2;
-      padding: $space-1 $space-3;
-      background: var(--color-primary-100);
-      color: var(--color-primary);
-      border-radius: $radius-full;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border: 1px solid var(--color-primary-200);
-      animation: pulse-primary 2s infinite;
+      gap: $space-4;
 
-      svg {
+      .avatar {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border-radius: $radius-full;
+        @include flex-center;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        font-weight: 700;
         font-size: 14px;
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
       }
 
-      @media (max-width: 500px) {
-        display: none; // Hide on very small screens to save space
+      .details {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .name {
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        .sub {
+          font-size: 10px;
+          color: var(--text-tertiary);
+          display: flex;
+          align-items: center;
+          gap: $space-1;
+        }
       }
     }
-  }
 
-  .checkIcon {
-    width: 32px;
-    height: 32px;
-    border-radius: $radius-full;
-    background: var(--color-success-light);
-    color: var(--color-success);
-    @include flex-center;
-    font-size: $font-size-lg;
+    .rightSide {
+      display: flex;
+      align-items: center;
+      gap: $space-4;
+
+      .paymentBadge {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        padding: $space-1 $space-4;
+        background: var(--color-primary-50);
+        color: var(--color-primary);
+        border-radius: $radius-full;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border: 1px solid var(--color-primary-100);
+
+        svg {
+          font-size: 14px;
+        }
+
+        @media (max-width: 500px) {
+          display: none;
+        }
+      }
+    }
+
+    .checkIcon {
+      width: 32px;
+      height: 32px;
+      border-radius: $radius-full;
+      background: var(--color-success-light);
+      color: var(--color-success);
+      @include flex-center;
+      font-size: $font-size-lg;
+    }
   }
 }
 
@@ -476,7 +459,7 @@ $transition-normal: $transition-base;
 }
 
 .modernWalletCard {
-  border-radius: $radius-xl;
+  border-radius: $radius-lg;
   padding: $space-5 $space-6;
   color: white;
   position: relative;
@@ -687,7 +670,7 @@ $transition-normal: $transition-base;
 
 .bankCardModern {
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-  border-radius: $radius-xl;
+  border-radius: $radius-lg;
   padding: $space-5 $space-6;
   color: white;
   min-height: 200px;
@@ -900,44 +883,36 @@ $transition-normal: $transition-base;
 .splitRow {
   display: grid;
   grid-template-columns: auto auto auto;
+  grid-template-columns: 1.5fr 1fr 1fr;
   align-items: center;
-  gap: $space-4;
-  padding: $space-4 $space-5;
-  background: var(--bg-tertiary);
-  border: 1px solid transparent;
-  border-radius: $radius-xl;
-  transition: all $transition-fast;
-  min-height: 85px;
-  justify-content: space-between;
+  padding: $space-2 $space-4;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: $radius-md;
+  transition: all $transition-base;
 
   &:hover {
-    border-color: var(--border-default);
-    background: var(--bg-primary);
-    transform: translateX(4px);
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
   }
 
   .left {
     display: flex;
     align-items: center;
     gap: $space-3;
-    flex: 1;
 
     .miniAvatar {
       position: relative;
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 800;
-      color: #64748b;
-      letter-spacing: -0.01em;
-      border: 1px solid #e2e8f0;
-      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: $radius-full;
+      background: var(--bg-tertiary);
+      @include flex-center;
       overflow: hidden;
+      font-weight: 800;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      border: 1px solid var(--border-light);
 
       img {
         width: 100%;
@@ -949,48 +924,45 @@ $transition-normal: $transition-base;
     .infoCol {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 0;
 
       .name {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 700;
-        color: #1e293b;
+        color: var(--text-primary);
         letter-spacing: -0.01em;
       }
 
       .payerLabel {
-        font-size: 9px;
-        color: #4f46e5;
-        background: #eef2ff;
-        padding: 1px 6px;
-        border-radius: 4px;
+        font-size: 8px;
+        color: var(--color-primary);
+        background: var(--color-primary-50);
+        padding: 0 4px;
+        border-radius: 2px;
         width: fit-content;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        line-height: 1.4;
       }
     }
   }
 
   .right {
-    text-align: right;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
     padding-right: $space-4;
-    border-right: 1px solid var(--border-subtle);
+    border-right: 1px solid var(--border-light);
 
     .amount {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 800;
-      color: #1e293b;
-      font-family: "Inter", sans-serif;
+      color: var(--text-primary);
     }
 
     .percentage {
-      font-size: 11px;
-      color: #64748b;
+      font-size: 9px;
+      color: var(--text-tertiary);
       font-weight: 500;
     }
   }
@@ -999,101 +971,104 @@ $transition-normal: $transition-base;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
-    padding-left: $space-2;
+    gap: 2px;
+    padding-left: $space-3;
 
     .statusBadge {
-      width: 100%;
+      width: fit-content;
       text-align: center;
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 800;
       text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 20px;
+      padding: 1px 6px;
+      border-radius: 4px;
       letter-spacing: 0.04em;
       white-space: nowrap;
-      text-align: center;
-      min-width: 125px;
+      min-width: 90px;
+      border: 1px solid var(--border-light);
 
       &.splitPending {
-        background: #fefce8;
-        color: #854d0e;
-        border: 1px solid #fef3c7;
+        background: var(--bg-tertiary);
+        color: var(--text-tertiary);
       }
 
       &.splitVerified {
-        background: #eff6ff;
-        color: #1e40af;
-        border: 1px solid #dbeafe;
+        background: var(--color-primary-50);
+        color: var(--color-primary);
+        border-color: var(--color-primary-100);
       }
 
       &.splitRejected {
-        background: #fef2f2;
-        color: #991b1b;
-        border: 1px solid #fee2e2;
-      }
-
-      &.confirmed {
-        background: #ecfdf5;
-        color: #065f46;
-        border: 1px solid #d1fae5;
-      }
-
-      &.pending {
-        background: #fff7ed;
-        color: #9a3412;
-        border: 1px solid #ffedd5;
-      }
-
-      &.paid {
-        background: #f0f9ff;
-        color: #075985;
-        border: 1px solid #e0f2fe;
-      }
-
-      &.rejected {
         background: var(--color-danger-light);
         color: var(--color-danger);
       }
 
-      &.payer {
-        background: var(--color-primary-100);
-        color: var(--color-primary);
+      &.confirmed {
+        background: var(--color-success-light);
+        color: var(--color-success);
+      }
+
+      &.pending {
+        background: var(--bg-tertiary);
+        color: var(--text-tertiary);
+      }
+
+      &.paid {
+        background: var(--color-info-light);
+        color: var(--color-info);
       }
     }
 
     .splitActions {
       display: flex;
-      gap: 6px;
+      gap: 4px;
 
       .actionBtn {
-        width: 28px;
-        height: 28px;
-        border-radius: $radius-full;
-        @include flex-center;
-        border: 1px solid var(--border-default);
-        background: var(--bg-primary);
-        color: var(--text-tertiary);
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        border: 1px solid transparent;
         cursor: pointer;
-        transition: all $transition-fast;
+        transition: all $transition-base;
+        font-size: 7.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+
+        span {
+          margin-bottom: -0.5px;
+        }
+
+        svg {
+          font-size: 10px;
+        }
 
         &:hover {
-          transform: scale(1.1);
+          transform: translateY(-0.5px);
         }
 
         &.verify {
+          background: rgba(34, 197, 94, 0.15);
+          color: #22c55e;
+          border-color: rgba(34, 197, 94, 0.1);
+
           &:hover {
-            background: var(--color-success-light);
-            color: var(--color-success);
-            border-color: var(--color-success);
+            background: rgba(34, 197, 94, 0.25);
+            border-color: rgba(34, 197, 94, 0.3);
           }
         }
 
         &.reject {
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
+          border-color: rgba(239, 68, 68, 0.1);
+
           &:hover {
-            background: var(--color-danger-light);
-            color: var(--color-danger);
-            border-color: var(--color-danger);
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.3);
           }
         }
       }
@@ -1113,9 +1088,10 @@ $transition-normal: $transition-base;
   align-items: center;
   gap: $space-4;
   padding: $space-4;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-default);
-  transition: all $transition-fast;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: $radius-md;
+  transition: all $transition-base;
 
   &:hover {
     border-color: var(--color-primary-400);

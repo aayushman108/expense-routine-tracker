@@ -2,6 +2,7 @@
 // SCSS MIXINS
 // ═══════════════════════════════════════════════════
 @use "./variables" as *;
+@forward "./variables";
 
 // ── Responsive ──
 @mixin responsive($bp) {
@@ -63,7 +64,7 @@
 // ── Card ──
 @mixin card {
   background: var(--bg-card);
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-card);
   transition:

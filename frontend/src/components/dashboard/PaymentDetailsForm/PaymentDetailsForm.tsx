@@ -167,7 +167,11 @@ export function PaymentDetailsForm({
   const metaFields = getMetadataFields(pmForm.provider as PAYMENT_METHOD_TYPE);
 
   return (
-    <form onSubmit={handlePmSubmit} className={styles.pmForm}>
+    <form
+      id="payment-details-form"
+      onSubmit={handlePmSubmit}
+      className={styles.pmForm}
+    >
       <Select
         label="Provider"
         name="provider"
@@ -238,15 +242,6 @@ export function PaymentDetailsForm({
         />
         Set as default payment method
       </label>
-
-      <div className={styles.modalFooter}>
-        <Button variant="ghost" type="button" onClick={() => closeModal()}>
-          Cancel
-        </Button>
-        <Button type="submit" isLoading={pmLoading} disabled={!pmForm.provider}>
-          {mode === FORM_MODE.EDIT ? "Update" : "Add"} Payment Method
-        </Button>
-      </div>
     </form>
   );
 }

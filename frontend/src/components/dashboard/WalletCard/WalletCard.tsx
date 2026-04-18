@@ -168,13 +168,8 @@ export function WalletCard({
         onClose={() => setDeleteId(null)}
         title="Remove Payment Method"
         size="sm"
-      >
-        <div className={styles.deleteConfirm}>
-          <p>
-            Are you sure you want to remove this payment method? This action
-            cannot be undone.
-          </p>
-          <div className={styles.modalFooter}>
+        footer={
+          <>
             <Button variant="ghost" onClick={() => setDeleteId(null)}>
               Cancel
             </Button>
@@ -185,7 +180,14 @@ export function WalletCard({
             >
               <HiOutlineTrash /> Remove
             </Button>
-          </div>
+          </>
+        }
+      >
+        <div className={styles.deleteConfirm}>
+          <p>
+            Are you sure you want to remove this payment method? This action
+            cannot be undone.
+          </p>
         </div>
       </Modal>
     </>

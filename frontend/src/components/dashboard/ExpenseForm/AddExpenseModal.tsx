@@ -99,68 +99,62 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
 
   return (
     <form
-      className={styles.form}
+      className={`${styles.form} ${styles.formFull}`}
       onSubmit={(e) => handleSubmit(EXPENSE_STATUS.SUBMITTED, e)}
     >
-      <Input
-        label="Description"
-        name="description"
-        placeholder="What was this for?"
-        icon={<HiOutlineClipboardList />}
-        value={form.description}
-        onChange={handleChange}
-        required
-      />
-
-      <div className={styles.row}>
+      <div className={styles.scrollableContent}>
         <Input
-          label="Amount"
-          name="totalAmount"
-          type="number"
-          placeholder="0.00"
-          icon={<HiOutlineCurrencyDollar />}
-          value={form.totalAmount}
+          label="Description"
+          name="description"
+          placeholder="What was this for?"
+          icon={<HiOutlineClipboardList />}
+          value={form.description}
           onChange={handleChange}
           required
-          step="0.01"
         />
-        <Select
-          label="Currency"
-          name="currency"
-          icon={<HiOutlineCash />}
-          value={form.currency}
+
+        <div className={styles.row}>
+          <Input
+            label="Amount"
+            name="totalAmount"
+            type="number"
+            placeholder="0.00"
+            icon={<HiOutlineCurrencyDollar />}
+            value={form.totalAmount}
+            onChange={handleChange}
+            required
+            step="0.01"
+          />
+          <Select
+            label="Currency"
+            name="currency"
+            icon={<HiOutlineCash />}
+            value={form.currency}
+            onChange={handleChange}
+            options={currencyOptions}
+            required
+          />
+        </div>
+
+        <Input
+          label="Date"
+          name="expenseDate"
+          type="date"
+          icon={<HiOutlineCalendar />}
+          value={form.expenseDate}
           onChange={handleChange}
-          options={currencyOptions}
           required
         />
+
+        <div className={styles.summary}>
+          <span className={styles.summaryLabel}>Total amount:</span>
+          <span className={styles.total}>
+            {form.currency} {(Number(form.totalAmount) || 0).toLocaleString()}
+          </span>
+        </div>
       </div>
 
-      <Input
-        label="Date"
-        name="expenseDate"
-        type="date"
-        icon={<HiOutlineCalendar />}
-        value={form.expenseDate}
-        onChange={handleChange}
-        required
-      />
-
-      <div className={styles.summary}>
-        <span className={styles.summaryLabel}>Total amount:</span>
-        <span className={styles.total}>
-          {form.currency} {(Number(form.totalAmount) || 0).toLocaleString()}
-        </span>
-      </div>
-
-      <div
-        className={styles.modalFooter}
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "0.5rem",
-          marginTop: "1.5rem",
-        }}
-      >
+      <div className={styles.modalFooter}>
         <Button variant="ghost" onClick={onClose} type="button">
           Cancel
         </Button>
@@ -444,313 +438,306 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
 
   return (
     <form
-      className={styles.form}
+      className={`${styles.form} ${styles.formFull}`}
       onSubmit={(e) => handleSubmit(EXPENSE_STATUS.SUBMITTED, e)}
     >
-      <Input
-        label="Description"
-        name="description"
-        placeholder="What was this for?"
-        icon={<HiOutlineClipboardList />}
-        value={form.description}
-        onChange={handleChange}
-        required
-      />
-
-      <div className={styles.row}>
+      <div className={styles.scrollableContent}>
         <Input
-          label="Amount"
-          name="totalAmount"
-          type="number"
-          placeholder="0.00"
-          icon={<HiOutlineCurrencyDollar />}
-          value={form.totalAmount}
-          onChange={handleChange}
-          required
-          step="0.01"
-        />
-        <Select
-          label="Currency"
-          name="currency"
-          icon={<HiOutlineCash />}
-          value={form.currency}
-          onChange={handleChange}
-          options={currencyOptions}
-          required
-        />
-      </div>
-
-      <div className={styles.row}>
-        <Input
-          label="Date"
-          name="expenseDate"
-          type="date"
-          icon={<HiOutlineCalendar />}
-          value={form.expenseDate}
+          label="Description"
+          name="description"
+          placeholder="What was this for?"
+          icon={<HiOutlineClipboardList />}
+          value={form.description}
           onChange={handleChange}
           required
         />
-        <Select
-          label="Paid By"
-          name="paidBy"
-          icon={<HiOutlineUser />}
-          value={form.paidBy}
-          onChange={handleChange}
-          options={payerOptions}
-          placeholder="Select Payer"
-          required
-        />
-      </div>
 
-      {(groupId || expense?.group_id) && (
-        <div className={styles.splitsSection}>
-          <div className={styles.splitsHeader}>
-            <h4>Split Between</h4>
-            <div className={styles.splitModeToggle}>
-              <button
-                type="button"
-                className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.EQUAL ? styles.modeActive : ""}`}
-                onClick={() => setSplitMode(SPLIT_MODE.EQUAL)}
-              >
-                Equal
-              </button>
-              <button
-                type="button"
-                className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.PERCENTAGE ? styles.modeActive : ""}`}
-                onClick={() => setSplitMode(SPLIT_MODE.PERCENTAGE)}
-              >
-                By %
-              </button>
-              <button
-                type="button"
-                className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.AMOUNT ? styles.modeActive : ""}`}
-                onClick={() => setSplitMode(SPLIT_MODE.AMOUNT)}
-              >
-                By Amount
-              </button>
-            </div>
-          </div>
+        <div className={styles.row}>
+          <Input
+            label="Amount"
+            name="totalAmount"
+            type="number"
+            placeholder="0.00"
+            icon={<HiOutlineCurrencyDollar />}
+            value={form.totalAmount}
+            onChange={handleChange}
+            required
+            step="0.01"
+          />
+          <Select
+            label="Currency"
+            name="currency"
+            icon={<HiOutlineCash />}
+            value={form.currency}
+            onChange={handleChange}
+            options={currencyOptions}
+            required
+          />
+        </div>
 
-          <div className={styles.splitsActions}>
-            <span className={styles.selectedCount}>
-              {activeMembers.length} of {groupMembers.length} selected
-            </span>
-            {splitMode === SPLIT_MODE.EQUAL &&
-              totalAmount > 0 &&
-              splits.length > 0 && (
-                <span className={styles.perPersonLabel}>
-                  {form.currency}{" "}
-                  {(totalAmount / activeMembers.length).toLocaleString(
-                    undefined,
-                    {
-                      maximumFractionDigits: 2,
-                    },
-                  )}{" "}
-                  / person
-                </span>
-              )}
-          </div>
+        <div className={styles.row}>
+          <Input
+            label="Date"
+            name="expenseDate"
+            type="date"
+            icon={<HiOutlineCalendar />}
+            value={form.expenseDate}
+            onChange={handleChange}
+            required
+          />
+          <Select
+            label="Paid By"
+            name="paidBy"
+            icon={<HiOutlineUser />}
+            value={form.paidBy}
+            onChange={handleChange}
+            options={payerOptions}
+            placeholder="Select Payer"
+            required
+          />
+        </div>
 
-          <div className={styles.membersList}>
-            {groupMembers.map((member: GroupMember) => {
-              const memberId = member.user_id;
-              const split = splits.find((s) => s.userId === memberId);
-              const splitPercentage = split?.splitPercentage || 0;
-              const splitAmount = split?.splitAmount || 0;
-              const isActiveMember = activeMembers.includes(memberId);
-
-              return (
-                <div
-                  key={memberId}
-                  className={`${styles.splitItem} ${isActiveMember ? styles.active : ""}`}
-                  onClick={() => toggleMember(memberId)}
+        {(groupId || expense?.group_id) && (
+          <div className={styles.splitsSection}>
+            <div className={styles.splitsHeader}>
+              <h4>Split Between</h4>
+              <div className={styles.splitModeToggle}>
+                <button
+                  type="button"
+                  className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.EQUAL ? styles.modeActive : ""}`}
+                  onClick={() => setSplitMode(SPLIT_MODE.EQUAL)}
                 >
-                  <div className={styles.userInfo}>
-                    <div
-                      className={`${styles.checkbox} ${isActiveMember ? styles.checked : ""}`}
-                    >
-                      {isActiveMember && <HiCheck />}
-                    </div>
-                    <div className={styles.avatar}>
-                      {member.user?.avatar?.url ? (
-                        <Image
-                          src={member.user.avatar.url}
-                          alt={member.user.full_name || "User"}
-                          fill
-                          style={{ objectFit: "cover" }}
-                        />
-                      ) : (
-                        (member?.user?.full_name).charAt(0)
-                      )}
-                    </div>
-                    <span className={styles.memberName}>
-                      {member.user?.full_name}
-                      {user?.id === memberId && " (You)"}
-                    </span>
-                  </div>
+                  Equal
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.PERCENTAGE ? styles.modeActive : ""}`}
+                  onClick={() => setSplitMode(SPLIT_MODE.PERCENTAGE)}
+                >
+                  By %
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.modeBtn} ${splitMode === SPLIT_MODE.AMOUNT ? styles.modeActive : ""}`}
+                  onClick={() => setSplitMode(SPLIT_MODE.AMOUNT)}
+                >
+                  By Amount
+                </button>
+              </div>
+            </div>
 
-                  {splitMode === SPLIT_MODE.EQUAL && totalAmount > 0 && (
-                    <span className={styles.equalShare}>
-                      {form.currency}{" "}
-                      {splitAmount.toLocaleString(undefined, {
+            <div className={styles.splitsActions}>
+              <span className={styles.selectedCount}>
+                {activeMembers.length} of {groupMembers.length} selected
+              </span>
+              {splitMode === SPLIT_MODE.EQUAL &&
+                totalAmount > 0 &&
+                splits.length > 0 && (
+                  <span className={styles.perPersonLabel}>
+                    {form.currency}{" "}
+                    {(totalAmount / activeMembers.length).toLocaleString(
+                      undefined,
+                      {
                         maximumFractionDigits: 2,
-                      })}
-                    </span>
-                  )}
+                      },
+                    )}{" "}
+                    / person
+                  </span>
+                )}
+            </div>
 
-                  {splitMode === SPLIT_MODE.PERCENTAGE && (
-                    <div
-                      className={styles.inputWrap}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className={styles.percentInputWrap}>
-                        <input
-                          type="number"
-                          value={splitPercentage || ""}
-                          min="0"
-                          max="100"
-                          step="0.01"
-                          placeholder="0"
-                          onChange={(e) =>
-                            handleSplitChange(
-                              memberId,
-                              Math.max(
-                                0,
-                                Math.min(100, parseFloat(e.target.value) || 0),
-                              ),
-                            )
-                          }
-                          disabled={!activeMembers.includes(memberId)}
-                        />
-                        <span className={styles.percentSuffix}>%</span>
+            <div className={styles.membersList}>
+              {groupMembers.map((member: GroupMember) => {
+                const memberId = member.user_id;
+                const split = splits.find((s) => s.userId === memberId);
+                const splitPercentage = split?.splitPercentage || 0;
+                const splitAmount = split?.splitAmount || 0;
+                const isActiveMember = activeMembers.includes(memberId);
+
+                return (
+                  <div
+                    key={memberId}
+                    className={`${styles.splitItem} ${isActiveMember ? styles.active : ""}`}
+                    onClick={() => toggleMember(memberId)}
+                  >
+                    <div className={styles.userInfo}>
+                      <div
+                        className={`${styles.checkbox} ${isActiveMember ? styles.checked : ""}`}
+                      >
+                        {isActiveMember && <HiCheck />}
                       </div>
-                      <span className={styles.share}>
+                      <div className={styles.avatar}>
+                        {member.user?.avatar?.url ? (
+                          <Image
+                            src={member.user.avatar.url}
+                            alt={member.user.full_name || "User"}
+                            fill
+                            style={{ objectFit: "cover" }}
+                          />
+                        ) : (
+                          (member?.user?.full_name).charAt(0)
+                        )}
+                      </div>
+                      <span className={styles.memberName}>
+                        {member.user?.full_name}
+                        {user?.id === memberId && " (You)"}
+                      </span>
+                    </div>
+
+                    {splitMode === SPLIT_MODE.EQUAL && totalAmount > 0 && (
+                      <span className={styles.equalShare}>
                         {form.currency}{" "}
                         {splitAmount.toLocaleString(undefined, {
                           maximumFractionDigits: 2,
                         })}
                       </span>
-                    </div>
-                  )}
+                    )}
 
-                  {splitMode === SPLIT_MODE.AMOUNT && (
-                    <div
-                      className={styles.inputWrap}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className={styles.amountInputWrap}>
-                        <span className={styles.currencyPrefix}>
-                          {form.currency}
+                    {splitMode === SPLIT_MODE.PERCENTAGE && (
+                      <div
+                        className={styles.inputWrap}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className={styles.percentInputWrap}>
+                          <input
+                            type="number"
+                            value={splitPercentage || ""}
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            placeholder="0"
+                            onChange={(e) =>
+                              handleSplitChange(
+                                memberId,
+                                Math.max(
+                                  0,
+                                  Math.min(100, parseFloat(e.target.value) || 0),
+                                ),
+                              )
+                            }
+                            disabled={!activeMembers.includes(memberId)}
+                          />
+                          <span className={styles.percentSuffix}>%</span>
+                        </div>
+                        <span className={styles.share}>
+                          {form.currency}{" "}
+                          {splitAmount.toLocaleString(undefined, {
+                            maximumFractionDigits: 2,
+                          })}
                         </span>
-                        <input
-                          type="number"
-                          value={splitAmount || ""}
-                          min="0"
-                          step="0.01"
-                          placeholder="0.00"
-                          onChange={(e) =>
-                            handleSplitChange(
-                              memberId,
-                              Math.max(0, parseFloat(e.target.value) || 0),
-                            )
-                          }
-                          disabled={!activeMembers.includes(memberId)}
-                        />
                       </div>
-                    </div>
-                  )}
+                    )}
+
+                    {splitMode === SPLIT_MODE.AMOUNT && (
+                      <div
+                        className={styles.inputWrap}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className={styles.amountInputWrap}>
+                          <span className={styles.currencyPrefix}>
+                            {form.currency}
+                          </span>
+                          <input
+                            type="number"
+                            value={splitAmount || ""}
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            onChange={(e) =>
+                              handleSplitChange(
+                                memberId,
+                                Math.max(0, parseFloat(e.target.value) || 0),
+                              )
+                            }
+                            disabled={!activeMembers.includes(memberId)}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {splitMode === SPLIT_MODE.PERCENTAGE && (
+              <div className={styles.amountStatus}>
+                <div className={styles.statusRow}>
+                  <span>Total Percentage</span>
+                  <span
+                    className={`${styles.statusValue} ${
+                      Math.abs(totalPercentage - 100) < 0.01
+                        ? styles.statusOk
+                        : styles.statusWarn
+                    }`}
+                  >
+                    {totalPercentage.toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}
+                    %
+                  </span>
                 </div>
-              );
-            })}
+                <div className={styles.progressBar}>
+                  <div
+                    className={`${styles.progressFill} ${
+                      Math.abs(totalPercentage - 100) < 0.01
+                        ? styles.progressOk
+                        : ""
+                    }`}
+                    style={{ width: `${Math.min(100, totalPercentage)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {splitMode === SPLIT_MODE.AMOUNT && totalAmount > 0 && (
+              <div className={styles.amountStatus}>
+                <div className={styles.statusRow}>
+                  <span>Assigned</span>
+                  <span className={styles.statusValue}>
+                    {form.currency}{" "}
+                    {totalAssigned.toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className={styles.statusRow}>
+                  <span>Remaining</span>
+                  <span
+                    className={`${styles.statusValue} ${
+                      Math.abs(amountRemaining) < 0.01
+                        ? styles.statusOk
+                        : styles.statusWarn
+                    }`}
+                  >
+                    {form.currency}{" "}
+                    {amountRemaining.toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className={styles.progressBar}>
+                  <div
+                    className={`${styles.progressFill} ${
+                      Math.abs(amountRemaining) < 0.01 ? styles.progressOk : ""
+                    }`}
+                    style={{
+                      width: `${Math.min(100, totalAmount > 0 ? (totalAssigned / totalAmount) * 100 : 0)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-
-          {splitMode === SPLIT_MODE.PERCENTAGE && (
-            <div className={styles.amountStatus}>
-              <div className={styles.statusRow}>
-                <span>Total Percentage</span>
-                <span
-                  className={`${styles.statusValue} ${
-                    Math.abs(totalPercentage - 100) < 0.01
-                      ? styles.statusOk
-                      : styles.statusWarn
-                  }`}
-                >
-                  {totalPercentage.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}
-                  %
-                </span>
-              </div>
-              <div className={styles.progressBar}>
-                <div
-                  className={`${styles.progressFill} ${
-                    Math.abs(totalPercentage - 100) < 0.01
-                      ? styles.progressOk
-                      : ""
-                  }`}
-                  style={{ width: `${Math.min(100, totalPercentage)}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {splitMode === SPLIT_MODE.AMOUNT && totalAmount > 0 && (
-            <div className={styles.amountStatus}>
-              <div className={styles.statusRow}>
-                <span>Assigned</span>
-                <span className={styles.statusValue}>
-                  {form.currency}{" "}
-                  {totalAssigned.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-              <div className={styles.statusRow}>
-                <span>Remaining</span>
-                <span
-                  className={`${styles.statusValue} ${
-                    Math.abs(amountRemaining) < 0.01
-                      ? styles.statusOk
-                      : styles.statusWarn
-                  }`}
-                >
-                  {form.currency}{" "}
-                  {amountRemaining.toLocaleString(undefined, {
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-              <div className={styles.progressBar}>
-                <div
-                  className={`${styles.progressFill} ${
-                    Math.abs(amountRemaining) < 0.01 ? styles.progressOk : ""
-                  }`}
-                  style={{
-                    width: `${Math.min(100, totalAmount > 0 ? (totalAssigned / totalAmount) * 100 : 0)}%`,
-                  }}
-                />
-              </div>
-            </div>
-          )}
+        )}
+        <div className={styles.summary}>
+          <span className={styles.summaryLabel}>Total amount to split:</span>
+          <span className={styles.total}>
+            {form.currency} {totalAmount.toLocaleString()}
+          </span>
         </div>
-      )}
-
-      <div className={styles.summary}>
-        <span className={styles.summaryLabel}>Total amount to split:</span>
-        <span className={styles.total}>
-          {form.currency} {totalAmount.toLocaleString()}
-        </span>
       </div>
 
-      <div
-        className={styles.modalFooter}
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "0.5rem",
-          marginTop: "1.5rem",
-        }}
-      >
+      <div className={styles.modalFooter}>
         <Button variant="ghost" onClick={onClose} type="button">
           Cancel
         </Button>
@@ -799,6 +786,8 @@ export default function AddExpenseModal({
             ? "Add Personal Expense"
             : "Add Group Expense"
       }
+      size="xl"
+      fullHeight
     >
       {expenseType === EXPENSE_TYPE.PERSONAL ? (
         <AddPersonalExpenseForm onClose={onClose} expense={expense} />

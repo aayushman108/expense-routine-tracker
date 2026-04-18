@@ -9,11 +9,12 @@ import styles from "./Header.module.scss";
 export default function DashboardHeader() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
+  const { sidebarOpen } = useAppSelector((s) => s.ui);
 
   const firstName = user?.full_name?.split(" ")[0] || "there";
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${!sidebarOpen ? styles.collapsed : ""}`}>
       <div className={styles.left}>
         <button
           className={styles.menuBtn}

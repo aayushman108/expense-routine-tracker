@@ -4,6 +4,28 @@
 .form {
   @include flex-column;
   gap: $space-5;
+  padding: $space-2;
+  
+  &.formFull {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+.scrollableContent {
+  flex: 1;
+  min-height: 0; // Essential for shrinking children
+  overflow-y: auto;
+  padding: $space-6; // Slightly more padding for breathability
+  @include styled-scrollbar;
+  @include flex-column;
+  gap: $space-5; // Healthier gap between form sections
 }
 
 .expenseTypeToggle {
@@ -53,11 +75,11 @@
 // ═══════════════════════════════════════
 
 .splitsSection {
-  margin-top: $space-2;
-  padding: $space-4;
-  background: var(--bg-tertiary);
+  margin-top: $space-3;
+  padding: $space-5 $space-6;
+  background: var(--bg-secondary);
   border-radius: $radius-lg;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border-light);
   @include flex-column;
   gap: $space-4;
 }
@@ -70,9 +92,11 @@
   flex-wrap: wrap;
 
   h4 {
-    font-size: $font-size-sm;
-    font-weight: $font-weight-semibold;
-    color: var(--text-primary);
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
     margin: 0;
   }
 }
@@ -80,33 +104,39 @@
 // ── Split mode toggle (Equal / Ratio / Amount) ──
 .splitModeToggle {
   display: flex;
-  background: var(--bg-surface);
-  border-radius: $radius-md;
-  border: 1px solid var(--border-default);
-  padding: 2px;
-  gap: 2px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--border-light);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .modeBtn {
-  padding: $space-1 $space-3;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
-  color: var(--text-tertiary);
+  padding: 4px 14px;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-secondary);
   background: transparent;
   border: none;
-  border-radius: calc(#{$radius-md} - 2px);
+  border-radius: 6px;
   cursor: pointer;
-  transition: all $transition-fast;
-  white-space: nowrap;
+  transition: all $transition-base;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.5;
 
   &:hover {
-    color: var(--text-secondary);
+    opacity: 0.8;
+    background: var(--bg-hover);
   }
 
   &.modeActive {
-    background: var(--color-primary);
-    color: #fff;
+    background: var(--bg-primary);
+    color: var(--color-primary);
+    opacity: 1;
     box-shadow: $shadow-sm;
+    border: 1px solid var(--border-light);
   }
 }
 
@@ -118,10 +148,12 @@
 }
 
 .selectedCount {
-  font-size: $font-size-xs;
-  color: var(--text-tertiary);
-  font-weight: $font-weight-medium;
-  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
 }
 
 .perPersonLabel {
@@ -134,10 +166,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-// ── Members list ──
 .membersList {
   @include flex-column;
-  gap: $space-2;
+  gap: $space-3;
 }
 
 .memberName {
@@ -150,23 +181,24 @@
 // ── Individual split item ──
 .splitItem {
   @include flex-between;
-  padding: $space-3 $space-4;
-  background: var(--bg-card);
+  padding: $space-2 $space-4;
+  background: var(--bg-tertiary);
   border-radius: $radius-md;
-  border: 1px solid var(--border-default);
-  transition: all 0.2s ease-in-out;
+  border: none;
+  transition: all $transition-base;
   cursor: pointer;
   position: relative;
+  height: 48px;
 
   &:hover {
-    border-color: var(--border-hover);
-    background: var(--bg-surface-hover);
+    background: var(--bg-hover);
   }
 
   &.active {
-    border-color: var(--color-primary);
-    background: var(--bg-primary-subtle);
-    box-shadow: 0 0 0 1px var(--color-primary-subtle);
+    background: var(--bg-primary);
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      0 10px 20px -5px rgba(0, 0, 0, 0.1);
   }
 
   .userInfo {
@@ -182,9 +214,9 @@
 
   // ── Equal share display (read-only) ──
   .equalShare {
-    font-size: $font-size-sm;
-    font-weight: $font-weight-semibold;
-    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-primary);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     flex-shrink: 0;
@@ -199,22 +231,22 @@
     flex-shrink: 0;
 
     input {
-      width: 72px;
+      width: 90px;
       height: 32px;
       text-align: center;
       padding: 0 $space-1;
       border-radius: $radius-md;
-      border: 1px solid var(--border-default);
-      background: var(--bg-surface);
-      font-size: $font-size-sm;
-      font-weight: $font-weight-bold;
+      border: 1px solid var(--border-light);
+      background: var(--bg-tertiary);
+      font-size: 13px;
+      font-weight: 700;
       color: var(--text-primary);
       transition: all 0.2s;
 
       &:focus {
         border-color: var(--color-primary);
         outline: none;
-        box-shadow: 0 0 0 2px var(--color-primary-subtle);
+        background: var(--bg-primary);
       }
 
       &::placeholder {
@@ -249,27 +281,28 @@
     }
 
     .currencyPrefix {
-      padding: 0 $space-2;
-      font-size: $font-size-xs;
-      font-weight: $font-weight-semibold;
+      padding: 0 10px;
+      font-size: 10px;
+      font-weight: 800;
       color: var(--text-tertiary);
-      background: var(--bg-tertiary);
+      background: var(--bg-hover);
       height: 32px;
       display: flex;
       align-items: center;
-      border-right: 1px solid var(--border-default);
+      border-right: 1px solid var(--border-light);
       white-space: nowrap;
+      text-transform: uppercase;
     }
 
     input {
-      width: 80px;
+      width: 100px;
       height: 32px;
       text-align: right;
-      padding: 0 $space-2;
+      padding: 0 $space-3;
       border: none;
       background: transparent;
-      font-size: $font-size-sm;
-      font-weight: $font-weight-bold;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--text-primary);
       outline: none;
 
@@ -296,27 +329,27 @@
     }
 
     input {
-      width: 56px;
+      width: 65px;
       height: 32px;
       text-align: right;
-      padding: 0 $space-1 0 $space-2;
+      padding: 0 $space-1 0 $space-3;
       border: none;
       background: transparent;
-      font-size: $font-size-sm;
-      font-weight: $font-weight-bold;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--text-primary);
       outline: none;
 
       &::placeholder {
         color: var(--text-tertiary);
-        font-weight: $font-weight-normal;
+        font-weight: 400;
       }
     }
 
     .percentSuffix {
-      padding: 0 $space-2 0 $space-1;
-      font-size: $font-size-xs;
-      font-weight: $font-weight-semibold;
+      padding: 0 10px 0 5px;
+      font-size: 11px;
+      font-weight: 700;
       color: var(--text-tertiary);
       height: 32px;
       display: flex;
@@ -325,18 +358,18 @@
   }
 
   .checkbox {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    border: 2px solid var(--border-default);
-    border-radius: 6px;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    background: var(--bg-surface);
+    background: var(--bg-tertiary);
     color: white;
-    font-size: 14px;
+    font-size: 12px;
 
     &.checked {
       background: var(--color-primary);
@@ -414,19 +447,40 @@
 
 .summary {
   @include flex-between;
-  padding: $space-3 0;
-  border-top: 1px solid var(--border-default);
+  padding: $space-5 $space-6;
+  background: var(--bg-secondary);
+  border-radius: $radius-lg;
+  border: 1px solid var(--border-light);
+  margin-top: $space-2;
 
   .summaryLabel {
     color: var(--text-secondary);
-    font-size: $font-size-sm;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    opacity: 0.8;
   }
 
   .total {
-    font-weight: $font-weight-bold;
-    color: var(--color-primary);
-    font-size: $font-size-lg;
+    font-weight: 900;
+    color: var(--text-primary);
+    font-size: $font-size-xl;
+    letter-spacing: -0.02em;
   }
+}
+
+// ═══════════════════════════════════════
+// FOOTER
+// ═══════════════════════════════════════
+.modalFooter {
+  padding: $space-4 $space-6;
+  background: var(--bg-tertiary);
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+  border-top: 1px solid var(--border-light);
+  flex-shrink: 0;
 }
 
 // ═══════════════════════════════════════
@@ -435,18 +489,17 @@
 
 .avatar {
   position: relative;
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: var(--bg-tertiary);
   @include flex-center;
   overflow: hidden;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-bold;
-  color: #fff;
-  border: 2px solid var(--bg-card);
-  box-shadow: 0 0 0 1px var(--border-default);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-light);
   text-transform: uppercase;
 
   img {

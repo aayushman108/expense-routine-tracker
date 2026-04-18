@@ -11,7 +11,8 @@ interface ModalProps {
   title?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
+  fullHeight?: boolean;
 }
 
 export default function Modal({
@@ -21,6 +22,7 @@ export default function Modal({
   children,
   footer,
   size,
+  fullHeight,
 }: ModalProps) {
   const handleEsc = useCallback(
     (e: KeyboardEvent) => {
@@ -60,7 +62,9 @@ export default function Modal({
             </button>
           </div>
         )}
-        <div className={styles.body}>{children}</div>
+        <div className={`${styles.body} ${fullHeight ? styles.fullHeight : ""}`}>
+          {children}
+        </div>
         {footer && <div className={styles.footer}>{footer}</div>}
       </div>
     </div>,

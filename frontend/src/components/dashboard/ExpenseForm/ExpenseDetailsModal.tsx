@@ -16,8 +16,10 @@ import {
   HiCheck,
   HiPencil,
   HiTrash,
+  HiXCircle,
 } from "react-icons/hi";
 import Modal from "@/components/ui/Modal/Modal";
+import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "./AddExpenseModal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -34,7 +36,6 @@ import {
 } from "@expense-tracker/shared";
 import type { Expense, ExpenseSplit } from "@/lib/types";
 import styles from "./ExpenseDetailsModal.module.scss";
-import { HiXCircle } from "react-icons/hi";
 
 interface ExpenseDetailsModalProps {
   isOpen: boolean;
@@ -175,6 +176,11 @@ export default function ExpenseDetailsModal({
       onClose={onClose}
       title="Expense Breakdown"
       size="lg"
+      footer={
+        <Button variant="ghost" onClick={onClose}>
+          Close
+        </Button>
+      }
     >
       {loading ? (
         <div className={styles.loader}>
@@ -662,6 +668,7 @@ export default function ExpenseDetailsModal({
                               }
                             >
                               <HiCheck />
+                              <span>Verify</span>
                             </button>
                             <button
                               className={`${styles.actionBtn} ${styles.reject}`}
@@ -674,6 +681,7 @@ export default function ExpenseDetailsModal({
                               }
                             >
                               <HiXCircle />
+                              <span>Reject</span>
                             </button>
                           </div>
                         )}

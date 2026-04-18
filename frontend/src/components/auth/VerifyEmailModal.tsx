@@ -99,26 +99,35 @@ export default function VerifyEmailModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Email Verification">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Email Verification"
+      footer={
+        <Button
+          type="submit"
+          form="verify-email-form"
+          fullWidth
+          isLoading={isLoading}
+          disabled={otp.length !== 6 || isLoading}
+        >
+          Verify Email
+        </Button>
+      }
+    >
       <div className={styles.container}>
         <p className={styles.description}>
           We've sent a 6-digit code to your email. Please enter it below to
           verify your account.
         </p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form
+          id="verify-email-form"
+          onSubmit={handleSubmit}
+          className={styles.form}
+        >
           <OtpInput value={otp} onChange={setOtp} disabled={isLoading} />
-
           {error && <p className={styles.error}>{error}</p>}
-
-          <Button
-            type="submit"
-            fullWidth
-            isLoading={isLoading}
-            disabled={otp.length !== 6 || isLoading}
-          >
-            Verify Email
-          </Button>
         </form>
       </div>
     </Modal>

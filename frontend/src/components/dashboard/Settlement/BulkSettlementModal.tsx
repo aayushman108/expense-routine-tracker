@@ -150,7 +150,44 @@ export default function BulkSettlementModal({
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Settle Balance" size="lg">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Settle Balance"
+      size="lg"
+      footer={
+        <>
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Cancel
+          </Button>
+
+          {balance.status === SETTLEMENT_STATUS.PENDING ? (
+            isYouOwe && (
+              <Button
+                variant="primary"
+                onClick={handleConfirm}
+                isLoading={isSubmitting}
+                disabled={!proofImage}
+              >
+                Settle Balance
+              </Button>
+            )
+          ) : isYouReceived ? (
+            <Button
+              variant="primary"
+              onClick={handleConfirm}
+              isLoading={isSubmitting}
+            >
+              Confirm Receipt
+            </Button>
+          ) : (
+            <Button variant="primary" disabled>
+              Awaiting Verification
+            </Button>
+          )}
+        </>
+      }
+    >
       <div className={styles.modalContent}>
         {/* Step 1: Participants */}
         <div className={styles.settlementFlow}>
@@ -464,41 +501,6 @@ export default function BulkSettlementModal({
             </div>
           </section>
         )}
-
-        {/* Footer Actions */}
-        <div className={styles.footer}>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Cancel
-          </Button>
-
-          {/* Action Button: Only show relevant action for the relevant user */}
-          {balance.status === SETTLEMENT_STATUS.PENDING ? (
-            // Pending State: Only the Debtor can settle
-            isYouOwe && (
-              <Button
-                variant="primary"
-                onClick={handleConfirm}
-                isLoading={isSubmitting}
-                disabled={!proofImage}
-              >
-                Settle Balance
-              </Button>
-            )
-          ) : // Paid State: Creditor confirms, Debtor waits
-          isYouReceived ? (
-            <Button
-              variant="primary"
-              onClick={handleConfirm}
-              isLoading={isSubmitting}
-            >
-              Confirm Receipt
-            </Button>
-          ) : (
-            <Button variant="primary" disabled>
-              Awaiting Verification
-            </Button>
-          )}
-        </div>
       </div>
     </Modal>
   );

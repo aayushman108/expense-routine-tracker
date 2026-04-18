@@ -363,6 +363,25 @@ export default function ProfilePage() {
         onClose={() => setIsPaymentModalOpen(false)}
         title={"Add Payment Method"}
         size="md"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              type="button"
+              onClick={() => setIsPaymentModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="payment-details-form"
+              variant="primary"
+              isLoading={pmLoading}
+            >
+              Add Payment Method
+            </Button>
+          </>
+        }
       >
         <PaymentDetailsForm
           mode={FORM_MODE.ADD}
@@ -376,6 +395,25 @@ export default function ProfilePage() {
         onClose={() => setIsPasswordModalOpen(false)}
         title="Change Password"
         size="sm"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              type="button"
+              onClick={() => setIsPasswordModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="change-password-form"
+              variant="primary"
+              isLoading={authLoading}
+            >
+              Update Password
+            </Button>
+          </>
+        }
       >
         <ChangePasswordForm closeModal={() => setIsPasswordModalOpen(false)} />
       </Modal>

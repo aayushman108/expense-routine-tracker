@@ -34,11 +34,15 @@
   &.lg {
     max-width: 680px;
   }
+
+  &.xl {
+    max-width: 800px;
+  }
 }
 
 .header {
   @include flex-between;
-  padding: $space-6;
+  padding: $space-4 $space-6;
   border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
 
@@ -67,11 +71,18 @@
 }
 
 .body {
-  padding: $space-6;
+  padding: $space-4 $space-6;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
   @include styled-scrollbar;
+
+  &.fullHeight {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
 }
 
 .footer {

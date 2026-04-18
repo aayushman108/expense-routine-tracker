@@ -74,7 +74,11 @@ export function ChangePasswordForm({ closeModal }: ChangePasswordFormProps) {
   };
 
   return (
-    <form onSubmit={handlePasswordSubmit} className={styles.pmForm}>
+    <form
+      id="change-password-form"
+      onSubmit={handlePasswordSubmit}
+      className={styles.pmForm}
+    >
       <Input
         label="Old Password"
         name="oldPassword"
@@ -108,15 +112,6 @@ export function ChangePasswordForm({ closeModal }: ChangePasswordFormProps) {
         error={validationErrors.confirmPassword}
         required
       />
-
-      <div className={styles.modalFooter}>
-        <Button variant="ghost" type="button" onClick={closeModal}>
-          Cancel
-        </Button>
-        <Button type="submit" isLoading={authLoading}>
-          Update Password
-        </Button>
-      </div>
     </form>
   );
 }

@@ -1,4 +1,3 @@
-@use "../../../../styles/variables" as *;
 @use "../../../../styles/mixins" as *;
 
 .page {
@@ -31,21 +30,11 @@
   gap: $space-6;
   padding: $space-6 $space-8;
   background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: $radius-2xl;
-  box-shadow: $shadow-sm;
+  border: 1px solid var(--border-light);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 6px;
-    height: 100%;
-    background: var(--gradient-primary);
-  }
 
   @include mobile-only {
     flex-direction: column;
@@ -97,13 +86,13 @@
     width: 64px;
     height: 64px;
     border-radius: $radius-xl;
-    background: var(--color-primary-50);
-    color: var(--color-primary);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
     @include flex-center;
     overflow: hidden;
-    border: 2px solid #fff;
-    box-shadow: $shadow-md;
-    font-size: 1.75rem;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    font-size: 1.5rem;
     flex-shrink: 0;
 
     img {
@@ -259,8 +248,9 @@
     flex-direction: column;
     gap: $space-2;
 
-    label, .label {
-     font-size: $font-size-sm;
+    label,
+    .label {
+      font-size: $font-size-sm;
       font-weight: $font-weight-medium;
       color: var(--text-primary);
       letter-spacing: 0.05em;
@@ -289,7 +279,8 @@
     padding-bottom: 2px;
   }
 
-  .dateInput, .filterSelect {
+  .dateInput,
+  .filterSelect {
     display: flex;
     align-items: center;
     gap: $space-2;
@@ -299,9 +290,9 @@
     border-radius: $radius-md;
     transition: all $transition-base;
     height: 38px;
-    
 
-    input, select {
+    input,
+    select {
       background: transparent;
       border: none;
       outline: none;
@@ -312,7 +303,8 @@
       cursor: pointer;
     }
 
-    &:focus-within, &:hover {
+    &:focus-within,
+    &:hover {
       background: #fff;
       border-color: var(--color-primary);
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
@@ -368,7 +360,7 @@
 .tab {
   padding: $space-2 $space-6;
   font-size: $font-size-sm;
-  font-weight: $font-weight-bold;
+  font-weight: 700;
   color: var(--text-tertiary);
   cursor: pointer;
   border-radius: $radius-lg;
@@ -382,13 +374,14 @@
 
   &:hover {
     color: var(--text-secondary);
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--bg-hover);
   }
 
   &.active {
-    background: #fff;
-    color: var(--color-primary);
-    box-shadow: $shadow-sm;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-strong);
   }
 }
 
@@ -425,31 +418,24 @@
 }
 
 .expenseCard {
-  @include card;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: $radius-md;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0;
+  transition: all $transition-base;
   cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid var(--border-default);
-  background: var(--bg-card);
   position: relative;
-  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 
   &:hover {
-    transform: translateY(-6px);
-    box-shadow:
-      0 20px 40px -12px rgba(99, 102, 241, 0.15),
-      0 8px 20px -8px rgba(0, 0, 0, 0.08);
-    border-color: var(--color-primary-200);
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
 
     .cardHeader {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-    }
-
-    .date {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.3);
+      background: var(--bg-secondary);
     }
   }
 
@@ -459,54 +445,58 @@
     align-items: center;
     justify-content: space-between;
     padding: $space-5 $space-6;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    transition: background 0.35s ease;
+    background: var(--bg-secondary);
+    position: relative;
+    border-bottom: 1px solid var(--border-light);
+    transition: background 0.3s ease;
 
     .amountSection {
       display: flex;
       align-items: baseline;
-      gap: $space-1;
+      gap: 4px;
 
       .currency {
         font-size: $font-size-sm;
-        font-weight: $font-weight-bold;
-        color: rgba(255, 255, 255, 0.8);
+        font-weight: 700;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
       .amountValue {
-        font-size: $font-size-2xl;
-        font-weight: $font-weight-extrabold;
-        color: #fff;
-        letter-spacing: -0.03em;
+        font-size: $font-size-xl;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
         line-height: 1;
       }
     }
 
     .date {
-      @include flex-center;
+      display: flex;
       flex-direction: column;
-      width: 44px;
-      height: 44px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: $radius-md;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(4px);
-      transition: all $transition-base;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      padding: 4px 8px;
+      border-radius: 8px;
+      min-width: 44px;
+      box-shadow: var(--shadow-sm);
 
       .day {
-        font-size: 16px;
+        font-size: $font-size-sm;
         font-weight: 800;
-        color: #fff;
-        line-height: 1;
+        color: var(--text-primary);
+        line-height: 1.1;
       }
 
       .month {
-        font-size: 8px;
+        font-size: 9px;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.85);
+        color: var(--text-tertiary);
         font-weight: 700;
-        letter-spacing: 0.08em;
-        margin-top: 1px;
+        letter-spacing: 0.05em;
       }
     }
   }
@@ -514,15 +504,15 @@
   // ── Body ──
   .cardBody {
     padding: $space-5 $space-6;
-    @include flex-column;
-    gap: $space-3;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
     flex: 1;
 
     .titleText {
-      font-weight: $font-weight-bold;
-      font-size: $font-size-base;
+      font-weight: 700;
+      font-size: $font-size-sm;
       color: var(--text-primary);
-      letter-spacing: -0.01em;
       line-height: 1.4;
       @include truncate(2);
       white-space: normal;
@@ -532,79 +522,73 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: $space-2;
     }
 
     .tag {
       display: inline-flex;
       align-items: center;
-      padding: 2px 8px;
+      padding: 4px 10px;
       border-radius: $radius-full;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
+      letter-spacing: 0.04em;
 
-      &.draft {
-        background: #f1f5f9;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
-      }
-      &.submitted {
-        background: #eef2ff;
-        color: #4f46e5;
-        border: 1px solid #e0e7ff;
-      }
-      &.verified {
-        background: #f0fdf4;
-        color: #16a34a;
-        border: 1px solid #dcfce7;
-      }
-      &.rejected {
-        background: #fef2f2;
-        color: #dc2626;
-        border: 1px solid #fee2e2;
-      }
-      &.pending {
-        background: #fffbeb;
-        color: #d97706;
-        border: 1px solid #fef3c7;
-      }
-      &.paid {
-        background: #eef2ff;
-        color: #4f46e5;
-        border: 1px solid #e0e7ff;
-      }
+      &.verified,
       &.confirmed {
-        background: #f0fdf4;
-        color: #16a34a;
-        border: 1px solid #dcfce7;
+        background: var(--color-success-light);
+        color: var(--color-success);
+        border: 1px solid
+          color-mix(in srgb, var(--color-success) 20%, transparent);
       }
+
+      &.submitted,
+      &.paid {
+        background: var(--color-primary-50);
+        color: var(--color-primary);
+        border: 1px solid
+          color-mix(in srgb, var(--color-primary) 20%, transparent);
+      }
+
+      &.pending {
+        background: var(--color-warning-light);
+        color: var(--color-warning);
+        border: 1px solid
+          color-mix(in srgb, var(--color-warning) 20%, transparent);
+      }
+
+      &.rejected {
+        background: var(--color-danger-light);
+        color: var(--color-danger);
+        border: 1px solid
+          color-mix(in srgb, var(--color-danger) 20%, transparent);
+      }
+
+      &.draft,
       &.personal {
-        background: #f8fafc;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
+        background: var(--bg-tertiary);
+        color: var(--text-tertiary);
+        border: 1px solid var(--border-light);
       }
     }
 
     .inlineSubmitBtn {
-      padding: 3px 10px;
-      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-      color: white;
+      padding: 4px 12px;
+      background: var(--color-primary);
+      color: #fff;
       border: none;
       border-radius: $radius-full;
-      font-size: 9px;
-      font-weight: 800;
+      font-size: 10px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 
       &:hover {
-        filter: brightness(1.1);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+        background: var(--color-primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
       }
     }
   }
@@ -616,25 +600,24 @@
     justify-content: space-between;
     padding: $space-3 $space-6;
     background: var(--bg-secondary);
-    border-top: 1px solid var(--border-default);
+    border-top: 1px solid var(--border-light);
     margin-top: auto;
+    font-size: 11px;
 
     .dateBadge {
-      font-size: $font-size-xs;
-      font-weight: $font-weight-semibold;
+      font-weight: 600;
       color: var(--text-tertiary);
     }
 
     .payer {
-      font-size: $font-size-xs;
-      font-weight: $font-weight-medium;
-      color: var(--text-tertiary);
+      font-weight: 500;
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       gap: 4px;
 
       .payerHighlight {
-        font-weight: $font-weight-bold;
+        font-weight: 700;
         color: var(--color-primary);
       }
     }
@@ -695,7 +678,7 @@
 
     .statValue {
       display: block;
-      font-size: $font-size-lg;
+      font-size: $font-size-md;
       font-weight: 800;
       color: var(--text-primary);
 
@@ -781,9 +764,10 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: var(--gradient-primary);
+      background: var(--bg-tertiary);
       @include flex-center;
-      color: #fff;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
       font-size: 10px;
       font-weight: $font-weight-bold;
       overflow: hidden;
@@ -813,7 +797,7 @@
       }
 
       .meBadge {
-        color: var(--color-primary);
+        color: var(--text-tertiary);
         font-size: 10px;
         font-weight: 700;
       }
@@ -857,19 +841,20 @@
 .settlementCard {
   @include card;
   display: grid;
-  grid-template-columns: 1fr auto 1fr 160px; // Fixed last column for consistent alignment
+  grid-template-columns: 1fr auto 1fr 160px;
   align-items: center;
-  gap: 24px;
-  padding: 20px 28px;
-  border: 1px solid #f1f5f9;
-  background: #fff;
-  margin-bottom: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: $space-6;
+  padding: $space-4 $space-6;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  border-radius: $radius-md;
+  margin-bottom: $space-4;
+  transition: all $transition-base;
 
   &:hover {
-    border-color: #e2e8f0;
+    border-color: var(--border-strong);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    box-shadow: var(--shadow-md);
   }
 
   .party {
@@ -878,17 +863,17 @@
     gap: 2px;
 
     .label {
-      font-size: 9px;
-      color: #94a3b8;
+      font-size: 10px;
+      color: var(--text-tertiary);
       text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.12em;
+      font-weight: 800;
+      letter-spacing: 0.1em;
     }
 
     .name {
-      font-size: 15px;
+      font-size: $font-size-base;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--text-primary);
       @include truncate;
     }
   }
@@ -900,10 +885,11 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: #f1f5f9;
-    color: #94a3b8;
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
     font-size: 14px;
     flex-shrink: 0;
+    border: 1px solid var(--border-light);
   }
 
   .amountWrap {
@@ -911,14 +897,14 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
-    min-width: 120px; // Guarantees consistent width
+    gap: $space-2;
+    min-width: 120px;
 
     .amount {
-      font-size: 18px;
+      font-size: $font-size-md;
       font-weight: 800;
-      color: #4f46e5;
-      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
     }
 
     .pendingBadge {
