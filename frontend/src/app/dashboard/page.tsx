@@ -165,22 +165,39 @@ export default function DashboardPage() {
           </div>
 
           <div className={styles.healthMain}>
-            <div className={styles.balanceCircle}>
-              <div className={styles.balanceRing}></div>
-              <div className={styles.balanceContent}>
-                <p className={styles.balanceLabel}>NET_LIQUIDITY</p>
-                <h4 className={styles.balanceValue}>
-                  {netBalance >= 0 ? "+" : "-"}रू{" "}
-                  {Math.abs(netBalance).toLocaleString()}
-                </h4>
+            <div className={styles.legendItem}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span className={styles.legendDot} style={{ background: 'var(--color-success)' }}></span>
+                <span className={styles.legendLabel}>Receivable</span>
+              </div>
+              <span className={styles.legendValueSuccess}>रू {owedToYou.toLocaleString()}</span>
+            </div>
+
+            <div className={styles.pieContainer}>
+              <div 
+                className={styles.pieChart}
+                style={{
+                  background: (owedToYou === 0 && youOwe === 0) 
+                    ? 'var(--bg-tertiary)' 
+                    : `conic-gradient(var(--color-success) 0% ${(owedToYou / (owedToYou + youOwe)) * 100}%, var(--color-danger) ${(owedToYou / (owedToYou + youOwe)) * 100}% 100%)`
+                }}
+              >
+                <div className={styles.pieInner}>
+                  <div className={`${styles.netLiquidityPill} ${netBalance >= 0 ? styles.positiveStatus : styles.negativeStatus}`}>
+                    {netBalance >= 0 ? "+" : "-"}रू {Math.abs(netBalance).toLocaleString()}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <Button variant="ghost" className={styles.fullReport}>
-            <span>Generate Audit Report</span>
-            <HiOutlineTrendingUp />
-          </Button>
+            <div className={`${styles.legendItem} ${styles.legendItemRight}`}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span className={styles.legendDot} style={{ background: 'var(--color-danger)' }}></span>
+                <span className={styles.legendLabel}>Payable</span>
+              </div>
+              <span className={styles.legendValueDanger}>रू {youOwe.toLocaleString()}</span>
+            </div>
+          </div>
         </div>
       </section>
 

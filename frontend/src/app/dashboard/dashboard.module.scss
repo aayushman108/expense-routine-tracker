@@ -12,14 +12,29 @@
 
 // ── Animations ──
 @keyframes pulseGlow {
-  0% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
-  100% { opacity: 0.3; transform: scale(1); }
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // ── Compact Infrastructure Stats ──
@@ -46,14 +61,27 @@
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 
-    .statIcon { transform: scale(1.05); opacity: 0.6; }
-    .statGlow { opacity: 0.25; }
+    .statIcon {
+      transform: scale(1.05);
+      opacity: 0.6;
+    }
+    .statGlow {
+      opacity: 0.25;
+    }
   }
 
-  &.blue { --theme-color: var(--color-primary); }
-  &.green { --theme-color: var(--color-success); }
-  &.yellow { --theme-color: var(--color-warning); }
-  &.red { --theme-color: var(--color-danger); }
+  &.blue {
+    --theme-color: var(--color-primary);
+  }
+  &.green {
+    --theme-color: var(--color-success);
+  }
+  &.yellow {
+    --theme-color: var(--color-warning);
+  }
+  &.red {
+    --theme-color: var(--color-danger);
+  }
 }
 
 .statGlow {
@@ -74,7 +102,10 @@
   margin-bottom: $space-4;
 }
 
-.statInfo { @include flex-column; gap: $space-1; }
+.statInfo {
+  @include flex-column;
+  gap: $space-1;
+}
 
 .statLabel {
   font-size: 13px;
@@ -112,7 +143,9 @@
   grid-template-columns: 1.65fr 1fr;
   gap: $space-4;
 
-  @include mobile-only { grid-template-columns: 1fr; }
+  @include responsive(lg) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .personalCard {
@@ -129,7 +162,10 @@
   &:hover {
     border-color: var(--color-primary-600);
     box-shadow: var(--shadow-md);
-    .cardGlow { transform: scale(1.05); opacity: 0.4; }
+    .cardGlow {
+      transform: scale(1.05);
+      opacity: 0.4;
+    }
   }
 }
 
@@ -149,32 +185,83 @@
   @include flex-column;
   gap: 4px;
   margin-bottom: $space-6;
-  p { font-family: $font-mono; font-size: 10px; font-weight: 700; color: var(--color-primary-600); letter-spacing: 0.2em; }
-  h2 { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; margin: 0; }
+  p {
+    font-family: $font-mono;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-primary-600);
+    letter-spacing: 0.2em;
+  }
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
 }
 
-.mainStats { display: flex; align-items: center; gap: $space-10; margin: $space-6 0; }
+.mainStats {
+  display: flex;
+  align-items: center;
+  gap: $space-10;
+  margin: $space-6 0;
+}
 
-.statDivider { width: 1px; height: 40px; background: var(--border-light); }
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background: var(--border-light);
+}
 
 .mainStat {
   @include flex-column;
   gap: 4px;
   flex: 1;
-  .mainStatLabel { font-family: $font-mono; font-size: 10px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.05em; }
+  .mainStatLabel {
+    font-family: $font-mono;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+  }
   .mainStatValue {
     display: flex;
     align-items: baseline;
     gap: 8px;
-    h3 { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin: 0; }
-    .labelIndicator { font-size: 10px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; }
+    h3 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .labelIndicator {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
   }
 }
 
-.btnRow { display: flex; gap: $space-3; margin-top: $space-6; }
+.btnRow {
+  display: flex;
+  gap: $space-3;
+  margin-top: $space-6;
+}
 
-.quickEntryBtn { height: 38px !important; padding: 0 $space-5 !important; font-size: 13px !important; }
-.ledgerBtn { height: 38px !important; background: var(--bg-hover) !important; color: var(--text-secondary) !important; font-size: 13px !important; border-color: var(--border-light) !important; }
+.quickEntryBtn {
+  height: 38px !important;
+  padding: 0 $space-5 !important;
+  font-size: 13px !important;
+}
+.ledgerBtn {
+  height: 38px !important;
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+  border-color: var(--border-light) !important;
+}
 
 .chartSection {
   width: 100%;
@@ -193,36 +280,135 @@
 }
 
 .healthTitleContainer {
-  display: flex; align-items: center; gap: 8px;
-  h3 { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin: 0; }
-  .pulse { width: 8px; height: 8px; background: var(--color-success); border-radius: 50%; animation: pulseGlow 2s infinite; }
-}
-
-.healthHeader { p { color: var(--text-secondary); font-size: 12px; margin-top: 2px; } }
-
-.healthMain { padding: $space-4 0; }
-
-.balanceCircle {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  @include flex-center;
-  margin: 0 auto;
-  
-  .balanceRing {
-    position: absolute;
-    inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .pulse {
+    width: 8px;
+    height: 8px;
+    background: var(--color-success);
     border-radius: 50%;
-    border: 3px solid var(--border-light);
-    border-top: 3px solid var(--color-success);
-    rotate: -45deg;
+    animation: pulseGlow 2s infinite;
   }
 }
 
-.balanceContent {
+.healthHeader {
+  p {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+}
+
+.healthMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-4 $space-2 $space-2;
+  gap: $space-4;
+
+  @include responsive(md) {
+    flex-direction: column;
+    gap: $space-6;
+    
+    .pieLegend {
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    
+    .legendItem {
+      align-items: center;
+      text-align: center;
+    }
+  }
+}
+
+.pieContainer {
+  @include flex-center;
+  flex-shrink: 0;
+}
+
+.pieChart {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  position: relative;
+  @include flex-center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: background 0.5s ease;
+}
+
+.pieInner {
+  width: 132px; // exactly 4px thick ring
+  height: 132px;
+  background: var(--bg-card);
+  border-radius: 50%;
+  @include flex-center;
+  position: absolute;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.legendItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 6px;
+  flex: 1;
+}
+
+.legendItemRight {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legendLabel {
+  font-family: $font-mono;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.legendValueSuccess {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-success);
+}
+
+.legendValueDanger {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-danger);
+}
+
+.netLiquidityPill {
+  font-size: 14px;
+  font-weight: 800;
   text-align: center;
-  .balanceLabel { font-family: $font-mono; font-size: 9px; color: var(--text-tertiary); margin-bottom: 2px; }
-  .balanceValue { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); }
+  max-width: 90%;
+
+  &.positiveStatus {
+    color: var(--color-success);
+  }
+  &.negativeStatus {
+    color: var(--color-danger);
+  }
 }
 
 .fullReport {
@@ -233,11 +419,15 @@
   border-radius: 10px !important;
   padding: 0 $space-4 !important;
   justify-content: space-between !important;
-  svg { font-size: 1rem; }
+  svg {
+    font-size: 1rem;
+  }
 }
 
 // ── Compact Operational Group Cards ──
-.groupSection { margin-top: $space-4; }
+.groupSection {
+  margin-top: $space-4;
+}
 
 .sectionActions {
   display: flex;
@@ -267,14 +457,21 @@
     transform: translateY(-4px);
     border-color: var(--color-primary-600);
     box-shadow: var(--shadow-md);
-    
+
     .groupBanner {
       background: var(--bg-secondary);
-      &::after { opacity: 0.2; }
-      svg { transform: scale(1.1) rotate(5deg); opacity: 0.4; }
+      &::after {
+        opacity: 0.2;
+      }
+      svg {
+        transform: scale(1.1) rotate(5deg);
+        opacity: 0.4;
+      }
     }
 
-    .groupTop h4 { color: var(--color-primary); }
+    .groupTop h4 {
+      color: var(--color-primary);
+    }
   }
 }
 
@@ -290,17 +487,21 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, var(--bg-card) 100%);
+    background: linear-gradient(
+      to bottom,
+      transparent 40%,
+      var(--bg-card) 100%
+    );
     z-index: 2;
     transition: opacity 0.3s ease;
   }
 
-  svg { 
-    font-size: 3.5rem; 
-    color: var(--text-tertiary); 
-    position: relative; 
-    z-index: 3; 
-    opacity: 0.2; 
+  svg {
+    font-size: 3.5rem;
+    color: var(--text-tertiary);
+    position: relative;
+    z-index: 3;
+    opacity: 0.2;
     transition: all 0.5s ease;
   }
 
@@ -323,24 +524,24 @@
   @include flex-between;
   align-items: flex-start;
   gap: $space-3;
-  h4 { 
-    font-size: 1.25rem; 
-    font-weight: 800; 
-    color: var(--text-primary); 
-    margin: 0; 
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
     letter-spacing: -0.02em;
-    transition: color 0.3s ease; 
+    transition: color 0.3s ease;
     line-height: 1.2;
   }
-  .activeBadge { 
-    font-family: $font-mono; 
-    font-size: 9px; 
-    padding: 3px 10px; 
-    background: var(--color-success-light); 
-    color: var(--color-success); 
-    border: 1px solid color-mix(in srgb, var(--color-success) 20%, transparent); 
-    border-radius: $radius-full; 
-    text-transform: uppercase; 
+  .activeBadge {
+    font-family: $font-mono;
+    font-size: 9px;
+    padding: 3px 10px;
+    background: var(--color-success-light);
+    color: var(--color-success);
+    border: 1px solid color-mix(in srgb, var(--color-success) 20%, transparent);
+    border-radius: $radius-full;
+    text-transform: uppercase;
     font-weight: 800;
     letter-spacing: 0.05em;
     white-space: nowrap;
@@ -348,19 +549,19 @@
 }
 
 .groupMeta {
-  display: flex; 
+  display: flex;
   gap: $space-4;
-  span { 
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    font-size: 12px; 
-    color: var(--text-secondary); 
-    font-weight: 600; 
-    svg { 
-      font-size: 14px; 
-      color: var(--color-primary); 
-    } 
+  span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    svg {
+      font-size: 14px;
+      color: var(--color-primary);
+    }
   }
 }
 
@@ -369,14 +570,18 @@
   background: color-mix(in srgb, var(--bg-secondary) 40%, transparent);
   border-top: 1px solid var(--border-light);
   @include flex-between;
-  span { 
-    font-family: $font-mono; 
-    font-size: 9px; 
-    color: var(--text-tertiary); 
-    letter-spacing: 0.05em; 
+  span {
+    font-family: $font-mono;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
     font-weight: 700;
     text-transform: uppercase;
   }
 }
 
-.skeletonCard { height: 220px; border-radius: 12px; background: var(--skeleton-base); }
+.skeletonCard {
+  height: 220px;
+  border-radius: 12px;
+  background: var(--skeleton-base);
+}
