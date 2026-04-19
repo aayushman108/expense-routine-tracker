@@ -299,18 +299,11 @@
   border: none;
   border-radius: $radius-lg;
   font-family: $font-primary;
-  font-size: $font-size-lg;
-  font-weight: $font-weight-bold;
-  color: #fff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  font-size: $font-size-sm;
   cursor: pointer;
   text-decoration: none;
   text-align: center;
   transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3);
-  }
 }
 
 .drawerOverlay {

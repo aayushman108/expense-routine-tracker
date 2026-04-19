@@ -10,6 +10,7 @@ import { getCurrentUser } from "@/store/slices/authSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import { handleThunk } from "@/lib/utils";
 import styles from "./Navbar.module.scss";
+import ThemeToggle from "../ui/ThemeToggle/ThemeToggle";
 
 export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -19,7 +20,9 @@ export default function LandingNavbar() {
 
   const handleLoginClick = async () => {
     const accessToken =
-      typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken")
+        : null;
 
     if (accessToken) {
       const success = await handleThunk(
@@ -29,10 +32,13 @@ export default function LandingNavbar() {
         },
         (error) => {
           dispatch(
-            addToast({ type: "error", message: "Session expired. Please login again." }),
+            addToast({
+              type: "error",
+              message: "Session expired. Please login again.",
+            }),
           );
           console.info("Session in localStorage is invalid or expired.", error);
-        }
+        },
       );
 
       if (success) return;
@@ -62,12 +68,17 @@ export default function LandingNavbar() {
         </div>
 
         <div className={styles.navActions}>
+          <ThemeToggle />
+
           <div className={styles.desktopBtn}>
             <button className={styles.loginBtn} onClick={handleLoginClick}>
               Log in
             </button>
           </div>
-          <Link href="/signup" className={`${styles.getStartedBtn} ${styles.desktopBtn}`}>
+          <Link
+            href="/signup"
+            className={`${styles.getStartedBtn} ${styles.desktopBtn}`}
+          >
             Get Started
           </Link>
           <button
