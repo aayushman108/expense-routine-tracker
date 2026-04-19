@@ -62,7 +62,9 @@ export default function Modal({
             </button>
           </div>
         )}
-        <div className={`${styles.body} ${fullHeight ? styles.fullHeight : ""}`}>
+        <div
+          className={`${styles.body} ${fullHeight ? styles.fullHeight : ""}`}
+        >
           {children}
         </div>
         {footer && <div className={styles.footer}>{footer}</div>}

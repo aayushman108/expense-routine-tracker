@@ -16,14 +16,18 @@
 .gridOverlay {
   position: absolute;
   inset: 0;
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
   z-index: 1;
   mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
-  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    black 0%,
+    transparent 80%
+  );
 }
 
 .featuresInner {
@@ -95,18 +99,23 @@
   gap: $space-6;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+  @include responsive(sm) {
+    padding: $space-6 $space-6;
+  }
 
   &:hover {
     transform: translateY(-8px);
     border-color: rgba(99, 102, 241, 0.3);
     background: rgba(14, 17, 36, 0.9);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   }
 }
 
 .cardWide {
   grid-column: span 2;
-  @include mobile-only { grid-column: span 1; }
+  @include mobile-only {
+    grid-column: span 1;
+  }
 }
 
 .cardGlow {

@@ -32,6 +32,10 @@
   padding: $space-10;
   position: relative;
   z-index: 1;
+
+  @include responsive(sm) {
+    padding: $space-6 $space-4;
+  }
 }
 
 .header {

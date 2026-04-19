@@ -45,6 +45,9 @@
   padding: $space-4 $space-6;
   border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
+  @include responsive(sm) {
+    padding: $space-4 $space-3;
+  }
 
   h2 {
     @include heading($font-size-lg);
@@ -76,6 +79,9 @@
   flex: 1;
   min-height: 0;
   @include styled-scrollbar;
+  @include responsive(sm) {
+    padding: $space-4 $space-3;
+  }
 
   &.fullHeight {
     overflow: hidden;
@@ -92,6 +98,9 @@
   gap: $space-3;
   justify-content: flex-end;
   flex-shrink: 0;
+  @include responsive(sm) {
+    padding: $space-4 $space-3;
+  }
 }
 
 @keyframes fadeIn {

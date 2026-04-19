@@ -8,7 +8,11 @@ import { useGSAP } from "@gsap/react";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loginUser, clearError, getCurrentUser } from "@/store/slices/authSlice";
+import {
+  loginUser,
+  clearError,
+  getCurrentUser,
+} from "@/store/slices/authSlice";
 import { handleThunk } from "@/lib/utils";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";

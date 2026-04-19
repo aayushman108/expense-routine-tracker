@@ -12,6 +12,9 @@ $transition-normal: $transition-base;
   border-radius: $radius-lg;
   position: relative;
   overflow: hidden;
+  @include responsive(sm) {
+    padding: $space-4 $space-3 !important;
+  }
 }
 
 .header {
@@ -892,7 +895,6 @@ $transition-normal: $transition-base;
 
 .splitRow {
   display: grid;
-  grid-template-columns: auto auto auto;
   grid-template-columns: 1.5fr 1fr 1fr;
   align-items: center;
   padding: $space-2 $space-4;
@@ -900,6 +902,10 @@ $transition-normal: $transition-base;
   border: 1px solid var(--border-light);
   border-radius: $radius-md;
   transition: all $transition-base;
+  @include responsive(sm) {
+    grid-template-columns: auto;
+    gap: $space-2;
+  }
 
   &:hover {
     background: var(--bg-hover);

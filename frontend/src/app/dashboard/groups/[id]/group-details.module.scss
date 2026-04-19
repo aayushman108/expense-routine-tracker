@@ -173,6 +173,9 @@
 .actions {
   display: flex;
   gap: $space-3;
+  @include responsive(sm) {
+    justify-content: center;
+  }
 }
 
 .contentGrid {
@@ -403,6 +406,12 @@
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-strong);
   }
+
+  @include responsive(sm) {
+    padding: $space-2 $space-4;
+    font-size: $font-size-xs;
+    font-weight: 600;
+  }
 }
 
 @keyframes slideDown {
@@ -528,6 +537,9 @@
     flex-direction: column;
     gap: $space-4;
     flex: 1;
+    @include responsive(sm) {
+      padding: $space-5 $space-3 !important;
+    }
 
     .titleText {
       font-weight: 700;
@@ -554,6 +566,9 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      @include responsive(sm) {
+        font-size: 9px;
+      }
 
       &.verified,
       &.confirmed {

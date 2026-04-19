@@ -254,8 +254,8 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
       setSplits(
         expense.splits.map((s: any) => ({
           userId: s.user?.id || s.user_id,
-          splitPercentage: Number(s.split_percentage),
-          splitAmount: Number(s.split_amount),
+          splitPercentage: Number(Number(s.split_percentage).toFixed(2)),
+          splitAmount: Number(Number(s.split_amount).toFixed(2)),
         })),
       );
     } else if (groupMembers.length > 0) {
@@ -264,8 +264,10 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
       setSplits(
         groupMembers.map((m: GroupMember) => ({
           userId: m.user_id,
-          splitPercentage: 100 / groupMembers.length,
-          splitAmount: initialAmount / groupMembers.length,
+          splitPercentage: Number(Number(100 / groupMembers.length).toFixed(2)),
+          splitAmount: Number(
+            Number(initialAmount / groupMembers.length).toFixed(2),
+          ),
         })),
       );
     }
@@ -278,12 +280,12 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
           ...s,
           splitPercentage: members.includes(s.userId)
             ? members.length
-              ? 100 / members.length
+              ? Number(Number(100 / members.length).toFixed(2))
               : 0
             : 0,
           splitAmount: members.includes(s.userId)
             ? members.length
-              ? amount / members.length
+              ? Number(Number(amount / members.length).toFixed(2))
               : 0
             : 0,
         })),
@@ -306,7 +308,9 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
         setSplits((prev) =>
           prev.map((s) => ({
             ...s,
-            splitAmount: (s.splitPercentage * newAmount) / 100,
+            splitAmount: Number(
+              Number((s.splitPercentage * newAmount) / 100).toFixed(2),
+            ),
           })),
         );
       }
@@ -323,7 +327,9 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
               ? {
                   ...s,
                   splitPercentage: value,
-                  splitAmount: (value * totalAmount) / 100,
+                  splitAmount: Number(
+                    Number((value * totalAmount) / 100).toFixed(2),
+                  ),
                 }
               : s,
           );
@@ -333,7 +339,7 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
               ? {
                   ...s,
                   splitPercentage: totalAmount
-                    ? (value * 100) / totalAmount
+                    ? Number(Number((value * 100) / totalAmount).toFixed(2))
                     : 0,
                   splitAmount: value,
                 }
@@ -392,8 +398,8 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
         .filter((s) => activeMembers.includes(s.userId))
         .map((s) => ({
           ...s,
-          splitPercentage: Number(s.splitPercentage),
-          splitAmount: Number(s.splitAmount),
+          splitPercentage: Number(Number(s.splitPercentage).toFixed(2)),
+          splitAmount: Number(Number(s.splitAmount).toFixed(2)),
         }));
     }
 

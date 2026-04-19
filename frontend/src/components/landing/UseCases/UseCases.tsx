@@ -4,7 +4,6 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { FiArrowRight } from "react-icons/fi";
 import styles from "./UseCases.module.scss";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -49,10 +48,10 @@ export default function UseCases() {
           stagger: 0.1,
           duration: 0.8,
           ease: "back.out(1.2)",
-        }
+        },
       );
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
 
   return (
@@ -74,10 +73,6 @@ export default function UseCases() {
               <div className={styles.cardIcon}>{c.icon}</div>
               <h3 className={styles.cardTitle}>{c.title}</h3>
               <p className={styles.cardDesc}>{c.desc}</p>
-              <div className={styles.cardFooter}>
-                <span className={styles.cardTag}>{c.tag}</span>
-                <span className={styles.cardArrow}><FiArrowRight /></span>
-              </div>
             </div>
           ))}
         </div>

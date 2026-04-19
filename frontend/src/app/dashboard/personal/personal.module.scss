@@ -147,15 +147,29 @@
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 
-    .iconWrapper { transform: scale(1.05); }
-    .statGlow { opacity: 0.25; }
+    .iconWrapper {
+      transform: scale(1.05);
+    }
+    .statGlow {
+      opacity: 0.25;
+    }
   }
 
-  &.blue { --theme-color: var(--color-primary); }
-  &.green { --theme-color: var(--color-success); }
-  &.yellow { --theme-color: var(--color-warning); }
-  &.red { --theme-color: var(--color-danger); }
-  &.purple { --theme-color: var(--color-primary); }
+  &.blue {
+    --theme-color: var(--color-primary);
+  }
+  &.green {
+    --theme-color: var(--color-success);
+  }
+  &.yellow {
+    --theme-color: var(--color-warning);
+  }
+  &.red {
+    --theme-color: var(--color-danger);
+  }
+  &.purple {
+    --theme-color: var(--color-primary);
+  }
 }
 
 .statGlow {
@@ -175,7 +189,10 @@
   align-items: flex-start;
 }
 
-.statInfo { @include flex-column; gap: $space-1; }
+.statInfo {
+  @include flex-column;
+  gap: $space-1;
+}
 
 .statLabel {
   font-size: 13px;
@@ -210,9 +227,15 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 
-  &.success { color: var(--color-success); }
-  &.danger { color: var(--color-danger); }
-  &.secondary { color: var(--text-tertiary); }
+  &.success {
+    color: var(--color-success);
+  }
+  &.danger {
+    color: var(--color-danger);
+  }
+  &.secondary {
+    color: var(--text-tertiary);
+  }
 }
 
 .expenseHeaderActions {
@@ -480,6 +503,9 @@
     flex-direction: column;
     gap: $space-4;
     flex: 1;
+    @include responsive(sm) {
+      padding: $space-5 $space-3 !important;
+    }
 
     .titleText {
       font-weight: 700;
@@ -506,6 +532,9 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      @include responsive(sm) {
+        font-size: 9px;
+      }
 
       &.verified,
       &.confirmed {

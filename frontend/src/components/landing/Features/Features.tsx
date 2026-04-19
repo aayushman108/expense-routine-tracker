@@ -21,35 +21,35 @@ const features = [
     title: "Smart Expense Tracking",
     desc: "Capture every transaction instantly — from recurring rent to spontaneous coffee runs. Your financial story, all in one place.",
     wide: false,
-    tag: "Core"
+    tag: "Core",
   },
   {
     icon: <HiOutlineUserGroup />,
     title: "Custom Bill Splitting",
     desc: "Go beyond equal splits. Use custom ratios, percentages, or fixed amounts for true financial fairness.",
     wide: false,
-    tag: "Pro"
+    tag: "Pro",
   },
   {
     icon: <HiOutlineChartBar />,
     title: "Analytics Dashboard",
     desc: "Visual breakdowns of spending patterns with actionable insights. Know where every rupee goes.",
     wide: false,
-    tag: "Stats"
+    tag: "Stats",
   },
   {
     icon: <HiOutlineShieldCheck />,
     title: "Monthly Settlements",
     desc: "Generate optimized settlement paths that minimize transactions. Verify payments with digital receipts. Every payment, tracked and confirmed.",
     wide: true,
-    tag: "Settlements"
+    tag: "Settlements",
   },
   {
     icon: <HiOutlineLightningBolt />,
     title: "Group Management",
     desc: "Create and manage multiple groups with dedicated expense histories, member controls, and role-based permissions.",
     wide: false,
-    tag: "Teams"
+    tag: "Teams",
   },
 ];
 
@@ -86,14 +86,14 @@ export default function Features() {
           stagger: 0.1,
           duration: 0.8,
           ease: "power2.out",
-        }
+        },
       );
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
 
   return (
-    <section ref={sectionRef} id="features" className={styles.features}>      
+    <section ref={sectionRef} id="features" className={styles.features}>
       {/* Background puzzle shapes */}
       <div className={styles.shape} />
 
@@ -105,7 +105,7 @@ export default function Features() {
             <span>manage shared finances</span>
           </h2>
           <p className={styles.sectionSub}>
-            A precision-engineered platform built for clarity, fairness, and 
+            A precision-engineered platform built for clarity, fairness, and
             zero friction in your financial relationships.
           </p>
         </div>
