@@ -3,6 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import { handleThunk } from "@/lib/utils";
 import {
   HiOutlineHome,
@@ -18,7 +20,7 @@ import { logoutUser } from "@/store/slices/authSlice";
 import { toggleSidebar } from "@/store/slices/uiSlice";
 import styles from "./Sidebar.module.scss";
 
-const mainNav = [
+const navItems = [
   { href: "/dashboard", icon: <HiOutlineHome />, label: "Dashboard" },
   { href: "/dashboard/groups", icon: <HiOutlineUserGroup />, label: "Groups" },
   {
@@ -26,9 +28,6 @@ const mainNav = [
     icon: <HiOutlineCurrencyDollar />,
     label: "Personal",
   },
-];
-
-const settingsNav = [
   { href: "/dashboard/profile", icon: <FiUser />, label: "Profile" },
   { href: "/dashboard/settings", icon: <HiOutlineCog />, label: "Settings" },
 ];
@@ -39,6 +38,12 @@ export default function Sidebar() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { sidebarOpen } = useAppSelector((s) => s.ui);
+  
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    handleThunk(dispatch(logoutUser()), () => router.push("/"));
+  };
 
   const getInitials = (name?: string) => {
     if (!name) return "?";
@@ -71,50 +76,40 @@ export default function Sidebar() {
       </div>
 
       <nav className={styles.nav}>
-        <div className={styles.navSection}>
-          <div className={styles.navLabel}>Main</div>
-          {mainNav.map((item) => {
-            const isActive =
-              item.href === "/dashboard"
-                ? pathname === "/dashboard"
-                : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`${styles.navItem} ${isActive ? styles.active : ""}`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className={styles.navSection}>
-          <div className={styles.navLabel}>Account</div>
-          {settingsNav.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`${styles.navItem} ${isActive ? styles.active : ""}`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-          <button
-            className={`${styles.navItem} ${styles.logoutBtn}`}
-            onClick={() => handleThunk(dispatch(logoutUser()), () => router.push("/"))}
-          >
-            <FiLogOut />
-            <span>Logout</span>
-          </button>
-        </div>
+        {navItems.map((item) => {
+          const isActive =
+            item.href === "/dashboard"
+              ? pathname === "/dashboard"
+              : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${styles.navItem} ${isActive ? styles.active : ""}`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          className={`${styles.navItem} ${styles.logoutBtn}`}
+          onClick={() => setIsLogoutModalOpen(true)}
+        >
+          <FiLogOut />
+          <span>Logout</span>
+        </button>
       </nav>
+
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+        title="Confirm Logout"
+        message="Are you sure you want to log out of your Expensora account? You will need to sign back in to access your groups and personal expenses."
+        confirmText="Log Out"
+        confirmVariant="danger"
+      />
 
       <div className={styles.userSection}>
         <div className={styles.userCard}>

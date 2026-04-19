@@ -16,12 +16,17 @@
   @include flex-column;
   z-index: $z-sticky;
   transition: width $transition-base;
+  overflow: hidden;
 
-  &.collapsed { width: 72px; }
+  &.collapsed {
+    width: 84px;
+  }
 
   @include mobile-only {
-    width: 72px;
-    &.mobileOpen { width: 280px; }
+    width: 84px;
+    &.mobileOpen {
+      width: 280px;
+    }
   }
 }
 
@@ -29,6 +34,8 @@
   @include flex-between;
   padding: $space-6;
   border-bottom: 1px solid var(--border-light);
+  height: 80px;
+  overflow: hidden;
 
   a {
     display: flex;
@@ -39,41 +46,58 @@
       color: var(--text-primary);
       font-weight: 700;
       font-size: $font-size-lg;
+      white-space: nowrap;
+      transition:
+        opacity 0.2s ease,
+        width 0.2s ease;
     }
   }
 
   .logoIcon {
     @include flex-center;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     background: var(--color-primary);
-    border-radius: 6px;
+    border-radius: 8px;
     color: #fff;
     flex-shrink: 0;
   }
+}
+
+.sidebar.collapsed .logo {
+  padding: $space-6 0;
+  justify-content: center;
+  position: relative;
+
+  a span {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+  }
+
+  .collapseBtn {
+    position: absolute;
+    right: -40px;
+    opacity: 0;
+  }
+}
+
+.sidebar:not(.collapsed) .logo .collapseBtn {
+  opacity: 1;
 }
 
 .nav {
   flex: 1;
   padding: $space-4;
   overflow-y: auto;
+  overflow-x: hidden;
   @include styled-scrollbar;
-}
-
-.navLabel {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: $space-4 $space-3 $space-4;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: $space-3;
-  padding: $space-3 $space-4;
+  padding: $space-3 $space-5;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
@@ -82,8 +106,23 @@
   text-decoration: none;
   margin-bottom: 4px;
   position: relative;
+  white-space: nowrap;
 
-  svg { font-size: 1.1rem; }
+  svg {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    margin-right: $space-3;
+    transition: margin 0.2s ease;
+  }
+
+  span {
+    transition:
+      opacity 0.2s ease,
+      width 0.2s ease;
+  }
 
   &:hover {
     color: var(--text-primary);
@@ -94,13 +133,13 @@
     background: var(--color-primary-50);
     color: var(--color-primary);
     font-weight: 600;
-    
+
     &::after {
       content: "";
       position: absolute;
       left: 0;
-      height: 16px;
-      width: 3px;
+      height: 18px;
+      width: 4px;
       background: var(--color-primary);
       border-radius: 0 4px 4px 0;
     }
@@ -110,7 +149,28 @@
     margin-top: $space-8;
     color: var(--color-danger);
     font-weight: 600;
-    &:hover { background: var(--color-danger-light); }
+    background: transparent;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    &:hover {
+      background: var(--color-danger-light);
+    }
+  }
+}
+
+.sidebar.collapsed .navItem {
+  padding: $space-3 0;
+  justify-content: center;
+
+  svg {
+    margin-right: 0;
+  }
+
+  span {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
   }
 }
 
@@ -122,17 +182,19 @@
 .userCard {
   display: flex;
   align-items: center;
-  gap: $space-3;
   background: var(--bg-tertiary);
   padding: $space-3;
   border-radius: 12px;
   border: 1px solid var(--border-light);
+  overflow: hidden;
+  white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .avatar {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   background: var(--bg-secondary);
   border-radius: 50%;
   @include flex-center;
@@ -140,10 +202,51 @@
   font-weight: 700;
   overflow: hidden;
   flex-shrink: 0;
+  margin-right: $space-3;
+  transition: margin 0.2s ease;
 }
 
-.userName { color: var(--text-primary); font-weight: 600; font-size: 13px; }
-.userEmail { color: var(--text-tertiary); font-size: 11px; }
+.userInfo {
+  flex: 1;
+  min-width: 0;
+  transition:
+    opacity 0.2s ease,
+    width 0.2s ease;
+}
+
+.userName {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userEmail {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .userCard {
+  background: transparent;
+  border-color: transparent;
+  padding: $space-3 0;
+  justify-content: center;
+
+  .avatar {
+    margin-right: 0;
+  }
+  .userInfo {
+    flex: none;
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+  }
+}
 
 .collapseBtn {
   background: transparent;
@@ -151,5 +254,7 @@
   color: var(--text-tertiary);
   cursor: pointer;
   transition: color 0.2s;
-  &:hover { color: var(--text-primary); }
+  &:hover {
+    color: var(--text-primary);
+  }
 }
