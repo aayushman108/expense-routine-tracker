@@ -166,36 +166,54 @@ export default function DashboardPage() {
 
           <div className={styles.healthMain}>
             <div className={styles.legendItem}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span className={styles.legendDot} style={{ background: 'var(--color-success)' }}></span>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <span
+                  className={styles.legendDot}
+                  style={{ background: "var(--color-success)" }}
+                ></span>
                 <span className={styles.legendLabel}>Receivable</span>
               </div>
-              <span className={styles.legendValueSuccess}>रू {owedToYou.toLocaleString()}</span>
+              <span className={styles.legendValueSuccess}>
+                रू {owedToYou.toLocaleString()}
+              </span>
             </div>
 
             <div className={styles.pieContainer}>
-              <div 
+              <div
                 className={styles.pieChart}
                 style={{
-                  background: (owedToYou === 0 && youOwe === 0) 
-                    ? 'var(--bg-tertiary)' 
-                    : `conic-gradient(var(--color-success) 0% ${(owedToYou / (owedToYou + youOwe)) * 100}%, var(--color-danger) ${(owedToYou / (owedToYou + youOwe)) * 100}% 100%)`
+                  background:
+                    owedToYou === 0 && youOwe === 0
+                      ? "var(--bg-tertiary)"
+                      : `conic-gradient(var(--color-success) 0% ${(owedToYou / (owedToYou + youOwe)) * 100}%, var(--color-danger) ${(owedToYou / (owedToYou + youOwe)) * 100}% 100%)`,
                 }}
               >
                 <div className={styles.pieInner}>
-                  <div className={`${styles.netLiquidityPill} ${netBalance >= 0 ? styles.positiveStatus : styles.negativeStatus}`}>
-                    {netBalance >= 0 ? "+" : "-"}रू {Math.abs(netBalance).toLocaleString()}
+                  <div
+                    className={`${styles.netLiquidityPill} ${netBalance >= 0 ? styles.positiveStatus : styles.negativeStatus}`}
+                  >
+                    {netBalance >= 0 ? "+" : "-"}रू{" "}
+                    {Math.abs(netBalance).toLocaleString()}
                   </div>
                 </div>
               </div>
             </div>
 
             <div className={`${styles.legendItem} ${styles.legendItemRight}`}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span className={styles.legendDot} style={{ background: 'var(--color-danger)' }}></span>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <span
+                  className={styles.legendDot}
+                  style={{ background: "var(--color-danger)" }}
+                ></span>
                 <span className={styles.legendLabel}>Payable</span>
               </div>
-              <span className={styles.legendValueDanger}>रू {youOwe.toLocaleString()}</span>
+              <span className={styles.legendValueDanger}>
+                रू {youOwe.toLocaleString()}
+              </span>
             </div>
           </div>
         </div>

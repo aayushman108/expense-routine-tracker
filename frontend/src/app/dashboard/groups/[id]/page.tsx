@@ -20,9 +20,7 @@ import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import { fetchGroupExpenses, updateExpense } from "@/store/slices/expenseSlice";
-import {
-  fetchGroupBalances,
-} from "@/store/slices/settlementSlice";
+import { fetchGroupBalances } from "@/store/slices/settlementSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
@@ -307,20 +305,33 @@ export default function GroupDetailsPage() {
             </div>
 
             {activeTab === "expenses" && (
-              <div className={styles.filterActions}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={styles.filterToggleBtn}
-                  onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                >
-                  <HiOutlineFilter />
-                  {isFilterExpanded ? "Hide Filters" : "Filters"}
-                  {(startDate || endDate || expenseStatus || settlementStatus) && (
-                    <span className={styles.filterDot} />
-                  )}
-                </Button>
-              </div>
+              <>
+                <div className={styles.filterActions}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={styles.filterToggleBtn}
+                    onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                  >
+                    <HiOutlineFilter />
+                    {isFilterExpanded ? "Hide Filters" : "Filters"}
+                    {(startDate ||
+                      endDate ||
+                      expenseStatus ||
+                      settlementStatus) && (
+                      <span className={styles.filterDot} />
+                    )}
+                  </Button>
+                </div>
+                <div className={styles.filterActionsSm}>
+                  <button
+                    className={styles.filterToggleBtn}
+                    onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                  >
+                    <HiOutlineFilter />
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
@@ -378,16 +389,22 @@ export default function GroupDetailsPage() {
                 />
 
                 <div className={styles.filterActions}>
-                  <Button
-                    size="sm"
-                    onClick={handleApplyFilters}
-                  >
-                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Button size="sm" onClick={handleApplyFilters}>
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
                       <HiOutlineSearch />
                       Search
                     </span>
                   </Button>
-                  {(startDate || endDate || expenseStatus || settlementStatus) && (
+                  {(startDate ||
+                    endDate ||
+                    expenseStatus ||
+                    settlementStatus) && (
                     <button
                       className={styles.clearFilters}
                       onClick={handleClearFilters}
@@ -404,117 +421,119 @@ export default function GroupDetailsPage() {
           {activeTab === "expenses" ? (
             <div className={styles.expenseSection}>
               <div className={styles.expenseList}>
-              {expensesLoading ? (
-                <div className={styles.loaderContainer}>
-                  Loading expenses...
-                </div>
-              ) : groupExpenses.length > 0 ? (
-                groupExpenses.map((expense: any) => {
-                  const { day, month } = formatDate(expense.expense_date);
-                  const isPayer = expense.paid_by === user?.id;
-
-                  return (
-                    <div
-                      key={expense.id}
-                      className={styles.expenseCard}
-                      onClick={() => setSelectedExpenseId(expense.id)}
-                    >
-                      <div className={styles.cardHeader}>
-                        <div className={styles.amountSection}>
-                          <span className={styles.currency}>
-                            {expense.currency}
-                          </span>
-                          <span className={styles.amountValue}>
-                            {Number(expense.total_amount).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className={styles.date}>
-                          <span className={styles.day}>{day}</span>
-                          <span className={styles.month}>{month}</span>
-                        </div>
-                      </div>
-
-                      <div className={styles.cardBody}>
-                        <span className={styles.titleText}>
-                          {expense.description}
-                        </span>
-                        <div className={styles.tagsRow}>
-                          <span
-                            className={`${styles.tag} ${styles[expense.expense_status]}`}
-                          >
-                            Expense: {expense.expense_status.toUpperCase()}
-                          </span>
-                          {expense.expense_status === "verified" &&
-                            expense.settlement_status && (
-                              <span
-                                className={`${styles.tag} ${styles[expense.settlement_status]}`}
-                              >
-                                Settlement:{" "}
-                                {expense.settlement_status === "personal"
-                                  ? "PRIVATE"
-                                  : expense.settlement_status.toUpperCase()}
-                              </span>
-                            )}
-                          {expense.expense_status === "draft" && (
-                            <button
-                              className={styles.inlineSubmitBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleUpdateStatus(
-                                  expense.id,
-                                  EXPENSE_STATUS.SUBMITTED,
-                                );
-                              }}
-                            >
-                              Submit
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className={styles.cardFooter}>
-                        <span className={styles.dateBadge}>
-                          {new Date(expense.expense_date).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
-                        <span className={styles.payer}>
-                          {isPayer ? (
-                            <span className={styles.payerHighlight}>You</span>
-                          ) : (
-                            <span>
-                              {expense.payer?.full_name ||
-                                expense.payer_name ||
-                                "Member"}
-                            </span>
-                          )}{" "}
-                          paid
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className={styles.emptyStateCard}>
-                  <div className={styles.icon}>
-                    <HiOutlineCurrencyDollar />
+                {expensesLoading ? (
+                  <div className={styles.loaderContainer}>
+                    Loading expenses...
                   </div>
-                  <p className={styles.title}>No expenses yet</p>
-                  <p className={styles.subtext}>
-                    Start tracking your group spending.
-                  </p>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() => setIsExpenseModalOpen(true)}
-                  >
-                    Log First Expense
-                  </Button>
-                </div>
-              )}
-              
+                ) : groupExpenses.length > 0 ? (
+                  groupExpenses.map((expense: any) => {
+                    const { day, month } = formatDate(expense.expense_date);
+                    const isPayer = expense.paid_by === user?.id;
+
+                    return (
+                      <div
+                        key={expense.id}
+                        className={styles.expenseCard}
+                        onClick={() => setSelectedExpenseId(expense.id)}
+                      >
+                        <div className={styles.cardHeader}>
+                          <div className={styles.amountSection}>
+                            <span className={styles.currency}>
+                              {expense.currency}
+                            </span>
+                            <span className={styles.amountValue}>
+                              {Number(expense.total_amount).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className={styles.date}>
+                            <span className={styles.day}>{day}</span>
+                            <span className={styles.month}>{month}</span>
+                          </div>
+                        </div>
+
+                        <div className={styles.cardBody}>
+                          <span className={styles.titleText}>
+                            {expense.description}
+                          </span>
+                          <div className={styles.tagsRow}>
+                            <span
+                              className={`${styles.tag} ${styles[expense.expense_status]}`}
+                            >
+                              Expense: {expense.expense_status.toUpperCase()}
+                            </span>
+                            {expense.expense_status === "verified" &&
+                              expense.settlement_status && (
+                                <span
+                                  className={`${styles.tag} ${styles[expense.settlement_status]}`}
+                                >
+                                  Settlement:{" "}
+                                  {expense.settlement_status === "personal"
+                                    ? "PRIVATE"
+                                    : expense.settlement_status.toUpperCase()}
+                                </span>
+                              )}
+                            {expense.expense_status === "draft" && (
+                              <button
+                                className={styles.inlineSubmitBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateStatus(
+                                    expense.id,
+                                    EXPENSE_STATUS.SUBMITTED,
+                                  );
+                                }}
+                              >
+                                Submit
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className={styles.cardFooter}>
+                          <span className={styles.dateBadge}>
+                            {new Date(expense.expense_date).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              },
+                            )}
+                          </span>
+                          <span className={styles.payer}>
+                            {isPayer ? (
+                              <span className={styles.payerHighlight}>You</span>
+                            ) : (
+                              <span>
+                                {expense.payer?.full_name ||
+                                  expense.payer_name ||
+                                  "Member"}
+                              </span>
+                            )}{" "}
+                            paid
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className={styles.emptyStateCard}>
+                    <div className={styles.icon}>
+                      <HiOutlineCurrencyDollar />
+                    </div>
+                    <p className={styles.title}>No expenses yet</p>
+                    <p className={styles.subtext}>
+                      Start tracking your group spending.
+                    </p>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setIsExpenseModalOpen(true)}
+                    >
+                      Log First Expense
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {pagination && (
@@ -686,9 +705,7 @@ export default function GroupDetailsPage() {
                       <div className={styles.name}>
                         {member.user?.full_name}
                         {user?.id === member.user?.id && (
-                          <span className={styles.meBadge}>
-                            (You)
-                          </span>
+                          <span className={styles.meBadge}>(You)</span>
                         )}
                       </div>
                       <div className={styles.email}>{member.user?.email}</div>

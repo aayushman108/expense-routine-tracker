@@ -210,12 +210,20 @@
   align-items: center;
   gap: $space-10;
   margin: $space-6 0;
+  @include responsive(sm) {
+    flex-direction: column;
+    gap: $space-4;
+    align-items: flex-start;
+  }
 }
 
 .statDivider {
   width: 1px;
   height: 40px;
   background: var(--border-light);
+  @include responsive(sm) {
+    display: none;
+  }
 }
 
 .mainStat {
@@ -318,17 +326,19 @@
   gap: $space-4;
 
   @include responsive(md) {
-    
     .pieLegend {
       width: 100%;
       flex-direction: row;
       justify-content: space-between;
     }
-    
+
     .legendItem {
       align-items: center;
       text-align: center;
     }
+  }
+  @include responsive(sm) {
+    flex-direction: column;
   }
 }
 

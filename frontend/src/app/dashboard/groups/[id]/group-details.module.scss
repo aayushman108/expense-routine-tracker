@@ -211,6 +211,22 @@
 .filterActions {
   display: flex;
   gap: $space-3;
+  @include responsive(sm) {
+    display: none;
+  }
+}
+
+.filterActionsSm {
+  display: none;
+  @include responsive(sm) {
+    display: block;
+  }
+  & > button {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    color: var(--text-primary);
+  }
 }
 
 .filterToggleBtn {
