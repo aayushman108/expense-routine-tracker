@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.scss";
 import AppProvider from "@/components/providers/AppProvider";
 import ToastContainer from "@/components/ui/Toast/Toast";
+import ServiceWorkerRegister from "@/components/pwa/serviceWorkerRegister";
 
 export const metadata: Metadata = {
   title: {
@@ -65,6 +66,7 @@ export const metadata: Metadata = {
       { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
     ],
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -111,6 +113,7 @@ export default function RootLayout({
             }),
           }}
         />
+        <ServiceWorkerRegister />
         <AppProvider>
           {children}
           <ToastContainer />
@@ -119,4 +122,3 @@ export default function RootLayout({
     </html>
   );
 }
-
