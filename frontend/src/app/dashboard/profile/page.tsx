@@ -34,6 +34,9 @@ import { PaymentDetailsForm } from "@/components/dashboard/PaymentDetailsForm/Pa
 import { FORM_MODE } from "@expense-tracker/shared";
 import { ChangePasswordForm } from "@/components/dashboard/ChangePasswordForm/ChangePasswordForm";
 import { handleThunk } from "@/lib/utils";
+import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
+import { logoutUser } from "@/store/slices/authSlice";
+import { FiLogOut } from "react-icons/fi";
 
 interface MetadataField {
   key: string;
@@ -126,6 +129,7 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchPaymentMethods());
@@ -178,6 +182,10 @@ export default function ProfilePage() {
     dispatch(
       addToast({ type: "success", message: `${label} copied to clipboard!` }),
     );
+  };
+
+  const handleLogout = () => {
+    handleThunk(dispatch(logoutUser()), () => router.push("/"));
   };
 
   return (
@@ -315,6 +323,21 @@ export default function ProfilePage() {
                 Change Password
               </Button>
             </div>
+            <div className={styles.sessionRow}>
+              <div className={styles.sessionCopy}>
+                <span className={styles.sessionLabel}>Session</span>
+                <span className={styles.sessionHint}>
+                  Sign out on this device. You can sign in again anytime.
+                </span>
+              </div>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => setIsLogoutModalOpen(true)}
+              >
+                <FiLogOut /> Log out
+              </Button>
+            </div>
           </Card>
         </div>
 
@@ -411,6 +434,16 @@ export default function ProfilePage() {
       </Modal>
 
       {/* ── Change Password Modal ── */}
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+        title="Confirm Logout"
+        message="Are you sure you want to log out of your Expensora account? You will need to sign back in to access your groups and personal expenses."
+        confirmText="Log Out"
+        confirmVariant="danger"
+      />
+
       <Modal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}

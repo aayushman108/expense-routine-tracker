@@ -26,7 +26,12 @@
 
   @include mobile-only {
     padding: $space-4;
-    left: 72px; // Usually sidebar is collapsed on mobile
+    left: 0;
+    right: 0;
+
+    &.collapsed {
+      left: 0;
+    }
   }
 }
 
@@ -36,17 +41,35 @@
   gap: $space-4;
 }
 
-.menuBtn {
-  display: none;
+.sidebarToggle {
+  display: none!important;
   @include flex-center;
+  flex-shrink: 0;
   width: 36px;
   height: 36px;
   background: var(--bg-tertiary);
   border-radius: 8px;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   border: 1px solid var(--border-light);
-  
-  @include mobile-only { display: flex; }
+  cursor: pointer;
+  transition:
+    color $transition-fast,
+    background $transition-fast,
+    border-color $transition-fast;
+
+  svg {
+    font-size: 1.15rem;
+  }
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+
+  @media (min-width: $bp-md) {
+    display: flex!important;
+  }
 }
 
 .greeting {

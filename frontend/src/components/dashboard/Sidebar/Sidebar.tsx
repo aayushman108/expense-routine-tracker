@@ -6,31 +6,16 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import { handleThunk } from "@/lib/utils";
+import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
+import { FiPieChart, FiLogOut } from "react-icons/fi";
 import {
-  HiOutlineHome,
-  HiOutlineUserGroup,
-  HiOutlineCurrencyDollar,
-  // HiOutlineCog,
-  HiOutlineChevronLeft,
-  HiOutlineChevronRight,
-} from "react-icons/hi";
-import { FiPieChart, FiUser, FiLogOut } from "react-icons/fi";
+  DASHBOARD_NAV_ITEMS,
+  isDashboardNavActive,
+} from "@/constants/dashboardNav";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { logoutUser } from "@/store/slices/authSlice";
 import { toggleSidebar } from "@/store/slices/uiSlice";
 import styles from "./Sidebar.module.scss";
-
-const navItems = [
-  { href: "/dashboard", icon: <HiOutlineHome />, label: "Dashboard" },
-  { href: "/dashboard/groups", icon: <HiOutlineUserGroup />, label: "Groups" },
-  {
-    href: "/dashboard/personal",
-    icon: <HiOutlineCurrencyDollar />,
-    label: "Personal",
-  },
-  { href: "/dashboard/profile", icon: <FiUser />, label: "Profile" },
-  // { href: "/dashboard/settings", icon: <HiOutlineCog />, label: "Settings" },
-];
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -57,7 +42,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`${styles.sidebar} ${!sidebarOpen ? styles.collapsed : ""} ${sidebarOpen ? styles.mobileOpen : ""}`}
+      className={`${styles.sidebar} ${!sidebarOpen ? styles.collapsed : ""}`}
     >
       <div className={styles.logo}>
         <Link href="/dashboard">
@@ -66,28 +51,20 @@ export default function Sidebar() {
           </div>
           <span>Expensora</span>
         </Link>
-        <button
-          className={styles.collapseBtn}
-          onClick={() => dispatch(toggleSidebar())}
-          aria-label="Toggle sidebar"
-        >
-          {sidebarOpen ? <HiOutlineChevronLeft /> : <HiOutlineChevronRight />}
-        </button>
+        
       </div>
 
       <nav className={styles.nav}>
-        {navItems.map((item) => {
-          const isActive =
-            item.href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname.startsWith(item.href);
+        {DASHBOARD_NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive = isDashboardNavActive(pathname, item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`${styles.navItem} ${isActive ? styles.active : ""}`}
             >
-              {item.icon}
+              <Icon />
               <span>{item.label}</span>
             </Link>
           );

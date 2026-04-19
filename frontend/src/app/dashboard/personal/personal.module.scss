@@ -3,6 +3,10 @@
 .page {
   @include flex-column;
   gap: $space-8;
+  @include mobile-only {
+    padding: $space-6 0;
+    gap: $space-6;
+  }
 }
 
 .header {

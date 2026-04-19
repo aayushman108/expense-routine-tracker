@@ -8,6 +8,10 @@
   @include flex-column;
   gap: $space-6;
   padding-bottom: $space-10;
+  @include mobile-only {
+    padding: $space-6 0;
+    gap: $space-6;
+  }
 }
 
 // ── Animations ──
@@ -314,8 +318,6 @@
   gap: $space-4;
 
   @include responsive(md) {
-    flex-direction: column;
-    gap: $space-6;
     
     .pieLegend {
       width: 100%;

@@ -4,6 +4,10 @@
   display: flex;
   flex-direction: column;
   gap: $space-8;
+  @include mobile-only {
+    padding: $space-6 0;
+    gap: $space-6;
+  }
 }
 
 .groupIconPlaceholder {

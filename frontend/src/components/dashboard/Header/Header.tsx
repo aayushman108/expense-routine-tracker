@@ -1,8 +1,8 @@
 "use client";
 
-import { HiMenuAlt2 } from "react-icons/hi";
+import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { setSidebarOpen } from "@/store/slices/uiSlice";
+import { toggleSidebar } from "@/store/slices/uiSlice";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
 import styles from "./Header.module.scss";
 
@@ -17,11 +17,13 @@ export default function DashboardHeader() {
     <header className={`${styles.header} ${!sidebarOpen ? styles.collapsed : ""}`}>
       <div className={styles.left}>
         <button
-          className={styles.menuBtn}
-          onClick={() => dispatch(setSidebarOpen(true))}
-          aria-label="Open sidebar"
+          type="button"
+          className={styles.sidebarToggle}
+          onClick={() => dispatch(toggleSidebar())}
+          aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          aria-expanded={sidebarOpen}
         >
-          <HiMenuAlt2 />
+          {sidebarOpen ? <HiOutlineChevronLeft /> : <HiOutlineChevronRight />}
         </button>
         <h1 className={styles.greeting}>
           Hello, {firstName} <span>👋</span>

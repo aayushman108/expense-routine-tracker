@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
 import Header from "@/components/dashboard/Header/Header";
+import MobileBottomNav from "@/components/dashboard/MobileBottomNav/MobileBottomNav";
 import { getCurrentUser } from "@/store/slices/authSlice";
-import { setSidebarOpen } from "@/store/slices/uiSlice";
 import styles from "./layout.module.scss";
 
 import type { RootState } from "@/store";
@@ -64,18 +64,14 @@ export default function DashboardLayout({
     <div className={styles.layout}>
       <Sidebar />
 
-      {/* Mobile overlay */}
-      <div
-        className={`${styles.overlay} ${sidebarOpen ? styles.showOverlay : ""}`}
-        onClick={() => dispatch(setSidebarOpen(false))}
-      />
-
       <main
         className={`${styles.main} ${!sidebarOpen ? styles.collapsed : ""}`}
       >
         <Header />
         <div className={styles.content}>{children}</div>
       </main>
+
+      <MobileBottomNav />
     </div>
   );
 }

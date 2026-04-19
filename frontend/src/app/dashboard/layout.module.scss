@@ -27,7 +27,12 @@
   }
 
   @include mobile-only {
-    margin-left: 72px; 
+    margin-left: 0;
+
+    /* Beat `.main.collapsed` so narrow rail margin does not apply on phones */
+    &.collapsed {
+      margin-left: 0;
+    }
   }
 }
 
@@ -40,20 +45,9 @@
   position: relative;
 
   @include mobile-only {
-    padding: $space-4;
-  }
-}
-
-.overlay {
-  display: none;
-  @include mobile-only {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    z-index: $z-overlay;
-    &.showOverlay {
-      display: block;
-    }
+    padding: $space-4 $space-4;
+    padding-top: calc(56px + $space-4);
+    /* Space for fixed bottom tab bar + home indicator (PWA / iOS) */
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   }
 }

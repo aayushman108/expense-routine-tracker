@@ -9,7 +9,7 @@
   min-height: calc(100vh - 100px);
 
   @include mobile-only {
-    padding: $space-4;
+    padding: $space-6 0;
     gap: $space-6;
   }
 
@@ -406,6 +406,48 @@
   color: var(--text-primary);
   word-break: break-all;
   padding-left: 0;
+}
+
+.sessionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  margin-top: $space-6;
+  padding-top: $space-6;
+  border-top: 1px solid var(--border-default);
+  flex-wrap: wrap;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.sessionCopy {
+  @include flex-column;
+  gap: $space-1;
+  min-width: 0;
+  flex: 1;
+}
+
+.sessionLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.sessionHint {
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  max-width: 36rem;
 }
 
 .footer {

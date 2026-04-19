@@ -1,0 +1,90 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+$nav-height: 3.25rem;
+
+.bar {
+  display: none;
+
+  @include mobile-only {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: $z-sticky;
+    min-height: calc(#{$nav-height} + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-top: $space-2;
+    padding-left: $space-2;
+    padding-right: $space-2;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: $space-1;
+    /* Opaque bar so page content does not show through (PWA / mobile) */
+    background: color-mix(in srgb, var(--bg-card) 96%, var(--color-primary) 4%);
+    border-top: 1px solid var(--border-light);
+    box-shadow:
+      0 -1px 0 var(--border-light),
+      0 -8px 32px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.tab {
+  @include flex-column;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  min-width: 0;
+  max-width: 5.5rem;
+  padding: $space-1 $space-1;
+  border-radius: $radius-md;
+  text-decoration: none;
+  color: var(--text-tertiary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition:
+    color $transition-fast,
+    background $transition-fast;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+}
+
+.iconWrap {
+  @include flex-center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: $radius-md;
+  transition: background $transition-fast;
+
+  svg {
+    font-size: 1.35rem;
+  }
+}
+
+.label {
+  @include truncate(1);
+  max-width: 100%;
+  text-align: center;
+}
+
+.tab:hover {
+  color: var(--text-secondary);
+}
+
+.tab.active {
+  color: var(--color-primary);
+
+  .iconWrap {
+    background: var(--color-primary-50);
+  }
+}
