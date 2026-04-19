@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   HiOutlineUser,
+  HiOutlineChevronLeft,
   HiOutlineMail,
   HiOutlinePhone,
   HiOutlineCamera,
@@ -112,6 +114,7 @@ export function getMetadataFields(
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isLoading: authLoading } = useAppSelector(
     (s: RootState) => s.auth,
@@ -179,10 +182,28 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <h1>My Profile</h1>
-        <p>Manage your account settings and personal information.</p>
-      </div>
+      <header className={styles.header}>
+        <div className={styles.titleArea}>
+          <button
+            className={styles.backBtn}
+            onClick={() => router.push("/dashboard")}
+          >
+            <HiOutlineChevronLeft /> Back to Dashboard
+          </button>
+          <div className={styles.sessionTag}>SECURE_PROFILE_SETTINGS</div>
+          <div className={styles.titleWrapper}>
+            <div className={styles.icon}>
+              <HiOutlineUser />
+            </div>
+            <h1>My Profile</h1>
+          </div>
+          <p>
+            Manage your account settings, personal information, and payment methods.
+          </p>
+        </div>
+        <div className={styles.actions}>
+        </div>
+      </header>
 
       <div className={styles.profileLayout}>
         <div className={styles.leftColumn}>
