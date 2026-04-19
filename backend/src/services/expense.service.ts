@@ -138,6 +138,7 @@ async function getPersonalExpenses(
   endDate?: string,
   expenseStatus?: string,
   settlementStatus?: string,
+  expenseType?: string,
 ) {
   return await expenseDao.getUserExpenses(
     userId,
@@ -147,6 +148,7 @@ async function getPersonalExpenses(
     endDate,
     expenseStatus,
     settlementStatus,
+    expenseType,
   );
 }
 
@@ -194,6 +196,10 @@ async function getUserSummary(userId: string) {
   return await expenseDao.getUserSummary(userId);
 }
 
+async function getUserGroupSummaries(userId: string) {
+  return await expenseDao.getUserGroupSummaries(userId);
+}
+
 export const expenseService = {
   addExpense,
   updateExpense,
@@ -201,6 +207,7 @@ export const expenseService = {
   getGroupExpenses,
   getPersonalExpenses,
   getUserSummary,
+  getUserGroupSummaries,
   deleteExpense,
   updateSplitStatus,
 };

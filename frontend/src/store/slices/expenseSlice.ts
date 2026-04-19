@@ -19,6 +19,14 @@ interface ExpenseState {
     remainingToPay: number;
     remainingToReceive: number;
   } | null;
+  groupSummaries: {
+    id: string;
+    name: string;
+    totalGroupSpend: number;
+    myTotalShare: number;
+    iOweOthers: number;
+    othersOweMe: number;
+  }[];
   isLoading: boolean;
   isDetailsLoading: boolean;
   isSubmitting: boolean;
@@ -28,6 +36,7 @@ interface ExpenseState {
     page: number;
     limit: number;
     totalPages: number;
+    totalAmount?: number;
   } | null;
 }
 
@@ -37,6 +46,7 @@ const initialState: ExpenseState = {
   groupExpenses: [],
   currentExpense: null,
   summary: null,
+  groupSummaries: [],
   isLoading: false,
   isDetailsLoading: false,
   isSubmitting: false,
@@ -51,12 +61,35 @@ export interface ExpenseFilters {
   endDate?: string;
   expenseStatus?: string;
   settlementStatus?: string;
+  expenseType?: string;
 }
 
 export const fetchUserExpenses = createAsyncThunk<
-  { data: Expense[]; pagination: any },
+  { data: Expense[]; pagination: { total: number; page: number; limit: number; totalPages: number; totalAmount?: number } },
   ExpenseFilters | undefined
 >("expenses/fetchUserExpenses", async (filters, { rejectWithValue }) => {
+  try {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value.toString());
+      });
+    }
+
+    const { data } = await api.get(`/expenses/user?${params.toString()}`);
+    return data.data; // { data: Expense[], pagination: ... }
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to fetch expenses",
+    );
+  }
+});
+
+export const fetchPersonalExpenses = createAsyncThunk<
+  { data: Expense[]; pagination: { total: number; page: number; limit: number; totalPages: number; totalAmount?: number } },
+  ExpenseFilters | undefined
+>("expenses/fetchPersonalExpenses", async (filters, { rejectWithValue }) => {
   try {
     const params = new URLSearchParams();
     if (filters) {
@@ -90,8 +123,23 @@ export const fetchUserSummary = createAsyncThunk<ExpenseState["summary"], void>(
   },
 );
 
+export const fetchUserGroupSummaries = createAsyncThunk<ExpenseState["groupSummaries"], void>(
+  "expenses/fetchUserGroupSummaries",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get("/expenses/user/group-summaries");
+      return data.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch group summaries",
+      );
+    }
+  },
+);
+
 export const fetchGroupExpenses = createAsyncThunk<
-  { data: Expense[]; pagination: any },
+  { data: Expense[]; pagination: { total: number; page: number; limit: number; totalPages: number; totalAmount?: number } },
   { groupId: string; filters?: ExpenseFilters }
 >(
   "expenses/fetchGroupExpenses",
@@ -222,19 +270,32 @@ const expenseSlice = createSlice({
     builder.addCase(fetchUserExpenses.fulfilled, (state, action) => {
       state.isLoading = false;
       state.expenses = action.payload.data;
-      state.pagination = action.payload.pagination;
-      state.personalExpenses = action.payload.data.filter(
-        (e) => e.expense_type === EXPENSE_TYPE.PERSONAL,
-      );
     });
     builder.addCase(fetchUserExpenses.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });
 
+    // Personal expenses
+    builder.addCase(fetchPersonalExpenses.pending, () => {
+      // Don't set global isLoading to true so it doesn't mask the whole page if fetched softly
+    });
+    builder.addCase(fetchPersonalExpenses.fulfilled, (state, action) => {
+      state.personalExpenses = action.payload.data;
+      state.pagination = action.payload.pagination;
+    });
+    builder.addCase(fetchPersonalExpenses.rejected, (state, action) => {
+      state.error = action.payload as string;
+    });
+
     // User summary
     builder.addCase(fetchUserSummary.fulfilled, (state, action) => {
       state.summary = action.payload;
+    });
+
+    // User group summaries
+    builder.addCase(fetchUserGroupSummaries.fulfilled, (state, action) => {
+      state.groupSummaries = action.payload;
     });
 
     // Group expenses

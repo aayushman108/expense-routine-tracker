@@ -56,7 +56,7 @@ const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
     settlementStatus as string,
   );
 
-  const { total, data } = expenses;
+  const { total, totalAmount, data } = expenses;
 
   const pagination = generatePaginationObj({
     total,
@@ -66,7 +66,10 @@ const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
   return sendSuccessResponse(res, {
     data: {
       data,
-      pagination,
+      pagination: {
+        ...pagination,
+        totalAmount,
+      },
     },
     message: "Group expenses fetched successfully",
   });
@@ -75,12 +78,12 @@ const getGroupExpenses = asyncHandler(async (req: Request, res: Response) => {
 const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId as string;
 
-  const { page, limit, startDate, endDate, expenseStatus, settlementStatus } = req.query;
+  const { page, limit, startDate, endDate, expenseStatus, settlementStatus, expenseType } = req.query;
   const pageNumber = Number(page || 1);
   const pageLimit = Number(limit || 10);
   const pageOffset = Number((pageNumber - 1) * pageLimit);
 
-  const { total, data } = await expenseService.getPersonalExpenses(
+  const { total, totalAmount, data } = await expenseService.getPersonalExpenses(
     userId,
     pageLimit,
     pageOffset,
@@ -88,6 +91,7 @@ const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
     endDate as string,
     expenseStatus as string,
     settlementStatus as string,
+    expenseType as string,
   );
 
   const pagination = generatePaginationObj({
@@ -99,7 +103,10 @@ const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
   return sendSuccessResponse(res, {
     data: {
       data,
-      pagination,
+      pagination: {
+        ...pagination,
+        totalAmount,
+      },
     },
     message: "User expenses fetched successfully",
   });
@@ -140,6 +147,16 @@ const updateSplitStatus = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const getGroupSummaries = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const summaries = await expenseService.getUserGroupSummaries(userId);
+
+  return sendSuccessResponse(res, {
+    data: summaries,
+    message: "User group summaries fetched successfully",
+  });
+});
+
 export const expenseController = {
   createExpense,
   updateExpense,
@@ -147,6 +164,7 @@ export const expenseController = {
   getGroupExpenses,
   getUserExpenses,
   getSummary,
+  getGroupSummaries,
   deleteExpense,
   updateSplitStatus,
 };

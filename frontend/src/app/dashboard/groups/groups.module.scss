@@ -7,19 +7,55 @@
 
 .header {
   @include flex-between;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: $space-6;
+  padding-bottom: $space-6;
+  border-bottom: 1px solid var(--border-light);
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100px;
+    height: 1px;
+    background: var(--color-primary);
+    box-shadow: 0 0 10px var(--color-primary);
+    z-index: 2;
+  }
 
   @include mobile-only {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
   }
 }
 
 .titleArea {
   flex: 1;
   @include flex-column;
-  gap: $space-2;
+  gap: 4px;
+
+  .sessionTag {
+    font-family: $font-mono;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-primary-600);
+    letter-spacing: 0.2em;
+    margin-bottom: $space-1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--color-success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--color-success);
+    }
+  }
 
   .backBtn {
     background: none;
@@ -29,26 +65,53 @@
     align-items: center;
     gap: $space-2;
     color: var(--text-tertiary);
-    font-size: $font-size-sm;
-    margin-bottom: $space-2;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $space-4;
     cursor: pointer;
-    transition: color $transition-fast;
+    transition: all $transition-fast;
 
     &:hover {
       color: var(--color-primary);
+      transform: translateX(-4px);
     }
   }
 
-  h1 {
-    @include heading($font-size-3xl);
+  .titleWrapper {
     display: flex;
     align-items: center;
-    gap: $space-3;
+    gap: $space-4;
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      @include flex-center;
+      font-size: 24px;
+      color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--text-primary);
+      letter-spacing: -0.04em;
+      margin: 0;
+      line-height: 1;
+    }
   }
 
   p {
     @include body-text;
     max-width: 600px;
+    margin-top: $space-3;
+    color: var(--text-secondary);
+    font-weight: 500;
   }
 }
 
@@ -61,7 +124,12 @@
 .controls {
   @include flex-between;
   gap: $space-4;
-  margin-bottom: $space-2;
+  margin-top: $space-4;
+  background: var(--bg-card);
+  padding: $space-3 $space-5;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
 
   @include mobile-only {
     flex-direction: column;
@@ -72,7 +140,7 @@
 .searchWrapper {
   position: relative;
   flex: 1;
-  max-width: 400px;
+  max-width: 460px;
 
   @include mobile-only {
     max-width: none;
@@ -88,11 +156,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
   }
 
   input {
     @include input-base;
-    padding-left: $space-10;
+    padding-left: $space-12;
+    height: 44px;
+    background: var(--bg-tertiary);
+    border-color: transparent;
+    font-size: 14px;
+    font-weight: 500;
+
+    &:focus {
+      background: var(--bg-card);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, transparent);
+
+      & + .searchIcon {
+        color: var(--color-primary);
+      }
+    }
   }
 }
 
@@ -109,120 +194,157 @@
 .groupCard {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: $radius-md;
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: all $transition-base;
   text-decoration: none;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-sm);
   height: 100%;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, var(--color-primary), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
 
   .image {
-    height: 140px;
+    height: 160px;
     background: var(--bg-tertiary);
     position: relative;
     @include flex-center;
     overflow: hidden;
     color: var(--text-tertiary);
-    font-size: 3rem;
+    font-size: 3.5rem;
 
     &::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-      opacity: 0.1;
+      background: linear-gradient(to bottom, transparent 40%, var(--bg-card) 100%);
+      z-index: 2;
     }
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.5s ease;
     }
 
     svg {
-      opacity: 0.4;
+      opacity: 0.2;
+      z-index: 2;
+      transition: transform 0.5s ease;
     }
   }
 
   &:hover {
-    border-color: var(--border-strong);
+    border-color: var(--color-primary-600);
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
     
-    .image::after {
-      opacity: 0.2;
+    &::before {
+      opacity: 0.05;
+    }
+
+    .image img {
+      transform: scale(1.08);
     }
 
     .image svg {
-      opacity: 0.6;
-      transform: scale(1.04);
+      opacity: 0.4;
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .groupName {
+      color: var(--color-primary);
     }
   }
 
   .cardDetails {
-    padding: $space-5;
+    padding: $space-5 $space-6;
     flex: 1;
     @include flex-column;
-    gap: $space-3;
+    gap: $space-4;
+    position: relative;
+    z-index: 2;
 
     .topRow {
       @include flex-between;
-      align-items: center;
+      align-items: flex-start;
+      gap: $space-3;
     }
 
     .groupName {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: var(--text-primary);
+      letter-spacing: -0.02em;
+      transition: color 0.3s ease;
+      line-height: 1.2;
     }
 
     .roleBadge {
       font-family: $font-mono;
       font-size: 9px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: var(--bg-tertiary);
-      color: var(--text-secondary);
-      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: $radius-full;
+      background: var(--color-primary-50);
+      color: var(--color-primary);
+      font-weight: 800;
       text-transform: uppercase;
-      border: 1px solid var(--border-light);
+      letter-spacing: 0.05em;
+      border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+      white-space: nowrap;
     }
 
     .description {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-secondary);
       @include truncate(2);
       min-height: 2.8em;
-      line-height: 1.5;
+      line-height: 1.6;
+      font-weight: 500;
     }
   }
 
   .footer {
-    padding: $space-3 $space-5;
+    padding: $space-4 $space-6;
     border-top: 1px solid var(--border-light);
-    background: var(--bg-secondary);
+    background: color-mix(in srgb, var(--bg-secondary) 40%, transparent);
     @include flex-between;
     font-size: 11px;
     color: var(--text-tertiary);
+    position: relative;
+    z-index: 2;
 
     .memberInfo {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-weight: 600;
+      font-weight: 700;
+      color: var(--text-secondary);
 
       svg {
         font-size: 14px;
-        color: var(--text-tertiary);
+        color: var(--color-primary);
       }
     }
 
     .dateLabel {
-      font-weight: 600;
+      font-weight: 700;
       font-family: $font-mono;
       font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
   }
 }

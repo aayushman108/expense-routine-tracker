@@ -62,14 +62,24 @@ export default function GroupsPage() {
           >
             <HiOutlineChevronLeft /> Back to Dashboard
           </button>
-          <h1>Shared Groups</h1>
+          <div className={styles.sessionTag}>GROUP_COLLABORATION_ACTIVE</div>
+          <div className={styles.titleWrapper}>
+            <div className={styles.icon}>
+              <HiOutlineUserGroup />
+            </div>
+            <h1>Shared Groups</h1>
+          </div>
           <p>
             Collaborate and split expenses with your friends, family, and
             colleagues in shared workspaces.
           </p>
         </div>
         <div className={styles.actions}>
-          <Button variant="primary" onClick={() => setIsCreateModalOpen(true)}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
             <HiOutlinePlus /> Create New Group
           </Button>
         </div>

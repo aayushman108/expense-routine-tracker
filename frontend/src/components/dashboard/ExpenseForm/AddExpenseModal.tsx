@@ -175,15 +175,6 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
         </Button>
         <div style={{ display: "flex", gap: "0.5rem" }}>
           <Button
-            variant="outline"
-            onClick={() => handleSubmit(EXPENSE_STATUS.DRAFT)}
-            type="button"
-            isLoading={submittingAction === EXPENSE_STATUS.DRAFT}
-            disabled={isSubmitting}
-          >
-            {expense ? "Update as Draft" : "Save as Draft"}
-          </Button>
-          <Button
             variant="primary"
             type="submit"
             isLoading={submittingAction === EXPENSE_STATUS.SUBMITTED}

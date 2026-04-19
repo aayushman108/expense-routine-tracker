@@ -76,7 +76,7 @@ async function updateExpense({
   return await db.transaction(async (trx) => {
     // 1. Fetch current expense and check authorization
     const currentExpenseResult = await trx.raw(
-      `SELECT expense_status, paid_by FROM expenses WHERE id = ?`,
+      `SELECT expense_status, paid_by, group_id FROM expenses WHERE id = ?`,
       [expenseId],
     );
 
@@ -92,8 +92,8 @@ async function updateExpense({
       );
     }
 
-    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED) {
-      throw new Error("Verified expenses cannot be updated.");
+    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED && currentExpense.group_id !== null) {
+      throw new Error("Verified group expenses cannot be updated.");
     }
 
     const updatePayload = keysToSnakeCase(data);
@@ -266,13 +266,14 @@ async function getGroupExpenses(
   }
 
   const totalCount = await db.raw(
-    `SELECT COUNT(*) AS total_count
+    `SELECT COUNT(*) AS total_count, COALESCE(SUM(total_amount), 0) AS total_amount
      FROM expenses
      ${whereClause}`,
     queryParams,
   );
 
   const total = Number(totalCount.rows[0].total_count);
+  const totalAmount = Number(totalCount.rows[0].total_amount);
 
   const dataResult = await db.raw(
     `
@@ -336,7 +337,7 @@ async function getGroupExpenses(
     ],
   );
 
-  return { total, data: dataResult.rows };
+  return { total, totalAmount, data: dataResult.rows };
 }
 
 async function getUserExpenses(
@@ -347,12 +348,18 @@ async function getUserExpenses(
   endDate?: string,
   expenseStatus?: string,
   settlementStatus?: string,
+  expenseType?: string,
 ) {
   let whereClause = `WHERE (e.paid_by = ? OR (
        e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
        AND e.expense_status != 'draft'
      ))`;
   const queryParams: any[] = [userId, userId];
+
+  if (expenseType) {
+    whereClause += ` AND e.expense_type = ?`;
+    queryParams.push(expenseType);
+  }
 
   if (startDate) {
     whereClause += ` AND e.expense_date >= ?`;
@@ -389,13 +396,14 @@ async function getUserExpenses(
   }
 
   const totalCount = await db.raw(
-    `SELECT COUNT(*) AS total_count
+    `SELECT COUNT(*) AS total_count, COALESCE(SUM(e.total_amount), 0) AS total_amount
      FROM expenses e
      ${whereClause}`,
     queryParams,
   );
 
   const total = Number(totalCount.rows[0].total_count);
+  const totalAmount = Number(totalCount.rows[0].total_amount);
 
   const dataResult = await db.raw(
     `
@@ -495,13 +503,13 @@ async function getUserExpenses(
     ],
   );
 
-  return { total, data: dataResult.rows };
+  return { total, totalAmount, data: dataResult.rows };
 }
 
 async function deleteExpense(id: string, userId: string) {
   return await db.transaction(async (trx) => {
     const currentExpenseResult = await trx.raw(
-      `SELECT expense_status, paid_by FROM expenses WHERE id = ?`,
+      `SELECT expense_status, paid_by, group_id FROM expenses WHERE id = ?`,
       [id],
     );
 
@@ -517,8 +525,8 @@ async function deleteExpense(id: string, userId: string) {
       );
     }
 
-    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED) {
-      throw new Error("Verified expenses cannot be deleted.");
+    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED && currentExpense.group_id !== null) {
+      throw new Error("Verified group expenses cannot be deleted.");
     }
 
     await trx.raw(`DELETE FROM expenses WHERE id = ?`, [id]);
@@ -679,6 +687,78 @@ async function getUserSummary(userId: string) {
   };
 }
 
+async function getUserGroupSummaries(userId: string) {
+  const result = await db.raw(
+    `
+    WITH user_expenses AS (
+      SELECT 
+        e.id,
+        e.group_id,
+        g.name as group_name,
+        e.expense_status,
+        e.total_amount,
+        e.expense_date,
+        e.paid_by,
+        COALESCE(es.split_amount, 0) as user_share,
+        GREATEST(0, CASE
+          WHEN e.paid_by != ? THEN
+            COALESCE(es.split_amount, 0) - COALESCE(
+              (SELECT SUM(es_inner.split_amount) 
+               FROM expense_splits es_inner 
+               JOIN settlements st ON es_inner.settlement_id = st.id 
+               WHERE es_inner.expense_id = e.id AND es_inner.user_id = ? AND st.status = ?), 0
+            )
+          ELSE 0
+        END) as i_owe,
+        GREATEST(0, CASE
+          WHEN e.paid_by = ? THEN
+            (e.total_amount - COALESCE(es.split_amount, 0)) - COALESCE(
+              (SELECT SUM(es_inner.split_amount) 
+               FROM expense_splits es_inner 
+               JOIN settlements st ON es_inner.settlement_id = st.id 
+               WHERE es_inner.expense_id = e.id AND es_inner.user_id != e.paid_by AND st.status = ?), 0
+            )
+          ELSE 0
+        END) as others_owe
+      FROM expenses e
+      JOIN groups g ON e.group_id = g.id
+      LEFT JOIN expense_splits es ON e.id = es.expense_id AND es.user_id = ?
+      WHERE e.expense_type = 'group' AND e.expense_status = 'verified'
+      AND (e.paid_by = ? OR e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?))
+    )
+    SELECT
+      group_id as id,
+      MAX(group_name) as name,
+      COALESCE(SUM(total_amount), 0) as total_group_spend,
+      COALESCE(SUM(user_share), 0) as my_total_share,
+      COALESCE(SUM(i_owe), 0) as i_owe_others,
+      COALESCE(SUM(others_owe), 0) as others_owe_me
+    FROM user_expenses
+    GROUP BY group_id
+    ORDER BY MAX(group_name) ASC
+    `,
+    [
+      userId,
+      userId,
+      SETTLEMENT_STATUS.CONFIRMED,
+      userId,
+      SETTLEMENT_STATUS.CONFIRMED,
+      userId,
+      userId,
+      userId,
+    ]
+  );
+
+  return result.rows.map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    totalGroupSpend: Number(row.total_group_spend || 0),
+    myTotalShare: Number(row.my_total_share || 0),
+    iOweOthers: Number(row.i_owe_others || 0),
+    othersOweMe: Number(row.others_owe_me || 0),
+  }));
+}
+
 export const expenseDao = {
   createExpense,
   updateExpense,
@@ -686,6 +766,7 @@ export const expenseDao = {
   getGroupExpenses,
   getUserExpenses,
   getUserSummary,
+  getUserGroupSummaries,
   deleteExpense,
   updateSplitStatus,
 };

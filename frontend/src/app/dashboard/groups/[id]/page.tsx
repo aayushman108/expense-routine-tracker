@@ -178,11 +178,12 @@ export default function GroupDetailsPage() {
   );
 
   const totalGroupSpend = useMemo(() => {
+    if (pagination?.totalAmount !== undefined) return pagination.totalAmount;
     return groupExpenses.reduce(
       (acc, curr) => acc + Number(curr.total_amount),
       0,
     );
-  }, [groupExpenses]);
+  }, [groupExpenses, pagination]);
 
   const netPosition = useMemo(() => {
     if (!user) return 0;
