@@ -1,6 +1,6 @@
 "use client";
 
-import { HiMenuAlt2, HiOutlineSearch, HiOutlineBell } from "react-icons/hi";
+import { HiMenuAlt2 } from "react-icons/hi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setSidebarOpen } from "@/store/slices/uiSlice";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
@@ -29,13 +29,14 @@ export default function DashboardHeader() {
       </div>
 
       <div className={styles.right}>
-        <button className={styles.searchBtn} aria-label="Search">
+        {/* Search and Notification temporarily hidden */}
+        {/* <button className={styles.searchBtn} aria-label="Search">
           <HiOutlineSearch />
         </button>
         <button className={styles.notifBtn} aria-label="Notifications">
           <HiOutlineBell />
           <span className={styles.notifBadge} />
-        </button>
+        </button> */}
         <ThemeToggle />
       </div>
     </header>
