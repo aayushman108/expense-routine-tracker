@@ -6,7 +6,7 @@
 
 .features {
   position: relative;
-  background: $bg-elevated;
+  background: #060814;
   padding: $space-32 $container-padding;
   overflow: hidden;
   border-top: 1px solid rgba(255, 255, 255, 0.03);
@@ -17,11 +17,13 @@
   position: absolute;
   inset: 0;
   background-image: 
-    linear-gradient($grid-subtle 1px, transparent 1px),
-    linear-gradient(90deg, $grid-subtle 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
   z-index: 1;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
 }
 
 .featuresInner {
@@ -53,7 +55,7 @@
 }
 
 .sectionTitle {
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.75rem);
   font-weight: 800;
   line-height: 1.1;
   color: #ffffff;
@@ -84,8 +86,8 @@
 
 .card {
   position: relative;
-  background: rgba(13, 14, 27, 0.5); // Slightly darker than section
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(14, 17, 36, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 20px;
   padding: $space-10;
   display: flex;
@@ -97,7 +99,8 @@
   &:hover {
     transform: translateY(-8px);
     border-color: rgba(99, 102, 241, 0.3);
-    background: rgba(13, 14, 27, 0.8);
+    background: rgba(14, 17, 36, 0.9);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
   }
 }
 

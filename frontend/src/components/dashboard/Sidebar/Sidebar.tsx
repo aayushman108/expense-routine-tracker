@@ -10,7 +10,7 @@ import {
   HiOutlineHome,
   HiOutlineUserGroup,
   HiOutlineCurrencyDollar,
-  HiOutlineCog,
+  // HiOutlineCog,
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
 } from "react-icons/hi";
@@ -29,7 +29,7 @@ const navItems = [
     label: "Personal",
   },
   { href: "/dashboard/profile", icon: <FiUser />, label: "Profile" },
-  { href: "/dashboard/settings", icon: <HiOutlineCog />, label: "Settings" },
+  // { href: "/dashboard/settings", icon: <HiOutlineCog />, label: "Settings" },
 ];
 
 export default function Sidebar() {
@@ -38,7 +38,7 @@ export default function Sidebar() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const { sidebarOpen } = useAppSelector((s) => s.ui);
-  
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {

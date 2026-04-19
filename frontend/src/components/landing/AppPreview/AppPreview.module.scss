@@ -6,23 +6,11 @@
 
 .appPreview {
   position: relative;
-  background: $bg-elevated;
+  background: #0d0e1b;
   padding: $space-32 $container-padding;
   overflow: hidden;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-
-  // 📏 Section Divider (Subtle Metadata)
-  &::before {
-    content: "[ 03 / INTERFACE_CORE ]";
-    position: absolute;
-    top: $space-8;
-    right: $container-padding;
-    font-family: $font-mono;
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.1); // Even more subtle
-    letter-spacing: 0.2em;
-  }
+  border-top: 1px solid rgba(0, 0, 0, 1);
+  border-bottom: 1px solid rgba(0, 0, 0, 1);
 }
 
 .appPreviewInner {
@@ -38,7 +26,7 @@
 }
 
 .sectionTitle {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.75rem);
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.04em;
@@ -59,7 +47,11 @@
   transform: translate(-50%, -50%);
   width: 120%;
   height: 120%;
-  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1), transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(99, 102, 241, 0.1),
+    transparent 70%
+  );
   z-index: 1;
 }
 
@@ -87,9 +79,15 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  &.red { background: #ff5f56; }
-  &.yellow { background: #ffbd2e; }
-  &.green { background: #27c93f; }
+  &.red {
+    background: #ff5f56;
+  }
+  &.yellow {
+    background: #ffbd2e;
+  }
+  &.green {
+    background: #27c93f;
+  }
 }
 
 .mockContent {
@@ -110,7 +108,9 @@
   flex-direction: column;
   gap: 32px;
 
-  @include mobile-only { display: none; }
+  @include mobile-only {
+    display: none;
+  }
 }
 
 .fakeNav {
@@ -124,7 +124,7 @@
   width: 100%;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
-  
+
   &.active {
     width: 60%;
     background: #6366f1;
@@ -154,18 +154,18 @@
   gap: 6px;
 }
 
-.statLabel { 
-  font-size: 9px; 
+.statLabel {
+  font-size: 9px;
   color: #94a3b8; // Lightened from darken slate
-  font-weight: 700; 
-  text-transform: uppercase; 
+  font-weight: 700;
+  text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.statValue { 
-  font-size: 22px; 
+.statValue {
+  font-size: 22px;
   color: #ffffff; // Forced white
-  font-weight: 700; 
+  font-weight: 700;
 }
 
 .listArea {
@@ -233,23 +233,23 @@
   gap: 12px;
 }
 
-.itemIcon { 
-  width: 32px; 
-  height: 32px; 
-  background: rgba(255, 255, 255, 0.08); 
-  border-radius: 6px; 
+.itemIcon {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
 }
 
-.itemText { 
-  height: 10px; 
-  width: 120px; 
+.itemText {
+  height: 10px;
+  width: 120px;
   background: rgba(255, 255, 255, 0.2); // Lightened significantly
-  border-radius: 4px; 
+  border-radius: 4px;
 }
 
-.itemAmount { 
-  height: 10px; 
-  width: 60px; 
+.itemAmount {
+  height: 10px;
+  width: 60px;
   background: rgba(99, 102, 241, 0.4); // Pop color
-  border-radius: 4px; 
+  border-radius: 4px;
 }

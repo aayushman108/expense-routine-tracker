@@ -26,16 +26,6 @@ export default function CTA() {
           ease: "power3.out",
         }
       );
-
-      // Animate satellites
-      gsap.to(`.${styles.satellite}`, {
-        y: "random(-20, 20)",
-        x: "random(-10, 10)",
-        duration: "random(3, 5)",
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
     },
     { scope: containerRef }
   );
@@ -44,10 +34,6 @@ export default function CTA() {
     <section ref={containerRef} className={styles.cta}>
       <div className={styles.ctaInner}>
         <div className={styles.ctaCard}>
-          {/* 🛰 Satellite Decorations */}
-          <div className={`${styles.satellite} ${styles.topRight}`} />
-          <div className={`${styles.satellite} ${styles.bottomLeft}`} />
-          
           <h2 className={styles.title}>
             Ready to refine <br /> 
             <span>your group finances?</span>
@@ -58,9 +44,11 @@ export default function CTA() {
             economy with mathematical precision.
           </p>
           
-          <Link href="/signup" className={styles.btnPrimary}>
-            Start for Free <FiArrowRight />
-          </Link>
+          <div className={styles.buttonGroup}>
+            <Link href="/signup" className={styles.btnPrimary}>
+              Start for Free <FiArrowRight />
+            </Link>
+          </div>
 
           <div className={styles.benefits}>
             <span className={styles.benefitItem}>Deployment: Live</span>
