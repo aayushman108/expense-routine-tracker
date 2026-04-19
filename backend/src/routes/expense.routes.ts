@@ -27,6 +27,7 @@ router.patch(
 );
 router.get("/user", expenseController.getUserExpenses);
 router.get("/user/summary", expenseController.getSummary);
+router.get("/user/analytics/monthly", expenseController.getMonthlyAnalytics);
 router.get("/user/group-summaries", expenseController.getGroupSummaries);
 router.get("/group/:groupId", expenseController.getGroupExpenses);
 router.get("/:id", expenseController.getExpense);

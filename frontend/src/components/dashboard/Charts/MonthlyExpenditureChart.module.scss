@@ -67,17 +67,53 @@
 
   .label {
     font-size: 11px;
-    font-weight: 700;
-    color: var(--text-tertiary);
+    font-weight: 800;
+    color: var(--color-primary);
     text-transform: uppercase;
-    margin-bottom: 2px;
+    margin-bottom: $space-3;
+    letter-spacing: 0.05em;
+    display: block;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: $space-1;
   }
 
-  .value {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin: 0;
+  .metrics {
+    @include flex-column;
+    gap: $space-2;
+
+    .metric {
+      @include flex-between;
+      gap: $space-8;
+
+      span {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+
+      p {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0;
+      }
+
+      &.total {
+        margin-top: $space-1;
+        padding-top: $space-1;
+        border-top: 1px dashed var(--border-light);
+
+        span {
+          font-weight: 800;
+          color: var(--text-primary);
+        }
+
+        p {
+          font-size: 13px;
+          color: var(--color-primary);
+        }
+      }
+    }
   }
 }
 

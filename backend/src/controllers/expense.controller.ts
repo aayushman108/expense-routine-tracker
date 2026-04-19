@@ -114,7 +114,7 @@ const getUserExpenses = asyncHandler(async (req: Request, res: Response) => {
 
 const getSummary = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId as string;
-  const summary = await expenseService.getUserSummary(userId);
+  const summary = await expenseService.getSummary(userId);
 
   return sendSuccessResponse(res, {
     data: summary,
@@ -149,11 +149,21 @@ const updateSplitStatus = asyncHandler(async (req: Request, res: Response) => {
 
 const getGroupSummaries = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId as string;
-  const summaries = await expenseService.getUserGroupSummaries(userId);
+  const summaries = await expenseService.getGroupSummaries(userId);
 
   return sendSuccessResponse(res, {
     data: summaries,
     message: "User group summaries fetched successfully",
+  });
+});
+
+const getMonthlyAnalytics = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const analytics = await expenseService.getMonthlyAnalytics(userId);
+
+  return sendSuccessResponse(res, {
+    data: analytics,
+    message: "Monthly analytics fetched successfully",
   });
 });
 
@@ -165,6 +175,7 @@ export const expenseController = {
   getUserExpenses,
   getSummary,
   getGroupSummaries,
+  getMonthlyAnalytics,
   deleteExpense,
   updateSplitStatus,
 };

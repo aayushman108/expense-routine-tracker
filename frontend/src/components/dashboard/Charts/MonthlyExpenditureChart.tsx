@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -11,26 +11,21 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchMonthlyAnalytics } from "@/store/slices/expenseSlice";
 import styles from "./MonthlyExpenditureChart.module.scss";
-
-const data = [
-  { month: "Jan", amount: 4200 },
-  { month: "Feb", amount: 3800 },
-  { month: "Mar", amount: 2400 },
-  { month: "Apr", amount: 2100 },
-  { month: "May", amount: 3500 },
-  { month: "Jun", amount: 4800 },
-  { month: "Jul", amount: 5200 },
-  { month: "Aug", amount: 3900 },
-  { month: "Sep", amount: 2800 },
-  { month: "Oct", amount: 4100 },
-  { month: "Nov", amount: 3200 },
-  { month: "Dec", amount: 4500 },
-];
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: {
+    payload: {
+      month: string;
+      personalExpense: number;
+      groupExpense: number;
+      totalExpense: number;
+    };
+    value: number;
+  }[];
   label?: string;
 }
 
@@ -39,9 +34,20 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     return (
       <div className={styles.customTooltip}>
         <p className={styles.label}>{label}</p>
-        <p className={styles.value}>
-          रू {payload[0].value.toLocaleString()}
-        </p>
+        <div className={styles.metrics}>
+          <div className={styles.metric}>
+            <span>Personal</span>
+            <p>रू {payload[0].payload.personalExpense.toLocaleString()}</p>
+          </div>
+          <div className={styles.metric}>
+            <span>Group Share</span>
+            <p>रू {payload[0].payload.groupExpense.toLocaleString()}</p>
+          </div>
+          <div className={`${styles.metric} ${styles.total}`}>
+            <span>Total Outflow</span>
+            <p>रू {payload[0].payload.totalExpense.toLocaleString()}</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -49,6 +55,21 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 const MonthlyExpenditureChart = () => {
+  const dispatch = useAppDispatch();
+  const { monthlyAnalytics } = useAppSelector((state) => state.expenses);
+
+  useEffect(() => {
+    dispatch(fetchMonthlyAnalytics());
+  }, [dispatch]);
+
+  // Format data for the chart (shorten month names)
+  const chartData = monthlyAnalytics.map((item) => ({
+    ...item,
+    displayMonth: item.month.slice(0, 3),
+  }));
+
+  const currentMonthIndex = new Date().getMonth();
+
   return (
     <div className={styles.chartContainer}>
       <div className={styles.header}>
@@ -64,7 +85,7 @@ const MonthlyExpenditureChart = () => {
       
       <div className={styles.chartWrapper}>
         <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid 
               strokeDasharray="3 3" 
               vertical={false} 
@@ -72,7 +93,7 @@ const MonthlyExpenditureChart = () => {
               opacity={0.5}
             />
             <XAxis 
-              dataKey="month" 
+              dataKey="displayMonth" 
               axisLine={false} 
               tickLine={false} 
               tick={{ fill: "var(--text-tertiary)", fontSize: 11, fontWeight: 600 }}
@@ -85,14 +106,14 @@ const MonthlyExpenditureChart = () => {
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--bg-hover)", radius: 8 }} />
             <Bar 
-              dataKey="amount" 
+              dataKey="totalExpense" 
               radius={[6, 6, 0, 0]} 
               barSize={28}
             >
-              {data.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={index === 6 ? "var(--color-primary)" : "var(--color-primary-50)"} 
+                  fill={index === currentMonthIndex ? "var(--color-primary)" : "var(--color-primary-50)"} 
                   style={{ transition: 'fill 0.3s ease' }}
                 />
               ))}

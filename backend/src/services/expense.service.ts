@@ -200,14 +200,19 @@ async function getUserGroupSummaries(userId: string) {
   return await expenseDao.getUserGroupSummaries(userId);
 }
 
+async function getMonthlyAnalytics(userId: string) {
+  return await expenseDao.getMonthlyAnalytics(userId);
+}
+
 export const expenseService = {
   addExpense,
   updateExpense,
   getExpenseDetails,
   getGroupExpenses,
   getPersonalExpenses,
-  getUserSummary,
-  getUserGroupSummaries,
+  getSummary: getUserSummary,
+  getGroupSummaries: getUserGroupSummaries,
+  getMonthlyAnalytics,
   deleteExpense,
   updateSplitStatus,
 };

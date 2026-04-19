@@ -759,6 +759,49 @@ async function getUserGroupSummaries(userId: string) {
   }));
 }
 
+async function getMonthlyAnalytics(userId: string) {
+  const result = await db.raw(
+    `
+    WITH months AS (
+      SELECT generate_series(1, 12) AS month_num
+    ),
+    user_expenses AS (
+      SELECT 
+        EXTRACT(MONTH FROM expense_date) AS month_num,
+        CASE 
+          WHEN expense_type = 'personal' THEN total_amount 
+          ELSE 0 
+        END AS personal_amt,
+        CASE 
+          WHEN expense_type = 'group' AND expense_status = 'verified' THEN 
+            COALESCE((SELECT split_amount FROM expense_splits WHERE expense_id = e.id AND user_id = ?), 0)
+          ELSE 0 
+        END AS group_amt
+      FROM expenses e
+      WHERE (paid_by = ? OR e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?))
+      AND EXTRACT(YEAR FROM expense_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+    )
+    SELECT 
+      TRIM(TO_CHAR(TO_DATE(m.month_num::text, 'MM'), 'Month')) AS month,
+      COALESCE(SUM(ue.personal_amt), 0) AS personal_expense,
+      COALESCE(SUM(ue.group_amt), 0) AS group_expense,
+      (COALESCE(SUM(ue.personal_amt), 0) + COALESCE(SUM(ue.group_amt), 0)) AS total_expense
+    FROM months m
+    LEFT JOIN user_expenses ue ON m.month_num = ue.month_num
+    GROUP BY m.month_num
+    ORDER BY m.month_num;
+    `,
+    [userId, userId, userId],
+  );
+
+  return result.rows.map((row: any) => ({
+    month: row.month,
+    personalExpense: Number(row.personal_expense || 0),
+    groupExpense: Number(row.group_expense || 0),
+    totalExpense: Number(row.total_expense || 0),
+  }));
+}
+
 export const expenseDao = {
   createExpense,
   updateExpense,
@@ -767,6 +810,7 @@ export const expenseDao = {
   getUserExpenses,
   getUserSummary,
   getUserGroupSummaries,
+  getMonthlyAnalytics,
   deleteExpense,
   updateSplitStatus,
 };

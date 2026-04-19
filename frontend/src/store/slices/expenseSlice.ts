@@ -27,6 +27,12 @@ interface ExpenseState {
     iOweOthers: number;
     othersOweMe: number;
   }[];
+  monthlyAnalytics: {
+    month: string;
+    personalExpense: number;
+    groupExpense: number;
+    totalExpense: number;
+  }[];
   isLoading: boolean;
   isDetailsLoading: boolean;
   isSubmitting: boolean;
@@ -47,6 +53,7 @@ const initialState: ExpenseState = {
   currentExpense: null,
   summary: null,
   groupSummaries: [],
+  monthlyAnalytics: [],
   isLoading: false,
   isDetailsLoading: false,
   isSubmitting: false,
@@ -133,6 +140,21 @@ export const fetchUserGroupSummaries = createAsyncThunk<ExpenseState["groupSumma
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch group summaries",
+      );
+    }
+  },
+);
+
+export const fetchMonthlyAnalytics = createAsyncThunk<ExpenseState["monthlyAnalytics"], void>(
+  "expenses/fetchMonthlyAnalytics",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get("/expenses/user/analytics/monthly");
+      return data.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch monthly analytics",
       );
     }
   },
@@ -296,6 +318,11 @@ const expenseSlice = createSlice({
     // User group summaries
     builder.addCase(fetchUserGroupSummaries.fulfilled, (state, action) => {
       state.groupSummaries = action.payload;
+    });
+
+    // Monthly analytics
+    builder.addCase(fetchMonthlyAnalytics.fulfilled, (state, action) => {
+      state.monthlyAnalytics = action.payload;
     });
 
     // Group expenses
