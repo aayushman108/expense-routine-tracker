@@ -2,14 +2,13 @@
 
 import React, { useEffect } from "react";
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
 } from "recharts";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchMonthlyAnalytics } from "@/store/slices/expenseSlice";
@@ -68,7 +67,7 @@ const MonthlyExpenditureChart = () => {
     displayMonth: item.month.slice(0, 3),
   }));
 
-  const currentMonthIndex = new Date().getMonth();
+  const maxExpense = Math.max(...chartData.map(d => d.totalExpense), 1);
 
   return (
     <div className={styles.chartContainer}>
@@ -83,9 +82,16 @@ const MonthlyExpenditureChart = () => {
         </div>
       </div>
       
+      {/* ── Desktop Chart View ── */}
       <div className={styles.chartWrapper}>
         <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
             <CartesianGrid 
               strokeDasharray="3 3" 
               vertical={false} 
@@ -104,22 +110,42 @@ const MonthlyExpenditureChart = () => {
               tickLine={false} 
               tick={{ fill: "var(--text-tertiary)", fontSize: 11, fontWeight: 600 }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--bg-hover)", radius: 8 }} />
-            <Bar 
-              dataKey="totalExpense" 
-              radius={[6, 6, 0, 0]} 
-              barSize={28}
-            >
-              {chartData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={index === currentMonthIndex ? "var(--color-primary)" : "var(--color-primary-50)"} 
-                  style={{ transition: 'fill 0.3s ease' }}
-                />
-              ))}
-            </Bar>
-          </BarChart>
+            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "var(--color-primary)", strokeWidth: 1, strokeDasharray: "4 4" }} />
+            <Area
+              type="monotone"
+              dataKey="totalExpense"
+              stroke="var(--color-primary)"
+              strokeWidth={3}
+              fillOpacity={1}
+              fill="url(#colorTotal)"
+              animationDuration={1500}
+            />
+          </AreaChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* ── Mobile Modular Feed ── */}
+      <div className={styles.mobileFeed}>
+        {chartData.filter((_, index) => index <= new Date().getMonth()).reverse().map((item, index) => (
+          <div key={item.month} className={styles.monthRow} style={{ animationDelay: `${index * 0.05}s` }}>
+            <div className={styles.rowMetadata}>
+               <span className={styles.monthName}>{item.month}</span>
+               <span className={styles.amount}>रू {item.totalExpense.toLocaleString()}</span>
+            </div>
+            <div className={styles.progressContainer}>
+               <div 
+                 className={styles.progressBar} 
+                 style={{ width: `${(item.totalExpense / maxExpense) * 100}%` }}
+               />
+               <div className={styles.marker} style={{ left: `${(item.totalExpense / maxExpense) * 100}%` }} />
+            </div>
+            <div className={styles.breakdown}>
+               <span>Personal: रू {item.personalExpense.toLocaleString()}</span>
+               <span className={styles.divider}>•</span>
+               <span>Group: रू {item.groupExpense.toLocaleString()}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
