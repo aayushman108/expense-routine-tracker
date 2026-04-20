@@ -76,7 +76,7 @@ export default function Footer() {
               <h4>Legal</h4>
               <Link href="/privacy">Privacy Policy</Link>
               <Link href="/terms">Terms of Service</Link>
-              <Link href="/security">Data Security</Link>
+              {/* <Link href="/security">Data Security</Link> */}
             </div>
           </div>
         </div>
