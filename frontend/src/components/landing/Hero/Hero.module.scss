@@ -55,6 +55,9 @@
   height: 600px;
   z-index: 0;
   pointer-events: none;
+  @include responsive(md) {
+    display: none;
+  }
 
   &.left {
     left: -100px;
@@ -295,8 +298,9 @@
   @include mobile-only {
     flex-direction: column;
     gap: $space-8;
-    align-items: flex-start;
-    padding-left: $space-4;
+    align-items: center;
+    padding: $space-6 $space-4 0;
+    margin-top: $space-6;
   }
 }
 
@@ -321,10 +325,16 @@
     font-size: 14px;
     color: #cbd5e1;
     font-weight: $font-weight-bold;
+    @include responsive(md) {
+      font-size: $font-size-md;
+    }
   }
 
   span {
     font-size: 12px;
     color: #64748b;
+    @include responsive(md) {
+      font-size: $font-size-sm;
+    }
   }
 }

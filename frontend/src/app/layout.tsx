@@ -3,6 +3,9 @@ import "./globals.scss";
 import AppProvider from "@/components/providers/AppProvider";
 import ToastContainer from "@/components/ui/Toast/Toast";
 import ServiceWorkerRegister from "@/components/pwa/serviceWorkerRegister";
+import { Suspense } from "react";
+import PageLoader from "@/components/ui/PageLoader/PageLoader";
+import LoadingProvider from "@/components/providers/LoadingProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -114,10 +117,14 @@ export default function RootLayout({
           }}
         />
         <ServiceWorkerRegister />
-        <AppProvider>
-          {children}
-          <ToastContainer />
-        </AppProvider>
+        {/* <Suspense fallback={<PageLoader />}> */}
+        <LoadingProvider>
+          <AppProvider>
+            {children}
+            <ToastContainer />
+          </AppProvider>
+        </LoadingProvider>
+        {/* </Suspense> */}
       </body>
     </html>
   );

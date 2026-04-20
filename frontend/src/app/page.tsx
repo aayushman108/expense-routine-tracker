@@ -12,7 +12,7 @@ import styles from "./page.module.scss";
 
 export default function LandingPage() {
   return (
-    <div className={styles.landingWrapper}>
+    <div className={`${styles.landingWrapper} app-transition-wrapper`}>
       <div className={styles.contentWrapper}>
         <Navbar />
         <main>

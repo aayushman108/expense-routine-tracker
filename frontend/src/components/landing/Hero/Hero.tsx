@@ -25,18 +25,18 @@ export default function Hero() {
           stagger: 0.1,
           duration: 1.5,
           ease: "expo.out",
-        }
+        },
       );
 
       // Animate content items
       tl.fromTo(
         [
-          `.${styles.badge}`, 
-          `.${styles.heroTitle}`, 
-          `.${styles.heroSub}`, 
+          `.${styles.badge}`,
+          `.${styles.heroTitle}`,
+          `.${styles.heroSub}`,
           `.${styles.ctaGroup}`,
           `.${styles.trustRibbon}`,
-          `.${styles.featureHighlights}`
+          `.${styles.featureHighlights}`,
         ],
         { opacity: 0, y: 30 },
         {
@@ -46,7 +46,7 @@ export default function Hero() {
           duration: 0.8,
           ease: "power3.out",
         },
-        "-=1"
+        "-=1",
       );
 
       // Subtle float for shapes
@@ -58,7 +58,7 @@ export default function Hero() {
         ease: "sine.inOut",
       });
     },
-    { scope: heroRef }
+    { scope: heroRef },
   );
 
   return (
@@ -90,43 +90,51 @@ export default function Hero() {
         </h1>
 
         <p className={styles.heroSub}>
-          The smarter way to track group expenses, split bills with precision, 
-          and settle up effortlessly. Perfect for roommates, travelers, 
-          and anyone sharing costs.
+          The smarter way to track group expenses, split bills with precision,
+          and settle up effortlessly. Perfect for roommates, travelers, and
+          anyone sharing costs.
         </p>
 
         <div className={styles.ctaGroup}>
           <Link href="/signup" className={styles.btnPrimary}>
             Get Started for Free <FiArrowRight />
           </Link>
-          
+
           <div className={styles.trustRibbon}>
             <div className={styles.avatars}>
               {[...Array(4)].map((_, i) => (
                 <div key={i} className={styles.avatarCircle} />
               ))}
             </div>
-            <span className={styles.trustText}>Joined by 10,000+ cost-sharers</span>
+            <span className={styles.trustText}>
+              Joined by many cost-sharers
+            </span>
           </div>
         </div>
 
         <div className={styles.featureHighlights}>
           <div className={styles.featureItem}>
-            <span className={styles.featureIcon}><FiZap /></span>
+            <span className={styles.featureIcon}>
+              <FiZap />
+            </span>
             <div className={styles.featureText}>
               <strong>Instant Split</strong>
               <span>Equal or custom ratios</span>
             </div>
           </div>
           <div className={styles.featureItem}>
-            <span className={styles.featureIcon}><FiTarget /></span>
+            <span className={styles.featureIcon}>
+              <FiTarget />
+            </span>
             <div className={styles.featureText}>
               <strong>Smart Settle</strong>
               <span>Optimized payment paths</span>
             </div>
           </div>
           <div className={styles.featureItem}>
-            <span className={styles.featureIcon}><FiCheckCircle /></span>
+            <span className={styles.featureIcon}>
+              <FiCheckCircle />
+            </span>
             <div className={styles.featureText}>
               <strong>Verified</strong>
               <span>Proof for every payment</span>

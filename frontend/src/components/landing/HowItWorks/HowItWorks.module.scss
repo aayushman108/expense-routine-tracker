@@ -10,6 +10,9 @@
   padding: $space-32 $container-padding;
   overflow: hidden;
   border-top: 1px solid var(--border-light);
+  @include responsive(md) {
+    padding: $space-16 $container-padding;
+  }
 }
 
 .howItWorksInner {

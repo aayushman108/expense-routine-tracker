@@ -13,6 +13,7 @@
   z-index: $z-sticky;
   padding: $space-5 0;
   transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+  overflow-x: hidden;
 
   &.scrolled {
     padding: $space-3 0;
@@ -181,14 +182,18 @@
   -webkit-backdrop-filter: blur(30px);
   z-index: $z-modal;
   transform: translateX(100%);
-  transition: transform 0.5s cubic-bezier(0.85, 0, 0.15, 1);
+  transition: transform 0.5s cubic-bezier(0.85, 0, 0.15, 1), visibility 0.5s;
   padding: $space-24 $space-10 $space-12;
   @include flex-column;
   align-items: flex-start;
   gap: $space-12;
+  visibility: hidden;
+  pointer-events: none;
 
   &.showDrawer {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 }
 

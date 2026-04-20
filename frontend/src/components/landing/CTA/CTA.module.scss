@@ -9,6 +9,9 @@
   background: var(--bg-primary);
   padding: $space-24 $container-padding;
   overflow: hidden;
+  @include responsive(md) {
+    padding: $space-16 $container-padding;
+  }
 }
 
 .ctaInner {

@@ -9,6 +9,9 @@
   background: var(--bg-secondary);
   padding: $space-32 $container-padding;
   overflow: hidden;
+  @include responsive(md) {
+    padding: $space-16 $container-padding;
+  }
 }
 
 .gridOverlay {
