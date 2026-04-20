@@ -461,31 +461,16 @@ export default function GroupDetailsPage() {
                             >
                               Expense: {expense.expense_status.toUpperCase()}
                             </span>
-                            {expense.expense_status === "verified" &&
+                            {expense.expense_status ===
+                              EXPENSE_STATUS.VERIFIED &&
                               expense.settlement_status && (
                                 <span
                                   className={`${styles.tag} ${styles[expense.settlement_status]}`}
                                 >
                                   Settlement:{" "}
-                                  {expense.settlement_status === "personal"
-                                    ? "PRIVATE"
-                                    : expense.settlement_status.toUpperCase()}
+                                  {expense.settlement_status.toUpperCase()}
                                 </span>
                               )}
-                            {expense.expense_status === "draft" && (
-                              <button
-                                className={styles.inlineSubmitBtn}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleUpdateStatus(
-                                    expense.id,
-                                    EXPENSE_STATUS.SUBMITTED,
-                                  );
-                                }}
-                              >
-                                Submit
-                              </button>
-                            )}
                           </div>
                         </div>
 

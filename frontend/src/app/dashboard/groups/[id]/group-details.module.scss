@@ -873,6 +873,12 @@
 }
 
 // ── Settlement Cards ──
+.settlements {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
 .settlementCard {
   @include card;
   display: grid;
@@ -960,29 +966,48 @@
   @include mobile-only {
     grid-template-columns: 1fr;
     gap: $space-4;
-    padding: $space-5;
+    padding: $space-6 $space-5;
 
     .party {
-      flex-direction: row;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
+      text-align: center;
+      gap: $space-1;
 
       .name {
-        font-size: $font-size-sm;
+        font-size: $font-size-md;
+        white-space: normal;
+        @include truncate(2);
       }
     }
 
     .arrow {
       transform: rotate(90deg);
-      margin: 0 auto;
+      margin: $space-1 auto;
+      width: 28px;
+      height: 28px;
+      opacity: 0.4;
     }
 
     .amountWrap {
       text-align: center;
       align-items: center;
+      width: 100%;
       min-width: 0;
-      padding-top: $space-4;
+      padding-top: $space-5;
       border-top: 1px solid var(--border-default);
+      margin-top: $space-1;
+
+      .amount {
+        font-size: $font-size-lg;
+        margin-bottom: $space-1;
+      }
+
+      button {
+        width: 100%;
+        height: 42px;
+        margin-top: $space-1;
+      }
     }
   }
 }

@@ -5,12 +5,14 @@ import type { GroupBalance } from "../../lib/types";
 interface SettlementState {
   groupBalances: GroupBalance[];
   isLoading: boolean;
+  isSubmitting: boolean;
   error: string | null;
 }
 
 const initialState: SettlementState = {
   groupBalances: [],
   isLoading: false,
+  isSubmitting: false,
   error: null,
 };
 
@@ -97,18 +99,45 @@ const settlementSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchGroupBalances.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchGroupBalances.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.groupBalances = action.payload;
-    });
-    builder.addCase(fetchGroupBalances.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-    });
+    builder
+      .addCase(fetchGroupBalances.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchGroupBalances.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.groupBalances = action.payload;
+      })
+      .addCase(fetchGroupBalances.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(settleBulkAction.pending, (state) => {
+        state.isSubmitting = true;
+        state.error = null;
+      })
+      .addCase(settleBulkAction.fulfilled, (state) => {
+        state.isSubmitting = false;
+      })
+      .addCase(settleBulkAction.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(confirmBulkAction.pending, (state) => {
+        state.isSubmitting = true;
+        state.error = null;
+      })
+      .addCase(confirmBulkAction.fulfilled, (state) => {
+        state.isSubmitting = false;
+      })
+      .addCase(confirmBulkAction.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
+      });
   },
 });
 

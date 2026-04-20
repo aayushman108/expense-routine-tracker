@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
 import type { PaymentMethod } from "../../lib/types";
 
@@ -29,6 +29,22 @@ export const fetchPaymentMethods = createAsyncThunk<PaymentMethod[]>(
     }
   },
 );
+
+export const fetchTargetUserPaymentMethods = createAsyncThunk<
+  PaymentMethod[],
+  string
+>("paymentMethods/fetchTarget", async (userId, { rejectWithValue }) => {
+  try {
+    const { data } = await api.get(`/users/${userId}/profile`);
+    const result = data.data || data;
+    return result.paymentMethods || [];
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to fetch user payment methods",
+    );
+  }
+});
 
 export const createPaymentMethod = createAsyncThunk<
   PaymentMethod,
@@ -92,78 +108,97 @@ const paymentMethodSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Fetch
-    builder.addCase(fetchPaymentMethods.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchPaymentMethods.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.paymentMethods = action.payload;
-    });
-    builder.addCase(fetchPaymentMethods.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-    });
+    builder
+      .addCase(fetchPaymentMethods.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPaymentMethods.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.paymentMethods = action.payload;
+      })
+      .addCase(fetchPaymentMethods.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
 
     // Create
-    builder.addCase(createPaymentMethod.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(createPaymentMethod.fulfilled, (state, action) => {
-      state.isLoading = false;
-      // If the new method is default, unset others
-      if (action.payload.is_default) {
-        state.paymentMethods = state.paymentMethods.map((pm) => ({
-          ...pm,
-          is_default: false,
-        }));
-      }
-      state.paymentMethods.unshift(action.payload);
-    });
-    builder.addCase(createPaymentMethod.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-    });
+    builder
+      .addCase(createPaymentMethod.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createPaymentMethod.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // If the new method is default, unset others
+        if (action.payload.is_default) {
+          state.paymentMethods = state.paymentMethods.map((pm) => ({
+            ...pm,
+            is_default: false,
+          }));
+        }
+        state.paymentMethods.unshift(action.payload);
+      })
+      .addCase(createPaymentMethod.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
 
     // Update
-    builder.addCase(updatePaymentMethod.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(updatePaymentMethod.fulfilled, (state, action) => {
-      state.isLoading = false;
-      // If updated method is now default, unset others
-      if (action.payload.is_default) {
-        state.paymentMethods = state.paymentMethods.map((pm) => ({
-          ...pm,
-          is_default: pm.id === action.payload.id,
-        }));
-      }
-      state.paymentMethods = state.paymentMethods.map((pm) =>
-        pm.id === action.payload.id ? action.payload : pm,
-      );
-    });
-    builder.addCase(updatePaymentMethod.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-    });
+    builder
+      .addCase(updatePaymentMethod.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updatePaymentMethod.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // If updated method is now default, unset others
+        if (action.payload.is_default) {
+          state.paymentMethods = state.paymentMethods.map((pm) => ({
+            ...pm,
+            is_default: pm.id === action.payload.id,
+          }));
+        }
+        state.paymentMethods = state.paymentMethods.map((pm) =>
+          pm.id === action.payload.id ? action.payload : pm,
+        );
+      })
+      .addCase(updatePaymentMethod.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
 
     // Delete
-    builder.addCase(deletePaymentMethod.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(deletePaymentMethod.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.paymentMethods = state.paymentMethods.filter(
-        (pm) => pm.id !== action.payload,
-      );
-    });
-    builder.addCase(deletePaymentMethod.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-    });
+    builder
+      .addCase(deletePaymentMethod.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deletePaymentMethod.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.paymentMethods = state.paymentMethods.filter(
+          (pm) => pm.id !== action.payload,
+        );
+      })
+      .addCase(deletePaymentMethod.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch Target User Payment Methods
+    builder
+      .addCase(fetchTargetUserPaymentMethods.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchTargetUserPaymentMethods.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.paymentMethods = action.payload;
+      })
+      .addCase(fetchTargetUserPaymentMethods.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 

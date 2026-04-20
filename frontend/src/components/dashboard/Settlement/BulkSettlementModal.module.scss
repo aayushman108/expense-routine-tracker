@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   gap: $space-6;
-  padding: $space-2;
 }
 
 .settlementFlow {
@@ -22,6 +21,12 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
+
+  @media (max-width: $bp-md) {
+    flex-direction: column;
+    gap: $space-6;
+    padding: $space-6 $space-4;
+  }
 
   &::before {
     content: "";
@@ -44,6 +49,10 @@
     align-items: center;
     gap: $space-3;
     flex: 1;
+
+    @media (max-width: $bp-md) {
+      width: 100%;
+    }
 
     .avatar {
       position: relative;
@@ -176,6 +185,12 @@
       opacity: 0.5;
       margin-top: -$space-2;
       animation: slideRight 2s infinite ease-in-out;
+
+      @media (max-width: $bp-md) {
+        transform: rotate(90deg);
+        margin-top: 0;
+        animation: slideDown 2s infinite ease-in-out;
+      }
     }
   }
 }
@@ -251,6 +266,10 @@
       color: var(--text-secondary);
       font-weight: 700;
       text-transform: none;
+      @include responsive(sm) {
+        font-size: $font-size-sm;
+        @include truncate(2);
+      }
     }
   }
 }
@@ -376,9 +395,10 @@
     position: relative;
     padding-bottom: $space-2;
 
-    @media (max-width: 500px) {
+    @media (max-width: $bp-sm) {
       flex-direction: column;
       text-align: center;
+      gap: $space-6;
     }
 
     .infoSide {
@@ -446,6 +466,11 @@
       display: flex;
       justify-content: flex-end;
 
+      @media (max-width: $bp-sm) {
+        justify-content: center;
+        width: 100%;
+      }
+
       .qrWrapper {
         width: 140px;
         height: 140px;
@@ -499,6 +524,14 @@
   gap: $space-8;
   align-items: center;
   position: relative;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column;
+    padding: $space-6;
+    gap: $space-6;
+    text-align: center;
+  }
+
   box-shadow: $shadow-xl;
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
@@ -607,6 +640,11 @@
       display: flex;
       gap: $space-6;
 
+      @media (max-width: $bp-sm) {
+        justify-content: center;
+        gap: $space-8;
+      }
+
       .item {
         display: flex;
         flex-direction: column;
@@ -630,6 +668,12 @@
 
   .qrSide {
     flex: 0 0 auto;
+
+    @media (max-width: $bp-sm) {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
 
     .qrWrapper {
       width: 130px;
@@ -853,8 +897,71 @@
   padding-top: $space-6;
   border-top: 1px solid var(--border-default);
 
+  @media (max-width: $bp-sm) {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+
   button {
     min-width: 130px;
+  }
+}
+
+.pmLoader {
+  @include flex-center;
+  flex-direction: column;
+  padding: $space-10 $space-6;
+  gap: $space-4;
+  color: var(--text-tertiary);
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-default);
+    border-top-color: var(--color-primary);
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+  }
+
+  span {
+    font-size: $font-size-sm;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+}
+
+.noInfo {
+  @include flex-center;
+  flex-direction: column;
+  padding: $space-12 $space-6;
+  background: rgba(var(--text-tertiary-rgb), 0.03);
+  border: 1px dashed var(--border-default);
+  border-radius: $radius-2xl;
+  color: var(--text-tertiary);
+  text-align: center;
+  gap: $space-3;
+  margin: $space-2 0;
+
+  svg {
+    font-size: 48px;
+    opacity: 0.3;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    max-width: 250px;
+    line-height: 1.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -869,6 +976,21 @@
   }
   100% {
     transform: translateX(0);
+    opacity: 0.5;
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    transform: rotate(90deg) translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: rotate(90deg) translateX(10px);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(90deg) translateX(0);
     opacity: 0.5;
   }
 }

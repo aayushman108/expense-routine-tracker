@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import {
   HiOutlineCash,
@@ -19,6 +19,8 @@ import {
   settleBulkAction,
   confirmBulkAction,
 } from "@/store/slices/settlementSlice";
+import { fetchTargetUserPaymentMethods } from "@/store/slices/paymentMethodSlice";
+import { handleThunk } from "@/lib/utils";
 import { SETTLEMENT_STATUS } from "@expense-tracker/shared";
 import type { GroupBalance } from "@/lib/types";
 import styles from "./BulkSettlementModal.module.scss";
@@ -38,56 +40,91 @@ export default function BulkSettlementModal({
 }: BulkSettlementModalProps) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [proofImage, setProofImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"wallets" | "bank">("wallets");
 
-  if (!balance) return null;
+  const [submittingAction, setSubmittingAction] = useState<
+    "settle" | "confirm" | null
+  >(null);
+  const { isSubmitting } = useAppSelector((state) => state.settlements);
+
+  const { paymentMethods, isLoading: isPaymentLoading } = useAppSelector(
+    (state) => state.paymentMethods,
+  );
 
   const currentUserId = user?.id?.toString();
-  const debtorId = balance.from_user_id?.toString();
-  const creditorId = balance.to_user_id?.toString();
+  const debtorId = balance?.from_user_id?.toString();
+  const creditorId = balance?.to_user_id?.toString();
 
   const isYouOwe = debtorId === currentUserId;
   const isYouReceived = creditorId === currentUserId;
 
-  console.log("Identity Presence Check:", {
-    userExists: !!user,
-    userName: user?.full_name,
-    userId: user?.id,
-    debtorName: balance.from_user_name,
-    debtorId: balance.from_user_id,
-    isYouOwe,
-  });
+  const settlementStatus = balance?.status;
+  const targetUserId = balance?.to_user_id;
+
+  const fetchPaymentInfo = useCallback(async () => {
+    if (
+      isOpen &&
+      isYouOwe &&
+      settlementStatus === SETTLEMENT_STATUS.PENDING &&
+      targetUserId
+    ) {
+      await handleThunk(
+        dispatch(fetchTargetUserPaymentMethods(targetUserId)),
+        () => {},
+        (error: any) => {
+          console.error("Failed to fetch payment methods:", error);
+        },
+      );
+    }
+  }, [isOpen, isYouOwe, settlementStatus, targetUserId, dispatch]);
+
+  useEffect(() => {
+    fetchPaymentInfo();
+  }, [fetchPaymentInfo]);
+
+  if (!balance) return null;
 
   const handleConfirm = async () => {
-    setIsSubmitting(true);
-    try {
-      if (balance.status === SETTLEMENT_STATUS.PAID) {
-        await dispatch(
+    if (balance.status === SETTLEMENT_STATUS.PAID) {
+      setSubmittingAction("confirm");
+      await handleThunk(
+        dispatch(
           confirmBulkAction({
             groupId,
             fromUserId: balance.from_user_id,
             toUserId: balance.to_user_id,
           }),
-        ).unwrap();
-      } else {
-        await dispatch(
+        ),
+        () => {
+          setSubmittingAction(null);
+          onClose();
+        },
+        () => {
+          setSubmittingAction(null);
+        },
+      );
+    } else {
+      setSubmittingAction("settle");
+      await handleThunk(
+        dispatch(
           settleBulkAction({
             groupId,
             fromUserId: balance.from_user_id,
             toUserId: balance.to_user_id,
             proofImage,
           }),
-        ).unwrap();
-      }
-      onClose();
-    } catch (error) {
-      console.error("Settlement action failed:", error);
-    } finally {
-      setIsSubmitting(false);
+        ),
+        () => {
+          setSubmittingAction(null);
+          onClose();
+        },
+        () => {
+          setSubmittingAction(null);
+        },
+      );
     }
   };
 
@@ -122,33 +159,6 @@ export default function BulkSettlementModal({
       .slice(0, 2);
   };
 
-  const paymentMethods = [
-    {
-      id: "khalti-1",
-      provider: "Khalti",
-      external_id: "98XXXXXXXX",
-      metadata: { qr_label: "Scan for Khalti" },
-    },
-    {
-      id: "esewa-1",
-      provider: "eSewa",
-      external_id: "98XXXXXXXX",
-      metadata: { qr_label: "Scan for eSewa" },
-    },
-    {
-      id: "bank-1",
-      provider: "Nabil Bank Ltd.",
-      external_id: "001XXXXXXXXXXX",
-      metadata: {
-        bank_name: "Nabil Bank Ltd.",
-        branch_name: "New Road, Kathmandu",
-        account_name: balance.to_user_name,
-        swift_code: "NABILNPKA",
-        qr_label: "Bank QR Payment",
-      },
-    },
-  ];
-
   return (
     <Modal
       isOpen={isOpen}
@@ -166,8 +176,8 @@ export default function BulkSettlementModal({
               <Button
                 variant="primary"
                 onClick={handleConfirm}
-                isLoading={isSubmitting}
-                disabled={!proofImage}
+                isLoading={submittingAction === "settle"}
+                disabled={!proofImage || isSubmitting}
               >
                 Settle Balance
               </Button>
@@ -176,7 +186,8 @@ export default function BulkSettlementModal({
             <Button
               variant="primary"
               onClick={handleConfirm}
-              isLoading={isSubmitting}
+              isLoading={submittingAction === "confirm"}
+              disabled={isSubmitting}
             >
               Confirm Receipt
             </Button>
@@ -304,7 +315,12 @@ export default function BulkSettlementModal({
             </div>
 
             <div className={styles.tabContent}>
-              {activeTab === "wallets" ? (
+              {isPaymentLoading ? (
+                <div className={styles.pmLoader}>
+                  <div className={styles.spinner} />
+                  <span>Fetching payment accounts...</span>
+                </div>
+              ) : activeTab === "wallets" ? (
                 <div className={styles.modernWallets}>
                   {paymentMethods
                     .filter((pm) => !pm.provider.toLowerCase().includes("bank"))
@@ -312,6 +328,11 @@ export default function BulkSettlementModal({
                       const isKhalti = pm.provider
                         .toLowerCase()
                         .includes("khalti");
+                      const meta = (pm.metadata || {}) as Record<
+                        string,
+                        string
+                      >;
+                      const accountId = meta.phone || meta.account_id || "N/A";
                       return (
                         <div
                           key={pm.id}
@@ -319,20 +340,22 @@ export default function BulkSettlementModal({
                         >
                           <div className={styles.cardHeader}>
                             <div className={styles.providerLogo}>
-                              {pm.provider}
+                              {pm.provider.toUpperCase()}
                             </div>
                           </div>
                           <div className={styles.cardBody}>
                             <div className={styles.infoSide}>
-                              <span className={styles.label}>Account ID</span>
+                              <span className={styles.label}>
+                                Account / Phone
+                              </span>
                               <div className={styles.idRow}>
                                 <span className={styles.value}>
-                                  {pm.external_id}
+                                  {accountId}
                                 </span>
                                 <button
                                   className={styles.copyBtn}
                                   onClick={() =>
-                                    copyToClipboard(pm.external_id, pm.id)
+                                    copyToClipboard(accountId, pm.id)
                                   }
                                 >
                                   {copiedId === pm.id ? (
@@ -343,12 +366,22 @@ export default function BulkSettlementModal({
                                 </button>
                               </div>
                               <span className={styles.name}>
-                                {balance.to_user_name}
+                                {meta.name || balance.to_user_name}
                               </span>
                             </div>
                             <div className={styles.qrSide}>
                               <div className={styles.qrWrapper}>
-                                <HiOutlineQrcode />
+                                {meta.qrCode ? (
+                                  <Image
+                                    src={meta.qrCode}
+                                    alt="QR Code"
+                                    fill
+                                    unoptimized
+                                    style={{ objectFit: "contain" }}
+                                  />
+                                ) : (
+                                  <HiOutlineQrcode />
+                                )}
                                 <div className={styles.qrOverlay}>SCAN</div>
                               </div>
                             </div>
@@ -356,72 +389,103 @@ export default function BulkSettlementModal({
                         </div>
                       );
                     })}
+                  {paymentMethods.filter(
+                    (pm) => !pm.provider.toLowerCase().includes("bank"),
+                  ).length === 0 && (
+                    <div className={styles.noInfo}>
+                      <HiOutlineInformationCircle />
+                      <p>No wallet details shared by {balance.to_user_name}.</p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className={styles.modernBankWrapper}>
                   {paymentMethods
                     .filter((pm) => pm.provider.toLowerCase().includes("bank"))
-                    .map((pm) => (
-                      <div key={pm.id} className={styles.bankCardModern}>
-                        <div className={styles.infoSide}>
-                          <div className={styles.bankHeader}>
-                            <div className={styles.bankChip} />
-                            <span className={styles.bankName}>
-                              {pm.metadata?.bank_name}
-                            </span>
-                          </div>
-
-                          <div className={styles.mainAccount}>
-                            <span className={styles.label}>Account Number</span>
-                            <div className={styles.numberRow}>
-                              <span className={styles.number}>
-                                {pm.external_id.replace(/(.{4})/g, "$1 ")}
+                    .map((pm) => {
+                      const meta = (pm.metadata || {}) as Record<
+                        string,
+                        string
+                      >;
+                      const accNumber = meta.accountNumber || "N/A";
+                      return (
+                        <div key={pm.id} className={styles.bankCardModern}>
+                          <div className={styles.infoSide}>
+                            <div className={styles.bankHeader}>
+                              <div className={styles.bankChip} />
+                              <span className={styles.bankName}>
+                                {meta.bankName || "Bank Account"}
                               </span>
-                              <button
-                                className={styles.copyBtn}
-                                onClick={() =>
-                                  copyToClipboard(pm.external_id, pm.id)
-                                }
-                              >
-                                {copiedId === pm.id ? (
-                                  <HiCheck />
-                                ) : (
-                                  <HiOutlineDuplicate />
-                                )}
-                              </button>
+                            </div>
+
+                            <div className={styles.mainAccount}>
+                              <span className={styles.label}>
+                                Account Number
+                              </span>
+                              <div className={styles.numberRow}>
+                                <span className={styles.number}>
+                                  {accNumber.replace(/(.{4})/g, "$1 ")}
+                                </span>
+                                <button
+                                  className={styles.copyBtn}
+                                  onClick={() =>
+                                    copyToClipboard(accNumber, pm.id)
+                                  }
+                                >
+                                  {copiedId === pm.id ? (
+                                    <HiCheck />
+                                  ) : (
+                                    <HiOutlineDuplicate />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className={styles.auxInfo}>
+                              <div className={styles.item}>
+                                <span className={styles.al}>HOLDER</span>
+                                <span className={styles.av}>
+                                  {meta.accountHolder ||
+                                    meta.name ||
+                                    balance.to_user_name}
+                                </span>
+                              </div>
+                              <div className={styles.item}>
+                                <span className={styles.al}>BRANCH</span>
+                                <span className={styles.av}>
+                                  {meta.branchName || "N/A"}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
-                          <div className={styles.auxInfo}>
-                            <div className={styles.item}>
-                              <span className={styles.al}>HOLDER</span>
-                              <span className={styles.av}>
-                                {pm.metadata?.account_name}
-                              </span>
-                            </div>
-                            <div className={styles.item}>
-                              <span className={styles.al}>SWIFT</span>
-                              <span className={styles.av}>
-                                {pm.metadata?.swift_code}
-                              </span>
+                          <div className={styles.qrSide}>
+                            <div className={styles.qrWrapper}>
+                              {meta.qrCode ? (
+                                <Image
+                                  src={meta.qrCode}
+                                  alt="QR Code"
+                                  fill
+                                  unoptimized
+                                  style={{ objectFit: "contain" }}
+                                />
+                              ) : (
+                                <HiOutlineQrcode />
+                              )}
+                              <div className={styles.qrOverlay}>SCAN</div>
                             </div>
                           </div>
                         </div>
-
-                        <div className={styles.qrSide}>
-                          <div className={styles.qrWrapper}>
-                            <HiOutlineQrcode />
-                            <div className={styles.qrOverlay}>SCAN</div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  <div className={styles.bankAuxInfo}>
-                    <div className={styles.auxRow}>
-                      <span>Branch</span>
-                      <strong>{paymentMethods[2].metadata?.branch_name}</strong>
+                      );
+                    })}
+                  {paymentMethods.filter((pm) =>
+                    pm.provider.toLowerCase().includes("bank"),
+                  ).length === 0 && (
+                    <div className={styles.noInfo}>
+                      <HiOutlineInformationCircle />
+                      <p>No bank details shared by {balance.to_user_name}.</p>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
