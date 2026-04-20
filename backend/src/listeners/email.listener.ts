@@ -16,7 +16,6 @@ appEmitter.on(
         },
       });
     } catch (error) {
-      console.log(error, "Email Error")
       console.error("Error sending signup email:", error);
     }
   },
@@ -99,6 +98,64 @@ appEmitter.on(
       });
     } catch (error) {
       console.error("Error sending forgot password email:", error);
+    }
+  },
+);
+
+// Settlement proof uploaded email listener
+appEmitter.on(
+  EVENTS.EMAIL.SETTLEMENT_UPLOADED,
+  async (data: {
+    receiverEmail: string;
+    receiverName: string;
+    payerName: string;
+    amount: string;
+    currency: string;
+  }) => {
+    try {
+      await sendMail({
+        email: data.receiverEmail,
+        subject: `Payment proof uploaded by ${data.payerName}`,
+        template: "settlementUploaded.ejs",
+        data: {
+          receiverName: data.receiverName,
+          payerName: data.payerName,
+          amount: data.amount,
+          currency: data.currency,
+          dashboardUrl: process.env.FRONTEND_URL + "/dashboard",
+        },
+      });
+    } catch (error) {
+      console.error("Error sending settlement proof uploaded email:", error);
+    }
+  },
+);
+
+// Settlement confirmed email listener
+appEmitter.on(
+  EVENTS.EMAIL.SETTLEMENT_CONFIRMED,
+  async (data: {
+    payerEmail: string;
+    payerName: string;
+    receiverName: string;
+    amount: string;
+    currency: string;
+  }) => {
+    try {
+      await sendMail({
+        email: data.payerEmail,
+        subject: "Settlement confirmed!",
+        template: "settlementConfirmed.ejs",
+        data: {
+          payerName: data.payerName,
+          receiverName: data.receiverName,
+          amount: data.amount,
+          currency: data.currency,
+          dashboardUrl: process.env.FRONTEND_URL + "/dashboard",
+        },
+      });
+    } catch (error) {
+      console.error("Error sending settlement confirmed email:", error);
     }
   },
 );

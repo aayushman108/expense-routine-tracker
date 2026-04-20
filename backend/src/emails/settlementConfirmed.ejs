@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settlement Confirmed - Expensora</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <div class="header">
+          <h1>Settlement Confirmed</h1>
+        </div>
+        <div class="content">
+          <p class="greeting">Hello <%= payerName %>,</p>
+          <p class="message">
+            Great news! <strong><%= receiverName %></strong> has confirmed your settlement of <strong><%= amount %> <%= currency %></strong>.
+          </p>
+          
+          <div class="cta-container">
+            <p class="message">
+              The debt has been officially cleared from your group ledger.
+            </p>
+            <a href="<%= dashboardUrl %>" class="button">Go to Dashboard</a>
+          </div>
+
+          <p class="message" style="margin-top: 20px;">
+            Thank you for settling your balances promptly!
+          </p>
+        </div>
+        <div class="footer">
+          <p>© 2026 Expensora. All rights reserved.</p>
+          <p>This is an automated message, please do not reply.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

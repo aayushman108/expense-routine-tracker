@@ -10,5 +10,7 @@ export const EVENTS = {
     INVITE: "email:invite",
     EXPENSE_VERIFIED: "email:expense_verified",
     FORGOT_PASSWORD: "email:forgot_password",
+    SETTLEMENT_UPLOADED: "email:settlement_uploaded",
+    SETTLEMENT_CONFIRMED: "email:settlement_confirmed",
   },
 };

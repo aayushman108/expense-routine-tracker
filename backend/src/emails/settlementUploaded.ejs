@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Proof Uploaded - Expensora</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <div class="header">
+          <h1>Payment Proof Uploaded</h1>
+        </div>
+        <div class="content">
+          <p class="greeting">Hello <%= receiverName %>,</p>
+          <p class="message">
+            <strong><%= payerName %></strong> has uploaded a payment proof for a settlement of <strong><%= amount %> <%= currency %></strong>.
+          </p>
+          
+          <div class="cta-container">
+            <p class="message">
+              Please log in to your account to verify the proof and confirm the settlement.
+            </p>
+            <a href="<%= dashboardUrl %>" class="button">Verify Proof</a>
+          </div>
+
+          <p class="message" style="margin-top: 20px;">
+            The settlement will be cleared from your ledger once you confirm the receipt of funds.
+          </p>
+        </div>
+        <div class="footer">
+          <p>© 2026 Expensora. All rights reserved.</p>
+          <p>This is an automated message, please do not reply.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

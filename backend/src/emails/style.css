@@ -101,3 +101,24 @@ body {
     margin: 0 20px;
   }
 }
+
+.cta-container {
+  text-align: center;
+  margin: 32px 0;
+  padding: 24px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+}
+
+.button {
+  display: inline-block;
+  padding: 14px 28px;
+  background-color: #2563eb;
+  color: #ffffff !important;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
