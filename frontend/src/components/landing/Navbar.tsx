@@ -62,13 +62,13 @@ export default function LandingNavbar() {
         </Link>
 
         <div className={styles.navLinks}>
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How it works</a>
-          <a href="#use-cases">Use Cases</a>
+          <Link href="/#features">Features</Link>
+          <Link href="/#how-it-works">How it works</Link>
+          <Link href="/#use-cases">Use Cases</Link>
         </div>
 
         <div className={styles.navActions}>
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           <div className={styles.desktopBtn}>
             <button className={styles.loginBtn} onClick={handleLoginClick}>
@@ -114,15 +114,15 @@ export default function LandingNavbar() {
         </div>
 
         <div className={styles.drawerLinks}>
-          <a href="#features" onClick={() => setMobileOpen(false)}>
+          <Link href="/#features" onClick={() => setMobileOpen(false)}>
             Features
-          </a>
-          <a href="#how-it-works" onClick={() => setMobileOpen(false)}>
+          </Link>
+          <Link href="/#how-it-works" onClick={() => setMobileOpen(false)}>
             How it works
-          </a>
-          <a href="#use-cases" onClick={() => setMobileOpen(false)}>
+          </Link>
+          <Link href="/#use-cases" onClick={() => setMobileOpen(false)}>
             Use Cases
-          </a>
+          </Link>
           <div className={styles.drawerActions}>
             <button
               className={styles.drawerLoginBtn}
