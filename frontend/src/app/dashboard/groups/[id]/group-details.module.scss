@@ -120,10 +120,20 @@
 
 .loaderContainer {
   display: flex;
+  flex-direction: column;
+  gap: $space-4;
   align-items: center;
   justify-content: center;
-  min-height: 50vh;
+  min-height: 200px;
   color: var(--text-tertiary);
+  width: 100%;
+}
+
+.loadingWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  width: 100%;
 }
 
 .notFoundContainer {

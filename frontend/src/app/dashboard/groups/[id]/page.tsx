@@ -19,7 +19,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
-import { fetchGroupExpenses, updateExpense } from "@/store/slices/expenseSlice";
+import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
 import { fetchGroupBalances } from "@/store/slices/settlementSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
@@ -29,6 +29,11 @@ import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
 import BulkSettlementModal from "@/components/dashboard/Settlement/BulkSettlementModal";
 import Pagination from "@/components/ui/Pagination/Pagination";
 import Select from "@/components/ui/Select/Select";
+import {
+  FullPageSkeleton,
+  ExpenseListSkeleton,
+  BalanceSkeleton,
+} from "./GroupLoadingSkeletons";
 import styles from "./group-details.module.scss";
 import {
   clearGroupDetails,
@@ -47,9 +52,7 @@ export default function GroupDetailsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const { groupDetails, isLoading: groupLoading } = useAppSelector(
-    (s) => s.groups,
-  );
+  const { groupDetails } = useAppSelector((s) => s.groups);
 
   const { groupExpenses, isLoading: expensesLoading } = useAppSelector(
     (s) => s.expenses,
@@ -141,30 +144,6 @@ export default function GroupDetailsPage() {
     setCurrentPage(1);
   };
 
-  const handleUpdateStatus = async (
-    expenseId: string,
-    status: EXPENSE_STATUS,
-  ) => {
-    try {
-      await dispatch(
-        updateExpense({
-          id: expenseId,
-          body: { expenseStatus: status },
-        }),
-      ).unwrap();
-      if (id) {
-        dispatch(
-          fetchGroupExpenses({
-            groupId: id as string,
-            filters: { page: currentPage, limit, startDate, endDate },
-          }),
-        );
-      }
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
-
   const handleOpenBulkModal = (balance: any) => {
     setSelectedBalance(balance);
     setIsBulkModalOpen(true);
@@ -219,22 +198,20 @@ export default function GroupDetailsPage() {
     };
   };
 
-  if (groupLoading) {
-    return (
-      <div className={styles.loaderContainer}>Loading group details...</div>
-    );
+  if (groupDetails?.isLoading) {
+    return <FullPageSkeleton />;
   }
 
-  if (!groupDetails?.data) {
-    return (
-      <div className={styles.notFoundContainer}>
-        <p>Group not found.</p>
-        <Button variant="outline" onClick={() => router.push("/dashboard")}>
-          Back to Dashboard
-        </Button>
-      </div>
-    );
-  }
+  // if (!groupDetails?.data) {
+  //   return (
+  //     <div className={styles.notFoundContainer}>
+  //       <p>Group not found.</p>
+  //       <Button variant="outline" onClick={() => router.push("/dashboard")}>
+  //         Back to Dashboard
+  //       </Button>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className={styles.page}>
@@ -248,10 +225,10 @@ export default function GroupDetailsPage() {
           </button>
           <div className={styles.groupInfo}>
             <div className={styles.groupImage}>
-              {groupDetails.data.image?.url ? (
+              {groupDetails?.data?.image?.url ? (
                 <Image
-                  src={groupDetails.data.image.url}
-                  alt={groupDetails.data.name}
+                  src={groupDetails?.data?.image?.url}
+                  alt={groupDetails?.data?.name}
                   fill
                   style={{ objectFit: "cover" }}
                 />
@@ -260,9 +237,9 @@ export default function GroupDetailsPage() {
               )}
             </div>
             <div className={styles.textDetails}>
-              <h1>{groupDetails.data.name}</h1>
+              <h1>{groupDetails?.data?.name}</h1>
               <p>
-                {groupDetails.data.description ||
+                {groupDetails?.data?.description ||
                   "Shared expenses for the group."}
               </p>
             </div>
@@ -422,9 +399,7 @@ export default function GroupDetailsPage() {
             <div className={styles.expenseSection}>
               <div className={styles.expenseList}>
                 {expensesLoading ? (
-                  <div className={styles.loaderContainer}>
-                    Loading expenses...
-                  </div>
+                  <ExpenseListSkeleton count={limit} />
                 ) : groupExpenses.length > 0 ? (
                   groupExpenses.map((expense: any) => {
                     const { day, month } = formatDate(expense.expense_date);
@@ -534,9 +509,7 @@ export default function GroupDetailsPage() {
           ) : (
             <div className={styles.settlements}>
               {balancesLoading ? (
-                <div className={styles.loaderContainer}>
-                  Loading balances...
-                </div>
+                <BalanceSkeleton />
               ) : groupBalances.length > 0 ? (
                 groupBalances.map((balance: any, index: number) => {
                   const currentUserId = user?.id?.toLowerCase();
@@ -653,9 +626,9 @@ export default function GroupDetailsPage() {
             <div className={styles.createdInfo}>
               <span className={styles.label}>Created:</span>
               <span className={styles.value}>
-                {formatDate(groupDetails.data.created_at).month}{" "}
-                {formatDate(groupDetails.data.created_at).day},{" "}
-                {formatDate(groupDetails.data.created_at).year}
+                {formatDate(groupDetails?.data?.created_at || "")?.month}{" "}
+                {formatDate(groupDetails?.data?.created_at || "")?.day},{" "}
+                {formatDate(groupDetails?.data?.created_at || "")?.year}
               </span>
             </div>
           </section>
@@ -727,7 +700,7 @@ export default function GroupDetailsPage() {
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
         groupId={id as string}
-        groupName={groupDetails.data.name}
+        groupName={groupDetails?.data?.name || ""}
       />
 
       <AddMemberModal
