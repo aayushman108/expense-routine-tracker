@@ -1,26 +1,54 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from "react";
+import {
+  useState,
+  useEffect,
+  ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+} from "react";
 import PageLoader from "@/components/ui/PageLoader/PageLoader";
 
-interface LoadingProviderProps {
-  children: ReactNode;
+interface LoadingContextType {
+  setIsLoading: (isLoading: boolean) => void;
+  isLoading: boolean;
 }
 
-export default function LoadingProvider({ children }: LoadingProviderProps) {
+const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
+
+export const useLoading = () => {
+  const context = useContext(LoadingContext);
+  if (!context) {
+    throw new Error("useLoading must be used within a LoadingProvider");
+  }
+  return context;
+};
+
+export default function LoadingProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
+  // Initial mount loading
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return <PageLoader />;
-  }
+  const value = useMemo(
+    () => ({
+      setIsLoading: setLoading,
+      isLoading: loading,
+    }),
+    [loading],
+  );
 
-  return <>{children}</>;
+  return (
+    <LoadingContext.Provider value={value}>
+      {loading && <PageLoader />}
+      {children}
+    </LoadingContext.Provider>
+  );
 }

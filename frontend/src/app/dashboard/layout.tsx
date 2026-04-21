@@ -7,6 +7,7 @@ import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
 import Header from "@/components/dashboard/Header/Header";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav/MobileBottomNav";
 import { getCurrentUser } from "@/store/slices/authSlice";
+import { useLoading } from "@/components/providers/LoadingProvider";
 import styles from "./layout.module.scss";
 
 import type { RootState } from "@/store";
@@ -22,6 +23,7 @@ export default function DashboardLayout({
     (s: RootState) => s.auth,
   );
   const { sidebarOpen } = useAppSelector((s: RootState) => s.ui);
+  const { setIsLoading } = useLoading();
 
   const authAttempted = useRef(false);
   // Initialize based on current Redux state
@@ -31,6 +33,12 @@ export default function DashboardLayout({
   if (isAuthenticated && isInitializing) {
     setIsInitializing(false);
   }
+
+  useEffect(() => {
+    if (!isInitializing && !isLoading) {
+      setIsLoading(false);
+    }
+  }, [isInitializing, isLoading, setIsLoading]);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -45,19 +53,17 @@ export default function DashboardLayout({
       if (!isLoading && !authAttempted.current) {
         authAttempted.current = true;
         // isInitializing is already true from useState(!isAuthenticated)
+        setIsLoading(true);
         dispatch(getCurrentUser()).then(() => {
+          setIsLoading(false);
           setIsInitializing(false);
         });
       }
     }
-  }, [isAuthenticated, isLoading, dispatch, router]);
+  }, [isAuthenticated, isLoading, dispatch, router, setIsLoading]);
 
   if (isInitializing || (isLoading && !isAuthenticated)) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return null; // The global PageLoader will be shown via setIsLoading
   }
 
   return (

@@ -9,14 +9,15 @@ import { useAppDispatch } from "@/store/hooks";
 import { getCurrentUser } from "@/store/slices/authSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import { handleThunk } from "@/lib/utils";
+import { useLoading } from "../providers/LoadingProvider";
 import styles from "./Navbar.module.scss";
-import ThemeToggle from "../ui/ThemeToggle/ThemeToggle";
 
 export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { setIsLoading } = useLoading();
 
   const handleLoginClick = async () => {
     const accessToken =
@@ -25,12 +26,17 @@ export default function LandingNavbar() {
         : null;
 
     if (accessToken) {
+      setIsLoading(true);
       const success = await handleThunk(
         dispatch(getCurrentUser()),
         () => {
           router.push("/dashboard");
+          // The loader will be removed by the dashboard layout or we can set a timeout here
+          // but usually the next page's layout will handle its own loading.
+          // However, for consistency, let's keep it until navigation happens.
         },
         (error) => {
+          setIsLoading(false);
           dispatch(
             addToast({
               type: "error",
@@ -38,13 +44,17 @@ export default function LandingNavbar() {
             }),
           );
           console.info("Session in localStorage is invalid or expired.", error);
+          router.push("/login");
         },
       );
 
       if (success) return;
+    } else {
+      setIsLoading(true);
+      router.push("/login");
+      // For simple pushes, we might want to hide it after a bit if the page doesn't take over
+      setTimeout(() => setIsLoading(false), 800);
     }
-
-    router.push("/login");
   };
 
   useEffect(() => {
