@@ -1,0 +1,100 @@
+@use "../../../../styles/mixins" as *;
+
+.expenseHeaderActions {
+  @include flex-between;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  margin-bottom: $space-3 !important;
+  width: 100%;
+
+  .tabsWrapper {
+    display: inline-flex;
+    gap: $space-2;
+    background: var(--bg-tertiary);
+    padding: 4px;
+    border-radius: $radius-xl;
+  }
+}
+
+.tabHeader {
+  display: inline-flex;
+  gap: $space-2;
+  background: var(--bg-tertiary);
+  padding: 4px;
+  border-radius: $radius-xl;
+  margin-bottom: $space-2;
+}
+
+.tab {
+  padding: $space-2 $space-6;
+  font-size: $font-size-sm;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+  @include flex-center;
+  gap: $space-2;
+
+  svg {
+    font-size: $font-size-md;
+  }
+
+  &:hover {
+    color: var(--text-secondary);
+    background: var(--bg-hover);
+  }
+
+  &.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-strong);
+  }
+
+  @include responsive(sm) {
+    padding: $space-2 $space-4;
+    font-size: $font-size-xs;
+    font-weight: 600;
+  }
+}
+
+.filterActions {
+  display: flex;
+  gap: $space-3;
+  @include responsive(sm) {
+    display: none;
+  }
+}
+
+.filterActionsSm {
+  display: none;
+  @include responsive(sm) {
+    display: block;
+  }
+  & > button {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    color: var(--text-primary);
+  }
+}
+
+.filterToggleBtn {
+  position: relative;
+  svg {
+    font-size: 1.1rem;
+  }
+
+  .filterDot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background: var(--color-danger);
+    border-radius: 50%;
+    border: 2px solid #fff;
+  }
+}

@@ -1,0 +1,71 @@
+@use "../../../../styles/mixins" as *;
+
+.settlementCard {
+  @include card;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; // Ensure balance is distributed
+  gap: $space-3;
+  padding: $space-4 $space-6;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: var(--color-primary-100);
+    box-shadow: var(--shadow-sm);
+    transform: translateX(4px);
+  }
+
+  @include mobile-only {
+    padding: $space-4;
+    gap: $space-2;
+  }
+
+  .party {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    .label {
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+    }
+
+    .name {
+      font-size: $font-size-sm;
+      font-weight: 700;
+      color: var(--text-primary);
+      @include truncate(1);
+    }
+  }
+
+  .arrow {
+    color: var(--text-tertiary);
+    font-size: $font-size-sm;
+    opacity: 0.5;
+    @include flex-center;
+  }
+
+  .amountWrap {
+    display: flex;
+    align-items: center;
+    gap: $space-6;
+    margin-left: auto;
+
+    @include mobile-only {
+      gap: $space-3;
+    }
+
+    .amount {
+      font-size: $font-size-md;
+      font-weight: 800;
+      color: var(--color-primary);
+      white-space: nowrap;
+    }
+  }
+}

@@ -1,0 +1,99 @@
+@use "../../../../styles/mixins" as *;
+
+.header {
+  @include flex-between;
+  align-items: center;
+  gap: $space-6;
+  padding: $space-6 $space-8;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: stretch;
+    padding: $space-5;
+  }
+}
+
+.titleArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  .backBtn {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    color: var(--text-tertiary);
+    font-size: $font-size-xs;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all $transition-fast;
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: fit-content;
+
+    &:hover {
+      color: var(--color-primary);
+      transform: translateX(-4px);
+    }
+  }
+
+  .groupInfo {
+    display: flex;
+    align-items: center;
+    gap: $space-5;
+
+    @include mobile-only {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  .groupImage {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: $radius-xl;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    @include flex-center;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    font-size: 1.5rem;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  h1 {
+    @include heading($font-size-2xl);
+    margin-bottom: $space-1;
+  }
+
+  p {
+    @include body-text;
+    font-size: $font-size-sm;
+    max-width: 500px;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $space-3;
+  @include responsive(sm) {
+    justify-content: center;
+  }
+}
