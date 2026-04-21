@@ -1,0 +1,176 @@
+@use "../../../../styles/mixins" as *;
+
+.expenseCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: $radius-md;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all $transition-base;
+  cursor: pointer;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+
+    .cardHeader {
+      background: var(--bg-secondary);
+    }
+  }
+
+  // ── Header ──
+  .cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-5 $space-6;
+    background: var(--bg-secondary);
+    position: relative;
+    border-bottom: 1px solid var(--border-light);
+    transition: background 0.3s ease;
+
+    .amountSection {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+
+      .currency {
+        font-size: $font-size-sm;
+        font-weight: 700;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .amountValue {
+        font-size: $font-size-xl;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+    }
+
+    .date {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      padding: 4px 8px;
+      border-radius: 8px;
+      min-width: 44px;
+      box-shadow: var(--shadow-sm);
+
+      .day {
+        font-size: $font-size-sm;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.1;
+      }
+
+      .month {
+        font-size: 9px;
+        text-transform: uppercase;
+        color: var(--text-tertiary);
+        font-weight: 700;
+        letter-spacing: 0.05em;
+      }
+    }
+  }
+
+  // ── Body ──
+  .cardBody {
+    padding: $space-5 $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    flex: 1;
+    @include responsive(sm) {
+      padding: $space-5 $space-3 !important;
+    }
+
+    .titleText {
+      font-weight: 700;
+      font-size: $font-size-sm;
+      color: var(--text-primary);
+      line-height: 1.4;
+      @include truncate(2);
+      white-space: normal;
+    }
+  }
+
+  // ── Footer ──
+  .cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-3 $space-6;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-light);
+    margin-top: auto;
+    font-size: 11px;
+
+    .dateBadge {
+      font-weight: 600;
+      color: var(--text-tertiary);
+    }
+
+    .payer {
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .payerHighlight {
+        font-weight: 700;
+        color: var(--color-primary);
+      }
+    }
+
+    .actionButtons {
+      display: flex;
+      gap: $space-2;
+      align-items: center;
+
+      .iconBtn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: var(--text-tertiary);
+        padding: 6px;
+        border-radius: $radius-full;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+          background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+          color: var(--color-primary);
+          transform: scale(1.1);
+        }
+
+        &.deleteBtn {
+          color: var(--color-danger);
+
+          &:hover {
+            background: color-mix(
+              in srgb,
+              var(--color-danger) 10%,
+              transparent
+            );
+            color: var(--color-danger);
+          }
+        }
+      }
+    }
+  }
+}

@@ -34,6 +34,9 @@ interface ExpenseState {
     totalExpense: number;
   }[];
   isLoading: boolean;
+  isSummaryLoading: boolean;
+  isPersonalExpensesLoading: boolean;
+  isGroupSummariesLoading: boolean;
   isDetailsLoading: boolean;
   isSubmitting: boolean;
   error: string | null;
@@ -55,6 +58,9 @@ const initialState: ExpenseState = {
   groupSummaries: [],
   monthlyAnalytics: [],
   isLoading: false,
+  isSummaryLoading: false,
+  isPersonalExpensesLoading: false,
+  isGroupSummariesLoading: false,
   isDetailsLoading: false,
   isSubmitting: false,
   error: null,
@@ -299,25 +305,41 @@ const expenseSlice = createSlice({
     });
 
     // Personal expenses
-    builder.addCase(fetchPersonalExpenses.pending, () => {
-      // Don't set global isLoading to true so it doesn't mask the whole page if fetched softly
+    builder.addCase(fetchPersonalExpenses.pending, (state) => {
+      state.isPersonalExpensesLoading = true;
     });
     builder.addCase(fetchPersonalExpenses.fulfilled, (state, action) => {
+      state.isPersonalExpensesLoading = false;
       state.personalExpenses = action.payload.data;
       state.pagination = action.payload.pagination;
     });
     builder.addCase(fetchPersonalExpenses.rejected, (state, action) => {
+      state.isPersonalExpensesLoading = false;
       state.error = action.payload as string;
     });
 
     // User summary
+    builder.addCase(fetchUserSummary.pending, (state) => {
+      state.isSummaryLoading = true;
+    });
     builder.addCase(fetchUserSummary.fulfilled, (state, action) => {
+      state.isSummaryLoading = false;
       state.summary = action.payload;
+    });
+    builder.addCase(fetchUserSummary.rejected, (state) => {
+      state.isSummaryLoading = false;
     });
 
     // User group summaries
+    builder.addCase(fetchUserGroupSummaries.pending, (state) => {
+      state.isGroupSummariesLoading = true;
+    });
     builder.addCase(fetchUserGroupSummaries.fulfilled, (state, action) => {
+      state.isGroupSummariesLoading = false;
       state.groupSummaries = action.payload;
+    });
+    builder.addCase(fetchUserGroupSummaries.rejected, (state) => {
+      state.isGroupSummariesLoading = false;
     });
 
     // Monthly analytics

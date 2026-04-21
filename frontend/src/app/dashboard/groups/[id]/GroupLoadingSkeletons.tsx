@@ -12,8 +12,8 @@ export const GroupHeaderSkeleton = () => (
           className={styles.textDetails}
           style={{ display: "flex", flexDirection: "column", gap: "8px" }}
         >
-          <Skeleton width={200} height={32} />
-          <Skeleton width={300} height={16} />
+          <Skeleton width="100%" maxWidth={200} height={32} />
+          <Skeleton width="100%" maxWidth={300} height={16} />
         </div>
       </div>
     </div>
@@ -66,8 +66,8 @@ export const BalanceSkeleton = ({ count = 3 }: { count?: number }) => (
           className={styles.party}
           style={{ display: "flex", flexDirection: "column", gap: "6px" }}
         >
-          <Skeleton width={60} height={10} />
-          <Skeleton width={120} height={20} />
+          <Skeleton width="100%" maxWidth={60} height={10} />
+          <Skeleton width="100%" maxWidth={120} height={20} />
         </div>
         <div className={styles.arrow} style={{ border: "none" }}>
           <Skeleton width={24} height={24} borderRadius="50%" />
@@ -76,8 +76,8 @@ export const BalanceSkeleton = ({ count = 3 }: { count?: number }) => (
           className={styles.party}
           style={{ display: "flex", flexDirection: "column", gap: "6px" }}
         >
-          <Skeleton width={40} height={10} />
-          <Skeleton width={120} height={20} />
+          <Skeleton width="100%" maxWidth={40} height={10} />
+          <Skeleton width="100%" maxWidth={120} height={20} />
         </div>
         <div
           className={styles.amountWrap}

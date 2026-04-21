@@ -1,0 +1,114 @@
+@use "../../../../styles/mixins" as *;
+
+.summaryCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: $space-4;
+}
+
+.statCard {
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-light);
+  padding: $space-5;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all $transition-base;
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    border-color: var(--color-primary-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+
+    .iconWrapper {
+      transform: scale(1.05);
+    }
+    .statGlow {
+      opacity: 0.25;
+    }
+  }
+
+  &.blue {
+    --theme-color: var(--color-primary);
+  }
+  &.green {
+    --theme-color: var(--color-success);
+  }
+  &.yellow {
+    --theme-color: var(--color-warning);
+  }
+  &.red {
+    --theme-color: var(--color-danger);
+  }
+  &.purple {
+    --theme-color: var(--color-primary);
+  }
+}
+
+.statGlow {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, var(--theme-color) 0%, transparent 70%);
+  opacity: 0.1;
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.statHeader {
+  @include flex-between;
+  align-items: flex-start;
+}
+
+.statInfo {
+  @include flex-column;
+  gap: $space-1;
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  @include flex-center;
+  background: color-mix(in srgb, var(--theme-color) 15%, transparent);
+  color: var(--theme-color);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  transition: all $transition-base;
+}
+
+.statSub {
+  margin-top: $space-4;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.success {
+    color: var(--color-success);
+  }
+  &.danger {
+    color: var(--color-danger);
+  }
+  &.secondary {
+    color: var(--text-tertiary);
+  }
+}
