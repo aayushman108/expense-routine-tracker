@@ -4,8 +4,8 @@
   @include card;
   display: flex;
   align-items: center;
-  justify-content: space-between; // Ensure balance is distributed
-  gap: $space-3;
+  justify-content: space-between; // Ensure sections are pushed to edges
+  gap: $space-4;
   padding: $space-4 $space-6;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
@@ -18,8 +18,21 @@
   }
 
   @include mobile-only {
-    padding: $space-4;
-    gap: $space-2;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: $space-6 $space-4;
+    gap: $space-6;
+  }
+
+  .partiesInfo {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    min-width: 0;
+    
+    @include mobile-only {
+      gap: $space-2;
+    }
   }
 
   .party {
@@ -49,16 +62,21 @@
     font-size: $font-size-sm;
     opacity: 0.5;
     @include flex-center;
+
+    @include mobile-only {
+      opacity: 0.3;
+    }
   }
 
   .amountWrap {
     display: flex;
     align-items: center;
     gap: $space-6;
-    margin-left: auto;
 
     @include mobile-only {
-      gap: $space-3;
+      flex-direction: row;
+      align-self: flex-end;
+      gap: $space-4;
     }
 
     .amount {

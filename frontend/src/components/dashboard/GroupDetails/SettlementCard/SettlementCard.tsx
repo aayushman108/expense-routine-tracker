@@ -25,19 +25,21 @@ const SettlementCard: React.FC<SettlementCardProps> = ({
 
   return (
     <div className={styles.settlementCard}>
-      <div className={styles.party}>
-        <div className={styles.label}>OWES</div>
-        <div className={styles.name}>
-          {isFromUser ? "You" : balance.from_user_name}
+      <div className={styles.partiesInfo}>
+        <div className={styles.party}>
+          <div className={styles.label}>OWES</div>
+          <div className={styles.name}>
+            {isFromUser ? "You" : balance.from_user_name}
+          </div>
         </div>
-      </div>
-      <span className={styles.arrow}>
-        <HiOutlineArrowRight />
-      </span>
-      <div className={styles.party}>
-        <div className={styles.label}>TO</div>
-        <div className={styles.name}>
-          {isToUser ? "You" : balance.to_user_name}
+        <span className={styles.arrow}>
+          <HiOutlineArrowRight />
+        </span>
+        <div className={styles.party}>
+          <div className={styles.label}>TO</div>
+          <div className={styles.name}>
+            {isToUser ? "You" : balance.to_user_name}
+          </div>
         </div>
       </div>
       <div className={styles.amountWrap}>
