@@ -23,6 +23,7 @@ interface ExpenseState {
     id: string;
     name: string;
     totalGroupSpend: number;
+    totalPaidByMe: number;
     myTotalShare: number;
     iOweOthers: number;
     othersOweMe: number;

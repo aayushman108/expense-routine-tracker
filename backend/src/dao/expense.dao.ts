@@ -695,10 +695,8 @@ async function getUserGroupSummaries(userId: string) {
         e.id,
         e.group_id,
         g.name as group_name,
-        e.expense_status,
         e.total_amount,
-        e.expense_date,
-        e.paid_by,
+        CASE WHEN e.paid_by = ? THEN e.total_amount ELSE 0 END as total_paid_by_me,
         COALESCE(es.split_amount, 0) as user_share,
         GREATEST(0, CASE
           WHEN e.paid_by != ? THEN
@@ -722,14 +720,15 @@ async function getUserGroupSummaries(userId: string) {
         END) as others_owe
       FROM expenses e
       JOIN groups g ON e.group_id = g.id
+      JOIN group_members gm ON g.id = gm.group_id AND gm.user_id = ?
       LEFT JOIN expense_splits es ON e.id = es.expense_id AND es.user_id = ?
-      WHERE e.expense_type = 'group' AND e.expense_status = 'verified'
-      AND (e.paid_by = ? OR e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?))
+      WHERE e.expense_type = 'group' AND e.expense_status != 'draft'
     )
     SELECT
       group_id as id,
       MAX(group_name) as name,
       COALESCE(SUM(total_amount), 0) as total_group_spend,
+      COALESCE(SUM(total_paid_by_me), 0) as total_paid_by_me,
       COALESCE(SUM(user_share), 0) as my_total_share,
       COALESCE(SUM(i_owe), 0) as i_owe_others,
       COALESCE(SUM(others_owe), 0) as others_owe_me
@@ -738,21 +737,22 @@ async function getUserGroupSummaries(userId: string) {
     ORDER BY MAX(group_name) ASC
     `,
     [
-      userId,
-      userId,
-      SETTLEMENT_STATUS.CONFIRMED,
-      userId,
-      SETTLEMENT_STATUS.CONFIRMED,
-      userId,
-      userId,
-      userId,
-    ]
+      userId, // [1] total_paid_by_me CASE
+      userId, // [2] i_owe CASE
+      userId, // [3] i_owe subquery user_id
+      SETTLEMENT_STATUS.CONFIRMED, // [4]
+      userId, // [5] others_owe CASE
+      SETTLEMENT_STATUS.CONFIRMED, // [6]
+      userId, // [7] gm.user_id
+      userId, // [8] es.user_id
+    ],
   );
 
   return result.rows.map((row: any) => ({
     id: row.id,
     name: row.name,
     totalGroupSpend: Number(row.total_group_spend || 0),
+    totalPaidByMe: Number(row.total_paid_by_me || 0),
     myTotalShare: Number(row.my_total_share || 0),
     iOweOthers: Number(row.i_owe_others || 0),
     othersOweMe: Number(row.others_owe_me || 0),

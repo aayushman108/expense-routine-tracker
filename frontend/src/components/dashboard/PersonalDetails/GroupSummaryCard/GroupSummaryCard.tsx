@@ -11,6 +11,7 @@ interface GroupSummary {
   id: string;
   name: string;
   totalGroupSpend: number;
+  totalPaidByMe: number;
   myTotalShare: number;
   iOweOthers: number;
   othersOweMe: number;
@@ -21,6 +22,8 @@ interface GroupSummaryCardProps {
 }
 
 const GroupSummaryCard: React.FC<GroupSummaryCardProps> = ({ group }) => {
+  const netBalance = group.othersOweMe - group.iOweOthers;
+
   return (
     <div className={styles.groupSummaryCard}>
       <div className={styles.cardHeader}>
@@ -39,7 +42,7 @@ const GroupSummaryCard: React.FC<GroupSummaryCardProps> = ({ group }) => {
               <HiOutlineShoppingBag /> Group Spend
             </div>
             <div className={styles.statValue}>
-              रू {group.totalGroupSpend.toLocaleString()}
+              रू {group.totalGroupSpend?.toLocaleString()}
             </div>
           </div>
           <div className={styles.statItem}>
@@ -47,23 +50,27 @@ const GroupSummaryCard: React.FC<GroupSummaryCardProps> = ({ group }) => {
               <HiOutlineChartBar /> My Share
             </div>
             <div className={`${styles.statValue} ${styles.highlight}`}>
-              रू {group.myTotalShare.toLocaleString()}
+              रू {group.myTotalShare?.toLocaleString()}
             </div>
           </div>
+
           <div className={styles.statItem}>
             <div className={styles.statLabel}>
-              <HiOutlineArrowNarrowDown /> To Pay
+              <HiOutlineShoppingBag /> Total Paid by Me
             </div>
-            <div className={`${styles.statValue} ${group.iOweOthers > 0 ? styles.danger : ""}`}>
-              रू {group.iOweOthers.toLocaleString()}
+            <div className={styles.statValue}>
+              रू {group.totalPaidByMe?.toLocaleString()}
             </div>
           </div>
+
           <div className={styles.statItem}>
             <div className={styles.statLabel}>
-              <HiOutlineArrowNarrowUp /> To Receive
+              <HiOutlineChartBar /> Net Balance
             </div>
-            <div className={`${styles.statValue} ${group.othersOweMe > 0 ? styles.success : ""}`}>
-              रू {group.othersOweMe.toLocaleString()}
+            <div
+              className={`${styles.statValue} ${netBalance > 0 ? styles.success : netBalance < 0 ? styles.danger : ""}`}
+            >
+              {netBalance > 0 ? "+" : ""} रू {netBalance?.toLocaleString()}
             </div>
           </div>
         </div>
