@@ -34,6 +34,10 @@ export interface Group {
   image?: { url: string; publicId: string } | null;
   created_by: string;
   member_count?: number;
+  total_group_spend?: number;
+  total_paid_by_me?: number;
+  my_total_share?: number;
+  net_balance?: number;
   created_at: string;
   updated_at: string;
 }

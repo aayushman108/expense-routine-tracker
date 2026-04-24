@@ -10,6 +10,7 @@ import {
   HiOutlineUserGroup,
   HiOutlineSearch,
   HiOutlineOfficeBuilding,
+  HiOutlineChartBar,
 } from "react-icons/hi";
 import { FiUsers } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -33,16 +34,17 @@ export default function GroupsPage() {
   }, [dispatch]);
 
   const filteredGroups = useMemo(() => {
-    if (!groups?.data) return [];
-    if (!searchQuery.trim()) return groups.data;
+    const data = groups?.data;
+    if (!data) return [];
+    if (!searchQuery.trim()) return data;
 
     const query = searchQuery.toLowerCase().trim();
-    return groups.data.filter(
+    return data.filter(
       (group: any) =>
         group.name.toLowerCase().includes(query) ||
         (group.description && group.description.toLowerCase().includes(query)),
     );
-  }, [groups?.data, searchQuery]);
+  }, [groups.data, searchQuery]);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
@@ -143,6 +145,26 @@ export default function GroupsPage() {
                 <p className={styles.description}>
                   {group.description || "No description provided."}
                 </p>
+
+                <div className={styles.balanceArea}>
+                  <div className={styles.balanceLabelWrapper}>
+                    <span className={styles.statIcon}>
+                      <HiOutlineChartBar />
+                    </span>
+                    <span className={styles.statLabel}>Net Balance</span>
+                  </div>
+                  <div
+                    className={`${styles.statValue} ${
+                      (group.net_balance || 0) < 0
+                        ? styles.negative
+                        : (group.net_balance || 0) > 0
+                          ? styles.positive
+                          : ""
+                    }`}
+                  >
+                    रू {(group.net_balance || 0).toLocaleString()}
+                  </div>
+                </div>
               </div>
               <div className={styles.footer}>
                 <span className={styles.dateLabel}>

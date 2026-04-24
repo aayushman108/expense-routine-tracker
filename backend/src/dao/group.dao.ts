@@ -62,11 +62,53 @@ const findById = async (id: string): Promise<IGroup | null> => {
 
 const findByUserId = async (userId: string): Promise<IGroup[]> => {
   const { rows } = await db.raw(
-    `SELECT g.* FROM groups g
-     JOIN group_members gm ON g.id = gm.group_id
-     WHERE gm.user_id = ? AND gm.left_at IS NULL
-     ORDER BY g.created_at DESC`,
-    [userId],
+    `WITH group_stats AS (
+      SELECT 
+        e.group_id,
+        COALESCE(SUM(e.total_amount), 0) as total_group_spend,
+        COALESCE(SUM(CASE WHEN e.paid_by = ? THEN e.total_amount ELSE 0 END), 0) as total_paid_by_me,
+        COALESCE(SUM(es.split_amount), 0) as my_total_share,
+        COALESCE(SUM(
+          GREATEST(0, CASE
+            WHEN e.paid_by != ? THEN
+              COALESCE(es.split_amount, 0) - COALESCE(
+                (SELECT SUM(es_inner.split_amount) 
+                 FROM expense_splits es_inner 
+                 JOIN settlements st ON es_inner.settlement_id = st.id 
+                 WHERE es_inner.expense_id = e.id AND es_inner.user_id = ? AND st.status = 'confirmed'), 0
+              )
+            ELSE 0
+          END)
+        ), 0) as i_owe_others,
+        COALESCE(SUM(
+          GREATEST(0, CASE
+            WHEN e.paid_by = ? THEN
+              (e.total_amount - COALESCE(es.split_amount, 0)) - COALESCE(
+                (SELECT SUM(es_inner.split_amount) 
+                 FROM expense_splits es_inner 
+                 JOIN settlements st ON es_inner.settlement_id = st.id 
+                 WHERE es_inner.expense_id = e.id AND es_inner.user_id != e.paid_by AND st.status = 'confirmed'), 0
+              )
+            ELSE 0
+          END)
+        ), 0) as others_owe_me
+      FROM expenses e
+      LEFT JOIN expense_splits es ON e.id = es.expense_id AND es.user_id = ?
+      WHERE e.expense_type = 'group' AND e.expense_status != 'draft'
+      GROUP BY e.group_id
+    )
+    SELECT 
+      g.*,
+      COALESCE(gs.total_group_spend, 0) as total_group_spend,
+      COALESCE(gs.total_paid_by_me, 0) as total_paid_by_me,
+      COALESCE(gs.my_total_share, 0) as my_total_share,
+      COALESCE(gs.others_owe_me, 0) - COALESCE(gs.i_owe_others, 0) as net_balance
+    FROM groups g
+    JOIN group_members gm ON g.id = gm.group_id
+    LEFT JOIN group_stats gs ON g.id = gs.group_id
+    WHERE gm.user_id = ? AND gm.left_at IS NULL
+    ORDER BY g.created_at DESC`,
+    [userId, userId, userId, userId, userId, userId],
   );
   return rows;
 };

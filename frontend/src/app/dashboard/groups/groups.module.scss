@@ -318,6 +318,57 @@
       line-height: 1.6;
       font-weight: 500;
     }
+
+    .balanceArea {
+      padding-top: $space-3;
+      border-top: 1px solid var(--border-light);
+      margin-top: $space-3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .balanceLabelWrapper {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        color: #94a3b8;
+
+        .statIcon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          color: #6366f1;
+          opacity: 0.8;
+
+          svg {
+            display: block;
+          }
+        }
+
+        .statLabel {
+          font-size: 10px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+      }
+
+      .statValue {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+
+        &.negative {
+          color: #e11d48;
+        }
+
+        &.positive {
+          color: var(--color-success);
+        }
+      }
+    }
   }
 
   .footer {
