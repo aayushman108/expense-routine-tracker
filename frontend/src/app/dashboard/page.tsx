@@ -20,6 +20,7 @@ import {
 import CreateGroupModal from "@/components/dashboard/GroupModals/CreateGroupModal";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import MonthlyExpenditureChart from "@/components/dashboard/Charts/MonthlyExpenditureChart";
+import { FullDashboardSkeleton } from "./DashboardLoadingSkeletons";
 import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
 import { EXPENSE_TYPE } from "@expense-tracker/shared";
@@ -28,7 +29,9 @@ import { handleThunk } from "@/lib/utils";
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
   const { groups } = useAppSelector((s: RootState) => s.groups);
-  const { summary } = useAppSelector((s: RootState) => s.expenses);
+  const { summary, isSummaryLoading } = useAppSelector(
+    (s: RootState) => s.expenses,
+  );
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -85,6 +88,10 @@ export default function DashboardPage() {
     month: "long",
   });
   const currentYear = new Date().getFullYear();
+
+  if (!summary && isSummaryLoading) {
+    return <FullDashboardSkeleton />;
+  }
 
   return (
     <div className={styles.dashboard}>
