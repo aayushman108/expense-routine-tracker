@@ -30,6 +30,7 @@ import type { User } from "@/lib/types";
 import { PAYMENT_METHOD_TYPE } from "@expense-tracker/shared/enum/payment.enum";
 import { BankCard } from "@/components/dashboard/BankCard/BankCard";
 import { WalletCard } from "@/components/dashboard/WalletCard/WalletCard";
+import { FullProfileSkeleton } from "./ProfileLoadingSkeletons";
 import { PaymentDetailsForm } from "@/components/dashboard/PaymentDetailsForm/PaymentDetailsForm";
 import { FORM_MODE } from "@expense-tracker/shared";
 import { ChangePasswordForm } from "@/components/dashboard/ChangePasswordForm/ChangePasswordForm";
@@ -188,6 +189,10 @@ export default function ProfilePage() {
     handleThunk(dispatch(logoutUser()), () => router.push("/"));
   };
 
+  if (!user) {
+    return <FullProfileSkeleton />;
+  }
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -206,11 +211,11 @@ export default function ProfilePage() {
             <h1>My Profile</h1>
           </div>
           <p>
-            Manage your account settings, personal information, and payment methods.
+            Manage your account settings, personal information, and payment
+            methods.
           </p>
         </div>
-        <div className={styles.actions}>
-        </div>
+        <div className={styles.actions}></div>
       </header>
 
       <div className={styles.profileLayout}>
