@@ -9,7 +9,10 @@ import {
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
-import { fetchGroupExpenses } from "@/store/slices/expenseSlice";
+import {
+  fetchGroupExpenses,
+  fetchUserGroupSummaries,
+} from "@/store/slices/expenseSlice";
 import { fetchGroupBalances } from "@/store/slices/settlementSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
@@ -48,9 +51,11 @@ export default function GroupDetailsPage() {
 
   const { groupDetails } = useAppSelector((s) => s.groups);
 
-  const { groupExpenses, isLoading: expensesLoading } = useAppSelector(
-    (s) => s.expenses,
-  );
+  const {
+    groupExpenses,
+    isLoading: expensesLoading,
+    groupSummaries,
+  } = useAppSelector((s) => s.expenses);
 
   const { groupBalances, isLoading: balancesLoading } = useAppSelector(
     (s) => s.settlements,
@@ -92,11 +97,16 @@ export default function GroupDetailsPage() {
     if (id) {
       dispatch(fetchGroupDetailsAction(id as string));
       dispatch(fetchGroupBalances(id as string));
+      dispatch(fetchUserGroupSummaries());
     }
     return () => {
       dispatch(clearGroupDetails());
     };
   }, [id, dispatch]);
+
+  const currentGroupSummary = useMemo(() => {
+    return groupSummaries.find((gs) => gs.id === id);
+  }, [groupSummaries, id]);
 
   useEffect(() => {
     if (id && activeTab === "expenses") {
@@ -309,6 +319,7 @@ export default function GroupDetailsPage() {
             groupDetails={groupDetails}
             totalGroupSpend={totalGroupSpend}
             netPosition={netPosition}
+            summary={currentGroupSummary}
           />
 
           <section className={styles.sidebarSection}>

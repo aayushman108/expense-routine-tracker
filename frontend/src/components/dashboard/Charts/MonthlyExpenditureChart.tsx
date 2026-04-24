@@ -14,6 +14,11 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchMonthlyAnalytics } from "@/store/slices/expenseSlice";
 import styles from "./MonthlyExpenditureChart.module.scss";
 
+interface GroupDetail {
+  groupName: string;
+  amount: number;
+}
+
 interface CustomTooltipProps {
   active?: boolean;
   payload?: {
@@ -21,31 +26,68 @@ interface CustomTooltipProps {
       month: string;
       personalExpense: number;
       groupExpense: number;
+      totalGroupExpenditure: number;
+      totalPaidInGroup: number;
+      netGroupFlow: number;
       totalExpense: number;
+      groupDetails: GroupDetail[];
     };
     value: number;
   }[];
   label?: string;
+  mode?: "default" | "personal";
 }
 
-const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  mode = "default",
+}: CustomTooltipProps) => {
   if (active && payload && payload.length) {
+    const data = payload[0].payload;
     return (
       <div className={styles.customTooltip}>
         <p className={styles.label}>{label}</p>
         <div className={styles.metrics}>
           <div className={styles.metric}>
-            <span>Personal</span>
-            <p>रू {payload[0].payload.personalExpense.toLocaleString()}</p>
+            <span>Personal expenses</span>
+            <p>रू {data.personalExpense.toLocaleString()}</p>
           </div>
-          <div className={styles.metric}>
-            <span>Group Share</span>
-            <p>रू {payload[0].payload.groupExpense.toLocaleString()}</p>
-          </div>
-          <div className={`${styles.metric} ${styles.total}`}>
-            <span>Total Outflow</span>
-            <p>रू {payload[0].payload.totalExpense.toLocaleString()}</p>
-          </div>
+
+          {mode === "default" && (
+            <>
+              <div className={styles.groupAnalyticsSection}>
+                <span className={styles.sectionTitle}>Group Analytics</span>
+                <div className={styles.metric}>
+                  <span>Group Spend</span>
+                  <p>रू {data.totalGroupExpenditure.toLocaleString()}</p>
+                </div>
+                <div className={styles.metric}>
+                  <span>Paid by me</span>
+                  <p>रू {data.totalPaidInGroup.toLocaleString()}</p>
+                </div>
+                <div className={styles.metric}>
+                  <span>My share</span>
+                  <p>रू {data.groupExpense.toLocaleString()}</p>
+                </div>
+                <div
+                  className={`${styles.metric} ${data.netGroupFlow >= 0 ? styles.success : styles.danger}`}
+                >
+                  <span>Net Balance</span>
+                  <p>
+                    {data.netGroupFlow >= 0 ? "+" : ""} रू{" "}
+                    {data.netGroupFlow.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <div className={`${styles.metric} ${styles.total}`}>
+                <span>Total Outflow</span>
+                <p>रू {data.totalExpense.toLocaleString()}</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );
@@ -53,7 +95,67 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null;
 };
 
-const MonthlyExpenditureChart = () => {
+const AnalyticsCard = ({
+  data,
+  mode,
+}: {
+  data: any;
+  mode: "default" | "personal";
+}) => (
+  <div className={styles.analyticsCard}>
+    <p className={styles.cardMonth}>{data.month}</p>
+    <div className={styles.metrics}>
+      <div className={styles.metric}>
+        <span>Personal expenses</span>
+        <p>रू {data.personalExpense.toLocaleString()}</p>
+      </div>
+
+      {mode === "default" && (
+        <>
+          <div className={styles.groupAnalyticsSection}>
+            <span className={styles.sectionTitle}>Group Analytics</span>
+            <div className={styles.metric}>
+              <span>Group Spend</span>
+              <p>रू {data.totalGroupExpenditure.toLocaleString()}</p>
+            </div>
+            <div className={styles.metric}>
+              <span>Paid by me</span>
+              <p>रू {data.totalPaidInGroup.toLocaleString()}</p>
+            </div>
+            <div className={styles.metric}>
+              <span>My share</span>
+              <p>रू {data.groupExpense.toLocaleString()}</p>
+            </div>
+            <div
+              className={`${styles.metric} ${data.netGroupFlow >= 0 ? styles.success : styles.danger}`}
+            >
+              <span>Net Balance</span>
+              <p>
+                {data.netGroupFlow >= 0 ? "+" : ""} रू{" "}
+                {data.netGroupFlow.toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          <div className={`${styles.metric} ${styles.total}`}>
+            <span>Total Outflow</span>
+            <p>रू {data.totalExpense.toLocaleString()}</p>
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+);
+
+interface MonthlyExpenditureChartProps {
+  variant?: "default" | "compact";
+  mode?: "default" | "personal";
+}
+
+const MonthlyExpenditureChart: React.FC<MonthlyExpenditureChartProps> = ({
+  variant = "default",
+  mode = "default",
+}) => {
   const dispatch = useAppDispatch();
   const { monthlyAnalytics } = useAppSelector((state) => state.expenses);
 
@@ -67,53 +169,94 @@ const MonthlyExpenditureChart = () => {
     displayMonth: item.month.slice(0, 3),
   }));
 
-  const maxExpense = Math.max(...chartData.map(d => d.totalExpense), 1);
+  const activeMonths = chartData
+    .filter((_, index) => index <= new Date().getMonth())
+    .reverse();
+
+  const dataKey = mode === "personal" ? "personalExpense" : "totalExpense";
+  const chartHeight = variant === "compact" ? 200 : 240;
 
   return (
-    <div className={styles.chartContainer}>
+    <div
+      className={`${styles.chartContainer} ${variant === "compact" ? styles.compact : ""}`}
+    >
       <div className={styles.header}>
         <div className={styles.titleInfo}>
-          <h3>Expenditure Analytics</h3>
-          <p>Monthly spending patterns across current fiscal year</p>
+          <h3>
+            {variant === "compact"
+              ? "Spending Trends"
+              : "Expenditure Analytics"}
+          </h3>
+          <p>
+            {mode === "personal"
+              ? "Your private spending over the year"
+              : "Monthly spending patterns across current fiscal year"}
+          </p>
         </div>
         <div className={styles.legend}>
           <div className={styles.dot}></div>
-          <span>Net Outflow</span>
+          <span>{mode === "personal" ? "Personal Spend" : "Net Outflow"}</span>
         </div>
       </div>
-      
+
       {/* ── Desktop Chart View ── */}
       <div className={styles.chartWrapper}>
-        <ResponsiveContainer width="100%" height={240}>
-          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <AreaChart
+            data={chartData}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-primary)"
+                  stopOpacity={0.3}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-primary)"
+                  stopOpacity={0}
+                />
               </linearGradient>
             </defs>
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              vertical={false} 
-              stroke="var(--border-light)" 
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="var(--border-light)"
               opacity={0.5}
             />
-            <XAxis 
-              dataKey="displayMonth" 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: "var(--text-tertiary)", fontSize: 11, fontWeight: 600 }}
+            <XAxis
+              dataKey="displayMonth"
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fill: "var(--text-tertiary)",
+                fontSize: 11,
+                fontWeight: 600,
+              }}
               dy={10}
             />
-            <YAxis 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: "var(--text-tertiary)", fontSize: 11, fontWeight: 600 }}
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fill: "var(--text-tertiary)",
+                fontSize: 11,
+                fontWeight: 600,
+              }}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "var(--color-primary)", strokeWidth: 1, strokeDasharray: "4 4" }} />
+            <Tooltip
+              content={<CustomTooltip mode={mode} />}
+              cursor={{
+                stroke: "var(--color-primary)",
+                strokeWidth: 1,
+                strokeDasharray: "4 4",
+              }}
+            />
             <Area
               type="monotone"
-              dataKey="totalExpense"
+              dataKey={dataKey}
               stroke="var(--color-primary)"
               strokeWidth={3}
               fillOpacity={1}
@@ -124,27 +267,10 @@ const MonthlyExpenditureChart = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* ── Mobile Modular Feed ── */}
-      <div className={styles.mobileFeed}>
-        {chartData.filter((_, index) => index <= new Date().getMonth()).reverse().map((item, index) => (
-          <div key={item.month} className={styles.monthRow} style={{ animationDelay: `${index * 0.05}s` }}>
-            <div className={styles.rowMetadata}>
-               <span className={styles.monthName}>{item.month}</span>
-               <span className={styles.amount}>रू {item.totalExpense.toLocaleString()}</span>
-            </div>
-            <div className={styles.progressContainer}>
-               <div 
-                 className={styles.progressBar} 
-                 style={{ width: `${(item.totalExpense / maxExpense) * 100}%` }}
-               />
-               <div className={styles.marker} style={{ left: `${(item.totalExpense / maxExpense) * 100}%` }} />
-            </div>
-            <div className={styles.breakdown}>
-               <span>Personal: रू {item.personalExpense.toLocaleString()}</span>
-               <span className={styles.divider}>•</span>
-               <span>Group: रू {item.groupExpense.toLocaleString()}</span>
-            </div>
-          </div>
+      {/* ── Tablet/Mobile Analytics Feed ── */}
+      <div className={styles.analyticsContainer}>
+        {activeMonths.map((item) => (
+          <AnalyticsCard key={item.month} data={item} mode={mode} />
         ))}
       </div>
     </div>

@@ -92,7 +92,10 @@ async function updateExpense({
       );
     }
 
-    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED && currentExpense.group_id !== null) {
+    if (
+      currentExpense.expense_status === EXPENSE_STATUS.VERIFIED &&
+      currentExpense.group_id !== null
+    ) {
       throw new Error("Verified group expenses cannot be updated.");
     }
 
@@ -525,7 +528,10 @@ async function deleteExpense(id: string, userId: string) {
       );
     }
 
-    if (currentExpense.expense_status === EXPENSE_STATUS.VERIFIED && currentExpense.group_id !== null) {
+    if (
+      currentExpense.expense_status === EXPENSE_STATUS.VERIFIED &&
+      currentExpense.group_id !== null
+    ) {
       throw new Error("Verified group expenses cannot be deleted.");
     }
 
@@ -651,7 +657,13 @@ async function getUserSummary(userId: string) {
         AND date_trunc('month', expense_date) = date_trunc('month', CURRENT_DATE)
       ), 0) as current_month_spend,
 
-      -- Personal Spend
+      -- Current Month Personal Spend
+      COALESCE(SUM(user_share) FILTER (
+        WHERE expense_type = 'personal'
+        AND date_trunc('month', expense_date) = date_trunc('month', CURRENT_DATE)
+      ), 0) as current_month_personal_spend,
+
+      -- Personal Spend (Lifetime)
       COALESCE(SUM(user_share) FILTER (WHERE expense_type = 'personal'), 0) as personal_spend,
 
       -- Spend in Groups (All time, verified)
@@ -680,6 +692,7 @@ async function getUserSummary(userId: string) {
   return {
     lifetimeSpend: Number(row.lifetime_spend || 0),
     currentMonthSpend: Number(row.current_month_spend || 0),
+    currentMonthPersonalSpend: Number(row.current_month_personal_spend || 0),
     personalSpend: Number(row.personal_spend || 0),
     groupSpend: Number(row.group_spend || 0),
     remainingToPay: Number(row.remaining_to_pay || 0),
@@ -768,37 +781,71 @@ async function getMonthlyAnalytics(userId: string) {
     user_expenses AS (
       SELECT 
         EXTRACT(MONTH FROM expense_date) AS month_num,
+        CASE WHEN expense_type = 'personal' AND paid_by = ? THEN total_amount ELSE 0 END AS personal_amt,
         CASE 
-          WHEN expense_type = 'personal' THEN total_amount 
-          ELSE 0 
-        END AS personal_amt,
-        CASE 
-          WHEN expense_type = 'group' AND expense_status = 'verified' THEN 
+          WHEN expense_type = 'group' AND expense_status != 'draft' THEN 
             COALESCE((SELECT split_amount FROM expense_splits WHERE expense_id = e.id AND user_id = ?), 0)
           ELSE 0 
-        END AS group_amt
+        END AS group_share_amt,
+        CASE 
+          WHEN expense_type = 'group' AND expense_status != 'draft' 
+               AND e.group_id IN (SELECT group_id FROM group_members WHERE user_id = ?) 
+          THEN total_amount 
+          ELSE 0 
+        END AS full_group_amt,
+        CASE WHEN expense_type = 'group' AND expense_status != 'draft' AND paid_by = ? THEN total_amount ELSE 0 END AS paid_by_me_amt,
+        CASE 
+          WHEN expense_type = 'group' AND expense_status != 'draft' THEN g.name
+          ELSE NULL
+        END AS group_name
       FROM expenses e
-      WHERE (paid_by = ? OR e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?))
+      LEFT JOIN groups g ON e.group_id = g.id
+      WHERE (expense_type = 'personal' AND paid_by = ?)
+         OR (expense_type = 'group' AND e.group_id IN (SELECT group_id FROM group_members WHERE user_id = ?))
       AND EXTRACT(YEAR FROM expense_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+    ),
+    group_breakdown AS (
+      SELECT 
+        month_num,
+        group_name,
+        SUM(group_share_amt) AS group_amount
+      FROM user_expenses
+      WHERE group_name IS NOT NULL AND group_share_amt > 0
+      GROUP BY month_num, group_name
     )
     SELECT 
       TRIM(TO_CHAR(TO_DATE(m.month_num::text, 'MM'), 'Month')) AS month,
       COALESCE(SUM(ue.personal_amt), 0) AS personal_expense,
-      COALESCE(SUM(ue.group_amt), 0) AS group_expense,
-      (COALESCE(SUM(ue.personal_amt), 0) + COALESCE(SUM(ue.group_amt), 0)) AS total_expense
+      COALESCE(SUM(ue.group_share_amt), 0) AS group_expense,
+      COALESCE(SUM(ue.full_group_amt), 0) AS total_group_expenditure,
+      COALESCE(SUM(ue.paid_by_me_amt), 0) AS total_paid_in_group,
+      (COALESCE(SUM(ue.paid_by_me_amt), 0) - COALESCE(SUM(ue.group_share_amt), 0)) AS net_group_flow,
+      (COALESCE(SUM(ue.personal_amt), 0) + COALESCE(SUM(ue.group_share_amt), 0)) AS total_expense,
+      COALESCE(
+        (SELECT jsonb_agg(jsonb_build_object('groupName', gb.group_name, 'amount', gb.group_amount) ORDER BY gb.group_amount DESC)
+         FROM group_breakdown gb WHERE gb.month_num = m.month_num),
+        '[]'::jsonb
+      ) AS group_details
     FROM months m
     LEFT JOIN user_expenses ue ON m.month_num = ue.month_num
     GROUP BY m.month_num
     ORDER BY m.month_num;
     `,
-    [userId, userId, userId],
+    [userId, userId, userId, userId, userId, userId],
   );
 
   return result.rows.map((row: any) => ({
     month: row.month,
     personalExpense: Number(row.personal_expense || 0),
     groupExpense: Number(row.group_expense || 0),
+    totalGroupExpenditure: Number(row.total_group_expenditure || 0),
+    totalPaidInGroup: Number(row.total_paid_in_group || 0),
+    netGroupFlow: Number(row.net_group_flow || 0),
     totalExpense: Number(row.total_expense || 0),
+    groupDetails:
+      typeof row.group_details === "string"
+        ? JSON.parse(row.group_details)
+        : row.group_details || [],
   }));
 }
 

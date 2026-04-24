@@ -86,6 +86,9 @@
   &.red {
     --theme-color: var(--color-danger);
   }
+  &.purple {
+    --theme-color: #a855f7;
+  }
 }
 
 .statGlow {
@@ -187,8 +190,8 @@
 
 .cardHeader {
   @include flex-column;
-  gap: 4px;
-  margin-bottom: $space-6;
+  gap: 2px;
+  margin-bottom: $space-4;
   p {
     font-family: $font-mono;
     font-size: 10px;
@@ -197,7 +200,7 @@
     letter-spacing: 0.2em;
   }
   h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: var(--text-primary);
     letter-spacing: -0.02em;
@@ -206,52 +209,103 @@
 }
 
 .mainStats {
-  display: flex;
-  align-items: center;
-  gap: $space-10;
-  margin: $space-6 0;
-  @include responsive(sm) {
-    flex-direction: column;
-    gap: $space-4;
-    align-items: flex-start;
-  }
-}
-
-.statDivider {
-  width: 1px;
-  height: 40px;
-  background: var(--border-light);
-  @include responsive(sm) {
-    display: none;
-  }
+  @include flex-column;
+  gap: $space-4;
+  margin: $space-4 0;
 }
 
 .mainStat {
   @include flex-column;
-  gap: 4px;
-  flex: 1;
+  gap: 2px;
   .mainStatLabel {
     font-family: $font-mono;
     font-size: 10px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--color-primary-600);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
   .mainStatValue {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 12px;
     h3 {
-      font-size: 1.75rem;
+      font-size: 2.1rem;
       font-weight: 800;
       color: var(--text-primary);
       margin: 0;
+      letter-spacing: -0.03em;
     }
     .labelIndicator {
       font-size: 10px;
       color: var(--text-tertiary);
       font-weight: 700;
       text-transform: uppercase;
+      background: var(--bg-tertiary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      @include responsive(sm) {
+        display: none;
+      }
+    }
+  }
+}
+
+.breakdownRow {
+  display: flex;
+  gap: $space-8;
+  margin-top: $space-4;
+  @include responsive(sm) {
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
+
+.subStat {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex: 1;
+  padding: $space-2;
+  border-radius: 10px;
+  transition: all $transition-base;
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+
+  .subIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    @include flex-center;
+    font-size: 1.1rem;
+    color: var(--color-primary-600);
+    border: 1px solid var(--border-light);
+  }
+
+  .subInfo {
+    @include flex-column;
+    gap: 1px;
+    .subLabel {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .subValue {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-secondary);
+      &.success {
+        color: var(--color-success);
+      }
+      &.danger {
+        color: var(--color-danger);
+      }
     }
   }
 }

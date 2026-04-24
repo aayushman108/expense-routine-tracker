@@ -3,7 +3,6 @@ import {
   HiOutlineCurrencyDollar,
   HiOutlineCalendar,
   HiOutlineChartBar,
-  HiOutlineShoppingBag,
   HiOutlineArrowNarrowDown,
   HiOutlineArrowNarrowUp,
 } from "react-icons/hi";
@@ -13,6 +12,7 @@ interface PersonalStatsProps {
   summary: {
     lifetimeSpend: number;
     currentMonthSpend: number;
+    currentMonthPersonalSpend: number;
     personalSpend: number;
     groupSpend: number;
     remainingToPay: number;
@@ -21,61 +21,20 @@ interface PersonalStatsProps {
 }
 
 const PersonalStats: React.FC<PersonalStatsProps> = ({ summary }) => {
-  const calculations = {
-    personal: summary?.personalSpend || 0,
-    total: summary?.lifetimeSpend || 0,
-    currentMonthTotal: summary?.currentMonthSpend || 0,
-    totalIOwe: summary?.remainingToPay || 0,
-    totalOthersOweMe: summary?.remainingToReceive || 0,
-    groupOnly: summary?.groupSpend || 0,
-    netFlow: (summary?.remainingToReceive || 0) - (summary?.remainingToPay || 0),
-  };
-
   const stats = [
     {
-      label: "Lifetime Spend",
-      value: calculations.total,
-      subText: "Personal + All Group Shares",
-      icon: <HiOutlineCurrencyDollar />,
-      variant: styles.blue,
-    },
-    {
-      label: "Current Month Spend",
-      value: calculations.currentMonthTotal,
-      subText: new Date().toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      }),
+      label: "Current Month",
+      value: summary?.currentMonthPersonalSpend || 0,
+      subText: "This month's personal expenses",
       icon: <HiOutlineCalendar />,
       variant: styles.purple,
     },
     {
-      label: "Personal Spend",
-      value: calculations.personal,
-      subText: "Non-group expenses",
-      icon: <HiOutlineChartBar />,
-      variant: styles.green,
-    },
-    {
-      label: "Group Spend",
-      value: calculations.groupOnly,
-      subText: "Your verified group shares",
-      icon: <HiOutlineShoppingBag />,
-      variant: styles.yellow,
-    },
-    {
-      label: calculations.netFlow >= 0 ? "Net Inflow" : "Net Outflow",
-      value: Math.abs(calculations.netFlow),
-      subText:
-        calculations.netFlow >= 0 ? "Total you are owed" : "Total you owe",
-      icon:
-        calculations.netFlow >= 0 ? (
-          <HiOutlineArrowNarrowUp />
-        ) : (
-          <HiOutlineArrowNarrowDown />
-        ),
-      variant: calculations.netFlow >= 0 ? styles.green : styles.red,
-      subColor: calculations.netFlow >= 0 ? styles.success : styles.danger,
+      label: "Lifetime Total",
+      value: summary?.personalSpend || 0,
+      subText: "All-time personal spending",
+      icon: <HiOutlineCurrencyDollar />,
+      variant: styles.blue,
     },
   ];
 
@@ -93,7 +52,7 @@ const PersonalStats: React.FC<PersonalStatsProps> = ({ summary }) => {
             </div>
             <div className={styles.iconWrapper}>{stat.icon}</div>
           </div>
-          <span className={`${styles.statSub} ${stat.subColor || styles.secondary}`}>
+          <span className={styles.statSub}>
             {stat.subText}
           </span>
         </div>

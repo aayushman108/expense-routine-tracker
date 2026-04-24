@@ -23,7 +23,7 @@ const PersonalHeader: React.FC<PersonalHeaderProps> = ({ onBack, onAddExpense })
           <h1>Personal Ledger</h1>
         </div>
         <p>
-          Private workspace for tracking your individual spending and group contributions.
+          Private workspace for tracking and managing your individual expenses.
         </p>
       </div>
       <div className={styles.actions}>

@@ -1,25 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import {
   HiOutlineUserGroup,
   HiOutlineCurrencyDollar,
   HiOutlineTrendingUp,
   HiOutlineTrendingDown,
-  HiPlus,
   HiOutlineOfficeBuilding,
+  HiOutlineUser,
+  HiOutlineUsers,
+  HiOutlineScale,
 } from "react-icons/hi";
-import { FiUsers, FiClock } from "react-icons/fi";
-import { Group } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchMyGroupsAction } from "@/store/slices/groupSlice";
-import { fetchUserSummary } from "@/store/slices/expenseSlice";
-import Button from "@/components/ui/Button/Button";
+import {
+  fetchUserSummary,
+  fetchMonthlyAnalytics,
+} from "@/store/slices/expenseSlice";
 import CreateGroupModal from "@/components/dashboard/GroupModals/CreateGroupModal";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
-import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
 import MonthlyExpenditureChart from "@/components/dashboard/Charts/MonthlyExpenditureChart";
 import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
@@ -28,9 +27,7 @@ import { handleThunk } from "@/lib/utils";
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
-  const { groups, isLoading: groupsLoading } = useAppSelector(
-    (s: RootState) => s.groups,
-  );
+  const { groups } = useAppSelector((s: RootState) => s.groups);
   const { summary } = useAppSelector((s: RootState) => s.expenses);
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
@@ -39,44 +36,55 @@ export default function DashboardPage() {
   useEffect(() => {
     dispatch(fetchMyGroupsAction());
     handleThunk(dispatch(fetchUserSummary()));
+    dispatch(fetchMonthlyAnalytics());
   }, [dispatch]);
+
+  const currentMonthNum = new Date().getMonth() + 1;
+  const { monthlyAnalytics } = useAppSelector((s: RootState) => s.expenses);
+  const currentMonthData = monthlyAnalytics?.[currentMonthNum - 1];
+
+  const currentMonthTotal = currentMonthData?.totalExpense || 0;
+  const currentMonthPersonal = currentMonthData?.personalExpense || 0;
+  const currentMonthGroupShare = currentMonthData?.groupExpense || 0;
+  const currentMonthNetFlow = currentMonthData?.netGroupFlow || 0;
 
   const totalSpent = summary?.lifetimeSpend || 0;
   const owedToYou = summary?.remainingToReceive || 0;
   const youOwe = summary?.remainingToPay || 0;
-  const currentMonthTotal = summary?.currentMonthSpend || 0;
   const netBalance = owedToYou - youOwe;
 
   const stats = [
     {
       label: "Total Asset Flow",
       value: `रू ${totalSpent.toLocaleString()}`,
-      trend: "+12.4%",
       icon: <HiOutlineCurrencyDollar />,
       color: "blue",
     },
     {
+      label: "Total Personal Expense",
+      value: `रू ${(summary?.personalSpend || 0).toLocaleString()}`,
+      icon: <HiOutlineOfficeBuilding />,
+      color: "purple",
+    },
+    {
       label: "Operational Groups",
       value: groups?.totalGroups || 0,
-      trend: "Stable",
       icon: <HiOutlineUserGroup />,
       color: "green",
     },
     {
-      label: "Accounts Receivable",
-      value: `रू ${owedToYou.toLocaleString()}`,
-      trend: "+रू 2.1k",
-      icon: <HiOutlineTrendingUp />,
-      color: "yellow",
-    },
-    {
-      label: "Accounts Payable",
-      value: `रू ${youOwe.toLocaleString()}`,
-      trend: "-रू 1.2k",
-      icon: <HiOutlineTrendingDown />,
-      color: "red",
+      label: netBalance >= 0 ? "Net Assets Inflow" : "Net Assets Outflow",
+      value: `रू ${Math.abs(netBalance).toLocaleString()}`,
+      icon:
+        netBalance >= 0 ? <HiOutlineTrendingUp /> : <HiOutlineTrendingDown />,
+      color: netBalance >= 0 ? "green" : "red",
     },
   ];
+
+  const currentMonthName = new Date().toLocaleString("default", {
+    month: "long",
+  });
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className={styles.dashboard}>
@@ -98,59 +106,64 @@ export default function DashboardPage() {
 
       {/* ── Primary Assets ── */}
       <section className={styles.personalOverview}>
-        <div
-          className={styles.personalCard}
-          onClick={() => setIsExpenseModalOpen(true)}
-        >
+        <div className={styles.personalCard}>
           <div className={styles.cardGlow}></div>
           <div className={styles.personalContent}>
             <div className={styles.cardHeader}>
               <p>SECURE_PERSONAL_SESSION</p>
-              <h2>Private Ledger</h2>
+              <h2>
+                Private Ledger — {currentMonthName} {currentYear}
+              </h2>
             </div>
 
             <div className={styles.mainStats}>
               <div className={styles.mainStat}>
-                <span className={styles.mainStatLabel}>30D_CYCLE_SPEND</span>
+                <span className={styles.mainStatLabel}>
+                  Monthly Expenditure
+                </span>
                 <div className={styles.mainStatValue}>
                   <h3>रू {currentMonthTotal.toLocaleString()}</h3>
-                  <span className={styles.labelIndicator}>Current</span>
+                  <span className={styles.labelIndicator}>Current Month</span>
+                </div>
+                <div className={styles.breakdownRow}>
+                  <div className={styles.subStat}>
+                    <div className={styles.subIcon}>
+                      <HiOutlineUser />
+                    </div>
+                    <div className={styles.subInfo}>
+                      <span className={styles.subLabel}>Personal Ledger</span>
+                      <span className={styles.subValue}>
+                        रू {currentMonthPersonal.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.subStat}>
+                    <div className={styles.subIcon}>
+                      <HiOutlineUsers />
+                    </div>
+                    <div className={styles.subInfo}>
+                      <span className={styles.subLabel}>Group Shares</span>
+                      <span className={styles.subValue}>
+                        रू {currentMonthGroupShare.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.subStat}>
+                    <div className={styles.subIcon}>
+                      <HiOutlineScale />
+                    </div>
+                    <div className={styles.subInfo}>
+                      <span className={styles.subLabel}>Net Position</span>
+                      <span
+                        className={`${styles.subValue} ${currentMonthNetFlow >= 0 ? styles.success : styles.danger}`}
+                      >
+                        {currentMonthNetFlow >= 0 ? "+" : ""}रू{" "}
+                        {Math.abs(currentMonthNetFlow).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className={styles.statDivider}></div>
-              <div className={styles.mainStat}>
-                <span className={styles.mainStatLabel}>AGGREGATE_ASSETS</span>
-                <div className={styles.mainStatValue}>
-                  <h3>रू {totalSpent.toLocaleString()}</h3>
-                  <span className={styles.labelIndicator}>Lifetime</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.btnRow}>
-              <Button
-                variant="primary"
-                size="md"
-                className={styles.quickEntryBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsExpenseModalOpen(true);
-                }}
-              >
-                <HiPlus /> Quick Entry
-              </Button>
-              <Link
-                href="/dashboard/personal"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Button
-                  variant="outline"
-                  size="md"
-                  className={styles.ledgerBtn}
-                >
-                  Full Ledger Analysis
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
@@ -222,72 +235,6 @@ export default function DashboardPage() {
       {/* ── Transaction Intelligence ── */}
       <section className={styles.chartSection}>
         <MonthlyExpenditureChart />
-      </section>
-
-      {/* ── Operational Groups ── */}
-      <section className={styles.groupSection}>
-        <SectionHeader title="Operational Groups" align="between" fullWidth>
-          <div className={styles.sectionActions}>
-            <Link href="/dashboard/groups">
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
-            </Link>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsGroupModalOpen(true)}
-            >
-              <HiPlus /> Create Group
-            </Button>
-          </div>
-        </SectionHeader>
-
-        {groupsLoading ? (
-          <div className={styles.groupGrid}>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className={styles.skeletonCard} />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.groupGrid}>
-            {groups?.data?.map((group: Group) => (
-              <Link
-                key={group.id}
-                href={`/dashboard/groups/${group.id}`}
-                className={styles.groupItem}
-              >
-                <div className={styles.groupBanner}>
-                  {group.image?.url ? (
-                    <Image src={group.image.url} alt={group.name} fill />
-                  ) : (
-                    <HiOutlineOfficeBuilding />
-                  )}
-                </div>
-                <div className={styles.groupBody}>
-                  <div className={styles.groupTop}>
-                    <div className={styles.groupTitle}>
-                      <h4>{group.name}</h4>
-                    </div>
-                    <span className={styles.activeBadge}>Operational</span>
-                  </div>
-                  <div className={styles.groupMeta}>
-                    <span>
-                      <FiUsers /> {group.member_count || 1} Members
-                    </span>
-                    <span>
-                      <FiClock /> Active
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.groupFooter}>
-                  <span>PROTOCOL_ID: {group.id.slice(-8)}</span>
-                  <span>SETTLE_READY</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
       </section>
 
       <CreateGroupModal

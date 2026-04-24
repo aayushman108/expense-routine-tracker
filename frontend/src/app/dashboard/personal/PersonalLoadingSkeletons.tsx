@@ -4,7 +4,7 @@ import styles from "./personal.module.scss";
 
 export const StatsSkeleton = () => (
   <div className={styles.summaryCards}>
-    {Array.from({ length: 6 }).map((_, i) => (
+    {Array.from({ length: 2 }).map((_, i) => (
       <div key={i} className={styles.statCard} style={{ minHeight: "120px" }}>
         <div className={styles.statHeader}>
           <div className={styles.statInfo}>
@@ -46,29 +46,21 @@ export const PersonalExpenseListSkeleton = ({ count = 6 }: { count?: number }) =
   </div>
 );
 
-export const GroupSummaryListSkeleton = ({ count = 3 }: { count?: number }) => (
-  <div className={styles.groupSummaryGrid}>
-    {Array.from({ length: count }).map((_, i) => (
-      <div key={i} className={styles.groupSummaryCard} style={{ minHeight: "220px", cursor: "default" }}>
-        <div className={styles.cardHeader}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <Skeleton width={100} height={10} />
-            <Skeleton width={150} height={24} />
-          </div>
-          <Skeleton width={52} height={52} borderRadius="16px" />
-        </div>
-        <div className={styles.statsContainer}>
-          <div className={styles.statsGrid}>
-            {Array.from({ length: 4 }).map((_, j) => (
-              <div key={j} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <Skeleton width={80} height={8} />
-                <Skeleton width={100} height={20} />
-              </div>
-            ))}
-          </div>
-        </div>
+export const ChartSkeleton = () => (
+  <div style={{ 
+    background: "var(--bg-card)", 
+    border: "1px solid var(--border-light)", 
+    borderRadius: "12px", 
+    padding: "24px" 
+  }}>
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div>
+        <Skeleton width={160} height={20} style={{ marginBottom: "8px" }} />
+        <Skeleton width={260} height={12} />
       </div>
-    ))}
+      <Skeleton width={80} height={16} />
+    </div>
+    <Skeleton width="100%" height={200} borderRadius="8px" />
   </div>
 );
 
@@ -88,7 +80,9 @@ export const FullPersonalSkeleton = () => (
       </div>
     </header>
 
-    <StatsSkeleton />
+
+
+    <ChartSkeleton />
 
     <div className={styles.expenseSection}>
       <div className={styles.groupSection}>
@@ -97,13 +91,6 @@ export const FullPersonalSkeleton = () => (
           <Skeleton width={100} height={32} borderRadius="8px" />
         </div>
         <PersonalExpenseListSkeleton count={3} />
-      </div>
-
-      <div className={styles.groupSection}>
-        <div className={styles.groupHeader} style={{ marginBottom: "1.5rem" }}>
-          <Skeleton width={180} height={24} />
-        </div>
-        <GroupSummaryListSkeleton count={3} />
       </div>
     </div>
   </div>

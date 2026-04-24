@@ -14,6 +14,7 @@ interface ExpenseState {
   summary: {
     lifetimeSpend: number;
     currentMonthSpend: number;
+    currentMonthPersonalSpend: number;
     personalSpend: number;
     groupSpend: number;
     remainingToPay: number;
@@ -32,7 +33,11 @@ interface ExpenseState {
     month: string;
     personalExpense: number;
     groupExpense: number;
+    totalGroupExpenditure: number;
+    totalPaidInGroup: number;
+    netGroupFlow: number;
     totalExpense: number;
+    groupDetails: { groupName: string; amount: number }[];
   }[];
   isLoading: boolean;
   isSummaryLoading: boolean;
@@ -79,7 +84,16 @@ export interface ExpenseFilters {
 }
 
 export const fetchUserExpenses = createAsyncThunk<
-  { data: Expense[]; pagination: { total: number; page: number; limit: number; totalPages: number; totalAmount?: number } },
+  {
+    data: Expense[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+      totalAmount?: number;
+    };
+  },
   ExpenseFilters | undefined
 >("expenses/fetchUserExpenses", async (filters, { rejectWithValue }) => {
   try {
@@ -101,7 +115,16 @@ export const fetchUserExpenses = createAsyncThunk<
 });
 
 export const fetchPersonalExpenses = createAsyncThunk<
-  { data: Expense[]; pagination: { total: number; page: number; limit: number; totalPages: number; totalAmount?: number } },
+  {
+    data: Expense[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+      totalAmount?: number;
+    };
+  },
   ExpenseFilters | undefined
 >("expenses/fetchPersonalExpenses", async (filters, { rejectWithValue }) => {
   try {
@@ -137,38 +160,47 @@ export const fetchUserSummary = createAsyncThunk<ExpenseState["summary"], void>(
   },
 );
 
-export const fetchUserGroupSummaries = createAsyncThunk<ExpenseState["groupSummaries"], void>(
-  "expenses/fetchUserGroupSummaries",
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await api.get("/expenses/user/group-summaries");
-      return data.data;
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch group summaries",
-      );
-    }
-  },
-);
+export const fetchUserGroupSummaries = createAsyncThunk<
+  ExpenseState["groupSummaries"],
+  void
+>("expenses/fetchUserGroupSummaries", async (_, { rejectWithValue }) => {
+  try {
+    const { data } = await api.get("/expenses/user/group-summaries");
+    return data.data;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to fetch group summaries",
+    );
+  }
+});
 
-export const fetchMonthlyAnalytics = createAsyncThunk<ExpenseState["monthlyAnalytics"], void>(
-  "expenses/fetchMonthlyAnalytics",
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await api.get("/expenses/user/analytics/monthly");
-      return data.data;
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch monthly analytics",
-      );
-    }
-  },
-);
+export const fetchMonthlyAnalytics = createAsyncThunk<
+  ExpenseState["monthlyAnalytics"],
+  void
+>("expenses/fetchMonthlyAnalytics", async (_, { rejectWithValue }) => {
+  try {
+    const { data } = await api.get("/expenses/user/analytics/monthly");
+    return data.data;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to fetch monthly analytics",
+    );
+  }
+});
 
 export const fetchGroupExpenses = createAsyncThunk<
-  { data: Expense[]; pagination: { total: number; page: number; limit: number; totalPages: number; totalAmount?: number } },
+  {
+    data: Expense[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+      totalAmount?: number;
+    };
+  },
   { groupId: string; filters?: ExpenseFilters }
 >(
   "expenses/fetchGroupExpenses",

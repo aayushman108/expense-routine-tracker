@@ -407,6 +407,10 @@
   }
 }
 
+.chartSection {
+  animation: slideDown 0.4s ease-out;
+}
+
 .expenseSection {
   @include flex-column;
   gap: $space-6;

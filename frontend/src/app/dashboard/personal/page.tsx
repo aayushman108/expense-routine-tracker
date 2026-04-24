@@ -2,21 +2,18 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  HiOutlineFilter,
-  HiOutlineShoppingBag,
-} from "react-icons/hi";
+import { HiOutlineFilter, HiOutlineShoppingBag } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   deleteExpense,
   fetchUserSummary,
   fetchPersonalExpenses,
-  fetchUserGroupSummaries,
 } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import Pagination from "@/components/ui/Pagination/Pagination";
+import MonthlyExpenditureChart from "@/components/dashboard/Charts/MonthlyExpenditureChart";
 import styles from "./personal.module.scss";
 import { handleThunk } from "@/lib/utils";
 import type { RootState } from "@/store";
@@ -24,23 +21,22 @@ import { EXPENSE_TYPE } from "@expense-tracker/shared";
 
 // Modular Components
 import PersonalHeader from "@/components/dashboard/PersonalDetails/PersonalHeader/PersonalHeader";
-import PersonalStats from "@/components/dashboard/PersonalDetails/PersonalStats/PersonalStats";
 import PersonalFilters from "@/components/dashboard/PersonalDetails/PersonalFilters/PersonalFilters";
 import PersonalExpenseCard from "@/components/dashboard/PersonalDetails/PersonalExpenseCard/PersonalExpenseCard";
-import GroupSummaryCard from "@/components/dashboard/PersonalDetails/GroupSummaryCard/GroupSummaryCard";
-import { FullPersonalSkeleton, PersonalExpenseListSkeleton, GroupSummaryListSkeleton } from "./PersonalLoadingSkeletons";
+import {
+  FullPersonalSkeleton,
+  PersonalExpenseListSkeleton,
+} from "./PersonalLoadingSkeletons";
 
 export default function PersonalDetailsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { 
-    personalExpenses, 
-    summary, 
-    groupSummaries, 
+  const {
+    personalExpenses,
+    summary,
     isSummaryLoading,
     isPersonalExpensesLoading,
-    isGroupSummariesLoading,
-    pagination 
+    pagination,
   } = useAppSelector((s: RootState) => s.expenses);
   const { user } = useAppSelector((state: RootState) => state.auth);
 
@@ -73,7 +69,6 @@ export default function PersonalDetailsPage() {
   };
 
   useEffect(() => {
-    handleThunk(dispatch(fetchUserGroupSummaries()));
     handleThunk(dispatch(fetchUserSummary()));
   }, [dispatch]);
 
@@ -119,12 +114,15 @@ export default function PersonalDetailsPage() {
 
   return (
     <div className={styles.page}>
-      <PersonalHeader 
+      <PersonalHeader
         onBack={() => router.push("/dashboard")}
         onAddExpense={() => setIsExpenseModalOpen(true)}
       />
 
-      <PersonalStats summary={summary} />
+      {/* ── Spending Trends Line Chart ── */}
+      <section className={styles.chartSection}>
+        <MonthlyExpenditureChart variant="compact" mode="personal" />
+      </section>
 
       <section className={styles.expenseSection}>
         <div className={styles.groupSection}>
@@ -146,12 +144,14 @@ export default function PersonalDetailsPage() {
               >
                 <HiOutlineFilter />
                 {isFilterExpanded ? "Hide Filters" : "Filters"}
-                {(startDate || endDate) && <span className={styles.filterDot} />}
+                {(startDate || endDate) && (
+                  <span className={styles.filterDot} />
+                )}
               </Button>
             </div>
           </div>
 
-          <PersonalFilters 
+          <PersonalFilters
             isExpanded={isFilterExpanded}
             startDate={startDate}
             setStartDate={setStartDate}
@@ -167,7 +167,7 @@ export default function PersonalDetailsPage() {
             <div className={styles.groupList}>
               {personalExpenses.length > 0 ? (
                 personalExpenses.map((expense) => (
-                  <PersonalExpenseCard 
+                  <PersonalExpenseCard
                     key={expense.id}
                     expense={expense}
                     user={user}
@@ -182,7 +182,8 @@ export default function PersonalDetailsPage() {
                   </div>
                   <p className={styles.title}>No personal expenses yet</p>
                   <p className={styles.subtext}>
-                    Start tracking your individual spending by logging your first expense.
+                    Start tracking your individual spending by logging your
+                    first expense.
                   </p>
                   <Button
                     variant="primary"
@@ -206,33 +207,6 @@ export default function PersonalDetailsPage() {
             />
           )}
         </div>
-
-        {isGroupSummariesLoading && groupSummaries.length === 0 ? (
-          <div className={styles.groupSection}>
-            <div className={styles.groupHeader} style={{ marginBottom: "1.5rem" }}>
-              <h3>Group Summaries</h3>
-            </div>
-            <div className={styles.groupSummaryGrid}>
-              <GroupSummaryListSkeleton count={3} />
-            </div>
-          </div>
-        ) : (
-          groupSummaries.length > 0 && (
-            <div className={styles.groupSection}>
-              <div
-                className={styles.groupHeader}
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <h3>Group Summaries</h3>
-              </div>
-              <div className={styles.groupSummaryGrid}>
-                {groupSummaries.map((group) => (
-                  <GroupSummaryCard key={group.id} group={group} />
-                ))}
-              </div>
-            </div>
-          )
-        )}
       </section>
 
       <AddExpenseModal
