@@ -20,6 +20,7 @@ import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetai
 import InviteUserModal from "@/components/dashboard/GroupMembers/InviteUserModal";
 import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
 import BulkSettlementModal from "@/components/dashboard/Settlement/BulkSettlementModal";
+import EditGroupModal from "@/components/dashboard/GroupModals/EditGroupModal";
 import Pagination from "@/components/ui/Pagination/Pagination";
 import {
   FullPageSkeleton,
@@ -75,6 +76,7 @@ export default function GroupDetailsPage() {
     null,
   );
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Filters state
   const [currentPage, setCurrentPage] = useState(1);
@@ -160,6 +162,11 @@ export default function GroupDetailsPage() {
     [groupDetails],
   );
 
+  const isAdmin = useMemo(() => {
+    const me = members.find((m) => m.user_id === user?.id);
+    return me?.role === "admin";
+  }, [members, user]);
+
   const totalGroupSpend = useMemo(() => {
     if (pagination?.totalAmount !== undefined) return pagination.totalAmount;
     return groupExpenses.reduce(
@@ -212,6 +219,7 @@ export default function GroupDetailsPage() {
         onBack={() => router.push("/dashboard")}
         onInvite={() => setIsInviteModalOpen(true)}
         onAddExpense={() => setIsExpenseModalOpen(true)}
+        onEdit={isAdmin ? () => setIsEditModalOpen(true) : undefined}
       />
 
       <div className={styles.contentGrid}>
@@ -390,6 +398,15 @@ export default function GroupDetailsPage() {
         groupId={id as string}
         balance={selectedBalance}
       />
+
+      {groupDetails.data && (
+        <EditGroupModal
+          key={groupDetails.data.id}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          group={groupDetails.data}
+        />
+      )}
     </div>
   );
 }

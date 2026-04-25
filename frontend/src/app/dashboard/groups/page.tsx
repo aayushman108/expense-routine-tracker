@@ -140,7 +140,7 @@ export default function GroupsPage() {
                 <div className={styles.topRow}>
                   <div className={styles.nameAndBadge}>
                     <span className={styles.groupName}>{group.name}</span>
-                    {group.created_by === user?.id && (
+                    {group.role === "admin" && (
                       <span className={styles.roleBadge}>Admin</span>
                     )}
                   </div>

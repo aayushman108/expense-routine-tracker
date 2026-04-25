@@ -39,6 +39,7 @@ export interface Group {
   my_total_share?: number;
   net_balance?: number;
   pending_verifications?: number;
+  role?: "member" | "admin";
   created_at: string;
   updated_at: string;
 }

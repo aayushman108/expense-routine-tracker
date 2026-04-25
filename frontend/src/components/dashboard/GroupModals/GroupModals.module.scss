@@ -10,64 +10,123 @@
 
 .imageUpload {
   display: flex;
-  justify-content: center;
-  margin-bottom: 0.5rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 
-  .preview {
+  .previewWrapper {
     position: relative;
-    width: 120px;
-    height: 120px;
-    background: var(--bg-tertiary);
-    border: 2px dashed var(--border-default);
-    border-radius: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    width: 100%;
+    height: 180px;
+    cursor: pointer;
+    transition: all $transition-base;
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    &:hover {
+      .overlay {
+        opacity: 1;
+      }
+      .preview {
+        border-color: var(--color-primary);
+        border-style: solid;
+        box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+      }
     }
 
-    .placeholder {
+    .preview {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border-strong);
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: all $transition-base;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-tertiary);
+        text-align: center;
+        padding: 1.5rem;
+
+        svg {
+          font-size: 3rem;
+          opacity: 0.4;
+        }
+
+        span {
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          opacity: 0.8;
+        }
+      }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
-      color: var(--text-tertiary);
+      justify-content: center;
+      color: white;
+      opacity: 0;
+      transition: all $transition-base;
+      gap: 8px;
+      z-index: 1;
 
       svg {
-        font-size: 2rem;
+        font-size: 1.8rem;
       }
 
       span {
-        font-size: 0.75rem;
-        font-weight: 500;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
     }
 
-    .uploadBtn {
+    .uploadBadge {
       position: absolute;
-      bottom: 0.5rem;
-      right: 0.5rem;
-      width: 32px;
-      height: 32px;
+      bottom: 12px;
+      right: 12px;
+      width: 40px;
+      height: 40px;
       background: var(--primary);
       color: white;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: all $transition-base;
-      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 3px solid var(--bg-card);
+      z-index: 2;
 
-      &:hover {
-        transform: scale(1.1);
-        background: var(--primary-hover);
+      svg {
+        font-size: 1.2rem;
       }
     }
+  }
+
+  .hint {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-weight: 500;
   }
 }

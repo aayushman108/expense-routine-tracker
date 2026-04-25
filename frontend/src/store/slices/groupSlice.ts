@@ -203,7 +203,26 @@ const groupSlice = createSlice({
       state.error = null;
     });
     builder.addCase(updateGroupAction.fulfilled, (state, action) => {
-      state.groupDetails.data = action.payload;
+      // Update group details if it's the current group
+      if (
+        state.groupDetails.data &&
+        state.groupDetails.data.id === action.payload.id
+      ) {
+        state.groupDetails.data = {
+          ...state.groupDetails.data,
+          ...action.payload,
+        };
+      }
+
+      // Update the group in the list
+      const index = state.groups.data.findIndex((g) => g.id === action.payload.id);
+      if (index !== -1) {
+        state.groups.data[index] = {
+          ...state.groups.data[index],
+          ...action.payload,
+        };
+      }
+
       state.isLoading = false;
       state.error = null;
     });

@@ -12,6 +12,12 @@ export interface IGroup {
   image: { url: string; publicId: string } | null;
   created_by: string;
   created_at: Date;
+  role?: "member" | "admin";
+  total_group_spend?: number;
+  total_paid_by_me?: number;
+  my_total_share?: number;
+  net_balance?: number;
+  pending_verifications?: number;
 }
 
 export interface ICreateGroup extends ICreateGroupInput {
@@ -111,6 +117,7 @@ const findByUserId = async (userId: string): Promise<IGroup[]> => {
     )
     SELECT 
       g.*,
+      gm.role,
       COALESCE(gs.total_group_spend, 0) as total_group_spend,
       COALESCE(gs.total_paid_by_me, 0) as total_paid_by_me,
       COALESCE(gs.my_total_share, 0) as my_total_share,

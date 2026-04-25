@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./GroupHeader.module.scss";
-import { HiOutlineChevronLeft, HiOutlineChartPie, HiOutlineUserAdd, HiOutlinePlus } from "react-icons/hi";
+import { HiOutlineChevronLeft, HiOutlineChartPie, HiOutlineUserAdd, HiOutlinePlus, HiOutlinePencil } from "react-icons/hi";
 import Image from "next/image";
 import Button from "@/components/ui/Button/Button";
 import type { GroupDetails } from "@/lib/types";
@@ -10,6 +10,7 @@ interface GroupHeaderProps {
   onBack: () => void;
   onInvite: () => void;
   onAddExpense: () => void;
+  onEdit?: () => void;
 }
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({
@@ -17,6 +18,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({
   onBack,
   onInvite,
   onAddExpense,
+  onEdit,
 }) => {
   return (
     <header className={styles.header}>
@@ -38,7 +40,18 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({
             )}
           </div>
           <div className={styles.textDetails}>
-            <h1>{groupDetails?.data?.name}</h1>
+            <div className={styles.titleWithAction}>
+              <h1>{groupDetails?.data?.name}</h1>
+              {onEdit && (
+                <button
+                  className={styles.inlineEditBtn}
+                  onClick={onEdit}
+                  title="Edit Group Details"
+                >
+                  <HiOutlinePencil />
+                </button>
+              )}
+            </div>
             <p>
               {groupDetails?.data?.description ||
                 "Shared expenses for the group."}
