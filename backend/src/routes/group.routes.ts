@@ -53,5 +53,7 @@ router.post(
 );
 
 router.delete("/:id/leave", groupController.leaveGroup);
+router.delete("/:id/members/:userId", groupController.removeMember);
+router.patch("/:id/members/:userId/role", groupController.updateMemberRole);
 
 export { router as groupRouter };

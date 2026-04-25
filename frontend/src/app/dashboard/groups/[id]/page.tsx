@@ -21,6 +21,7 @@ import InviteUserModal from "@/components/dashboard/GroupMembers/InviteUserModal
 import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
 import BulkSettlementModal from "@/components/dashboard/Settlement/BulkSettlementModal";
 import EditGroupModal from "@/components/dashboard/GroupModals/EditGroupModal";
+import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import Pagination from "@/components/ui/Pagination/Pagination";
 import {
   FullPageSkeleton,
@@ -31,7 +32,11 @@ import styles from "./group-details.module.scss";
 import {
   clearGroupDetails,
   fetchGroupDetailsAction,
+  leaveGroupAction,
+  removeMemberAction,
+  updateMemberRoleAction,
 } from "@/store/slices/groupSlice";
+import { handleThunk } from "@/lib/utils";
 import { EXPENSE_TYPE } from "@expense-tracker/shared";
 
 import type { GroupMember, Expense, GroupBalance } from "@/lib/types";
@@ -77,6 +82,11 @@ export default function GroupDetailsPage() {
   );
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+  const [memberToPromote, setMemberToPromote] = useState<string | null>(null);
 
   // Filters state
   const [currentPage, setCurrentPage] = useState(1);
@@ -167,6 +177,14 @@ export default function GroupDetailsPage() {
     return me?.role === "admin";
   }, [members, user]);
 
+  const isLastAdmin = useMemo(() => {
+    if (!isAdmin) return false;
+    const otherAdmins = members.filter(
+      (m) => m.role === "admin" && m.user_id !== user?.id,
+    );
+    return otherAdmins.length === 0 && members.length > 1;
+  }, [isAdmin, members, user]);
+
   const totalGroupSpend = useMemo(() => {
     if (pagination?.totalAmount !== undefined) return pagination.totalAmount;
     return groupExpenses.reduce(
@@ -201,6 +219,40 @@ export default function GroupDetailsPage() {
     };
   };
 
+  const handleLeaveGroup = async () => {
+    await handleThunk(dispatch(leaveGroupAction(id as string)), () => {
+      router.push("/dashboard");
+    });
+  };
+
+  const handleRemoveMember = async () => {
+    if (!memberToRemove) return;
+
+    await handleThunk(
+      dispatch(removeMemberAction({ groupId: id as string, userId: memberToRemove })),
+      () => {
+        setMemberToRemove(null);
+      },
+    );
+  };
+
+  const handlePromoteMember = async () => {
+    if (!memberToPromote) return;
+
+    await handleThunk(
+      dispatch(
+        updateMemberRoleAction({
+          groupId: id as string,
+          userId: memberToPromote,
+          role: "admin",
+        }),
+      ),
+      () => {
+        setMemberToPromote(null);
+      },
+    );
+  };
+
   const hasFiltersApplied = !!(
     appliedFilters.startDate ||
     appliedFilters.endDate ||
@@ -220,6 +272,7 @@ export default function GroupDetailsPage() {
         onInvite={() => setIsInviteModalOpen(true)}
         onAddExpense={() => setIsExpenseModalOpen(true)}
         onEdit={isAdmin ? () => setIsEditModalOpen(true) : undefined}
+        onLeave={() => setIsLeaveModalOpen(true)}
       />
 
       <div className={styles.contentGrid}>
@@ -341,6 +394,15 @@ export default function GroupDetailsPage() {
                   key={member.id}
                   member={member}
                   currentUser={user}
+                  isAdmin={isAdmin}
+                  onRemove={(userId) => {
+                    setMemberToRemove(userId);
+                    setIsRemoveModalOpen(true);
+                  }}
+                  onPromote={(userId) => {
+                    setMemberToPromote(userId);
+                    setIsPromoteModalOpen(true);
+                  }}
                 />
               ))}
             </div>
@@ -407,6 +469,41 @@ export default function GroupDetailsPage() {
           group={groupDetails.data}
         />
       )}
+
+      <ConfirmModal
+        isOpen={isLeaveModalOpen}
+        onClose={() => setIsLeaveModalOpen(false)}
+        onConfirm={handleLeaveGroup}
+        title="Leave Group"
+        message={
+          isLastAdmin
+            ? "You are the last admin of this group. You must promote another member to admin before you can leave."
+            : "Are you sure you want to leave this group? This action cannot be undone and you must have no pending settlements."
+        }
+        confirmText={isLastAdmin ? "Cannot Leave" : "Leave Group"}
+        confirmVariant="danger"
+        confirmDisabled={isLastAdmin}
+      />
+
+      <ConfirmModal
+        isOpen={isRemoveModalOpen}
+        onClose={() => setIsRemoveModalOpen(false)}
+        onConfirm={handleRemoveMember}
+        title="Remove Member"
+        message="Are you sure you want to remove this member from the group? All their expenses must be verified."
+        confirmText="Remove Member"
+        confirmVariant="danger"
+      />
+
+      <ConfirmModal
+        isOpen={isPromoteModalOpen}
+        onClose={() => setIsPromoteModalOpen(false)}
+        onConfirm={handlePromoteMember}
+        title="Promote to Admin"
+        message="Are you sure you want to promote this member to an administrator? Admins can manage group details, invite members, and remove others."
+        confirmText="Promote Member"
+        confirmVariant="primary"
+      />
     </div>
   );
 }

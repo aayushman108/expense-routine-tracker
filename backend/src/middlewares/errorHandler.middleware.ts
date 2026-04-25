@@ -12,13 +12,17 @@ export function errorHandler(
   if (error instanceof BaseError) {
     error.handleError(res);
   } else if (error instanceof JsonWebTokenError) {
-    return res
-      .status(HttpStatusCode.UNAUTHORIZED)
-      .json({ message: error.message });
+    return res.status(HttpStatusCode.UNAUTHORIZED).json({
+      success: false,
+      message: error.message,
+      data: null,
+    });
   } else {
     console.log(error, "Error from error handler");
-    return res
-      .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal Server Error" });
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Internal Server Error",
+      data: null,
+    });
   }
 }

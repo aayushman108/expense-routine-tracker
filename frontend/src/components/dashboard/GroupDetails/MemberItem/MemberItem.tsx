@@ -3,13 +3,23 @@ import styles from "./MemberItem.module.scss";
 import Link from "next/link";
 import Image from "next/image";
 import type { GroupMember, User } from "@/lib/types";
+import { HiOutlineTrash, HiOutlineShieldCheck } from "react-icons/hi";
 
 interface MemberItemProps {
   member: GroupMember;
   currentUser: User | null;
+  isAdmin: boolean;
+  onRemove?: (userId: string) => void;
+  onPromote?: (userId: string) => void;
 }
 
-const MemberItem: React.FC<MemberItemProps> = ({ member, currentUser }) => {
+const MemberItem: React.FC<MemberItemProps> = ({
+  member,
+  currentUser,
+  isAdmin,
+  onRemove,
+  onPromote,
+}) => {
   const getInitials = (name?: string) => {
     if (!name) return "?";
     return name
@@ -50,6 +60,26 @@ const MemberItem: React.FC<MemberItemProps> = ({ member, currentUser }) => {
           <div className={styles.role}>{member.role}</div>
         </div>
       </Link>
+      <div className={styles.memberActions}>
+        {isAdmin && member.role === "member" && (
+          <button
+            className={styles.promoteBtn}
+            onClick={() => onPromote?.(member.user_id)}
+            title="Promote to Admin"
+          >
+            <HiOutlineShieldCheck />
+          </button>
+        )}
+        {isAdmin && member.role === "member" && member.user_id !== currentUser?.id && (
+          <button
+            className={styles.removeBtn}
+            onClick={() => onRemove?.(member.user_id)}
+            title="Remove member"
+          >
+            <HiOutlineTrash />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

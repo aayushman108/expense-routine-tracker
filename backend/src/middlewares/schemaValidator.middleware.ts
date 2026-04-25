@@ -17,6 +17,7 @@ export const validateRequest = (schema: ZodSchema<any>) => {
         res.status(HttpStatusCode.BAD_REQUEST).json({
           success: false,
           message: error.issues[0].message,
+          data: null,
         });
       } else {
         next(error);

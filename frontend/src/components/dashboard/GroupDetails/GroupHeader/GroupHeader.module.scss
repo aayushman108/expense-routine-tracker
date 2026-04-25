@@ -129,4 +129,15 @@
   @include responsive(sm) {
     justify-content: center;
   }
+
+  .leaveBtn {
+    color: var(--color-danger);
+    border-color: var(--color-danger-light);
+
+    &:hover {
+      background: var(--color-danger);
+      color: white;
+      border-color: var(--color-danger);
+    }
+  }
 }

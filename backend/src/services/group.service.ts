@@ -85,14 +85,26 @@ const addMember = async (data: IAddMember) => {
   });
 };
 
+const checkRemovalConstraints = async (groupId: string, userId: string) => {
+  const hasUnverified = await groupDao.hasUnverifiedExpenses(groupId);
+  const hasPending = await groupDao.hasPendingSettlements(groupId, userId);
+
+  if (hasUnverified || hasPending) {
+    throw new BadRequestError(
+      "Action blocked. Members can only leave or be removed once:\n" +
+        "1. All group expenses are verified.\n" +
+        "2. All settlements involving the member are confirmed.",
+    );
+  }
+};
+
 const leaveGroup = async (groupId: string, userId: string) => {
   const isMember = await groupDao.isMember(groupId, userId);
   if (!isMember) {
-    throw new BaseError(
-      HttpStatusCode.BAD_REQUEST,
-      "You are not a member of this group",
-    );
+    throw new BadRequestError("You are not a member of this group");
   }
+
+  await checkRemovalConstraints(groupId, userId);
 
   // Check if user is the last admin
   const members = await groupDao.getMembers(groupId);
@@ -100,13 +112,60 @@ const leaveGroup = async (groupId: string, userId: string) => {
   const userMember = members.find((m: any) => m.user_id === userId);
 
   if (userMember?.role === "admin" && admins.length === 1) {
-    throw new BaseError(
-      HttpStatusCode.BAD_REQUEST,
-      "You are the last admin. Please appoint another admin before leaving or delete the group.",
-    );
+    const otherMembersCount = members.length - 1;
+    if (otherMembersCount > 0) {
+      throw new BadRequestError(
+        "You are the last admin. Please promote another member to admin before leaving.",
+      );
+    }
   }
 
   return await groupDao.removeMember(groupId, userId);
+};
+
+const removeMemberByAdmin = async (
+  groupId: string,
+  adminId: string,
+  targetUserId: string,
+) => {
+  const adminRole = await groupDao.getMemberRole(groupId, adminId);
+  if (adminRole !== "admin") {
+    throw new ForbiddentError("Only admins can remove members");
+  }
+
+  const targetRole = await groupDao.getMemberRole(groupId, targetUserId);
+  if (!targetRole) {
+    throw new BadRequestError("Target user is not a member of this group");
+  }
+
+  if (targetRole === "admin") {
+    throw new BadRequestError(
+      "Admins cannot remove other admins. They must demote themselves or leave voluntarily.",
+    );
+  }
+
+  await checkRemovalConstraints(groupId, targetUserId);
+
+  return await groupDao.removeMember(groupId, targetUserId);
+};
+
+const updateMemberRole = async (
+  groupId: string,
+  adminId: string,
+  targetUserId: string,
+  role: "admin" | "member",
+) => {
+  const adminRole = await groupDao.getMemberRole(groupId, adminId);
+  if (adminRole !== "admin") {
+    throw new ForbiddentError("Only admins can change member roles");
+  }
+
+  const targetRole = await groupDao.getMemberRole(groupId, targetUserId);
+  if (!targetRole) {
+    throw new BadRequestError("User is not a member of this group");
+  }
+
+  return await groupDao.setMemberRole(groupId, targetUserId, role);
 };
 
 const inviteMember = async (
@@ -148,7 +207,7 @@ const inviteMember = async (
     inviteLink,
   });
 
-  return { message: "Invitation sent successfully" };
+  return;
 };
 
 export const groupService = {
@@ -158,5 +217,7 @@ export const groupService = {
   updateGroup,
   addMember,
   leaveGroup,
+  removeMemberByAdmin,
+  updateMemberRole,
   inviteMember,
 };

@@ -66,10 +66,32 @@ const leaveGroup = asyncHandler(async (req: Request, res: Response) => {
 
 const inviteMember = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await groupService.inviteMember(id, req.userId!, req.body);
+  await groupService.inviteMember(id, req.userId!, req.body);
   return sendSuccessResponse(res, {
-    data: result,
     message: "Invitation sent successfully",
+  });
+});
+
+const removeMember = asyncHandler(async (req: Request, res: Response) => {
+  const { id, userId: targetUserId } = req.params;
+  await groupService.removeMemberByAdmin(id, req.userId!, targetUserId);
+  return sendSuccessResponse(res, {
+    message: "Member removed successfully",
+  });
+});
+
+const updateMemberRole = asyncHandler(async (req: Request, res: Response) => {
+  const { id, userId: targetUserId } = req.params;
+  const { role } = req.body;
+  const member = await groupService.updateMemberRole(
+    id,
+    req.userId!,
+    targetUserId,
+    role,
+  );
+  return sendSuccessResponse(res, {
+    data: member,
+    message: `Member role updated to ${role} successfully`,
   });
 });
 
@@ -81,4 +103,6 @@ export const groupController = {
   addMember,
   leaveGroup,
   inviteMember,
+  removeMember,
+  updateMemberRole,
 };

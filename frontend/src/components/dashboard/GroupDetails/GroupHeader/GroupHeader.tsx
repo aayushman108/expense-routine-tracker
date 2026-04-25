@@ -1,6 +1,13 @@
 import React from "react";
 import styles from "./GroupHeader.module.scss";
-import { HiOutlineChevronLeft, HiOutlineChartPie, HiOutlineUserAdd, HiOutlinePlus, HiOutlinePencil } from "react-icons/hi";
+import {
+  HiOutlineChevronLeft,
+  HiOutlineChartPie,
+  HiOutlineUserAdd,
+  HiOutlinePlus,
+  HiOutlinePencil,
+  HiOutlineLogout,
+} from "react-icons/hi";
 import Image from "next/image";
 import Button from "@/components/ui/Button/Button";
 import type { GroupDetails } from "@/lib/types";
@@ -11,6 +18,7 @@ interface GroupHeaderProps {
   onInvite: () => void;
   onAddExpense: () => void;
   onEdit?: () => void;
+  onLeave?: () => void;
 }
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({
@@ -19,6 +27,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({
   onInvite,
   onAddExpense,
   onEdit,
+  onLeave,
 }) => {
   return (
     <header className={styles.header}>
@@ -63,6 +72,16 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({
         <Button variant="outline" size="sm" onClick={onInvite}>
           <HiOutlineUserAdd /> Invite
         </Button>
+        {onLeave && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onLeave}
+            className={styles.leaveBtn}
+          >
+            <HiOutlineLogout /> Leave
+          </Button>
+        )}
         <Button variant="primary" size="sm" onClick={onAddExpense}>
           <HiOutlinePlus /> Add Expense
         </Button>

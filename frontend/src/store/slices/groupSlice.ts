@@ -143,6 +143,41 @@ export const leaveGroupAction = createAsyncThunk<void, string>(
   },
 );
 
+export const removeMemberAction = createAsyncThunk<
+  string,
+  { groupId: string; userId: string }
+>(
+  "groups/removeMember",
+  async ({ groupId, userId }, { rejectWithValue }) => {
+    try {
+      await api.delete(`/groups/${groupId}/members/${userId}`);
+      return userId;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to remove member",
+      );
+    }
+  },
+);
+export const updateMemberRoleAction = createAsyncThunk<
+  { userId: string; role: "admin" | "member" },
+  { groupId: string; userId: string; role: "admin" | "member" }
+>(
+  "groups/updateMemberRole",
+  async ({ groupId, userId, role }, { rejectWithValue }) => {
+    try {
+      await api.patch(`/groups/${groupId}/members/${userId}/role`, { role });
+      return { userId, role };
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update member role",
+      );
+    }
+  },
+);
+
 const groupSlice = createSlice({
   name: "groups",
   initialState,
@@ -252,11 +287,53 @@ const groupSlice = createSlice({
       state.error = null;
     });
     builder.addCase(leaveGroupAction.fulfilled, (state, action) => {
+      const groupId = action.meta.arg;
+      state.groups.data = state.groups.data.filter((g) => g.id !== groupId);
       state.groupDetails.data = null;
       state.isLoading = false;
       state.error = null;
     });
     builder.addCase(leaveGroupAction.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
+    });
+
+    // Remove member
+    builder.addCase(removeMemberAction.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(removeMemberAction.fulfilled, (state, action) => {
+      if (state.groupDetails.data) {
+        state.groupDetails.data.members = state.groupDetails.data.members.filter(
+          (m) => m.user_id !== action.payload,
+        );
+      }
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(removeMemberAction.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
+    });
+    // Update member role
+    builder.addCase(updateMemberRoleAction.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(updateMemberRoleAction.fulfilled, (state, action) => {
+      if (state.groupDetails.data) {
+        const index = state.groupDetails.data.members.findIndex(
+          (m) => m.user_id === action.payload.userId,
+        );
+        if (index !== -1) {
+          state.groupDetails.data.members[index].role = action.payload.role;
+        }
+      }
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(updateMemberRoleAction.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload as string;
     });

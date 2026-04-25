@@ -3,6 +3,10 @@ import {
   ICreateGroupInput,
   IUpdateGroupInput,
 } from "@expense-tracker/shared/validationSchema";
+import {
+  EXPENSE_STATUS,
+  SETTLEMENT_STATUS,
+} from "@expense-tracker/shared";
 import { keysToSnakeCase } from "../utils/caseConverter";
 
 export interface IGroup {
@@ -247,6 +251,58 @@ const getGroupWithMembers = async (groupId: string) => {
   return rows[0] || null;
 };
 
+const hasUnverifiedExpenses = async (groupId: string): Promise<boolean> => {
+  const { rows } = await db.raw(
+    `SELECT 1 FROM expenses WHERE group_id = ? AND expense_status != ? LIMIT 1`,
+    [groupId, EXPENSE_STATUS.VERIFIED],
+  );
+  return rows.length > 0;
+};
+
+const hasPendingSettlements = async (
+  groupId: string,
+  userId: string,
+): Promise<boolean> => {
+  // 1. Check for any splits not yet linked to a settlement (either owing or owed)
+  // Only verified expenses create actionable debt
+  const unlinkedSplits = await db.raw(
+    `SELECT 1 FROM expense_splits es
+     JOIN expenses e ON es.expense_id = e.id
+     WHERE e.group_id = ? 
+     AND es.settlement_id IS NULL 
+     AND es.user_id != e.paid_by
+     AND e.expense_status = ?
+     AND (es.user_id = ? OR e.paid_by = ?)
+     LIMIT 1`,
+    [groupId, EXPENSE_STATUS.VERIFIED, userId, userId],
+  );
+
+  if (unlinkedSplits.rows.length > 0) return true;
+
+  // 2. Check for any active settlements (pending or paid)
+  const activeSettlements = await db.raw(
+    `SELECT 1 FROM settlements 
+     WHERE group_id = ? AND (from_user_id = ? OR to_user_id = ?) 
+     AND status IN (?, ?)
+     LIMIT 1`,
+    [groupId, userId, userId, SETTLEMENT_STATUS.PENDING, SETTLEMENT_STATUS.PAID],
+  );
+
+  return activeSettlements.rows.length > 0;
+};
+
+const setMemberRole = async (
+  groupId: string,
+  userId: string,
+  role: "admin" | "member",
+) => {
+  const { rows } = await db.raw(
+    "UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ? RETURNING *",
+    [role, groupId, userId],
+  );
+  return rows[0];
+};
+
 export const groupDao = {
   createGroup,
   findById,
@@ -259,4 +315,7 @@ export const groupDao = {
   isMember,
   getMemberRole,
   getGroupWithMembers,
+  hasUnverifiedExpenses,
+  hasPendingSettlements,
+  setMemberRole,
 };

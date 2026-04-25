@@ -12,6 +12,7 @@ interface ConfirmModalProps {
   cancelText?: string;
   confirmVariant?: "primary" | "danger" | "secondary";
   isLoading?: boolean;
+  confirmDisabled?: boolean;
 }
 
 export default function ConfirmModal({
@@ -24,6 +25,7 @@ export default function ConfirmModal({
   cancelText = "Cancel",
   confirmVariant = "danger",
   isLoading = false,
+  confirmDisabled = false,
 }: ConfirmModalProps) {
   return (
     <Modal
@@ -43,6 +45,7 @@ export default function ConfirmModal({
               onClose();
             }}
             isLoading={isLoading}
+            disabled={confirmDisabled}
           >
             {confirmText}
           </Button>
