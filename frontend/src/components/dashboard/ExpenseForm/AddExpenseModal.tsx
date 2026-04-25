@@ -248,17 +248,30 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
   const [hasInitializedSplits, setHasInitializedSplits] = useState(false);
 
   // Initialize splits on first render or when groupMembers are loaded
-  if (!hasInitializedSplits) {
+  if (!hasInitializedSplits && groupMembers.length > 0) {
     if (expense?.splits && expense.splits.length > 0) {
       setHasInitializedSplits(true);
-      setSplits(
-        expense.splits.map((s: any) => ({
-          userId: s.user?.id || s.user_id,
-          splitPercentage: Number(Number(s.split_percentage).toFixed(2)),
-          splitAmount: Number(Number(s.split_amount).toFixed(2)),
-        })),
+
+      const existingSplits = expense.splits.map((s: any) => ({
+        userId: s.user?.id || s.user_id,
+        splitPercentage: Number(Number(s.split_percentage).toFixed(2)),
+        splitAmount: Number(Number(s.split_amount).toFixed(2)),
+      }));
+
+      const existingSplitUserIds = new Set(
+        existingSplits.map((s: any) => s.userId),
       );
-    } else if (groupMembers.length > 0) {
+
+      const missingSplits = groupMembers
+        .filter((m: GroupMember) => !existingSplitUserIds.has(m.user_id))
+        .map((m: GroupMember) => ({
+          userId: m.user_id,
+          splitPercentage: 0,
+          splitAmount: 0,
+        }));
+
+      setSplits([...existingSplits, ...missingSplits]);
+    } else {
       const initialAmount = Number(form.totalAmount) || 0;
       setHasInitializedSplits(true);
       setSplits(
@@ -460,6 +473,16 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
       if (activeMembers.includes(memberId)) {
         thisActiveMembers = activeMembers.filter((id) => id !== memberId);
         setActiveMembers(thisActiveMembers);
+
+        if (splitMode !== SPLIT_MODE.EQUAL) {
+          setSplits((prev) =>
+            prev.map((s) =>
+              s.userId === memberId
+                ? { ...s, splitPercentage: 0, splitAmount: 0 }
+                : s,
+            ),
+          );
+        }
       } else {
         thisActiveMembers = [...activeMembers, memberId];
         setActiveMembers(thisActiveMembers);
