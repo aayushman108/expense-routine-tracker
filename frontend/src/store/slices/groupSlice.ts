@@ -146,20 +146,17 @@ export const leaveGroupAction = createAsyncThunk<void, string>(
 export const removeMemberAction = createAsyncThunk<
   string,
   { groupId: string; userId: string }
->(
-  "groups/removeMember",
-  async ({ groupId, userId }, { rejectWithValue }) => {
-    try {
-      await api.delete(`/groups/${groupId}/members/${userId}`);
-      return userId;
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to remove member",
-      );
-    }
-  },
-);
+>("groups/removeMember", async ({ groupId, userId }, { rejectWithValue }) => {
+  try {
+    await api.delete(`/groups/${groupId}/members/${userId}`);
+    return userId;
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to remove member",
+    );
+  }
+});
 export const updateMemberRoleAction = createAsyncThunk<
   { userId: string; role: "admin" | "member" },
   { groupId: string; userId: string; role: "admin" | "member" }
@@ -250,7 +247,9 @@ const groupSlice = createSlice({
       }
 
       // Update the group in the list
-      const index = state.groups.data.findIndex((g) => g.id === action.payload.id);
+      const index = state.groups.data.findIndex(
+        (g) => g.id === action.payload.id,
+      );
       if (index !== -1) {
         state.groups.data[index] = {
           ...state.groups.data[index],
@@ -305,9 +304,10 @@ const groupSlice = createSlice({
     });
     builder.addCase(removeMemberAction.fulfilled, (state, action) => {
       if (state.groupDetails.data) {
-        state.groupDetails.data.members = state.groupDetails.data.members.filter(
-          (m) => m.user_id !== action.payload,
-        );
+        state.groupDetails.data.members =
+          state.groupDetails.data.members.filter(
+            (m) => m.user_id !== action.payload,
+          );
       }
       state.isLoading = false;
       state.error = null;

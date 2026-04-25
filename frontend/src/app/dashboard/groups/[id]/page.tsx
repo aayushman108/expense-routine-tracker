@@ -49,6 +49,8 @@ import ExpenseCard from "@/components/dashboard/GroupDetails/ExpenseCard/Expense
 import SettlementCard from "@/components/dashboard/GroupDetails/SettlementCard/SettlementCard";
 import GroupStats from "@/components/dashboard/GroupDetails/GroupStats/GroupStats";
 import MemberItem from "@/components/dashboard/GroupDetails/MemberItem/MemberItem";
+import { showToast } from "@/lib/toast";
+import { ToastType } from "@/enums/general.enum";
 
 export default function GroupDetailsPage() {
   const { id } = useParams();
@@ -220,18 +222,29 @@ export default function GroupDetailsPage() {
   };
 
   const handleLeaveGroup = async () => {
-    await handleThunk(dispatch(leaveGroupAction(id as string)), () => {
-      router.push("/dashboard");
-    });
+    await handleThunk(
+      dispatch(leaveGroupAction(id as string)),
+      () => {
+        router.push("/dashboard");
+      },
+      (error: string) => {
+        showToast(ToastType.ERROR, error);
+      },
+    );
   };
 
   const handleRemoveMember = async () => {
     if (!memberToRemove) return;
 
     await handleThunk(
-      dispatch(removeMemberAction({ groupId: id as string, userId: memberToRemove })),
+      dispatch(
+        removeMemberAction({ groupId: id as string, userId: memberToRemove }),
+      ),
       () => {
         setMemberToRemove(null);
+      },
+      (error: string) => {
+        showToast(ToastType.ERROR, error);
       },
     );
   };
