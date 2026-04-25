@@ -3,6 +3,7 @@ import {
   requiredPreprocessor,
   optionalPreprocessor,
   emailPreprocessor,
+  patchPreprocessor,
 } from "../utils/validationSchemaPreprocessor";
 
 export class UserValidation {
@@ -137,18 +138,20 @@ export class UserValidation {
   static updateProfileSchema = z.object({
     body: z.object({
       fullName: z.preprocess(
-        optionalPreprocessor,
+        patchPreprocessor,
         z
           .string({ message: "Full name is required" })
           .min(1, { message: "Full name is required" })
-          .max(255, { message: "Full name must not exceed 255 characters" }),
+          .max(255, { message: "Full name must not exceed 255 characters" })
+          .optional(),
       ),
       phone: z.preprocess(
-        optionalPreprocessor,
+        patchPreprocessor,
         z
           .string()
           .max(20, { message: "Phone number must not exceed 20 characters" })
-          .nullable(),
+          .nullable()
+          .optional(),
       ),
     }),
   });

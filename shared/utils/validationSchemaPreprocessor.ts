@@ -31,6 +31,21 @@ export const optionalPreprocessor = (val: any) => {
 };
 
 /**
+ * Preprocessor for PATCH/Update fields.
+ * Preserves undefined so the field is excluded from updates.
+ * Converts null or empty strings to null to clear the field.
+ */
+export const patchPreprocessor = (val: any) => {
+  if (val === undefined) {
+    return undefined;
+  }
+  if (val === null || (typeof val === "string" && val.trim() === "")) {
+    return null;
+  }
+  return typeof val === "string" ? val.trim() : val;
+};
+
+/**
  * Specifically for emails: Trims and converts to lowercase.
  */
 export const emailPreprocessor = (val: any) => {

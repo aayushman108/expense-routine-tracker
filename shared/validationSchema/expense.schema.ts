@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   requiredPreprocessor,
   optionalPreprocessor,
+  patchPreprocessor,
 } from "../utils/validationSchemaPreprocessor";
 import {
   EXPENSE_TYPE,
@@ -117,11 +118,11 @@ export class ExpenseValidation {
           ])
           .optional(),
         description: z.preprocess(
-          optionalPreprocessor,
+          patchPreprocessor,
           z.string().min(1).optional().nullable(),
         ),
         totalAmount: z.preprocess(
-          optionalPreprocessor,
+          patchPreprocessor,
           z
             .number()
             .positive("Amount must be greater than 0")
@@ -129,7 +130,7 @@ export class ExpenseValidation {
             .nullable(),
         ),
         expenseDate: z.preprocess(
-          optionalPreprocessor,
+          patchPreprocessor,
           z
             .string()
             .refine((val) => !isNaN(Date.parse(val)))
@@ -137,15 +138,15 @@ export class ExpenseValidation {
             .nullable(),
         ),
         currency: z.preprocess(
-          optionalPreprocessor,
+          patchPreprocessor,
           z.string().length(3).optional().nullable(),
         ),
         paidBy: z.preprocess(
-          optionalPreprocessor,
-          z.string().uuid().nullable(),
+          patchPreprocessor,
+          z.string().uuid().nullable().optional(),
         ),
         splits: z.preprocess(
-          optionalPreprocessor,
+          patchPreprocessor,
           z
             .array(
               z.object({

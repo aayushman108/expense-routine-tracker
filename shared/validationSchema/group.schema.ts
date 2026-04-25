@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   requiredPreprocessor,
   optionalPreprocessor,
+  patchPreprocessor,
 } from "../utils/validationSchemaPreprocessor";
 
 const imageSchema = z
@@ -26,30 +27,33 @@ export class GroupValidation {
         z
           .string()
           .max(1000, { message: "Description must not exceed 1000 characters" })
-          .nullable(),
+          .nullable()
+          .optional(),
       ),
-      image: z.preprocess(optionalPreprocessor, imageSchema),
+      image: z.preprocess(optionalPreprocessor, imageSchema).optional(),
     }),
   });
 
   static updateGroupSchema = z.object({
     body: z.object({
       name: z.preprocess(
-        optionalPreprocessor,
+        patchPreprocessor,
         z
           .string()
           .min(1, { message: "Group name cannot be empty" })
           .max(255, { message: "Group name must not exceed 255 characters" })
-          .nullable(),
+          .nullable()
+          .optional(),
       ),
       description: z.preprocess(
-        optionalPreprocessor,
+        patchPreprocessor,
         z
           .string()
           .max(1000, { message: "Description must not exceed 1000 characters" })
-          .nullable(),
+          .nullable()
+          .optional(),
       ),
-      image: z.preprocess(optionalPreprocessor, imageSchema),
+      image: z.preprocess(patchPreprocessor, imageSchema).optional(),
     }),
   });
 
