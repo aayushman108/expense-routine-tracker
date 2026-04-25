@@ -21,9 +21,10 @@ import { handleThunk } from "@/lib/utils";
 interface BankCardProps {
   pm: PaymentMethod;
   handleCopyToClipboard: (text: string, label: string) => void;
+  readOnly?: boolean;
 }
 
-export function BankCard({ pm, handleCopyToClipboard }: BankCardProps) {
+export function BankCard({ pm, handleCopyToClipboard, readOnly }: BankCardProps) {
   const dispatch = useAppDispatch();
   const { isLoading: pmLoading } = useAppSelector(
     (s: RootState) => s.paymentMethods,
@@ -96,17 +97,19 @@ export function BankCard({ pm, handleCopyToClipboard }: BankCardProps) {
               <span className={styles.al}>HOLDER</span>
               <span className={styles.av}>{meta.accountHolder}</span>
             </div>
-            <div className={styles.pmActionsOverlay}>
-              <button onClick={() => openEditModal(pm)}>
-                <HiOutlinePencil />
-              </button>
-              <button
-                className={styles.danger}
-                onClick={() => setDeleteId(pm.id)}
-              >
-                <HiOutlineTrash />
-              </button>
-            </div>
+            {!readOnly && (
+              <div className={styles.pmActionsOverlay}>
+                <button onClick={() => openEditModal(pm)}>
+                  <HiOutlinePencil />
+                </button>
+                <button
+                  className={styles.danger}
+                  onClick={() => setDeleteId(pm.id)}
+                >
+                  <HiOutlineTrash />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

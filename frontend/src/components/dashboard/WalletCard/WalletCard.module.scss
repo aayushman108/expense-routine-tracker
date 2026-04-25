@@ -19,8 +19,23 @@
     transform: translateY(-4px);
   }
 
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--wallet-accent, #fff);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--wallet-accent-grad);
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+  }
+
   &.khalti {
-    background: linear-gradient(135deg, #5c2d91 0%, #8c52ff 100%);
+    --wallet-accent: #8c52ff;
+    --wallet-accent-grad: linear-gradient(135deg, #5c2d91 0%, #8c52ff 100%);
     &::after {
       content: "";
       position: absolute;
@@ -28,13 +43,15 @@
       right: -10%;
       width: 180px;
       height: 180px;
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--wallet-accent-grad);
+      opacity: 0.05;
       border-radius: 50%;
     }
   }
 
   &.esewa {
-    background: linear-gradient(135deg, #60bb46 0%, #a2d149 100%);
+    --wallet-accent: #60bb46;
+    --wallet-accent-grad: linear-gradient(135deg, #60bb46 0%, #a2d149 100%);
     &::after {
       content: "";
       position: absolute;
@@ -42,14 +59,16 @@
       right: -10%;
       width: 150px;
       height: 150px;
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--wallet-accent-grad);
+      opacity: 0.05;
       border-radius: 30px;
       transform: rotate(45deg);
     }
   }
 
   &.bank {
-    background: linear-gradient(135deg, #1a73e8 0%, #64b5f6 100%);
+    --wallet-accent: #64b5f6;
+    --wallet-accent-grad: linear-gradient(135deg, #1a73e8 0%, #64b5f6 100%);
     &::after {
       content: "";
       position: absolute;
@@ -57,14 +76,16 @@
       left: -10%;
       width: 200px;
       height: 200px;
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--wallet-accent-grad);
+      opacity: 0.05;
       border-radius: 40px;
       transform: rotate(-15deg);
     }
   }
 
   &.fonepay {
-    background: linear-gradient(135deg, #e31837 0%, #ff5252 100%);
+    --wallet-accent: #e31837;
+    --wallet-accent-grad: linear-gradient(135deg, #e31837 0%, #ff5252 100%);
     &::after {
       content: "";
       position: absolute;
@@ -72,14 +93,15 @@
       right: -5%;
       width: 120px;
       height: 120px;
-      background: rgba(255, 255, 255, 0.15);
+      background: var(--wallet-accent-grad);
+      opacity: 0.05;
       border-radius: 50%;
-      box-shadow: 40px 40px 0 rgba(255, 255, 255, 0.05);
     }
   }
 
   &.imepay {
-    background: linear-gradient(135deg, #00a4e4 0%, #40c4ff 100%);
+    --wallet-accent: #00a4e4;
+    --wallet-accent-grad: linear-gradient(135deg, #00a4e4 0%, #40c4ff 100%);
     &::after {
       content: "";
       position: absolute;
@@ -87,14 +109,16 @@
       left: 10%;
       width: 160px;
       height: 60px;
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--wallet-accent-grad);
+      opacity: 0.05;
       border-radius: 100px;
       transform: rotate(-45deg);
     }
   }
 
   &.connectips {
-    background: linear-gradient(135deg, #004b87 0%, #0072bc 100%);
+    --wallet-accent: #0072bc;
+    --wallet-accent-grad: linear-gradient(135deg, #004b87 0%, #0072bc 100%);
     &::after {
       content: "";
       position: absolute;
@@ -102,7 +126,8 @@
       right: -10%;
       width: 140px;
       height: 140px;
-      border: 20px solid rgba(255, 255, 255, 0.05);
+      border: 20px solid var(--wallet-accent);
+      opacity: 0.05;
       border-radius: 50%;
     }
   }
@@ -122,10 +147,11 @@
 
       .providerLogo {
         font-weight: 900;
-        font-size: $font-size-lg;
+        font-size: $font-size-xl;
         letter-spacing: -0.02em;
         font-style: italic;
-        opacity: 0.9;
+        opacity: 1;
+        color: var(--wallet-accent, #fff);
       }
     }
 
@@ -148,7 +174,7 @@
         gap: $space-3;
 
         .number {
-          font-size: $font-size-xl;
+          font-size: $font-size-md;
           font-family: inherit;
           letter-spacing: 1px;
           font-weight: 700;
@@ -293,23 +319,26 @@
   background: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   white-space: nowrap;
+  color: var(--wallet-accent, #1a73e8);
+}
 
-  &.khalti {
-    color: #5c2d91;
-  }
-  &.esewa {
-    color: #60bb46;
-  }
-  &.bank {
-    color: #1a73e8;
-  }
-  &.fonepay {
-    color: #e31837;
-  }
-  &.imepay {
-    color: #00a4e4;
-  }
-  &.connectips {
-    color: #004b87;
+@include responsive(sm) {
+  .modernWalletCard {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .infoSide {
+      width: 100%;
+    }
+
+    .qrSide {
+      align-self: center;
+      margin-top: $space-4;
+
+      .qrWrapper {
+        width: 200px;
+        height: 200px;
+      }
+    }
   }
 }

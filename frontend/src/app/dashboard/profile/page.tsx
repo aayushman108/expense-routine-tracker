@@ -133,7 +133,7 @@ export default function ProfilePage() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchPaymentMethods());
+    handleThunk(dispatch(fetchPaymentMethods()), () => {});
   }, [dispatch]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,7 +189,7 @@ export default function ProfilePage() {
     handleThunk(dispatch(logoutUser()), () => router.push("/"));
   };
 
-  if (!user) {
+  if (!user || authLoading || pmLoading) {
     return <FullProfileSkeleton />;
   }
 

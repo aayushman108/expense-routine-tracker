@@ -22,8 +22,9 @@ import { handleThunk } from "@/lib/utils";
 
 interface WalletCardProps {
   pm: PaymentMethod;
-  user: User;
+  user?: User;
   handleCopyToClipboard: (text: string, label: string) => void;
+  readOnly?: boolean;
 }
 
 function getProviderLabel(provider: string) {
@@ -34,6 +35,7 @@ export function WalletCard({
   pm,
   user,
   handleCopyToClipboard,
+  readOnly,
 }: WalletCardProps) {
   const dispatch = useAppDispatch();
   const { isLoading: pmLoading } = useAppSelector(
@@ -86,9 +88,7 @@ export function WalletCard({
               {getProviderLabel(pm.provider)}
             </div>
             {pm.is_default && (
-              <span
-                className={[styles.defaultBadge, styles[pm.provider]].join(" ")}
-              >
+              <span className={styles.defaultBadge}>
                 Default
               </span>
             )}
@@ -119,17 +119,19 @@ export function WalletCard({
               <span className={styles.al}>HOLDER</span>
               <span className={styles.av}>{meta.name || user?.full_name}</span>
             </div>
-            <div className={styles.pmActionsOverlay}>
-              <button onClick={() => openEditModal(pm)}>
-                <HiOutlinePencil />
-              </button>
-              <button
-                className={styles.danger}
-                onClick={() => setDeleteId(pm.id)}
-              >
-                <HiOutlineTrash />
-              </button>
-            </div>
+            {!readOnly && (
+              <div className={styles.pmActionsOverlay}>
+                <button onClick={() => openEditModal(pm)}>
+                  <HiOutlinePencil />
+                </button>
+                <button
+                  className={styles.danger}
+                  onClick={() => setDeleteId(pm.id)}
+                >
+                  <HiOutlineTrash />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
