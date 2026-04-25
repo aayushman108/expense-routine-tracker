@@ -3,27 +3,42 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-// Store active abort controllers
-const pendingRequests = new Map<string, AbortController>();
+// ==============================
+// 🔐 TOKEN REFRESH MANAGEMENT
+// ==============================
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
 
-/**
- * Generate a unique key for each request (method + url)
- */
-const getRequestKey = (config: InternalAxiosRequestConfig): string => {
-  return `${config.method}:${config.url}`;
+const subscribeTokenRefresh = (cb: (token: string) => void) => {
+  refreshSubscribers.push(cb);
 };
 
-/**
- * Cancel previous pending request with same key
- */
+const onRefreshed = (token: string) => {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+};
+
+// ==============================
+// ❌ REQUEST CANCELLATION
+// ==============================
+const pendingRequests = new Map<string, AbortController>();
+
+const getRequestKey = (config: InternalAxiosRequestConfig) => {
+  return `${config.method}:${config.url}:${JSON.stringify(
+    config.params || {},
+  )}:${JSON.stringify(config.data || {})}`;
+};
+
 const cancelPendingRequest = (key: string) => {
   if (pendingRequests.has(key)) {
-    const controller = pendingRequests.get(key)!;
-    controller.abort();
+    pendingRequests.get(key)?.abort();
     pendingRequests.delete(key);
   }
 };
 
+// ==============================
+// 🌐 AXIOS INSTANCE
+// ==============================
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
@@ -33,25 +48,27 @@ const api = axios.create({
   },
 });
 
-// ── Request Interceptor ──
+// ==============================
+// 📤 REQUEST INTERCEPTOR
+// ==============================
 api.interceptors.request.use(
   (config) => {
-    // Attach abort controller
     const key = getRequestKey(config);
 
-    // For GET requests, cancel duplicates
-    if (config.method === "get") {
+    // Cancel duplicate GET requests (optional flag)
+    if (config.method === "get" && !config.headers?.["x-no-cancel"]) {
       cancelPendingRequest(key);
     }
 
     const controller = new AbortController();
-    config.signal = config.signal || controller.signal;
+    config.signal = controller.signal;
     pendingRequests.set(key, controller);
 
-    // Attach access token
+    // Attach token (client-side only)
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("accessToken");
       if (token) {
+        config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
@@ -61,10 +78,11 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// ── Response Interceptor ──
+// ==============================
+// 📥 RESPONSE INTERCEPTOR
+// ==============================
 api.interceptors.response.use(
   (response) => {
-    // Remove from pending
     const key = getRequestKey(response.config);
     pendingRequests.delete(key);
     return response;
@@ -79,12 +97,14 @@ api.interceptors.response.use(
       pendingRequests.delete(key);
     }
 
-    // If request was cancelled, don't retry
-    if (axios.isCancel(error)) {
+    // ✅ Handle cancellation properly
+    if ((error as any)?.name === "CanceledError") {
       return Promise.reject(error);
     }
 
-    // 401 — try to refresh token
+    // ==============================
+    // 🔁 HANDLE 401 TOKEN REFRESH
+    // ==============================
     if (
       error.response?.status === 401 &&
       originalRequest &&
@@ -93,23 +113,49 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
+      // If already refreshing → queue requests
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token: string) => {
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
+
       try {
         const { data } = await axios.get(`${API_BASE_URL}/auth/refresh`, {
           withCredentials: true,
         });
 
         const newToken = data?.data?.accessToken;
+
         if (newToken) {
-          localStorage.setItem("accessToken", newToken);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("accessToken", newToken);
+          }
+
+          onRefreshed(newToken);
+
+          // Retry original request
+          originalRequest.headers = originalRequest.headers || {};
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          originalRequest.headers["x-no-cancel"] = true; // prevent self-cancel
+
           return api(originalRequest);
         }
-      } catch {
-        // Refresh failed — clear and redirect to login
-        localStorage.removeItem("accessToken");
+      } catch (refreshError) {
+        // 🔴 Refresh failed → logout
         if (typeof window !== "undefined") {
+          localStorage.removeItem("accessToken");
           window.location.href = "/login";
         }
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
@@ -117,17 +163,17 @@ api.interceptors.response.use(
   },
 );
 
-/**
- * Cancel all pending requests (useful on route change / unmount)
- */
+// ==============================
+// 🧹 UTILITIES
+// ==============================
+
+// Cancel all requests (e.g., on route change)
 export const cancelAllRequests = () => {
   pendingRequests.forEach((controller) => controller.abort());
   pendingRequests.clear();
 };
 
-/**
- * Create a standalone abort controller for manual cancellation
- */
+// Manual cancellation support
 export const createAbortController = () => {
   const controller = new AbortController();
   return {
