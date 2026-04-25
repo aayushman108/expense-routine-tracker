@@ -11,6 +11,7 @@ import {
   HiOutlineSearch,
   HiOutlineOfficeBuilding,
   HiOutlineChartBar,
+  HiOutlineExclamationCircle,
 } from "react-icons/hi";
 import { FiUsers } from "react-icons/fi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -137,9 +138,20 @@ export default function GroupsPage() {
               </div>
               <div className={styles.cardDetails}>
                 <div className={styles.topRow}>
-                  <span className={styles.groupName}>{group.name}</span>
-                  {group.created_by === user?.id && (
-                    <span className={styles.roleBadge}>Admin</span>
+                  <div className={styles.nameAndBadge}>
+                    <span className={styles.groupName}>{group.name}</span>
+                    {group.created_by === user?.id && (
+                      <span className={styles.roleBadge}>Admin</span>
+                    )}
+                  </div>
+                  {group.pending_verifications > 0 && (
+                    <div
+                      className={styles.pendingBadge}
+                      title="Action required: verify expenses"
+                    >
+                      <HiOutlineExclamationCircle />
+                      {group.pending_verifications}
+                    </div>
                   )}
                 </div>
                 <p className={styles.description}>

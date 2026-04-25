@@ -10,6 +10,7 @@ import {
   HiOutlineUser,
   HiOutlineUsers,
   HiOutlineScale,
+  HiOutlineExclamationCircle,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchMyGroupsAction } from "@/store/slices/groupSlice";
@@ -25,6 +26,8 @@ import styles from "./dashboard.module.scss";
 import type { RootState } from "@/store";
 import { EXPENSE_TYPE } from "@expense-tracker/shared";
 import { handleThunk } from "@/lib/utils";
+import Link from "next/link";
+import Button from "@/components/ui/Button/Button";
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
@@ -95,6 +98,30 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.dashboard}>
+      {/* ── Actionable Alerts ── */}
+      {summary && summary.pendingVerificationsCount > 0 && (
+        <div className={styles.verificationBanner}>
+          <div className={styles.bannerContent}>
+            <div className={styles.bannerIcon}>
+              <HiOutlineExclamationCircle />
+            </div>
+            <div className={styles.bannerText}>
+              <h4>Action Required: Pending Verifications</h4>
+              <p>
+                You have {summary.pendingVerificationsCount} expense
+                {summary.pendingVerificationsCount > 1 ? "s" : ""} in your
+                groups awaiting your verification.
+              </p>
+            </div>
+          </div>
+          <Link href="/dashboard/groups">
+            <Button variant="outline" className={styles.viewBtn}>
+              Review Expenses
+            </Button>
+          </Link>
+        </div>
+      )}
+
       {/* ── Infrastructure Stats ── */}
       <section className={styles.stats}>
         {stats.map((stat, idx) => (

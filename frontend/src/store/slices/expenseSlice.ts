@@ -19,6 +19,7 @@ interface ExpenseState {
     groupSpend: number;
     remainingToPay: number;
     remainingToReceive: number;
+    pendingVerificationsCount: number;
   } | null;
   groupSummaries: {
     id: string;

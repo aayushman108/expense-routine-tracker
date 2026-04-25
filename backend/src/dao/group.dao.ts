@@ -96,19 +96,33 @@ const findByUserId = async (userId: string): Promise<IGroup[]> => {
       LEFT JOIN expense_splits es ON e.id = es.expense_id AND es.user_id = ?
       WHERE e.expense_type = 'group' AND e.expense_status = 'verified'
       GROUP BY e.group_id
+    ),
+    pending_stats AS (
+      SELECT 
+        e.group_id,
+        COUNT(*) as pending_count
+      FROM expenses e
+      JOIN expense_splits es ON e.id = es.expense_id
+      WHERE e.expense_type = 'group' 
+        AND e.expense_status = 'submitted' 
+        AND es.user_id = ? 
+        AND es.split_status = 'pending'
+      GROUP BY e.group_id
     )
     SELECT 
       g.*,
       COALESCE(gs.total_group_spend, 0) as total_group_spend,
       COALESCE(gs.total_paid_by_me, 0) as total_paid_by_me,
       COALESCE(gs.my_total_share, 0) as my_total_share,
-      COALESCE(gs.others_owe_me, 0) - COALESCE(gs.i_owe_others, 0) as net_balance
+      COALESCE(gs.others_owe_me, 0) - COALESCE(gs.i_owe_others, 0) as net_balance,
+      COALESCE(ps.pending_count, 0) as pending_verifications
     FROM groups g
     JOIN group_members gm ON g.id = gm.group_id
     LEFT JOIN group_stats gs ON g.id = gs.group_id
+    LEFT JOIN pending_stats ps ON g.id = ps.group_id
     WHERE gm.user_id = ? AND gm.left_at IS NULL
     ORDER BY g.created_at DESC`,
-    [userId, userId, userId, userId, userId, userId],
+    [userId, userId, userId, userId, userId, userId, userId],
   );
   return rows;
 };

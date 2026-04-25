@@ -67,6 +67,28 @@ const GroupStats: React.FC<GroupStatsProps> = ({
             </div>
           </div>
 
+          {summary && (
+            <div className={styles.statItem}>
+              <div className={styles.statLabel}>
+                <HiOutlineChartBar /> My Share
+              </div>
+              <div className={`${styles.statValue} ${styles.highlight}`}>
+                रू {summary.myTotalShare.toLocaleString()}
+              </div>
+            </div>
+          )}
+
+          {summary && (
+            <div className={styles.statItem}>
+              <div className={styles.statLabel}>
+                <HiOutlineCurrencyDollar /> Paid by Me
+              </div>
+              <div className={styles.statValue}>
+                रू {summary.totalPaidByMe.toLocaleString()}
+              </div>
+            </div>
+          )}
+
           <div className={styles.statItem}>
             <div className={styles.statLabel}>
               <HiOutlineChartBar /> Net Balance
@@ -83,28 +105,6 @@ const GroupStats: React.FC<GroupStatsProps> = ({
               {netPosition > 0 ? "+" : ""} रू {netPosition.toLocaleString()}
             </div>
           </div>
-
-          {summary && (
-            <>
-              <div className={styles.statItem}>
-                <div className={styles.statLabel}>
-                  <HiOutlineCurrencyDollar /> Paid by Me
-                </div>
-                <div className={styles.statValue}>
-                  रू {summary.totalPaidByMe.toLocaleString()}
-                </div>
-              </div>
-
-              <div className={styles.statItem}>
-                <div className={styles.statLabel}>
-                  <HiOutlineChartBar /> My Share
-                </div>
-                <div className={`${styles.statValue} ${styles.highlight}`}>
-                  रू {summary.myTotalShare.toLocaleString()}
-                </div>
-              </div>
-            </>
-          )}
         </div>
       </div>
 

@@ -38,6 +38,7 @@ export interface Group {
   total_paid_by_me?: number;
   my_total_share?: number;
   net_balance?: number;
+  pending_verifications?: number;
   created_at: string;
   updated_at: string;
 }

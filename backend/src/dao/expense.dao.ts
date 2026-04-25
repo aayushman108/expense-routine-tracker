@@ -621,6 +621,7 @@ async function getUserSummary(userId: string) {
         e.total_amount,
         e.expense_date,
         e.paid_by,
+        es.split_status,
         CASE 
           WHEN e.expense_type = 'personal' THEN e.total_amount
           ELSE COALESCE(es.split_amount, 0)
@@ -675,7 +676,10 @@ async function getUserSummary(userId: string) {
       COALESCE(SUM(i_owe) FILTER (WHERE expense_type = 'group' AND expense_status = 'verified'), 0) as remaining_to_pay,
 
       -- Remaining to Receive (Others owe me)
-      COALESCE(SUM(others_owe) FILTER (WHERE expense_type = 'group' AND expense_status = 'verified'), 0) as remaining_to_receive
+      COALESCE(SUM(others_owe) FILTER (WHERE expense_type = 'group' AND expense_status = 'verified'), 0) as remaining_to_receive,
+
+      -- Pending Verifications Count
+      COUNT(*) FILTER (WHERE expense_type = 'group' AND expense_status = 'submitted' AND split_status = 'pending') as pending_verifications
     FROM user_expenses
     `,
     [
@@ -699,6 +703,7 @@ async function getUserSummary(userId: string) {
     groupSpend: Number(row.group_spend || 0),
     remainingToPay: Number(row.remaining_to_pay || 0),
     remainingToReceive: Number(row.remaining_to_receive || 0),
+    pendingVerificationsCount: Number(row.pending_verifications || 0),
   };
 }
 

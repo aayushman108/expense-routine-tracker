@@ -18,6 +18,8 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 }) => {
   const { day, month } = formatDate(expense.expense_date);
   const isPayer = expense.paid_by === user?.id;
+  const mySplit = expense.splits?.find((s) => s.user?.id === user?.id);
+  const myStatus = mySplit?.split_status;
 
   return (
     <div
@@ -43,6 +45,11 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
           <span className={`${styles.tag} ${styles[expense.expense_status]}`}>
             Expense: {expense.expense_status.toUpperCase()}
           </span>
+          {expense.expense_status === EXPENSE_STATUS.SUBMITTED && myStatus && (
+            <span className={`${styles.tag} ${styles[myStatus]}`}>
+              My Split: {myStatus.toUpperCase()}
+            </span>
+          )}
           {expense.expense_status === EXPENSE_STATUS.VERIFIED &&
             expense.settlement_status && (
               <span
