@@ -269,7 +269,8 @@ async function getGroupExpenses(
   }
 
   const totalCount = await db.raw(
-    `SELECT COUNT(*) AS total_count, COALESCE(SUM(total_amount), 0) AS total_amount
+    `SELECT COUNT(*) AS total_count, 
+            COALESCE(SUM(total_amount) FILTER (WHERE expense_status = 'verified' OR expense_type = 'personal'), 0) AS total_amount
      FROM expenses
      ${whereClause}`,
     queryParams,
@@ -399,7 +400,8 @@ async function getUserExpenses(
   }
 
   const totalCount = await db.raw(
-    `SELECT COUNT(*) AS total_count, COALESCE(SUM(e.total_amount), 0) AS total_amount
+    `SELECT COUNT(*) AS total_count, 
+            COALESCE(SUM(e.total_amount) FILTER (WHERE e.expense_status = 'verified' OR e.expense_type = 'personal'), 0) AS total_amount
      FROM expenses e
      ${whereClause}`,
     queryParams,
@@ -735,7 +737,7 @@ async function getUserGroupSummaries(userId: string) {
       JOIN groups g ON e.group_id = g.id
       JOIN group_members gm ON g.id = gm.group_id AND gm.user_id = ?
       LEFT JOIN expense_splits es ON e.id = es.expense_id AND es.user_id = ?
-      WHERE e.expense_type = 'group' AND e.expense_status != 'draft'
+      WHERE e.expense_type = 'group' AND e.expense_status = 'verified'
     )
     SELECT
       group_id as id,
@@ -783,25 +785,25 @@ async function getMonthlyAnalytics(userId: string) {
         EXTRACT(MONTH FROM expense_date) AS month_num,
         CASE WHEN expense_type = 'personal' AND paid_by = ? THEN total_amount ELSE 0 END AS personal_amt,
         CASE 
-          WHEN expense_type = 'group' AND expense_status != 'draft' THEN 
+          WHEN expense_type = 'group' AND expense_status = 'verified' THEN 
             COALESCE((SELECT split_amount FROM expense_splits WHERE expense_id = e.id AND user_id = ?), 0)
           ELSE 0 
         END AS group_share_amt,
         CASE 
-          WHEN expense_type = 'group' AND expense_status != 'draft' 
+          WHEN expense_type = 'group' AND expense_status = 'verified' 
                AND e.group_id IN (SELECT group_id FROM group_members WHERE user_id = ?) 
           THEN total_amount 
           ELSE 0 
         END AS full_group_amt,
-        CASE WHEN expense_type = 'group' AND expense_status != 'draft' AND paid_by = ? THEN total_amount ELSE 0 END AS paid_by_me_amt,
+        CASE WHEN expense_type = 'group' AND expense_status = 'verified' AND paid_by = ? THEN total_amount ELSE 0 END AS paid_by_me_amt,
         CASE 
-          WHEN expense_type = 'group' AND expense_status != 'draft' THEN g.name
+          WHEN expense_type = 'group' AND expense_status = 'verified' THEN g.name
           ELSE NULL
         END AS group_name
       FROM expenses e
       LEFT JOIN groups g ON e.group_id = g.id
-      WHERE (expense_type = 'personal' AND paid_by = ?)
-         OR (expense_type = 'group' AND e.group_id IN (SELECT group_id FROM group_members WHERE user_id = ?))
+      WHERE ((expense_type = 'personal' AND paid_by = ?)
+         OR (expense_type = 'group' AND e.group_id IN (SELECT group_id FROM group_members WHERE user_id = ?) AND expense_status = 'verified'))
       AND EXTRACT(YEAR FROM expense_date) = EXTRACT(YEAR FROM CURRENT_DATE)
     ),
     group_breakdown AS (

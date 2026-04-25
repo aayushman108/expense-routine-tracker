@@ -94,7 +94,7 @@ const findByUserId = async (userId: string): Promise<IGroup[]> => {
         ), 0) as others_owe_me
       FROM expenses e
       LEFT JOIN expense_splits es ON e.id = es.expense_id AND es.user_id = ?
-      WHERE e.expense_type = 'group' AND e.expense_status != 'draft'
+      WHERE e.expense_type = 'group' AND e.expense_status = 'verified'
       GROUP BY e.group_id
     )
     SELECT 
