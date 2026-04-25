@@ -150,7 +150,7 @@
   grid-template-columns: 1.65fr 1fr;
   gap: $space-4;
 
-  @include responsive(lg) {
+  @include responsive(2xl) {
     grid-template-columns: 1fr;
   }
 }
@@ -253,12 +253,15 @@
 }
 
 .breakdownRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: $space-8;
   margin-top: $space-4;
+  @include responsive(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
   @include responsive(sm) {
-    flex-direction: column;
-    gap: $space-4;
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 
