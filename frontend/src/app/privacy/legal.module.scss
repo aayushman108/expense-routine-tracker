@@ -60,6 +60,9 @@
   @include mobile-only {
     padding: 100px $container-padding $space-16;
   }
+  @include responsive(sm) {
+    padding: 80px 16px;
+  }
 }
 
 .backLink {
@@ -73,7 +76,7 @@
   letter-spacing: 0.1em;
   margin-bottom: $space-16;
   transition: all $transition-fast;
-  
+
   &:hover {
     color: #818cf8;
     transform: translateX(-4px);
@@ -96,13 +99,13 @@
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: $radius-full;
     width: fit-content;
-    
+
     .icon {
       font-size: 18px;
       color: #818cf8;
       display: flex;
     }
-    
+
     span {
       font-size: 11px;
       font-weight: 800;
@@ -173,7 +176,7 @@
       display: flex;
       align-items: baseline;
       gap: $space-3;
-      
+
       @include mobile-only {
         font-size: 1.5rem;
       }
@@ -202,7 +205,7 @@
       display: flex;
       flex-direction: column;
       gap: $space-4;
-      
+
       li {
         background: rgba(255, 255, 255, 0.03);
         padding: $space-5 $space-6;
@@ -211,13 +214,13 @@
         line-height: 1.6;
         border: 1px solid rgba(255, 255, 255, 0.03);
         transition: all $transition-base;
-        
+
         &:hover {
           background: rgba(255, 255, 255, 0.05);
           border-color: rgba(99, 102, 241, 0.2);
           transform: translateX(4px);
         }
-        
+
         strong {
           color: #fff;
           font-weight: 800;
@@ -235,7 +238,11 @@
 .contactNotice {
   margin-top: $space-16;
   padding: $space-10;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.1),
+    rgba(168, 85, 247, 0.1)
+  );
   border: 1px solid rgba(99, 102, 241, 0.2);
   border-radius: 20px;
   display: flex;
@@ -243,7 +250,7 @@
   align-items: center;
   text-align: center;
   gap: $space-4;
-  
+
   .contactIcon {
     width: 50px;
     height: 50px;
@@ -254,12 +261,12 @@
     color: #fff;
     box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
   }
-  
+
   p {
     margin: 0;
     font-size: $font-size-base;
     color: #94a3b8;
-    
+
     a {
       color: #fff;
       font-weight: 700;
@@ -267,7 +274,7 @@
       border-bottom: 2px solid #6366f1;
       padding-bottom: 2px;
       transition: all $transition-fast;
-      
+
       &:hover {
         background: #6366f1;
         color: #fff;

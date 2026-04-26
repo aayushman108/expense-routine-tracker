@@ -27,7 +27,7 @@ export default function AppPreview() {
           y: 0,
           duration: 1.2,
           ease: "expo.out",
-        }
+        },
       );
 
       // Bar and list item Entrance
@@ -44,16 +44,17 @@ export default function AppPreview() {
           stagger: 0.05,
           duration: 1,
           ease: "power2.out",
-        }
+        },
       );
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
 
   return (
     <section ref={sectionRef} id="app-preview" className={styles.appPreview}>
       <div className={styles.appPreviewInner}>
         <div className={styles.header}>
+          <p className={styles.sectionEyebrow}>Preview</p>
           <h2 className={styles.sectionTitle}>Built for clarity</h2>
         </div>
 
@@ -95,9 +96,9 @@ export default function AppPreview() {
                 <div className={styles.barChart}>
                   {[70, 40, 90, 60, 80, 50, 85].map((h, i) => (
                     <div key={i} className={styles.bar}>
-                      <div 
-                        className={styles.barFill} 
-                        style={{ height: `${h}%` }} 
+                      <div
+                        className={styles.barFill}
+                        style={{ height: `${h}%` }}
                       />
                     </div>
                   ))}
@@ -119,12 +120,16 @@ export default function AppPreview() {
                 <div className={styles.distributionArea}>
                   <h4 className={styles.listHeader}>Split Distribution</h4>
                   <div className={styles.distTable}>
-                    {["Aayushman", "Ritesh", "Shravan", "Rajesh"].map((name, i) => (
-                      <div key={i} className={styles.distRow}>
-                        <span className={styles.distName}>{name}</span>
-                        <span className={styles.distValue}>{75 - i * 10}%</span>
-                      </div>
-                    ))}
+                    {["Aayushman", "Ritesh", "Shravan", "Rajesh"].map(
+                      (name, i) => (
+                        <div key={i} className={styles.distRow}>
+                          <span className={styles.distName}>{name}</span>
+                          <span className={styles.distValue}>
+                            {75 - i * 10}%
+                          </span>
+                        </div>
+                      ),
+                    )}
                   </div>
                 </div>
               </main>

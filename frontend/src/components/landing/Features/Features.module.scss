@@ -14,6 +14,9 @@
   @include responsive(md) {
     padding: $space-16 $container-padding;
   }
+  @include responsive(sm) {
+    padding: $space-16 $space-4;
+  }
 }
 
 .gridOverlay {
@@ -46,6 +49,9 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  @include responsive(sm) {
+    margin-bottom: $space-16;
+  }
 }
 
 .sectionEyebrow {
@@ -78,6 +84,9 @@
   font-size: $font-size-lg;
   color: #94a3b8;
   line-height: 1.6;
+  @include responsive(sm) {
+    font-size: $font-size-sm;
+  }
 }
 
 // ── Bento Grid ──
@@ -184,10 +193,16 @@
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.02em;
+  @include responsive(sm) {
+    font-size: $font-size-md;
+  }
 }
 
 .cardDesc {
   font-size: $font-size-base;
   color: #94a3b8;
   line-height: 1.6;
+  @include responsive(sm) {
+    font-size: $font-size-sm;
+  }
 }

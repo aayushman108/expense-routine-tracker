@@ -24,10 +24,10 @@ export default function CTA() {
           y: 0,
           duration: 1.2,
           ease: "power3.out",
-        }
+        },
       );
     },
-    { scope: containerRef }
+    { scope: containerRef },
   );
 
   return (
@@ -35,15 +35,15 @@ export default function CTA() {
       <div className={styles.ctaInner}>
         <div className={styles.ctaCard}>
           <h2 className={styles.title}>
-            Ready to refine <br /> 
+            Ready to refine <br />
             <span>your group finances?</span>
           </h2>
-          
+
           <p className={styles.sub}>
-            Join thousands of users who have automated their shared 
-            economy with mathematical precision.
+            Join thousands of users who have automated their shared economy with
+            mathematical precision.
           </p>
-          
+
           <div className={styles.buttonGroup}>
             <Link href="/signup" className={styles.btnPrimary}>
               Start for Free <FiArrowRight />

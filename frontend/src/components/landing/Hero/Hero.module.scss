@@ -158,6 +158,9 @@
   align-items: center;
   text-align: center;
   gap: $space-10;
+  @include responsive(sm) {
+    gap: $space-6;
+  }
 }
 
 .badge {
@@ -191,6 +194,9 @@
   letter-spacing: -0.04em;
   color: #fff;
   margin: 0;
+  @include responsive(sm) {
+    font-size: 2rem;
+  }
 }
 
 .heroTitleGradient {
@@ -206,6 +212,9 @@
   max-width: 720px;
   margin: 0 auto;
   line-height: 1.6;
+  @include responsive(sm) {
+    font-size: 14px;
+  }
 }
 
 // ── CTA Area ──
@@ -230,6 +239,10 @@
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
   box-shadow: 0 4px 25px rgba(99, 102, 241, 0.4);
+  @include responsive(sm) {
+    font-size: $font-size-sm;
+    padding: 12px 20px;
+  }
 
   &:hover {
     background: #4f46e5;
@@ -261,6 +274,10 @@
   border: 2px solid #0d0e1b;
   background: #1e293b;
   margin-left: -8px;
+  @include responsive(sm) {
+    width: 18px;
+    height: 18px;
+  }
 
   &:first-child {
     margin-left: 0;
@@ -302,6 +319,9 @@
     padding: $space-6 $space-4 0;
     margin-top: $space-6;
   }
+  @include responsive(sm) {
+    margin-top: 0px;
+  }
 }
 
 .featureItem {
@@ -327,6 +347,9 @@
     font-weight: $font-weight-bold;
     @include responsive(md) {
       font-size: $font-size-md;
+    }
+    @include responsive(sm) {
+      font-size: $font-size-sm;
     }
   }
 

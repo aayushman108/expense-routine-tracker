@@ -1,9 +1,5 @@
 import Link from "next/link";
-import {
-  HiOutlineChevronLeft,
-  HiOutlineDocumentText,
-  HiOutlineScale,
-} from "react-icons/hi";
+import { HiOutlineChevronLeft, HiOutlineDocumentText } from "react-icons/hi";
 import styles from "../privacy/legal.module.scss";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer/Footer";
