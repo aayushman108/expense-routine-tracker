@@ -1,7 +1,9 @@
 @use "../../../../styles/mixins" as *;
 
 .memberItem {
-  @include flex-between;
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  gap: $space-1;
 
   .memberInfo {
     display: flex;

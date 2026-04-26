@@ -195,7 +195,7 @@
   gap: $space-8;
   width: 100%;
 
-  @media (max-width: $bp-xl) {
+  @include responsive(2xl) {
     grid-template-columns: 1fr;
   }
 }
@@ -449,7 +449,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: $space-5;
 
-  @media (max-width: $bp-lg) {
+  @media (max-width: $bp-xl) {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -673,13 +673,20 @@
 
 // ── Members Column ──
 .sidebarColumn {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 100%;
   gap: $space-6;
+  @include responsive(2xl) {
+    grid-template-columns: 1fr 50%;
+  }
+  @include responsive(lg) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .sidebarSection {
   @include card;
+  width: 100%;
   padding: $space-6;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
@@ -694,69 +701,6 @@
     letter-spacing: 0.12em;
     color: var(--text-tertiary);
     font-weight: 800;
-  }
-
-  .statsContainer {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: $space-4;
-  }
-
-  .statBox {
-    padding: $space-4;
-    background: var(--bg-tertiary);
-    border-radius: $radius-lg;
-    border: 1px solid var(--border-default);
-    transition: all $transition-fast;
-
-    &:hover {
-      background: #fff;
-      border-color: var(--color-primary-100);
-      transform: translateY(-2px);
-    }
-
-    .statLabel {
-      display: block;
-      font-size: $font-size-xs;
-      color: var(--text-tertiary);
-      margin-bottom: $space-1;
-      font-weight: 600;
-    }
-
-    .statValue {
-      display: block;
-      font-size: $font-size-md;
-      font-weight: 800;
-      color: var(--text-primary);
-
-      &.success {
-        color: var(--color-success);
-      }
-
-      &.danger {
-        color: var(--color-danger);
-      }
-    }
-  }
-
-  .createdInfo {
-    margin-top: $space-4;
-    padding-top: $space-4;
-    border-top: 1px solid var(--border-default);
-    display: flex;
-    align-items: center;
-    gap: $space-2;
-
-    .label {
-      font-size: $font-size-xs;
-      color: var(--text-tertiary);
-      font-weight: 600;
-    }
-    .value {
-      font-size: $font-size-xs;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
   }
 
   .memberCount {

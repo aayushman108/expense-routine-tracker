@@ -2,6 +2,7 @@
 
 .sidebarSection {
   @include card;
+  width: 100%;
   padding: 0;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
@@ -9,6 +10,9 @@
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 
   &:hover {
     box-shadow: var(--shadow-md);
@@ -126,6 +130,7 @@
     gap: $space-2;
     font-size: 11px;
     color: var(--text-tertiary);
+    margin-top: auto;
 
     svg {
       color: var(--color-primary);
