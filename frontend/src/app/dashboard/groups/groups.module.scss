@@ -107,6 +107,9 @@
       letter-spacing: -0.04em;
       margin: 0;
       line-height: 1;
+      @include responsive(sm) {
+        font-size: 1.5rem;
+      }
     }
   }
 
@@ -116,6 +119,9 @@
     margin-top: $space-3;
     color: var(--text-secondary);
     font-weight: 500;
+    @include responsive(sm) {
+      font-size: 14px;
+    }
   }
 }
 
@@ -176,7 +182,8 @@
     &:focus {
       background: var(--bg-card);
       border-color: var(--color-primary);
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, transparent);
+      box-shadow: 0 0 0 4px
+        color-mix(in srgb, var(--color-primary) 10%, transparent);
 
       & + .searchIcon {
         color: var(--color-primary);
@@ -214,7 +221,11 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top right, var(--color-primary), transparent 70%);
+    background: radial-gradient(
+      circle at top right,
+      var(--color-primary),
+      transparent 70%
+    );
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -223,7 +234,9 @@
 
   .image {
     height: 160px;
-    background: var(--bg-card); // Match card background to prevent contrast flickering
+    background: var(
+      --bg-card
+    ); // Match card background to prevent contrast flickering
     position: relative;
     @include flex-center;
     overflow: hidden;
@@ -237,7 +250,11 @@
       position: absolute;
       inset: 0;
       bottom: -1px; // Slight overlap
-      background: linear-gradient(to bottom, transparent 40%, var(--bg-card) 100%);
+      background: linear-gradient(
+        to bottom,
+        transparent 40%,
+        var(--bg-card) 100%
+      );
       z-index: 2;
       pointer-events: none;
     }
@@ -264,7 +281,7 @@
     border-color: var(--color-primary-600);
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
-    
+
     &::before {
       opacity: 0.05;
     }
@@ -319,7 +336,8 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+      border: 1px solid
+        color-mix(in srgb, var(--color-primary) 20%, transparent);
       white-space: nowrap;
     }
 

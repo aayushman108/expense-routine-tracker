@@ -150,6 +150,9 @@
       @include mobile-only {
         font-size: 2rem;
       }
+      @include responsive(sm) {
+        font-size: 1.5rem;
+      }
     }
   }
 
@@ -159,6 +162,9 @@
     margin: $space-1 0 0 0;
     max-width: 600px;
     line-height: 1.5;
+    @include responsive(sm) {
+      font-size: 14px;
+    }
   }
 }
 

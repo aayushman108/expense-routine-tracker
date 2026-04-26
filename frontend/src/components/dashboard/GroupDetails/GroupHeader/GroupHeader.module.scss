@@ -86,10 +86,16 @@
       align-items: center;
       gap: $space-3;
       margin-bottom: $space-1;
+      @include responsive(sm) {
+        flex-direction: column;
+      }
 
       h1 {
         @include heading($font-size-2xl);
         margin: 0;
+        @include responsive(sm) {
+          @include heading($font-size-lg);
+        }
       }
 
       .inlineEditBtn {

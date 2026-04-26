@@ -1,5 +1,9 @@
 import React from "react";
-import { HiOutlineChevronLeft, HiOutlineCurrencyDollar, HiOutlinePlus } from "react-icons/hi";
+import {
+  HiOutlineChevronLeft,
+  HiOutlineCurrencyDollar,
+  HiOutlinePlus,
+} from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import styles from "./PersonalHeader.module.scss";
 
@@ -8,7 +12,10 @@ interface PersonalHeaderProps {
   onAddExpense: () => void;
 }
 
-const PersonalHeader: React.FC<PersonalHeaderProps> = ({ onBack, onAddExpense }) => {
+const PersonalHeader: React.FC<PersonalHeaderProps> = ({
+  onBack,
+  onAddExpense,
+}) => {
   return (
     <header className={styles.header}>
       <div className={styles.titleArea}>

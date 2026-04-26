@@ -129,11 +129,6 @@ export default function PersonalDetailsPage() {
           <div className={styles.groupHeader}>
             <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
               <h3>Personal Expenses</h3>
-              {pagination && (
-                <span className={styles.groupTotal}>
-                  रू {pagination.totalAmount?.toLocaleString()}
-                </span>
-              )}
             </div>
             <div className={styles.filterActions}>
               <Button

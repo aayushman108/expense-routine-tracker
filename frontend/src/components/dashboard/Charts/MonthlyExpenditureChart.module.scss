@@ -15,10 +15,16 @@
   @include responsive(md) {
     padding: $space-2;
   }
+  @include responsive(sm) {
+    padding: $space-1;
+  }
 
   &.compact {
     padding: $space-5;
     gap: $space-4;
+    @include responsive(sm) {
+      padding: $space-3;
+    }
   }
 }
 
@@ -26,6 +32,9 @@
   @include flex-between;
   align-items: flex-start;
   padding: $space-3 $space-3 0;
+  @include responsive(sm) {
+    padding: $space-1;
+  }
 }
 
 .titleInfo {
@@ -97,6 +106,9 @@
     }
     scrollbar-width: none;
     -ms-overflow-style: none;
+    @include responsive(sm) {
+      padding: $space-1 0;
+    }
   }
 }
 

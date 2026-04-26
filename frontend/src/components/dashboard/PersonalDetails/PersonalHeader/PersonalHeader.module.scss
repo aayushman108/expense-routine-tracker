@@ -98,6 +98,9 @@
       letter-spacing: -0.04em;
       margin: 0;
       line-height: 1;
+      @include responsive(sm) {
+        font-size: 1.5rem;
+      }
     }
   }
 
@@ -107,6 +110,9 @@
     margin-top: $space-3;
     color: var(--text-secondary);
     font-weight: 500;
+    @include responsive(sm) {
+      font-size: 14px;
+    }
   }
 }
 
