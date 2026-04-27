@@ -27,12 +27,12 @@ const cases = [
     desc: "Track every booking, meal, and activity across multiple currencies. Settle the entire trip with one click when you land.",
     tag: "Adventure",
   },
-  {
-    icon: "👥",
-    title: "Project Teams",
-    desc: "Manage shared subscription costs, software licenses, and collaborative expenses with detailed audit logs.",
-    tag: "Productivity",
-  },
+  // {
+  //   icon: "👥",
+  //   title: "Project Teams",
+  //   desc: "Manage shared subscription costs, software licenses, and collaborative expenses with detailed audit logs.",
+  //   tag: "Productivity",
+  // },
 ];
 
 export default function UseCases() {
