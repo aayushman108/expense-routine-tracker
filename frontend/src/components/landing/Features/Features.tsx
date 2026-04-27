@@ -102,11 +102,11 @@ export default function Features() {
           <p className={styles.sectionEyebrow}>Ecosystem</p>
           <h2 className={styles.sectionTitle}>
             Everything you need to <br />
-            <span>manage shared finances</span>
+            <span>manage your finances</span>
           </h2>
           <p className={styles.sectionSub}>
             A precision-engineered platform built for clarity, fairness, and
-            zero friction in your financial relationships.
+            zero friction in your personal and group finances.
           </p>
         </div>
 

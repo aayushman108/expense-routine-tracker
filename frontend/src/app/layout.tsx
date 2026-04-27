@@ -3,8 +3,6 @@ import "./globals.scss";
 import AppProvider from "@/components/providers/AppProvider";
 import ToastContainer from "@/components/ui/Toast/Toast";
 import ServiceWorkerRegister from "@/components/pwa/serviceWorkerRegister";
-import { Suspense } from "react";
-import PageLoader from "@/components/ui/PageLoader/PageLoader";
 import LoadingProvider from "@/components/providers/LoadingProvider";
 
 export const metadata: Metadata = {
@@ -38,7 +36,7 @@ export const metadata: Metadata = {
     siteName: "Expensora",
     images: [
       {
-        url: "/expensora-home.png",
+        url: "/landing.png",
         width: 1200,
         height: 630,
         alt: "Expensora App Preview",
@@ -50,7 +48,7 @@ export const metadata: Metadata = {
     title: "Expensora | Smart Expense Tracker",
     description:
       "Efficiently track and manage your shared and individual expenses.",
-    images: ["/expensora-home.png"],
+    images: ["/landing.png"],
   },
   robots: {
     index: true,

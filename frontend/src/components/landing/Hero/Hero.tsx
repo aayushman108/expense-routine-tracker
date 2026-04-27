@@ -66,7 +66,7 @@ export default function Hero() {
       <div className={styles.gridOverlay} />
 
       {/* Side Geometric Puzzle Pieces */}
-      <div className={`${styles.puzzleSide} ${styles.left}`}>
+      {/* <div className={`${styles.puzzleSide} ${styles.left}`}>
         <div className={`${styles.shape} ${styles.circle1}`} />
         <div className={`${styles.shape} ${styles.square1}`} />
         <div className={`${styles.shape} ${styles.dots1}`} />
@@ -76,7 +76,7 @@ export default function Hero() {
         <div className={`${styles.shape} ${styles.circle2}`} />
         <div className={`${styles.shape} ${styles.square2}`} />
         <div className={`${styles.shape} ${styles.dots2}`} />
-      </div>
+      </div> */}
 
       <div className={styles.heroInner}>
         <div className={styles.badge}>
@@ -86,13 +86,12 @@ export default function Hero() {
 
         <h1 className={styles.heroTitle}>
           Master your <br />
-          <span className={styles.heroTitleGradient}>Shared Finances</span>
+          <span className={styles.heroTitleGradient}>Personal & Shared Finances</span>
         </h1>
 
         <p className={styles.heroSub}>
-          The smarter way to track group expenses, split bills with precision,
-          and settle up effortlessly. Perfect for roommates, travelers, and
-          anyone sharing costs.
+          The smarter way to track your personal spending, group expenses, and split bills with precision.
+          Perfect for individuals, roommates, travelers, and anyone sharing costs.
         </p>
 
         <div className={styles.ctaGroup}>

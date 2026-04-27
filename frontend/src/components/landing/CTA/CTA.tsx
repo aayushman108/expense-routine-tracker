@@ -36,11 +36,11 @@ export default function CTA() {
         <div className={styles.ctaCard}>
           <h2 className={styles.title}>
             Ready to refine <br />
-            <span>your group finances?</span>
+            <span>your finances?</span>
           </h2>
 
           <p className={styles.sub}>
-            Join thousands of users who have automated their shared economy with
+            Join thousands of users who have automated their personal and shared economy with
             mathematical precision.
           </p>
 

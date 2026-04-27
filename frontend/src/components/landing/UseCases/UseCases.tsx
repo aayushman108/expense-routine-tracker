@@ -10,6 +10,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 const cases = [
   {
+    icon: "👤",
+    title: "Individuals",
+    desc: "Gain complete visibility into your personal cash flow. Track your daily spending and manage your budgets effortlessly.",
+    tag: "Personal",
+  },
+  {
     icon: "🏠",
     title: "Roommates",
     desc: "Simplify rent, utilities, and grocery runs. No more awkward conversations about who owes what at the end of the month.",
@@ -63,7 +69,7 @@ export default function UseCases() {
           <p className={styles.sectionEyebrow}>Scenarios</p>
           <h2 className={styles.sectionTitle}>
             Designed for every way <br />
-            you share.
+            you spend and share.
           </h2>
         </div>
 
