@@ -79,7 +79,7 @@
   font-size: clamp(1.8rem, 3.5vw, 2.75rem);
   font-weight: 800;
   line-height: 1.1;
-  color: #ffffff;
+  color: var(--text-primary);
   letter-spacing: -0.04em;
   margin-bottom: $space-6;
 }
