@@ -2,56 +2,62 @@ import { SETTLEMENT_STATUS } from "@expense-tracker/shared";
 import { db } from "../database/db";
 
 /**
- * Fetches group balances including virtual debts (not yet settled)
- * and active settlements (paid or pending review).
+ * Fetches group balances using a greedy settlement algorithm to minimize
+ * the number of transactions (debt simplification).
  */
 export async function getGroupBalances(groupId: string) {
-  const query = `
-    WITH raw_debts AS (
-        -- Sum up all splits per user pair that aren't linked to a settlement
-        SELECT 
-          es.user_id AS from_id,
-          e.paid_by AS to_id,
-          SUM(es.split_amount) AS amount
-        FROM expense_splits es
-        JOIN expenses e ON es.expense_id = e.id
-        WHERE e.group_id = ? 
-          AND es.settlement_id IS NULL
-          AND es.user_id != e.paid_by
-          AND e.expense_status = 'verified'
-        GROUP BY es.user_id, e.paid_by
+  // 1. Fetch net balances and user details for all members with outstanding splits
+  const balancesQuery = `
+    WITH user_debts AS (
+      SELECT 
+        es.user_id,
+        SUM(es.split_amount) as total_debt
+      FROM expense_splits es
+      JOIN expenses e ON es.expense_id = e.id
+      WHERE e.group_id = ? 
+        AND es.settlement_id IS NULL
+        AND es.user_id != e.paid_by
+        AND e.expense_status = 'verified'
+      GROUP BY es.user_id
     ),
-    netted_debts AS (
-        -- Net the debts between users (e.g., A owes B 10, B owes A 4 -> A owes B 6)
-        SELECT 
-            CASE WHEN d.from_id < d.to_id THEN d.from_id ELSE d.to_id END as u1,
-            CASE WHEN d.from_id < d.to_id THEN d.to_id ELSE d.from_id END as u2,
-            SUM(CASE WHEN d.from_id < d.to_id THEN d.amount ELSE -d.amount END) as net
-        FROM raw_debts d
-        GROUP BY u1, u2
-        HAVING ABS(SUM(CASE WHEN d.from_id < d.to_id THEN d.amount ELSE -d.amount END)) > 0
+    user_credits AS (
+      SELECT 
+        e.paid_by as user_id,
+        SUM(es.split_amount) as total_credit
+      FROM expense_splits es
+      JOIN expenses e ON es.expense_id = e.id
+      WHERE e.group_id = ? 
+        AND es.settlement_id IS NULL
+        AND es.user_id != e.paid_by
+        AND e.expense_status = 'verified'
+      GROUP BY e.paid_by
     )
-    -- 1. Virtual Debts (Pending initiation)
     SELECT 
-        CASE WHEN net > 0 THEN u1 ELSE u2 END as from_user_id,
-        CASE WHEN net > 0 THEN u2 ELSE u1 END as to_user_id,
-        ABS(net) as total_amount,
-        ? as status,
-        NULL::uuid as settlement_id,
-        NULL::jsonb as proof_image,
-        fu.full_name as from_user_name,
-        fu.email as from_user_email,
-        fu.avatar as from_user_avatar,
-        tu.full_name as to_user_name,
-        tu.email as to_user_email,
-        tu.avatar as to_user_avatar
-    FROM netted_debts
-    JOIN users fu ON (CASE WHEN net > 0 THEN u1 ELSE u2 END) = fu.id
-    JOIN users tu ON (CASE WHEN net > 0 THEN u2 ELSE u1 END) = tu.id
+      u.id,
+      u.full_name,
+      u.email,
+      u.avatar,
+      COALESCE(uc.total_credit, 0) - COALESCE(ud.total_debt, 0) as net_balance
+    FROM users u
+    JOIN group_members gm ON u.id = gm.user_id
+    LEFT JOIN user_debts ud ON u.id = ud.user_id
+    LEFT JOIN user_credits uc ON u.id = uc.user_id
+    WHERE gm.group_id = ?
+    AND (ud.total_debt IS NOT NULL OR uc.total_credit IS NOT NULL)
+  `;
 
-    UNION ALL
+  const balancesResult = await db.raw(balancesQuery, [
+    groupId,
+    groupId,
+    groupId,
+  ]);
+  const users = balancesResult.rows;
 
-    -- 2. Active Settlements (Paid or Pending review)
+  // 2. Greedy algorithm for simplified debts (Virtual Settlements)
+  const simplifiedDebts = simplifyDebts(users);
+
+  // 3. Fetch active settlements (Paid or Pending review)
+  const activeSettlementsQuery = `
     SELECT 
         s.from_user_id,
         s.to_user_id,
@@ -73,19 +79,72 @@ export async function getGroupBalances(groupId: string) {
     ORDER BY status DESC, total_amount DESC
   `;
 
-  const result = await db.raw(query, [
-    groupId,
-    SETTLEMENT_STATUS.PENDING,
+  const activeSettlementsResult = await db.raw(activeSettlementsQuery, [
     groupId,
     SETTLEMENT_STATUS.PENDING,
     SETTLEMENT_STATUS.PAID,
   ]);
-  return result.rows;
+
+  return [...simplifiedDebts, ...activeSettlementsResult.rows];
 }
 
 /**
- * Calculates net debt between two users and creates a single settlement record,
- * linking all relevant expense splits to it.
+ * Greedy algorithm to simplify debts.
+ * Minimizes transactions by matching largest debtors with largest creditors.
+ */
+function simplifyDebts(users: any[]) {
+  const debtors = users
+    .filter((u) => parseFloat(u.net_balance) < -0.01)
+    .sort((a, b) => parseFloat(a.net_balance) - parseFloat(b.net_balance));
+
+  const creditors = users
+    .filter((u) => parseFloat(u.net_balance) > 0.01)
+    .sort((a, b) => parseFloat(b.net_balance) - parseFloat(a.net_balance));
+
+  const transactions: any[] = [];
+  let i = 0,
+    j = 0;
+
+  while (i < debtors.length && j < creditors.length) {
+    const debtor = debtors[i];
+    const creditor = creditors[j];
+
+    const debtorBalance = Math.abs(parseFloat(debtor.net_balance));
+    const creditorBalance = parseFloat(creditor.net_balance);
+
+    const amount = Math.min(debtorBalance, creditorBalance);
+
+    transactions.push({
+      from_user_id: debtor.id,
+      to_user_id: creditor.id,
+      total_amount: amount,
+      status: SETTLEMENT_STATUS.PENDING, // This status marks it as a "Virtual Debt" in UI
+      settlement_id: null,
+      proof_image: null,
+      from_user_name: debtor.full_name,
+      from_user_email: debtor.email,
+      from_user_avatar: debtor.avatar,
+      to_user_name: creditor.full_name,
+      to_user_email: creditor.email,
+      to_user_avatar: creditor.avatar,
+    });
+
+    debtor.net_balance = (parseFloat(debtor.net_balance) + amount).toFixed(2);
+    creditor.net_balance = (parseFloat(creditor.net_balance) - amount).toFixed(
+      2,
+    );
+
+    if (Math.abs(parseFloat(debtor.net_balance)) < 0.01) i++;
+    if (Math.abs(parseFloat(creditor.net_balance)) < 0.01) j++;
+  }
+
+  return transactions;
+}
+
+/**
+ * Creates a settlement based on simplified debt and links relevant expense splits.
+ * Since we use debt simplification, a settlement between A and B might cover
+ * parts of multiple splits involving other users (middlemen).
  */
 export async function settleBulk(
   groupId: string,
@@ -94,32 +153,48 @@ export async function settleBulk(
   proofImage?: { url: string; publicId: string } | null,
 ) {
   return await db.transaction(async (trx) => {
-    // 1. Calculate the net amount from the perspective of fromUserId
-    const { rows } = await trx.raw(
-      `
-      SELECT SUM(CASE WHEN es.user_id = ? THEN es.split_amount ELSE -es.split_amount END) as net
-      FROM expense_splits es
-      JOIN expenses e ON es.expense_id = e.id
-      WHERE e.group_id = ? 
-        AND es.settlement_id IS NULL
-        AND e.expense_status = 'verified'
-        AND (
-          (es.user_id = ? AND e.paid_by = ?) OR 
-          (es.user_id = ? AND e.paid_by = ?)
-        )
-    `,
-      [fromUserId, groupId, fromUserId, toUserId, toUserId, fromUserId],
+    // 1. Calculate the simplified amount that SHOULD be paid between these two
+    // We run the same greedy algorithm to find the current transaction amount
+    const balancesQuery = `
+      WITH user_debts AS (
+        SELECT es.user_id, SUM(es.split_amount) as total_debt
+        FROM expense_splits es
+        JOIN expenses e ON es.expense_id = e.id
+        WHERE e.group_id = ? AND es.settlement_id IS NULL AND es.user_id != e.paid_by AND e.expense_status = 'verified'
+        GROUP BY es.user_id
+      ),
+      user_credits AS (
+        SELECT e.paid_by as user_id, SUM(es.split_amount) as total_credit
+        FROM expense_splits es
+        JOIN expenses e ON es.expense_id = e.id
+        WHERE e.group_id = ? AND es.settlement_id IS NULL AND es.user_id != e.paid_by AND e.expense_status = 'verified'
+        GROUP BY e.paid_by
+      )
+      SELECT u.id, COALESCE(uc.total_credit, 0) - COALESCE(ud.total_debt, 0) as net_balance
+      FROM group_members gm
+      JOIN users u ON gm.user_id = u.id
+      LEFT JOIN user_debts ud ON u.id = ud.user_id
+      LEFT JOIN user_credits uc ON u.id = uc.user_id
+      WHERE gm.group_id = ?
+    `;
+    const { rows: users } = await trx.raw(balancesQuery, [
+      groupId,
+      groupId,
+      groupId,
+    ]);
+    const simplified = simplifyDebts(users);
+
+    const targetTransaction = simplified.find(
+      (t) => t.from_user_id === fromUserId && t.to_user_id === toUserId,
     );
 
-    const net = Number(rows[0]?.net || 0);
-    if (Math.abs(net) < 0.01) {
-      throw new Error("No outstanding debts to settle between these users.");
+    if (!targetTransaction) {
+      throw new Error(
+        "No outstanding simplified debt to settle between these users.",
+      );
     }
 
-    // Determine actual payer/receiver based on the net sign
-    const finalFrom = net > 0 ? fromUserId : toUserId;
-    const finalTo = net > 0 ? toUserId : fromUserId;
-    const finalAmount = Math.abs(net);
+    const finalAmount = targetTransaction.total_amount;
 
     // 2. Create the settlement record
     const settlementResult = await trx.raw(
@@ -130,8 +205,8 @@ export async function settleBulk(
     `,
       [
         groupId,
-        finalFrom,
-        finalTo,
+        fromUserId,
+        toUserId,
         finalAmount,
         proofImage ? SETTLEMENT_STATUS.PAID : SETTLEMENT_STATUS.PENDING,
         proofImage ? JSON.stringify(proofImage) : null,
@@ -141,7 +216,11 @@ export async function settleBulk(
 
     const settlement = settlementResult.rows[0];
 
-    // 3. Link splits involved in this netting to the new settlement
+    // 3. Link splits to this settlement
+    // In simplified debt, we need to mark splits such that we reduce the payer's debt
+    // and the receiver's credit. We use a simple heuristic: link ALL unsettled splits
+    // that involve the payer as debtor OR the receiver as creditor.
+    // This effectively "clears" the path in the debt graph.
     await trx.raw(
       `
       UPDATE expense_splits
@@ -154,12 +233,12 @@ export async function settleBulk(
           AND es.settlement_id IS NULL
           AND e.expense_status = 'verified'
           AND (
-            (es.user_id = ? AND e.paid_by = ?) OR 
-            (es.user_id = ? AND e.paid_by = ?)
+            es.user_id = ? OR -- payer's debt
+            e.paid_by = ?     -- receiver's credit
           )
       )
     `,
-      [settlement.id, groupId, fromUserId, toUserId, toUserId, fromUserId],
+      [settlement.id, groupId, fromUserId, toUserId],
     );
 
     return settlement;
