@@ -143,6 +143,7 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
             onChange={handleChange}
             options={currencyOptions}
             required
+            disabled
           />
         </div>
 
@@ -531,6 +532,7 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
             onChange={handleChange}
             options={currencyOptions}
             required
+            disabled
           />
         </div>
 
