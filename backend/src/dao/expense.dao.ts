@@ -511,6 +511,89 @@ async function getUserExpenses(
   return { total, totalAmount, data: dataResult.rows };
 }
 
+async function getUserExpensesForDownload(
+  userId: string,
+  startDate?: string,
+  endDate?: string,
+  groupId?: string,
+  expenseType?: string,
+) {
+  let whereClause = "";
+  const queryParams: any[] = [];
+
+  if (groupId) {
+    whereClause = `WHERE e.group_id = ?`;
+    queryParams.push(groupId);
+  } else {
+    whereClause = `WHERE (e.paid_by = ? OR (
+       e.id IN (SELECT expense_id FROM expense_splits WHERE user_id = ?)
+       AND e.expense_status != 'draft'
+     ))`;
+    queryParams.push(userId, userId);
+
+    if (expenseType) {
+      whereClause += ` AND e.expense_type = ?`;
+      queryParams.push(expenseType);
+    }
+  }
+
+  if (startDate) {
+    whereClause += ` AND e.expense_date >= ?`;
+    queryParams.push(startDate);
+  }
+
+  if (endDate) {
+    whereClause += ` AND e.expense_date <= ?`;
+    queryParams.push(endDate);
+  }
+
+  const dataResult = await db.raw(
+    `
+    SELECT e.*,
+       p.full_name as payer_name,
+       g.name as group_name,
+       CASE 
+         WHEN e.group_id IS NULL THEN NULL
+         ELSE COALESCE(settlement_info.overall_status, ?)
+       END AS settlement_status,
+       e.total_amount AS user_amount,
+       COALESCE(es_user.split_amount, 0) AS user_split_amount
+    FROM expenses e
+    LEFT JOIN users p ON e.paid_by = p.id
+    LEFT JOIN groups g ON e.group_id = g.id
+    LEFT JOIN expense_splits es_user ON e.id = es_user.expense_id AND es_user.user_id = ?
+    LEFT JOIN LATERAL (
+      SELECT 
+        CASE 
+          WHEN COUNT(*) = 0 THEN ?
+          WHEN BOOL_AND(COALESCE(st_all.status = ?, FALSE)) THEN ?
+          WHEN BOOL_AND(COALESCE(st_all.status IN (?, ?), FALSE)) THEN ?
+          ELSE ?
+        END AS overall_status
+      FROM expense_splits es_all
+      LEFT JOIN settlements st_all ON es_all.settlement_id = st_all.id
+      WHERE es_all.expense_id = e.id
+    ) settlement_info ON true
+    ${whereClause}
+    ORDER BY e.expense_date DESC
+    `,
+    [
+      SETTLEMENT_STATUS.PENDING,
+      userId,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.CONFIRMED,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.PAID,
+      SETTLEMENT_STATUS.PENDING,
+      ...queryParams,
+    ],
+  );
+
+  return dataResult.rows;
+}
+
 async function deleteExpense(id: string, userId: string) {
   return await db.transaction(async (trx) => {
     const currentExpenseResult = await trx.raw(
@@ -867,4 +950,5 @@ export const expenseDao = {
   getMonthlyAnalytics,
   deleteExpense,
   updateSplitStatus,
+  getUserExpensesForDownload,
 };

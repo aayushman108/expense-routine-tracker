@@ -10,6 +10,9 @@ import {
 } from "@expense-tracker/shared";
 import { appEmitter, EVENTS } from "../utils/emitter.util";
 import { keysToSnakeCase } from "../utils/caseConverter";
+import PDFDocument from "pdfkit";
+import ExcelJS from "exceljs";
+import { Response } from "express";
 
 export type IAddExpense = ICreateExpenseSchema["body"] &
   ICreateExpenseSchema["params"] & {
@@ -204,6 +207,199 @@ async function getMonthlyAnalytics(userId: string) {
   return await expenseDao.getMonthlyAnalytics(userId);
 }
 
+async function generateExpenseStatement(
+  userId: string,
+  res: Response,
+  format: "pdf" | "xls",
+  options: {
+    startDate?: string;
+    endDate?: string;
+    groupId?: string;
+    expenseType?: string;
+    currentUserName?: string;
+  },
+) {
+  const { startDate, endDate, groupId, expenseType, currentUserName } = options;
+  const expenses = await expenseDao.getUserExpensesForDownload(
+    userId,
+    startDate,
+    endDate,
+    groupId,
+    expenseType,
+  );
+
+  const isPersonal = expenseType === "personal";
+  const groupName = expenses.length > 0 && expenses[0].group_name 
+    ? expenses[0].group_name 
+    : isPersonal ? "Personal" : "Expense";
+  
+  const fileNamePrefix = groupName.replace(/\s+/g, '_').toLowerCase();
+
+  if (format === "pdf") {
+    const doc = new PDFDocument({ margin: 50, layout: "landscape" });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${fileNamePrefix}_statement_${Date.now()}.pdf`,
+    );
+
+    doc.pipe(res);
+
+    // Title
+    doc.fontSize(20).text(`${groupName} Expense Statement`, { align: "center" });
+    doc.fontSize(12).text(`Generated for: ${currentUserName || "User"}`, { align: "center" });
+    doc.moveDown();
+
+    if (startDate || endDate) {
+      doc
+        .fontSize(10)
+        .text(`Period: ${startDate || "Start"} to ${endDate || "End"}`, {
+          align: "center",
+        });
+      doc.moveDown();
+    }
+
+    // Table Header
+    const tableTop = 150;
+    doc.fontSize(10).font("Helvetica-Bold");
+    
+    doc.text("Date", 50, tableTop);
+    doc.text("Description", 120, tableTop);
+    
+    if (isPersonal) {
+      doc.text("Paid By", 350, tableTop);
+      doc.text("Amount", 450, tableTop);
+    } else {
+      doc.text("Exp Status", 280, tableTop);
+      doc.text("Setl Status", 360, tableTop);
+      doc.text("Paid By", 440, tableTop);
+      doc.text("Total Amount", 540, tableTop);
+      doc.text("My Split", 640, tableTop);
+    }
+
+    doc.moveTo(50, tableTop + 15).lineTo(750, tableTop + 15).stroke();
+
+    // Rows
+    let y = tableTop + 25;
+    doc.font("Helvetica");
+
+    let totalAmount = 0;
+    let totalSplitAmount = 0;
+
+    expenses.forEach((expense: any) => {
+      const date = new Date(expense.expense_date).toLocaleDateString();
+      const amountValue = Number(expense.user_amount);
+      const splitValue = Number(expense.user_split_amount || 0);
+      const currency = expense.currency || "NPR";
+      
+      const totalAmountStr = `${currency} ${amountValue.toFixed(2)}`;
+      const splitAmountStr = `${currency} ${splitValue.toFixed(2)}`;
+      
+      const description = expense.description || "No description";
+      const payer = expense.payer_name || "Me";
+      const expStatus = expense.expense_status || "Verified";
+      const setlStatus = expense.settlement_status || "N/A";
+
+      const descriptionHeight = doc.heightOfString(description, { width: 150 });
+      const rowHeight = Math.max(descriptionHeight, 20);
+
+      if (y + rowHeight > 550) {
+        doc.addPage();
+        y = 50;
+      }
+
+      totalAmount += amountValue;
+      totalSplitAmount += splitValue;
+
+      doc.text(date, 50, y);
+      doc.text(description, 120, y, { width: 150 });
+
+      if (isPersonal) {
+        doc.text(payer, 350, y);
+        doc.text(totalAmountStr, 450, y);
+      } else {
+        doc.text(expStatus, 280, y);
+        doc.text(setlStatus, 360, y);
+        doc.text(payer, 440, y);
+        doc.text(totalAmountStr, 540, y);
+        doc.text(splitAmountStr, 640, y);
+      }
+
+      y += rowHeight + 10;
+    });
+
+    doc.moveDown();
+    doc.moveTo(50, y).lineTo(750, y).stroke();
+    y += 10;
+    
+    if (isPersonal) {
+      doc.font("Helvetica-Bold").text("Total Amount", 350, y);
+      doc.text(`${expenses[0]?.currency || "NPR"} ${totalAmount.toFixed(2)}`, 450, y);
+    } else {
+      doc.font("Helvetica-Bold").text("Total", 440, y);
+      doc.text(`${expenses[0]?.currency || "NPR"} ${totalAmount.toFixed(2)}`, 540, y);
+      doc.text(`${expenses[0]?.currency || "NPR"} ${totalSplitAmount.toFixed(2)}`, 640, y);
+    }
+
+    doc.end();
+  } else {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Expenses");
+
+    if (isPersonal) {
+      worksheet.columns = [
+        { header: "Date", key: "date", width: 15 },
+        { header: "Description", key: "description", width: 30 },
+        { header: "Paid By", key: "payer", width: 20 },
+        { header: "Currency", key: "currency", width: 10 },
+        { header: "Amount", key: "amount", width: 15 },
+      ];
+    } else {
+      worksheet.columns = [
+        { header: "Date", key: "date", width: 15 },
+        { header: "Description", key: "description", width: 30 },
+        { header: "Expense Status", key: "expStatus", width: 15 },
+        { header: "Settlement Status", key: "setlStatus", width: 15 },
+        { header: "Paid By", key: "payer", width: 20 },
+        { header: "Currency", key: "currency", width: 10 },
+        { header: "Total Amount", key: "amount", width: 15 },
+        { header: "My Split", key: "splitAmount", width: 15 },
+      ];
+    }
+
+    expenses.forEach((expense: any) => {
+      const rowData: any = {
+        date: new Date(expense.expense_date).toLocaleDateString(),
+        description: expense.description,
+        payer: expense.payer_name || "Me",
+        currency: expense.currency || "NPR",
+        amount: Number(expense.user_amount),
+      };
+
+      if (!isPersonal) {
+        rowData.expStatus = expense.expense_status || "Verified";
+        rowData.setlStatus = expense.settlement_status || "N/A";
+        rowData.splitAmount = Number(expense.user_split_amount || 0);
+      }
+
+      worksheet.addRow(rowData);
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${fileNamePrefix}_statement_${Date.now()}.xlsx`,
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  }
+}
+
 export const expenseService = {
   addExpense,
   updateExpense,
@@ -215,4 +411,5 @@ export const expenseService = {
   getMonthlyAnalytics,
   deleteExpense,
   updateSplitStatus,
+  generateExpenseStatement,
 };

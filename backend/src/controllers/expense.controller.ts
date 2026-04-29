@@ -3,6 +3,7 @@ import { expenseService } from "../services/expense.service";
 import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccessResponse } from "../utils/successResponseHandler.utils";
 import { generatePaginationObj } from "src/utils";
+import { userDao } from "../dao/user.dao";
 
 const createExpense = asyncHandler(async (req: Request, res: Response) => {
   const expense = await expenseService.addExpense({
@@ -167,6 +168,26 @@ const getMonthlyAnalytics = asyncHandler(async (req: Request, res: Response) => 
   });
 });
 
+const downloadStatement = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const { startDate, endDate, format, groupId, expenseType } = req.query;
+
+  const user = await userDao.findById(userId);
+
+  return await expenseService.generateExpenseStatement(
+    userId,
+    res,
+    (format as any) || "pdf",
+    {
+      startDate: startDate as string,
+      endDate: endDate as string,
+      groupId: groupId as string,
+      expenseType: expenseType as string,
+      currentUserName: user?.full_name,
+    }
+  );
+});
+
 export const expenseController = {
   createExpense,
   updateExpense,
@@ -178,4 +199,5 @@ export const expenseController = {
   getMonthlyAnalytics,
   deleteExpense,
   updateSplitStatus,
+  downloadStatement,
 };

@@ -25,6 +25,7 @@ router.patch(
   validateRequest(ExpenseValidation.updateSplitStatusSchema),
   expenseController.updateSplitStatus,
 );
+router.get("/user/download-statement", expenseController.downloadStatement);
 router.get("/user", expenseController.getUserExpenses);
 router.get("/user/summary", expenseController.getSummary);
 router.get("/user/analytics/monthly", expenseController.getMonthlyAnalytics);
