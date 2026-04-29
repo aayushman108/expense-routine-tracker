@@ -8,12 +8,21 @@
   margin-bottom: $space-3 !important;
   width: 100%;
 
+  @include responsive(sm) {
+    margin-bottom: $space-2 !important;
+  }
+
   .tabsWrapper {
     display: inline-flex;
     gap: $space-2;
     background: var(--bg-tertiary);
     padding: 4px;
     border-radius: $radius-xl;
+
+    @include responsive(sm) {
+      gap: 2px;
+      padding: 3px;
+    }
   }
 }
 
@@ -53,31 +62,70 @@
     border: 1px solid var(--border-strong);
   }
 
-  @include responsive(sm) {
+  @include responsive(lg) {
     padding: $space-2 $space-4;
     font-size: $font-size-xs;
     font-weight: 600;
+  }
+
+  @include responsive(sm) {
+    padding: 6px $space-3;
+    gap: 4px;
+
+    svg {
+      font-size: $font-size-sm;
+    }
   }
 }
 
 .filterActions {
   display: flex;
   gap: $space-3;
-  @include responsive(sm) {
+  @include responsive(lg) {
     display: none;
+  }
+}
+
+.downloadBtn {
+  display: flex !important;
+  align-items: center !important;
+  gap: $space-2 !important;
+
+  svg {
+    font-size: 1.1rem;
   }
 }
 
 .filterActionsSm {
   display: none;
-  @include responsive(sm) {
-    display: block;
+  @include responsive(lg) {
+    display: flex;
+    gap: $space-4;
+    align-items: center;
   }
+
+  @include responsive(sm) {
+    gap: $space-1;
+  }
+
   & > button {
     background-color: transparent !important;
     border: none !important;
     padding: 0 !important;
     color: var(--text-primary);
+    cursor: pointer;
+    // Ensure minimum 44px tap target for accessibility
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.downloadBtnSm {
+  svg {
+    font-size: 1.3rem;
   }
 }
 
@@ -85,6 +133,10 @@
   position: relative;
   svg {
     font-size: 1.1rem;
+
+    @include responsive(lg) {
+      font-size: 1.3rem;
+    }
   }
 
   .filterDot {
@@ -96,5 +148,10 @@
     background: var(--color-danger);
     border-radius: 50%;
     border: 2px solid #fff;
+
+    @include responsive(lg) {
+      top: 4px;
+      right: 4px;
+    }
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { HiOutlineFilter, HiOutlineShoppingBag } from "react-icons/hi";
+import { HiOutlineFilter, HiOutlineShoppingBag, HiOutlineDownload } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   deleteExpense,
@@ -16,6 +16,7 @@ import Pagination from "@/components/ui/Pagination/Pagination";
 import MonthlyExpenditureChart from "@/components/dashboard/Charts/MonthlyExpenditureChart";
 import styles from "./personal.module.scss";
 import { handleThunk } from "@/lib/utils";
+import api from "@/lib/api";
 import type { RootState } from "@/store";
 import { EXPENSE_TYPE } from "@expense-tracker/shared";
 
@@ -23,6 +24,7 @@ import { EXPENSE_TYPE } from "@expense-tracker/shared";
 import PersonalHeader from "@/components/dashboard/PersonalDetails/PersonalHeader/PersonalHeader";
 import PersonalFilters from "@/components/dashboard/PersonalDetails/PersonalFilters/PersonalFilters";
 import PersonalExpenseCard from "@/components/dashboard/PersonalDetails/PersonalExpenseCard/PersonalExpenseCard";
+import DownloadStatementModal from "@/components/dashboard/GroupDetails/DownloadStatementModal/DownloadStatementModal";
 import {
   FullPersonalSkeleton,
   PersonalExpenseListSkeleton,
@@ -55,6 +57,7 @@ export default function PersonalDetailsPage() {
     endDate: "",
   });
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const handleApplyFilters = () => {
     setAppliedFilters({ startDate, endDate });
@@ -66,6 +69,43 @@ export default function PersonalDetailsPage() {
     setEndDate("");
     setAppliedFilters({ startDate: "", endDate: "" });
     setCurrentPage(1);
+  };
+  const [downloadingFormat, setDownloadingFormat] = useState<string | null>(
+    null,
+  );
+
+  const handleDownloadStatement = async (format: "pdf" | "xls", modalStartDate: string, modalEndDate: string) => {
+    setDownloadingFormat(format);
+    try {
+      const params = new URLSearchParams();
+      if (modalStartDate) params.append("startDate", modalStartDate);
+      if (modalEndDate) params.append("endDate", modalEndDate);
+      params.append("format", format);
+      params.append("expenseType", "personal");
+
+      const response = await api.get(`/expenses/user/download-statement?${params.toString()}`, {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `expense_statement_${Date.now()}.${format === "xls" ? "xlsx" : "pdf"}`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      // Close modal on success
+      setIsDownloadModalOpen(false);
+    } catch (error) {
+      console.error("Failed to download statement", error);
+    } finally {
+      setDownloadingFormat(null);
+    }
   };
 
   useEffect(() => {
@@ -134,6 +174,15 @@ export default function PersonalDetailsPage() {
               <Button
                 variant="outline"
                 size="sm"
+                className={styles.downloadBtn}
+                onClick={() => setIsDownloadModalOpen(true)}
+              >
+                <HiOutlineDownload />
+                Download Statement
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 className={styles.filterToggleBtn}
                 onClick={() => setIsFilterExpanded(!isFilterExpanded)}
               >
@@ -143,6 +192,24 @@ export default function PersonalDetailsPage() {
                   <span className={styles.filterDot} />
                 )}
               </Button>
+            </div>
+            <div className={styles.filterActionsSm}>
+              <button
+                className={styles.downloadBtnSm}
+                onClick={() => setIsDownloadModalOpen(true)}
+                title="Download Statement"
+              >
+                <HiOutlineDownload />
+              </button>
+              <button
+                className={styles.filterToggleBtn}
+                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+              >
+                <HiOutlineFilter />
+                {(startDate || endDate) && (
+                  <span className={styles.filterDot} />
+                )}
+              </button>
             </div>
           </div>
 
@@ -214,6 +281,13 @@ export default function PersonalDetailsPage() {
         }}
         expenseType={EXPENSE_TYPE.PERSONAL}
         expense={expenseToEdit}
+      />
+
+      <DownloadStatementModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        onDownload={handleDownloadStatement}
+        isDownloading={downloadingFormat}
       />
 
       <ConfirmModal

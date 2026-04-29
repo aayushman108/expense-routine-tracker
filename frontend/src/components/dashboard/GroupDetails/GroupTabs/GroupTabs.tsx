@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./GroupTabs.module.scss";
-import { HiOutlineCurrencyDollar, HiCheck, HiOutlineFilter } from "react-icons/hi";
+import { HiOutlineCurrencyDollar, HiCheck, HiOutlineFilter, HiOutlineDownload } from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 
 interface GroupTabsProps {
@@ -9,6 +9,7 @@ interface GroupTabsProps {
   isFilterExpanded: boolean;
   setIsFilterExpanded: (expanded: boolean) => void;
   hasFiltersApplied: boolean;
+  onDownloadStatement: () => void;
 }
 
 const GroupTabs: React.FC<GroupTabsProps> = ({
@@ -17,6 +18,7 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
   isFilterExpanded,
   setIsFilterExpanded,
   hasFiltersApplied,
+  onDownloadStatement,
 }) => {
   return (
     <div className={`${styles.tabHeader} ${styles.expenseHeaderActions}`}>
@@ -41,6 +43,15 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
             <Button
               variant="outline"
               size="sm"
+              onClick={onDownloadStatement}
+              className={styles.downloadBtn}
+            >
+              <HiOutlineDownload />
+              Download Statement
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               className={styles.filterToggleBtn}
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
             >
@@ -50,6 +61,13 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
             </Button>
           </div>
           <div className={styles.filterActionsSm}>
+            <button
+              className={styles.downloadBtnSm}
+              onClick={onDownloadStatement}
+              title="Download Statement"
+            >
+              <HiOutlineDownload />
+            </button>
             <button
               className={styles.filterToggleBtn}
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
@@ -64,3 +82,4 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
 };
 
 export default GroupTabs;
+

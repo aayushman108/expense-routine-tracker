@@ -260,12 +260,63 @@
 .filterActions {
   display: flex;
   gap: $space-3;
+
+  @include responsive(lg) {
+    display: none;
+  }
+}
+
+.downloadBtn {
+  display: flex !important;
+  align-items: center !important;
+  gap: $space-2 !important;
+
+  svg {
+    font-size: 1.1rem;
+  }
+}
+
+.filterActionsSm {
+  display: none;
+
+  @include responsive(lg) {
+    display: flex;
+    gap: $space-4;
+    align-items: center;
+  }
+
+  @include responsive(sm) {
+    gap: $space-1;
+  }
+
+  & > button {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    color: var(--text-primary);
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.downloadBtnSm {
+  svg {
+    font-size: 1.3rem;
+  }
 }
 
 .filterToggleBtn {
   position: relative;
   svg {
     font-size: 1.1rem;
+
+    @include responsive(lg) {
+      font-size: 1.3rem;
+    }
   }
 
   .filterDot {
@@ -277,6 +328,11 @@
     background: var(--color-danger);
     border-radius: 50%;
     border: 2px solid #fff;
+
+    @include responsive(lg) {
+      top: 4px;
+      right: 4px;
+    }
   }
 }
 

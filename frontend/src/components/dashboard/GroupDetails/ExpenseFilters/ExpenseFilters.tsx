@@ -97,6 +97,7 @@ const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
               Search
             </span>
           </Button>
+
           {hasFiltersApplied && (
             <button className={styles.clearFilters} onClick={onClear}>
               <HiOutlineX />

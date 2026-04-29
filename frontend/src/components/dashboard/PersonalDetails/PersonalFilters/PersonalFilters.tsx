@@ -55,7 +55,9 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
 
           <div className={styles.actionRow}>
             <Button size="sm" onClick={onApply}>
-              <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <HiOutlineSearch />
                 Search
               </span>
@@ -74,3 +76,4 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
 };
 
 export default PersonalFilters;
+

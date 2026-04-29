@@ -47,6 +47,7 @@
     margin-left: $space-2;
     align-self: flex-end;
     padding-bottom: 2px;
+    flex-wrap: wrap;
 
     @include mobile-only {
       margin-left: 0;
@@ -56,6 +57,7 @@
 
       button {
         flex: 1;
+        min-width: 120px;
       }
     }
   }
@@ -145,3 +147,4 @@
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+

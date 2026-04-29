@@ -1,0 +1,245 @@
+@use "../../../../styles/mixins" as *;
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+// ── Full Report Checkbox ──
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  cursor: pointer;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  border: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 4%, var(--bg-tertiary));
+  }
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: $radius-sm;
+  border: 2px solid var(--border-strong);
+  background: var(--bg-card);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  svg {
+    width: 12px;
+    height: 10px;
+    color: #fff;
+  }
+
+  &.checked {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px
+      color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+
+.checkboxText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+}
+
+// ── Divider ──
+.dividerRow {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border-default);
+}
+
+.dividerText {
+  font-size: $font-size-xs;
+  color: var(--text-tertiary);
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+// ── Date Fields ──
+.dateFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+  transition: opacity 0.3s ease;
+
+  @include responsive(480px) {
+    grid-template-columns: 1fr;
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+  }
+}
+
+.dateInput {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-md;
+  transition: all $transition-base;
+  height: 42px;
+
+  input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: var(--text-primary);
+    width: 100%;
+    cursor: pointer;
+    color-scheme: light dark;
+
+    &:disabled {
+      cursor: not-allowed;
+      color: var(--text-tertiary);
+    }
+
+    &::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+
+      [data-theme="dark"] & {
+        filter: invert(1);
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  &:focus-within,
+  &:hover {
+    background: var(--bg-secondary);
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px
+      color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+
+  svg {
+    color: var(--text-tertiary);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+}
+
+// ── Footer Action Buttons ──
+.footerActions {
+  display: flex;
+  gap: $space-3;
+  width: 100%;
+
+  @include responsive(410px) {
+    flex-direction: column;
+  }
+}
+
+.pdfButton,
+.xlsButton {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: $space-2 !important;
+  padding: $space-3 $space-4 !important;
+  border-radius: $radius-md !important;
+  font-weight: 600 !important;
+  font-size: $font-size-sm !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid var(--border-default) !important;
+  background: var(--bg-tertiary) !important;
+  flex: 1;
+
+  span {
+    font-size: $font-size-sm;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.pdfButton {
+  svg {
+    color: #ff4d4d;
+  }
+  &:hover:not(:disabled) {
+    border-color: #ff4d4d !important;
+    background: color-mix(in srgb, #ff4d4d 8%, var(--bg-tertiary)) !important;
+    color: #ff4d4d !important;
+  }
+}
+
+.xlsButton {
+  svg {
+    color: #27ae60;
+  }
+  &:hover:not(:disabled) {
+    border-color: #27ae60 !important;
+    background: color-mix(in srgb, #27ae60 8%, var(--bg-tertiary)) !important;
+    color: #27ae60 !important;
+  }
+}

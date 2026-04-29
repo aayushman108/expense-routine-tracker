@@ -29,14 +29,9 @@ import {
   BalanceSkeleton,
 } from "./GroupLoadingSkeletons";
 import styles from "./group-details.module.scss";
-import {
-  clearGroupDetails,
-  fetchGroupDetailsAction,
-  leaveGroupAction,
-  removeMemberAction,
-  updateMemberRoleAction,
-} from "@/store/slices/groupSlice";
+import { clearGroupDetails, fetchGroupDetailsAction, leaveGroupAction, removeMemberAction, updateMemberRoleAction } from "@/store/slices/groupSlice";
 import { handleThunk } from "@/lib/utils";
+import api from "@/lib/api";
 import { EXPENSE_TYPE } from "@expense-tracker/shared";
 
 import type { GroupMember, Expense, GroupBalance } from "@/lib/types";
@@ -49,6 +44,7 @@ import ExpenseCard from "@/components/dashboard/GroupDetails/ExpenseCard/Expense
 import SettlementCard from "@/components/dashboard/GroupDetails/SettlementCard/SettlementCard";
 import GroupStats from "@/components/dashboard/GroupDetails/GroupStats/GroupStats";
 import MemberItem from "@/components/dashboard/GroupDetails/MemberItem/MemberItem";
+import DownloadStatementModal from "@/components/dashboard/GroupDetails/DownloadStatementModal/DownloadStatementModal";
 import { showToast } from "@/lib/toast";
 import { ToastType } from "@/enums/general.enum";
 
@@ -87,6 +83,7 @@ export default function GroupDetailsPage() {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
   const [memberToPromote, setMemberToPromote] = useState<string | null>(null);
 
@@ -162,6 +159,44 @@ export default function GroupDetailsPage() {
       settlementStatus: "",
     });
     setCurrentPage(1);
+  };
+
+  const [downloadingFormat, setDownloadingFormat] = useState<string | null>(
+    null,
+  );
+
+  const handleDownloadStatement = async (format: "pdf" | "xls", modalStartDate: string, modalEndDate: string) => {
+    setDownloadingFormat(format);
+    try {
+      const params = new URLSearchParams();
+      if (id) params.append("groupId", id as string);
+      if (modalStartDate) params.append("startDate", modalStartDate);
+      if (modalEndDate) params.append("endDate", modalEndDate);
+      params.append("format", format);
+
+      const response = await api.get(`/expenses/user/download-statement?${params.toString()}`, {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `group_expense_statement_${Date.now()}.${format === "xls" ? "xlsx" : "pdf"}`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Close modal on success
+      setIsDownloadModalOpen(false);
+    } catch (error) {
+      console.error("Failed to download group statement", error);
+    } finally {
+      setDownloadingFormat(null);
+    }
   };
 
   const handleOpenBulkModal = (balance: GroupBalance) => {
@@ -296,6 +331,7 @@ export default function GroupDetailsPage() {
             isFilterExpanded={isFilterExpanded}
             setIsFilterExpanded={setIsFilterExpanded}
             hasFiltersApplied={hasFiltersApplied}
+            onDownloadStatement={() => setIsDownloadModalOpen(true)}
           />
 
           {activeTab === "expenses" && isFilterExpanded && (
@@ -482,6 +518,13 @@ export default function GroupDetailsPage() {
           group={groupDetails.data}
         />
       )}
+
+      <DownloadStatementModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        onDownload={handleDownloadStatement}
+        isDownloading={downloadingFormat}
+      />
 
       <ConfirmModal
         isOpen={isLeaveModalOpen}
