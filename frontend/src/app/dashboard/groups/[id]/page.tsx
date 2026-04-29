@@ -29,10 +29,16 @@ import {
   BalanceSkeleton,
 } from "./GroupLoadingSkeletons";
 import styles from "./group-details.module.scss";
-import { clearGroupDetails, fetchGroupDetailsAction, leaveGroupAction, removeMemberAction, updateMemberRoleAction } from "@/store/slices/groupSlice";
+import {
+  clearGroupDetails,
+  fetchGroupDetailsAction,
+  leaveGroupAction,
+  removeMemberAction,
+  updateMemberRoleAction,
+} from "@/store/slices/groupSlice";
 import { handleThunk } from "@/lib/utils";
 import api from "@/lib/api";
-import { EXPENSE_TYPE } from "@expense-tracker/shared";
+import { EXPENSE_TYPE, REPORT_TYPE } from "@expense-tracker/shared";
 
 import type { GroupMember, Expense, GroupBalance } from "@/lib/types";
 
@@ -165,7 +171,11 @@ export default function GroupDetailsPage() {
     null,
   );
 
-  const handleDownloadStatement = async (format: "pdf" | "xls", modalStartDate: string, modalEndDate: string) => {
+  const handleDownloadStatement = async (
+    format: REPORT_TYPE,
+    modalStartDate: string,
+    modalEndDate: string,
+  ) => {
     setDownloadingFormat(format);
     try {
       const params = new URLSearchParams();
@@ -174,16 +184,19 @@ export default function GroupDetailsPage() {
       if (modalEndDate) params.append("endDate", modalEndDate);
       params.append("format", format);
 
-      const response = await api.get(`/expenses/user/download-statement?${params.toString()}`, {
-        responseType: "blob",
-      });
+      const response = await api.get(
+        `/expenses/user/download-statement?${params.toString()}`,
+        {
+          responseType: "blob",
+        },
+      );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute(
         "download",
-        `group_expense_statement_${Date.now()}.${format === "xls" ? "xlsx" : "pdf"}`
+        `group_expense_statement_${Date.now()}.${format}`,
       );
       document.body.appendChild(link);
       link.click();

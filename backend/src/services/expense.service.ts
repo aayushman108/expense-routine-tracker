@@ -6,6 +6,7 @@ import {
 import {
   EXPENSE_STATUS,
   EXPENSE_TYPE,
+  REPORT_TYPE,
   SPLIT_STATUS,
 } from "@expense-tracker/shared";
 import { appEmitter, EVENTS } from "../utils/emitter.util";
@@ -228,14 +229,17 @@ async function generateExpenseStatement(
     expenseType,
   );
 
-  const isPersonal = expenseType === "personal";
-  const groupName = expenses.length > 0 && expenses[0].group_name 
-    ? expenses[0].group_name 
-    : isPersonal ? "Personal" : "Expense";
-  
-  const fileNamePrefix = groupName.replace(/\s+/g, '_').toLowerCase();
+  const isPersonal = expenseType === EXPENSE_TYPE.PERSONAL;
+  const groupName =
+    expenses.length > 0 && expenses[0].group_name
+      ? expenses[0].group_name
+      : isPersonal
+        ? "Personal"
+        : "Expense";
 
-  if (format === "pdf") {
+  const fileNamePrefix = groupName.replace(/\s+/g, "_").toLowerCase();
+
+  if (format === REPORT_TYPE.PDF) {
     const doc = new PDFDocument({ margin: 50, layout: "landscape" });
 
     res.setHeader("Content-Type", "application/pdf");
@@ -247,8 +251,12 @@ async function generateExpenseStatement(
     doc.pipe(res);
 
     // Title
-    doc.fontSize(20).text(`${groupName} Expense Statement`, { align: "center" });
-    doc.fontSize(12).text(`Generated for: ${currentUserName || "User"}`, { align: "center" });
+    doc
+      .fontSize(20)
+      .text(`${groupName} Expense Statement`, { align: "center" });
+    doc
+      .fontSize(12)
+      .text(`Generated for: ${currentUserName || "User"}`, { align: "center" });
     doc.moveDown();
 
     if (startDate || endDate) {
@@ -263,10 +271,10 @@ async function generateExpenseStatement(
     // Table Header
     const tableTop = 150;
     doc.fontSize(10).font("Helvetica-Bold");
-    
+
     doc.text("Date", 50, tableTop);
     doc.text("Description", 120, tableTop);
-    
+
     if (isPersonal) {
       doc.text("Paid By", 350, tableTop);
       doc.text("Amount", 450, tableTop);
@@ -278,7 +286,10 @@ async function generateExpenseStatement(
       doc.text("My Split", 640, tableTop);
     }
 
-    doc.moveTo(50, tableTop + 15).lineTo(750, tableTop + 15).stroke();
+    doc
+      .moveTo(50, tableTop + 15)
+      .lineTo(750, tableTop + 15)
+      .stroke();
 
     // Rows
     let y = tableTop + 25;
@@ -292,13 +303,13 @@ async function generateExpenseStatement(
       const amountValue = Number(expense.user_amount);
       const splitValue = Number(expense.user_split_amount || 0);
       const currency = expense.currency || "NPR";
-      
+
       const totalAmountStr = `${currency} ${amountValue.toFixed(2)}`;
       const splitAmountStr = `${currency} ${splitValue.toFixed(2)}`;
-      
+
       const description = expense.description || "No description";
       const payer = expense.payer_name || "Me";
-      const expStatus = expense.expense_status || "Verified";
+      const expStatus = expense.expense_status || "N/A";
       const setlStatus = expense.settlement_status || "N/A";
 
       const descriptionHeight = doc.heightOfString(description, { width: 150 });
@@ -332,14 +343,26 @@ async function generateExpenseStatement(
     doc.moveDown();
     doc.moveTo(50, y).lineTo(750, y).stroke();
     y += 10;
-    
+
     if (isPersonal) {
       doc.font("Helvetica-Bold").text("Total Amount", 350, y);
-      doc.text(`${expenses[0]?.currency || "NPR"} ${totalAmount.toFixed(2)}`, 450, y);
+      doc.text(
+        `${expenses[0]?.currency || "NPR"} ${totalAmount.toFixed(2)}`,
+        450,
+        y,
+      );
     } else {
       doc.font("Helvetica-Bold").text("Total", 440, y);
-      doc.text(`${expenses[0]?.currency || "NPR"} ${totalAmount.toFixed(2)}`, 540, y);
-      doc.text(`${expenses[0]?.currency || "NPR"} ${totalSplitAmount.toFixed(2)}`, 640, y);
+      doc.text(
+        `${expenses[0]?.currency || "NPR"} ${totalAmount.toFixed(2)}`,
+        540,
+        y,
+      );
+      doc.text(
+        `${expenses[0]?.currency || "NPR"} ${totalSplitAmount.toFixed(2)}`,
+        640,
+        y,
+      );
     }
 
     doc.end();
@@ -378,7 +401,7 @@ async function generateExpenseStatement(
       };
 
       if (!isPersonal) {
-        rowData.expStatus = expense.expense_status || "Verified";
+        rowData.expStatus = expense.expense_status || "N/A";
         rowData.setlStatus = expense.settlement_status || "N/A";
         rowData.splitAmount = Number(expense.user_split_amount || 0);
       }

@@ -43,6 +43,11 @@ export enum SETTLEMENT_STATUS {
   REJECTED = "rejected",
 }
 
+export enum REPORT_TYPE {
+  PDF = "pdf",
+  XLSX = "xlsx",
+}
+
 /**
  * @description
  * if all split_status are verified then expense_status will be verified,

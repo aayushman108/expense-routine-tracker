@@ -4,15 +4,12 @@ import Button from "@/components/ui/Button/Button";
 import { HiOutlineCalendar } from "react-icons/hi";
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import styles from "./DownloadStatementModal.module.scss";
+import { REPORT_TYPE } from "@expense-tracker/shared";
 
 interface DownloadStatementModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onDownload: (
-    format: "pdf" | "xls",
-    startDate: string,
-    endDate: string,
-  ) => void;
+  onDownload: (format: REPORT_TYPE, startDate: string, endDate: string) => void;
   isDownloading?: string | null;
 }
 
@@ -26,7 +23,7 @@ const DownloadStatementModal: React.FC<DownloadStatementModalProps> = ({
   const [endDate, setEndDate] = useState("");
   const [isFullReport, setIsFullReport] = useState(false);
 
-  const handleDownload = (format: "pdf" | "xls") => {
+  const handleDownload = (format: REPORT_TYPE) => {
     onDownload(
       format,
       isFullReport ? "" : startDate,
@@ -64,8 +61,8 @@ const DownloadStatementModal: React.FC<DownloadStatementModalProps> = ({
           <Button
             size="md"
             variant="outline"
-            onClick={() => handleDownload("pdf")}
-            isLoading={isDownloading === "pdf"}
+            onClick={() => handleDownload(REPORT_TYPE.PDF)}
+            isLoading={isDownloading === REPORT_TYPE.PDF}
             disabled={!!isDownloading || !canDownload}
             className={styles.pdfButton}
           >
@@ -75,8 +72,8 @@ const DownloadStatementModal: React.FC<DownloadStatementModalProps> = ({
           <Button
             size="md"
             variant="outline"
-            onClick={() => handleDownload("xls")}
-            isLoading={isDownloading === "xls"}
+            onClick={() => handleDownload(REPORT_TYPE.XLSX)}
+            isLoading={isDownloading === REPORT_TYPE.XLSX}
             disabled={!!isDownloading || !canDownload}
             className={styles.xlsButton}
           >
@@ -163,4 +160,3 @@ const DownloadStatementModal: React.FC<DownloadStatementModalProps> = ({
 };
 
 export default DownloadStatementModal;
-
