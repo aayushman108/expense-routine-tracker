@@ -68,7 +68,7 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({
       </div>
       <div className={styles.actions}>
         <Button variant="outline" size="sm" onClick={onSettings}>
-          Settings
+          Manage Group
         </Button>
         <Button variant="primary" size="sm" onClick={onAddExpense}>
           <HiOutlinePlus /> Add Expense

@@ -4,21 +4,16 @@
 .modalContent {
   display: flex;
   flex-direction: column;
-  gap: $space-6;
+  gap: $space-4;
 }
 
 .settlementFlow {
   @include flex-center;
-  gap: $space-8;
-  padding: $space-8 $space-6;
-  background: linear-gradient(
-    to bottom,
-    var(--bg-secondary),
-    var(--bg-tertiary)
-  );
-  border-radius: $radius-2xl;
+  gap: $space-4;
+  padding: $space-3 $space-4;
+  background: var(--bg-secondary);
+  border-radius: $radius-md;
   border: 1px solid var(--border-default);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
 
@@ -56,9 +51,9 @@
 
     .avatar {
       position: relative;
-      width: 72px;
-      height: 72px;
-      border-radius: $radius-2xl;
+      width: 56px;
+      height: 56px;
+      border-radius: $radius-md;
       background: var(--bg-primary);
       @include flex-center;
       font-size: $font-size-2xl;
@@ -91,7 +86,7 @@
 
       .name {
         font-weight: 700;
-        font-size: $font-size-md;
+        font-size: 0.875rem;
         color: var(--text-primary);
         display: flex;
         align-items: center;
@@ -166,11 +161,11 @@
         #7c3aed 100%
       );
       color: white;
-      padding: $space-2 $space-6;
+      padding: $space-1 $space-4;
       border-radius: $radius-full;
       font-weight: 800;
-      font-size: $font-size-lg;
-      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+      font-size: $font-size-md;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
       border: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 2;
 
@@ -196,8 +191,8 @@
 }
 
 .guidanceBox {
-  padding: $space-4;
-  border-radius: $radius-xl;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-default);
 
@@ -211,7 +206,7 @@
     .iconWrapper {
       width: 44px;
       height: 44px;
-      border-radius: $radius-lg;
+      border-radius: $radius-md;
       @include flex-center;
       flex-shrink: 0;
       font-size: $font-size-xl;
@@ -259,7 +254,7 @@
 }
 
 .paymentSection {
-  margin-top: $space-6;
+  margin-top: $space-4;
   .sectionHeader {
     margin-bottom: $space-4;
     h3 {
@@ -280,7 +275,7 @@
   padding: 0 $space-2;
   gap: $space-8;
   border-bottom: 1px solid var(--border-default);
-  margin-bottom: $space-6;
+  margin-bottom: $space-4;
 
   .tab {
     padding-bottom: $space-3;
@@ -317,7 +312,7 @@
 .tabContent {
   display: flex;
   flex-direction: column;
-  gap: $space-6;
+  gap: $space-4;
 }
 
 // ── Modern Wallets ──
@@ -328,8 +323,8 @@
 }
 
 .modernWalletCard {
-  border-radius: $radius-xl;
-  padding: $space-4 $space-6;
+  border-radius: $radius-md;
+  padding: $space-3 $space-5;
   color: white;
   position: relative;
   overflow: hidden;
@@ -423,7 +418,7 @@
         gap: $space-3;
 
         .value {
-          font-size: $font-size-xl;
+          font-size: $font-size-lg;
           font-weight: 800;
           font-family: $font-mono;
           letter-spacing: 1px;
@@ -476,7 +471,7 @@
         width: 140px;
         height: 140px;
         background: white;
-        border-radius: $radius-xl;
+        border-radius: $radius-md;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -497,7 +492,7 @@
           justify-content: center;
           opacity: 0;
           transition: opacity $transition-fast;
-          border-radius: $radius-xl;
+          border-radius: $radius-md;
         }
 
         &:hover .qrOverlay {
@@ -517,8 +512,8 @@
 
 .bankCardModern {
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-  border-radius: $radius-xl;
-  padding: $space-5 $space-6;
+  border-radius: $radius-md;
+  padding: $space-4 $space-5;
   color: white;
   min-height: 180px;
   display: flex;
@@ -610,9 +605,9 @@
         gap: $space-3;
 
         .number {
-          font-size: $font-size-xl;
+          font-size: $font-size-lg;
           font-family: $font-mono;
-          letter-spacing: 2px;
+          letter-spacing: 1.5px;
           font-weight: 700;
           opacity: 1;
         }
@@ -680,7 +675,7 @@
       width: 130px;
       height: 130px;
       background: white;
-      border-radius: $radius-lg;
+      border-radius: $radius-md;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -715,7 +710,7 @@
 .bankAuxInfo {
   background: var(--bg-secondary);
   border: 1px solid var(--border-default);
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   padding: $space-3 $space-4;
 
   .auxRow {
@@ -767,7 +762,7 @@
   flex-direction: column;
   padding: $space-10 $space-6;
   border: 2px dashed var(--border-default);
-  border-radius: $radius-2xl;
+  border-radius: $radius-md;
   background: var(--bg-secondary);
   transition: all $transition-base;
   position: relative;
@@ -838,7 +833,7 @@
   position: relative;
   width: 100%;
   height: 300px;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   overflow: hidden;
   border: 1px solid var(--border-default);
   background: var(--bg-tertiary);
@@ -895,7 +890,7 @@
   display: flex;
   justify-content: flex-end;
   gap: $space-3;
-  padding-top: $space-6;
+  padding-top: $space-4;
   border-top: 1px solid var(--border-default);
 
   @media (max-width: $bp-sm) {
@@ -940,7 +935,7 @@
   padding: $space-12 $space-6;
   background: rgba(var(--text-tertiary-rgb), 0.03);
   border: 1px dashed var(--border-default);
-  border-radius: $radius-2xl;
+  border-radius: $radius-md;
   color: var(--text-tertiary);
   text-align: center;
   gap: $space-3;

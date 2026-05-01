@@ -13,7 +13,7 @@
 
 .modal {
   background: var(--bg-elevated);
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-xl);
   width: 90%;
@@ -42,22 +42,23 @@
 
 .header {
   @include flex-between;
-  padding: $space-4 $space-6;
+  padding: $space-2 $space-4;
   border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
   @include responsive(sm) {
-    padding: $space-4 $space-3;
+    padding: $space-2 $space-4;
   }
 
   h2 {
-    @include heading($font-size-lg);
+    @include heading($font-size-md);
+    letter-spacing: -0.01em;
   }
 }
 
 .closeBtn {
   @include flex-center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: none;
   background: var(--bg-tertiary);
   border-radius: $radius-full;
@@ -74,13 +75,13 @@
 }
 
 .body {
-  padding: $space-4 $space-6;
+  padding: $space-3 $space-4;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
   @include styled-scrollbar;
   @include responsive(sm) {
-    padding: $space-4 $space-3;
+    padding: $space-2 $space-3;
   }
 
   &.fullHeight {
@@ -93,13 +94,13 @@
 
 .footer {
   @include flex-between;
-  padding: $space-4 $space-6;
+  padding: $space-2 $space-4;
   border-top: 1px solid var(--border-default);
   gap: $space-3;
   justify-content: flex-end;
   flex-shrink: 0;
   @include responsive(sm) {
-    padding: $space-4 $space-3;
+    padding: $space-3 $space-4;
   }
 }
 

@@ -10,7 +10,7 @@
 
 // ── Label ──
 .label {
-  font-size: $font-size-sm;
+  font-size: 0.8125rem;
   font-weight: $font-weight-medium;
   color: var(--text-primary);
   display: flex;
@@ -92,7 +92,7 @@
 // ── Value text ──
 .valueText {
   flex: 1;
-  font-size: $font-size-sm;
+  font-size: 0.8125rem;
   color: var(--text-primary);
   @include truncate;
 
@@ -129,7 +129,7 @@
   z-index: $z-dropdown;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: $radius-md;
+  border-radius: $radius-sm;
   box-shadow: $shadow-lg;
   max-height: 220px;
   overflow-y: auto;
@@ -160,7 +160,7 @@
   padding: 6px 12px;
   margin: 2px 4px;
   border-radius: 4px;
-  font-size: $font-size-sm;
+  font-size: 0.8125rem;
   color: var(--text-primary);
   cursor: pointer;
   transition:

@@ -3,7 +3,7 @@
 
 .form {
   @include flex-column;
-  gap: $space-5;
+  gap: $space-3;
   padding: $space-2;
 
   &.formFull {
@@ -22,10 +22,10 @@
   flex: 1;
   min-height: 0; // Essential for shrinking children
   overflow-y: auto;
-  padding: $space-6; // Slightly more padding for breathability
+  padding: $space-4 $space-5; // Slightly more padding for breathability
   @include styled-scrollbar;
   @include flex-column;
-  gap: $space-5; // Healthier gap between form sections
+  gap: $space-3; // Healthier gap between form sections
   @include responsive(sm) {
     padding: $space-4 $space-3;
   }
@@ -33,9 +33,9 @@
 
 .expenseTypeToggle {
   display: flex;
-  background: var(--bg-tertiary);
-  padding: $space-1;
-  border-radius: $radius-lg;
+  background: var(--bg-secondary);
+  padding: 3px;
+  border-radius: $radius-sm;
   border: 1px solid var(--border-default);
   margin-bottom: $space-2;
 
@@ -47,7 +47,7 @@
     color: var(--text-secondary);
     background: transparent;
     border: none;
-    border-radius: $radius-md;
+    border-radius: $radius-sm;
     cursor: pointer;
     transition: all $transition-fast;
 
@@ -66,7 +66,7 @@
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $space-4;
+  gap: $space-3;
 
   @include mobile-only {
     grid-template-columns: 1fr;
@@ -79,10 +79,10 @@
 
 .splitsSection {
   margin-top: $space-3;
-  padding: $space-5 $space-6;
+  padding: $space-4 $space-5;
   background: var(--bg-secondary);
-  border-radius: $radius-lg;
-  border: 1px solid var(--border-light);
+  border-radius: $radius-sm;
+  border: 1px solid var(--border-default);
   @include flex-column;
   gap: $space-4;
   @include responsive(sm) {
@@ -174,7 +174,7 @@
 
 .membersList {
   @include flex-column;
-  gap: $space-3;
+  gap: $space-2;
 }
 
 .memberName {
@@ -192,8 +192,8 @@
   @include flex-between;
   padding: $space-2 $space-4;
   background: var(--bg-tertiary);
-  border-radius: $radius-md;
-  border: none;
+  border-radius: $radius-sm;
+  border: 1px solid var(--border-default);
   transition: all $transition-base;
   cursor: pointer;
   position: relative;
@@ -201,7 +201,7 @@
   @include responsive(sm) {
     flex-direction: column;
     align-items: flex-start;
-    gap: $space-2;
+    gap: $space-1;
     padding: $space-2;
     height: auto;
   }
@@ -211,10 +211,9 @@
   }
 
   &.active {
-    background: var(--bg-primary);
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.1),
-      0 10px 20px -5px rgba(0, 0, 0, 0.1);
+    background: var(--bg-tertiary);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
   }
 
   .userInfo {
@@ -245,7 +244,7 @@
   .inputWrap {
     display: flex;
     align-items: center;
-    gap: $space-3;
+    gap: $space-2;
     z-index: 2;
     flex-shrink: 0;
 
@@ -254,9 +253,9 @@
       height: 32px;
       text-align: center;
       padding: 0 $space-1;
-      border-radius: $radius-md;
-      border: 1px solid var(--border-light);
-      background: var(--bg-tertiary);
+      border-radius: $radius-sm;
+      border: 1px solid var(--border-default);
+      background: var(--bg-secondary);
       font-size: 13px;
       font-weight: 700;
       color: var(--text-primary);
@@ -291,8 +290,8 @@
     display: flex;
     align-items: center;
     border: 1px solid var(--border-default);
-    border-radius: $radius-md;
-    background: var(--bg-surface);
+    border-radius: $radius-sm;
+    background: var(--bg-secondary);
     overflow: hidden;
     transition: all 0.2s;
 
@@ -342,8 +341,8 @@
     display: flex;
     align-items: center;
     border: 1px solid var(--border-default);
-    border-radius: $radius-md;
-    background: var(--bg-surface);
+    border-radius: $radius-sm;
+    background: var(--bg-secondary);
     overflow: hidden;
     transition: all 0.2s;
 
@@ -423,9 +422,9 @@
 // ═══════════════════════════════════════
 
 .amountStatus {
-  padding: $space-3 $space-4;
-  background: var(--bg-card);
-  border-radius: $radius-md;
+  padding: $space-2 $space-3;
+  background: var(--bg-secondary);
+  border-radius: $radius-sm;
   border: 1px solid var(--border-default);
   @include flex-column;
   gap: $space-2;
@@ -474,10 +473,10 @@
 
 .summary {
   @include flex-between;
-  padding: $space-5 $space-6;
-  background: var(--bg-secondary);
-  border-radius: $radius-lg;
-  border: 1px solid var(--border-light);
+  padding: $space-4 $space-5;
+  background: var(--bg-tertiary);
+  border-radius: $radius-sm;
+  border: 1px solid var(--border-default);
   margin-top: $space-2;
 
   .summaryLabel {
@@ -501,7 +500,7 @@
 // FOOTER
 // ═══════════════════════════════════════
 .modalFooter {
-  padding: $space-4 $space-6;
+  padding: $space-2 $space-4;
   background: var(--bg-tertiary);
   display: flex;
   justify-content: flex-end;
