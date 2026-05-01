@@ -7,14 +7,25 @@ const API_BASE_URL =
 // 🔐 TOKEN REFRESH MANAGEMENT
 // ==============================
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: Array<{
+  resolve: (token: string) => void;
+  reject: (error: any) => void;
+}> = [];
 
-const subscribeTokenRefresh = (cb: (token: string) => void) => {
-  refreshSubscribers.push(cb);
+const subscribeTokenRefresh = (
+  resolve: (token: string) => void,
+  reject: (error: any) => void,
+) => {
+  refreshSubscribers.push({ resolve, reject });
 };
 
 const onRefreshed = (token: string) => {
-  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers.forEach(({ resolve }) => resolve(token));
+  refreshSubscribers = [];
+};
+
+const onRefreshFailed = (error: any) => {
+  refreshSubscribers.forEach(({ reject }) => reject(error));
   refreshSubscribers = [];
 };
 
@@ -97,37 +108,44 @@ api.interceptors.response.use(
       pendingRequests.delete(key);
     }
 
-    // ✅ Handle cancellation properly
+    // Handle cancellation properly
     if ((error as any)?.name === "CanceledError") {
       return Promise.reject(error);
     }
 
+    const status = error.response?.status;
+    const isRefreshRequest = originalRequest?.url?.includes("/auth/refresh");
+
     // ==============================
     // 🔁 HANDLE 401 TOKEN REFRESH
     // ==============================
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes("/auth/refresh")
-    ) {
+    if (status === 401 && originalRequest && !originalRequest._retry && !isRefreshRequest) {
       originalRequest._retry = true;
 
       // If already refreshing → queue requests
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          subscribeTokenRefresh((token: string) => {
-            originalRequest.headers = originalRequest.headers || {};
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(api(originalRequest));
-          });
+        return new Promise((resolve, reject) => {
+          subscribeTokenRefresh(
+            (token: string) => {
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              originalRequest.headers["x-no-cancel"] = true; // Prevent self-cancel on retry
+              resolve(api(originalRequest));
+            },
+            (err: any) => {
+              reject(err);
+            },
+          );
         });
       }
 
       isRefreshing = true;
 
       try {
-        const { data } = await axios.get(`${API_BASE_URL}/auth/refresh`, {
+        // Robust URL joining for refresh endpoint
+        const refreshUrl = `${API_BASE_URL.replace(/\/$/, "")}/auth/refresh`;
+        
+        const { data } = await axios.get(refreshUrl, {
           withCredentials: true,
         });
 
@@ -146,12 +164,19 @@ api.interceptors.response.use(
           originalRequest.headers["x-no-cancel"] = true; // prevent self-cancel
 
           return api(originalRequest);
+        } else {
+          throw new Error("Refresh failed: No access token in response");
         }
       } catch (refreshError) {
+        onRefreshFailed(refreshError);
+        
         // 🔴 Refresh failed → logout
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
-          window.location.href = "/login";
+          // Avoid infinite loops if we are already on login page
+          if (!window.location.pathname.includes("/login")) {
+            window.location.href = "/login";
+          }
         }
         return Promise.reject(refreshError);
       } finally {
