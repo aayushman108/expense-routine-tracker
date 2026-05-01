@@ -17,10 +17,11 @@ import {
 } from "@expense-tracker/shared/validationSchema";
 import { ENV } from "src/constants";
 
-const cookieOptions = {
+const cookieOptions: any = {
   httpOnly: true,
-  // sameSite: "none",
-  // secure: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
 };
 
 const signup = asyncHandler(
