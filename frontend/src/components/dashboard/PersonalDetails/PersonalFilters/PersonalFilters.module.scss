@@ -56,10 +56,13 @@
     &:focus-within,
     &:hover {
       background: var(--bg-secondary);
-      border-color: var(--color-primary-200);
+      border-color: var(--color-primary);
     }
 
     .leftIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--text-tertiary);
       font-size: 0.875rem;
       flex-shrink: 0;

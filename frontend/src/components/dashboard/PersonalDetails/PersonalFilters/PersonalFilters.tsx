@@ -27,7 +27,9 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
         <div className={styles.inputWrapper}>
           <label>FROM</label>
           <div className={styles.dateInput}>
-            <HiOutlineCalendar className={styles.leftIcon} />
+            <span className={styles.leftIcon}>
+              <HiOutlineCalendar />
+            </span>
             <input
               type="date"
               value={startDate}
@@ -38,7 +40,9 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
         <div className={styles.inputWrapper}>
           <label>TO</label>
           <div className={styles.dateInput}>
-            <HiOutlineCalendar className={styles.leftIcon} />
+            <span className={styles.leftIcon}>
+              <HiOutlineCalendar />
+            </span>
             <input
               type="date"
               value={endDate}
@@ -50,7 +54,9 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
         <div className={styles.filterActions}>
           <Button size="sm" onClick={onApply} className={styles.actionBtn}>
             <div className={styles.btnContent}>
-              <HiOutlineSearch />
+              <span className={styles.btnIcon}>
+                <HiOutlineSearch />
+              </span>
               <span>Search</span>
             </div>
           </Button>
@@ -62,8 +68,10 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
               className={styles.actionBtn}
             >
               <div className={styles.btnContent}>
-                <HiOutlineRefresh />
-                <span>Clear</span>
+                <span className={styles.btnIcon}>
+                  <HiOutlineRefresh />
+                </span>
+                <span>Reset</span>
               </div>
             </Button>
           )}

@@ -361,7 +361,6 @@ export default function GroupDetailsPage() {
               setSettlementStatus={setSettlementStatus}
               onApply={handleApplyFilters}
               onClear={handleClearFilters}
-              onDownloadStatement={() => setIsDownloadModalOpen(true)}
               hasFiltersApplied={hasFiltersApplied}
               isStatic={isLargeScreen}
             />
