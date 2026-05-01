@@ -14,8 +14,8 @@
     animation: none;
     margin-top: 0;
     margin-bottom: 0.75rem;
-    border-color: var(--border-light);
-    box-shadow: none;
+    border-color: var(--border-default);
+    box-shadow: var(--shadow-sm);
   }
 
   .filterGroup {
