@@ -1,0 +1,91 @@
+@use "../../../../styles/mixins" as *;
+
+.tableWrapper {
+  margin-top: 0.5rem;
+}
+
+.dateText {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.descriptionCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  max-width: 300px;
+
+  .description {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    @include truncate;
+  }
+}
+
+.categoryBadge {
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.amountCell {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 700;
+  font-size: 0.8125rem;
+
+  .currency {
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+    font-weight: 600;
+  }
+
+  .amount {
+    color: var(--text-primary);
+  }
+}
+
+.actionBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  @include flex-center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+
+  &:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-default);
+    color: var(--color-primary);
+    transform: scale(1.05);
+  }
+
+  &.editBtn:hover {
+    color: var(--color-primary);
+  }
+
+  &.deleteBtn:hover {
+    color: var(--color-danger);
+    background: var(--color-danger-light);
+    border-color: rgba(var(--color-danger-rgb, 239, 68, 68), 0.1);
+  }
+}
+
+@media (max-width: 640px) {
+  .tableWrapper {
+    display: none;
+  }
+}

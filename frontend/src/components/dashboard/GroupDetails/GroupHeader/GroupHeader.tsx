@@ -15,19 +15,17 @@ import type { GroupDetails } from "@/lib/types";
 interface GroupHeaderProps {
   groupDetails: { data: GroupDetails | null };
   onBack: () => void;
-  onInvite: () => void;
   onAddExpense: () => void;
+  onSettings: () => void;
   onEdit?: () => void;
-  onLeave?: () => void;
 }
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({
   groupDetails,
   onBack,
-  onInvite,
   onAddExpense,
+  onSettings,
   onEdit,
-  onLeave,
 }) => {
   return (
     <header className={styles.header}>
@@ -69,19 +67,9 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({
         </div>
       </div>
       <div className={styles.actions}>
-        <Button variant="outline" size="sm" onClick={onInvite}>
-          <HiOutlineUserAdd /> Invite
+        <Button variant="outline" size="sm" onClick={onSettings}>
+          Settings
         </Button>
-        {onLeave && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onLeave}
-            className={styles.leaveBtn}
-          >
-            <HiOutlineLogout /> Leave
-          </Button>
-        )}
         <Button variant="primary" size="sm" onClick={onAddExpense}>
           <HiOutlinePlus /> Add Expense
         </Button>

@@ -1,0 +1,143 @@
+@use "../../../../styles/mixins" as *;
+
+.descriptionCell {
+  max-width: 280px;
+
+  .description {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.125rem;
+    font-size: 0.8125rem;
+  }
+
+  .category {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--text-link);
+    background: var(--bg-tertiary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    border: 1px solid var(--border-light);
+  }
+}
+
+.dateText {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.8125rem;
+}
+
+.payer {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+}
+
+.youBadge {
+  background: var(--color-primary-50);
+  color: var(--color-primary);
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  border: 1px solid var(--color-primary-100);
+}
+
+.statusBadge {
+  padding: 0.125rem 0.4375rem; // Slightly tighter padding
+  border-radius: 4px;
+  font-size: 0.6875rem; // Reduced to 11px
+  font-weight: 700; // Increased weight for uppercase clarity
+  text-transform: uppercase; // Restored to uppercase
+  letter-spacing: 0.05em; // Added tracking for uppercase readability
+  display: inline-block;
+  border: 1px solid transparent;
+  line-height: 1.2;
+
+  &.submitted {
+    background: var(--bg-tertiary);
+    color: var(--color-info);
+    border-color: var(--color-info-light);
+  }
+
+  &.verified, &.settled, &.confirmed, &.paid {
+    background: var(--color-success-light);
+    color: var(--color-success);
+    border-color: rgba(var(--color-success-rgb, 16, 185, 129), 0.15);
+  }
+
+  &.pending {
+    background: var(--color-warning-light);
+    color: var(--color-warning);
+    border-color: rgba(var(--color-warning-rgb, 245, 158, 11), 0.15);
+  }
+
+  &.rejected {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+    border-color: rgba(var(--color-danger-rgb, 239, 68, 68), 0.15);
+  }
+}
+
+.notApplicable {
+  color: var(--text-tertiary);
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+.amountCell {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+
+  .currency {
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+    margin-right: 0.25rem;
+    font-weight: 600;
+  }
+
+  .amount {
+    color: var(--text-primary);
+  }
+}
+
+.actionBtn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  color: var(--text-tertiary);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--bg-card);
+    color: var(--color-primary);
+    border-color: var(--color-primary-100);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &.editBtn:hover {
+    color: var(--color-info);
+    border-color: var(--color-info-light);
+  }
+
+  &.deleteBtn:hover {
+    color: var(--color-danger);
+    border-color: var(--color-danger-light);
+    background: var(--color-danger-light);
+  }
+
+  svg {
+    font-size: 0.875rem;
+  }
+}

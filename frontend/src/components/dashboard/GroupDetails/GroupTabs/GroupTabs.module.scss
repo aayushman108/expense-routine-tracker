@@ -5,49 +5,49 @@
   background: transparent !important;
   padding: 0 !important;
   border-radius: 0 !important;
-  margin-bottom: $space-3 !important;
+  margin-bottom: 0.5rem !important; // Reduced from 1rem
   width: 100%;
 
   @include responsive(sm) {
-    margin-bottom: $space-2 !important;
+    margin-bottom: 0.375rem !important;
   }
 
   .tabsWrapper {
     display: inline-flex;
-    gap: $space-2;
+    gap: 0.25rem;
     background: var(--bg-tertiary);
-    padding: 4px;
-    border-radius: $radius-xl;
+    padding: 3px;
+    border-radius: 6px;
 
     @include responsive(sm) {
       gap: 2px;
-      padding: 3px;
+      padding: 2px;
     }
   }
 }
 
 .tabHeader {
   display: inline-flex;
-  gap: $space-2;
+  gap: 0.25rem;
   background: var(--bg-tertiary);
-  padding: 4px;
-  border-radius: $radius-xl;
-  margin-bottom: $space-2;
+  padding: 3px;
+  border-radius: 6px;
+  margin-bottom: 0.25rem; // Reduced from 0.5rem
 }
 
 .tab {
-  padding: $space-2 $space-6;
-  font-size: $font-size-sm;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-tertiary);
   cursor: pointer;
-  border-radius: $radius-lg;
-  transition: all $transition-base;
+  border-radius: 4px;
+  transition: all 0.15s ease;
   @include flex-center;
-  gap: $space-2;
+  gap: 0.375rem;
 
   svg {
-    font-size: $font-size-md;
+    font-size: 0.875rem;
   }
 
   &:hover {
@@ -59,40 +59,43 @@
     background: var(--bg-card);
     color: var(--text-primary);
     box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-default);
   }
 
   @include responsive(lg) {
-    padding: $space-2 $space-4;
-    font-size: $font-size-xs;
-    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
   }
 
   @include responsive(sm) {
-    padding: 6px $space-3;
+    padding: 4px 0.5rem;
     gap: 4px;
-
-    svg {
-      font-size: $font-size-sm;
-    }
   }
 }
 
 .filterActions {
   display: flex;
-  gap: $space-3;
+  gap: 0.5rem;
   @include responsive(lg) {
     display: none;
+  }
+
+  button {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    height: 32px !important;
+    font-size: 0.75rem !important;
+    border-radius: 4px !important;
   }
 }
 
 .downloadBtn {
   display: flex !important;
   align-items: center !important;
-  gap: $space-2 !important;
+  gap: 0.375rem !important;
 
   svg {
-    font-size: 1.1rem;
+    font-size: 0.875rem !important;
   }
 }
 
@@ -100,12 +103,8 @@
   display: none;
   @include responsive(lg) {
     display: flex;
-    gap: $space-4;
+    gap: 0.75rem;
     align-items: center;
-  }
-
-  @include responsive(sm) {
-    gap: $space-1;
   }
 
   & > button {
@@ -114,9 +113,8 @@
     padding: 0 !important;
     color: var(--text-primary);
     cursor: pointer;
-    // Ensure minimum 44px tap target for accessibility
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -125,33 +123,33 @@
 
 .downloadBtnSm {
   svg {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 }
 
 .filterToggleBtn {
   position: relative;
   svg {
-    font-size: 1.1rem;
+    font-size: 1rem;
 
     @include responsive(lg) {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
     }
   }
 
   .filterDot {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 8px;
-    height: 8px;
+    top: -2px;
+    right: -2px;
+    width: 6px;
+    height: 6px;
     background: var(--color-danger);
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 1.5px solid var(--bg-card);
 
     @include responsive(lg) {
-      top: 4px;
-      right: 4px;
+      top: 2px;
+      right: 2px;
     }
   }
 }

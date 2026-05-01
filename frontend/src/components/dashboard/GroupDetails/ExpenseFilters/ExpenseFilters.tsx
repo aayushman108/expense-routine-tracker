@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./ExpenseFilters.module.scss";
-import { HiOutlineCalendar, HiOutlineSearch, HiOutlineX } from "react-icons/hi";
+import { HiOutlineCalendar, HiOutlineSearch, HiOutlineRefresh } from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import Select from "@/components/ui/Select/Select";
 
@@ -16,6 +16,7 @@ interface ExpenseFiltersProps {
   onApply: () => void;
   onClear: () => void;
   hasFiltersApplied: boolean;
+  isStatic?: boolean;
 }
 
 const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
@@ -30,9 +31,12 @@ const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
   onApply,
   onClear,
   hasFiltersApplied,
+  isStatic = false,
 }) => {
+  const isAnyValuePresent = !!(startDate || endDate || expenseStatus || settlementStatus);
+
   return (
-    <div className={styles.filterBar}>
+    <div className={`${styles.filterBar} ${isStatic ? styles.isStatic : ""}`}>
       <div className={styles.filterGroup}>
         <div className={styles.inputWrapper}>
           <label>From</label>
@@ -86,23 +90,19 @@ const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
 
         <div className={styles.filterActions}>
           <Button size="sm" onClick={onApply}>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
+            <span className={styles.btnContent}>
               <HiOutlineSearch />
               Search
             </span>
           </Button>
 
-          {hasFiltersApplied && (
-            <button className={styles.clearFilters} onClick={onClear}>
-              <HiOutlineX />
-              Clear
-            </button>
+          {isAnyValuePresent && (
+            <Button size="sm" variant="outline" onClick={onClear}>
+              <span className={styles.btnContent}>
+                <HiOutlineRefresh />
+                Clear
+              </span>
+            </Button>
           )}
         </div>
       </div>

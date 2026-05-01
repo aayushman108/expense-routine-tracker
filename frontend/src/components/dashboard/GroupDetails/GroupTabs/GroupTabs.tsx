@@ -10,6 +10,7 @@ interface GroupTabsProps {
   setIsFilterExpanded: (expanded: boolean) => void;
   hasFiltersApplied: boolean;
   onDownloadStatement: () => void;
+  isLargeScreen?: boolean;
 }
 
 const GroupTabs: React.FC<GroupTabsProps> = ({
@@ -19,6 +20,7 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
   setIsFilterExpanded,
   hasFiltersApplied,
   onDownloadStatement,
+  isLargeScreen = false,
 }) => {
   return (
     <div className={`${styles.tabHeader} ${styles.expenseHeaderActions}`}>
@@ -49,16 +51,18 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
               <HiOutlineDownload />
               Download Statement
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className={styles.filterToggleBtn}
-              onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-            >
-              <HiOutlineFilter />
-              {isFilterExpanded ? "Hide Filters" : "Filters"}
-              {hasFiltersApplied && <span className={styles.filterDot} />}
-            </Button>
+            {!isLargeScreen && (
+              <Button
+                variant="outline"
+                size="sm"
+                className={styles.filterToggleBtn}
+                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+              >
+                <HiOutlineFilter />
+                {isFilterExpanded ? "Hide Filters" : "Filters"}
+                {hasFiltersApplied && <span className={styles.filterDot} />}
+              </Button>
+            )}
           </div>
           <div className={styles.filterActionsSm}>
             <button
@@ -68,12 +72,14 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
             >
               <HiOutlineDownload />
             </button>
-            <button
-              className={styles.filterToggleBtn}
-              onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-            >
-              <HiOutlineFilter />
-            </button>
+            {!isLargeScreen && (
+              <button
+                className={styles.filterToggleBtn}
+                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+              >
+                <HiOutlineFilter />
+              </button>
+            )}
           </div>
         </>
       )}
@@ -82,4 +88,3 @@ const GroupTabs: React.FC<GroupTabsProps> = ({
 };
 
 export default GroupTabs;
-

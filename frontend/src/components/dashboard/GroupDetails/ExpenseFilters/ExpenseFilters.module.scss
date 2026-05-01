@@ -1,93 +1,150 @@
 @use "../../../../styles/mixins" as *;
 
 .filterBar {
-  @include card;
-  padding: $space-3 $space-6;
+  padding: 0.625rem 0.875rem;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  margin-bottom: $space-2;
-  margin-top: -$space-1;
-  animation: slideDown 0.3s ease-out;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  margin-top: -0.125rem;
+  animation: slideDown 0.2s ease-out;
+  box-shadow: var(--shadow-sm);
+
+  &.isStatic {
+    animation: none;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    border-color: var(--border-light);
+    box-shadow: none;
+  }
 
   .filterGroup {
     display: flex;
     align-items: flex-end;
-    gap: $space-6;
+    gap: 0.75rem;
     flex-wrap: wrap;
 
     @include mobile-only {
       flex-direction: column;
       align-items: stretch;
-      gap: $space-4;
+      gap: 0.5rem;
     }
   }
 
   .inputWrapper {
     display: flex;
     flex-direction: column;
-    gap: $space-2;
+    gap: 0.125rem;
 
     @include mobile-only {
       width: 100%;
     }
 
     label {
-      font-size: $font-size-sm;
-      font-weight: $font-weight-medium;
-      color: var(--text-primary);
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--text-tertiary) !important;
+      text-transform: uppercase;
       letter-spacing: 0.05em;
     }
   }
 
   .filterSelectWrapper {
-    width: 200px;
-    gap: $space-2 !important;
+    width: 160px;
+    gap: 0.125rem !important;
 
     @include mobile-only {
       width: 100%;
     }
 
+    label {
+      font-size: 0.625rem !important;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-tertiary) !important;
+    }
+
     [class*="trigger"] {
-      height: 38px;
-      padding-top: 0;
-      padding-bottom: 0;
+      height: 32px;
+      padding: 0 0.75rem;
+      font-size: 0.8125rem !important; // Reduced to 13px for better density
       background: var(--bg-tertiary);
+      border-radius: 4px;
+      font-weight: 500 !important; // Consistent weight
+
+      [class*="valueText"] {
+        font-size: 0.8125rem !important;
+        font-weight: 500 !important;
+      }
+
+      [class*="placeholder"] {
+        color: var(--text-tertiary) !important;
+        opacity: 0.8;
+        font-size: 0.8125rem !important; // Match value font size
+        font-weight: 500 !important; // Match value font weight
+      }
+    }
+
+    [class*="dropdown"] {
+      padding: 0.125rem 0 !important;
+      border-radius: 4px !important;
+      
+      [class*="option"] {
+        padding: 0.1875rem 0.5rem !important;
+        margin: 1px 2px !important;
+        font-size: 0.8125rem !important;
+        border-radius: 2px !important;
+        font-weight: 500 !important;
+      }
     }
   }
 
   .filterActions {
     display: flex;
     align-items: center;
-    gap: $space-4;
-    margin-left: $space-2;
+    gap: 0.5rem;
+    margin-left: 0.25rem;
     align-self: flex-end;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
     flex-wrap: wrap;
 
     @include mobile-only {
       margin-left: 0;
       align-self: stretch;
       justify-content: flex-start;
-      margin-top: $space-2;
+      margin-top: 0.25rem;
       padding-bottom: 0;
+    }
 
-      button {
-        flex: 1;
-        min-width: 120px;
-      }
+    button {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+      height: 32px !important;
+      font-size: 0.75rem !important;
+      border-radius: 4px !important;
+    }
+  }
+
+  .btnContent {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    svg {
+      font-size: 0.875rem;
     }
   }
 
   .dateInput {
     display: flex;
     align-items: center;
-    gap: $space-2;
-    padding: $space-2 $space-4;
+    gap: 0.25rem;
+    padding: 0 0.75rem;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-default);
-    border-radius: $radius-md;
-    transition: all $transition-base;
-    height: 38px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    height: 32px;
 
     @include mobile-only {
       width: 100%;
@@ -97,29 +154,25 @@
       background: transparent;
       border: none;
       outline: none;
-      font-size: $font-size-sm;
-      font-weight: $font-weight-medium;
+      font-size: 0.8125rem; // Standardized to 13px
+      font-weight: 500; // Match Select weight
       color: var(--text-primary);
-      width: 130px;
+      width: 115px;
       cursor: pointer;
       color-scheme: light dark;
 
-      @include mobile-only {
-        width: 100%;
-        flex: 1;
+      &:not([value]),
+      &[value=""] {
+        color: var(--text-tertiary) !important;
+        font-weight: 500 !important;
       }
 
       &::-webkit-calendar-picker-indicator {
         cursor: pointer;
         opacity: 0.6;
-        transition: opacity 0.2s;
-        
-        [data-theme='dark'] & {
-          filter: invert(1);
-        }
 
-        &:hover {
-          opacity: 1;
+        [data-theme="dark"] & {
+          filter: invert(1);
         }
       }
     }
@@ -128,27 +181,26 @@
     &:hover {
       background: var(--bg-secondary);
       border-color: var(--color-primary);
-      box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 10%, transparent);
     }
 
     svg {
       color: var(--text-tertiary);
-      font-size: 1.1rem;
+      font-size: 0.8125rem;
     }
   }
 
   .clearFilters {
     @include flex-center;
-    gap: $space-2;
-    padding: $space-2 $space-4;
-    font-size: $font-size-xs;
+    gap: 0.25rem;
+    padding: 0 0.375rem;
+    font-size: 0.6875rem;
     font-weight: 700;
     color: var(--text-tertiary);
     background: transparent;
     border: none;
     cursor: pointer;
-    transition: color $transition-fast;
-    height: 40px;
+    transition: color 0.2s;
+    height: 32px;
 
     &:hover {
       color: var(--color-danger);
@@ -159,11 +211,10 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-5px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-

@@ -19,6 +19,8 @@ import { handleThunk } from "@/lib/utils";
 import api from "@/lib/api";
 import type { RootState } from "@/store";
 import { EXPENSE_TYPE } from "@expense-tracker/shared";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import PersonalExpenseTable from "@/components/dashboard/PersonalDetails/PersonalExpenseTable/PersonalExpenseTable";
 
 // Modular Components
 import PersonalHeader from "@/components/dashboard/PersonalDetails/PersonalHeader/PersonalHeader";
@@ -28,6 +30,7 @@ import DownloadStatementModal from "@/components/dashboard/GroupDetails/Download
 import {
   FullPersonalSkeleton,
   PersonalExpenseListSkeleton,
+  TableSkeleton,
 } from "./PersonalLoadingSkeletons";
 
 export default function PersonalDetailsPage() {
@@ -47,17 +50,30 @@ export default function PersonalDetailsPage() {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [submittingAction, setSubmittingAction] = useState<string | null>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit] = useState(6);
+  const { updateQuery, searchParams } = useUpdateQuery();
+  const [currentPage, setCurrentPage] = useState(() => 
+    Number(searchParams.get("page")) || 1
+  );
+  const [limit] = useState(10); // Increased limit for table view
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(searchParams.get("startDate") || "");
+  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
   const [appliedFilters, setAppliedFilters] = useState({
-    startDate: "",
-    endDate: "",
+    startDate: searchParams.get("startDate") || "",
+    endDate: searchParams.get("endDate") || "",
   });
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+
+  // Responsive state
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreen = () => setIsLargeScreen(window.innerWidth > 768);
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
 
   const handleApplyFilters = () => {
     setAppliedFilters({ startDate, endDate });
@@ -128,7 +144,13 @@ export default function PersonalDetailsPage() {
 
   useEffect(() => {
     fetchExpenses();
-  }, [fetchExpenses]);
+    // Sync with URL
+    updateQuery({
+      page: currentPage,
+      startDate: appliedFilters.startDate,
+      endDate: appliedFilters.endDate,
+    });
+  }, [fetchExpenses, currentPage, appliedFilters, updateQuery]);
 
   const handleDeleteExpense = async () => {
     if (!expenseToDelete) return;
@@ -180,18 +202,20 @@ export default function PersonalDetailsPage() {
                 <HiOutlineDownload />
                 Download Statement
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className={styles.filterToggleBtn}
-                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              >
-                <HiOutlineFilter />
-                {isFilterExpanded ? "Hide Filters" : "Filters"}
-                {(startDate || endDate) && (
-                  <span className={styles.filterDot} />
-                )}
-              </Button>
+              {!isLargeScreen && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={styles.filterToggleBtn}
+                  onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                >
+                  <HiOutlineFilter />
+                  {isFilterExpanded ? "Hide Filters" : "Filters"}
+                  {(startDate || endDate) && (
+                    <span className={styles.filterDot} />
+                  )}
+                </Button>
+              )}
             </div>
             <div className={styles.filterActionsSm}>
               <button
@@ -215,6 +239,7 @@ export default function PersonalDetailsPage() {
 
           <PersonalFilters
             isExpanded={isFilterExpanded}
+            isStatic={isLargeScreen}
             startDate={startDate}
             setStartDate={setStartDate}
             endDate={endDate}
@@ -224,19 +249,39 @@ export default function PersonalDetailsPage() {
           />
 
           {isPersonalExpensesLoading ? (
-            <PersonalExpenseListSkeleton count={limit} />
+            isLargeScreen ? (
+              <TableSkeleton rows={8} cols={4} />
+            ) : (
+              <PersonalExpenseListSkeleton count={limit} />
+            )
           ) : (
             <div className={styles.groupList}>
               {personalExpenses.length > 0 ? (
-                personalExpenses.map((expense) => (
-                  <PersonalExpenseCard
-                    key={expense.id}
-                    expense={expense}
+                isLargeScreen ? (
+                  <PersonalExpenseTable
+                    expenses={personalExpenses}
                     user={user}
                     onEdit={setExpenseToEdit}
                     onDelete={setExpenseToDelete}
+                    pagination={{
+                      currentPage,
+                      totalPages: pagination?.totalPages || 1,
+                      totalResults: pagination?.total || 0,
+                      pageSize: limit,
+                    }}
+                    onPageChange={setCurrentPage}
                   />
-                ))
+                ) : (
+                  personalExpenses.map((expense) => (
+                    <PersonalExpenseCard
+                      key={expense.id}
+                      expense={expense}
+                      user={user}
+                      onEdit={setExpenseToEdit}
+                      onDelete={setExpenseToDelete}
+                    />
+                  ))
+                )
               ) : (
                 <div className={styles.emptyStateCard}>
                   <div className={styles.icon}>
@@ -259,7 +304,7 @@ export default function PersonalDetailsPage() {
             </div>
           )}
 
-          {pagination && pagination.totalPages > 1 && (
+          {!isLargeScreen && pagination && pagination.totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
               totalPages={pagination.totalPages}

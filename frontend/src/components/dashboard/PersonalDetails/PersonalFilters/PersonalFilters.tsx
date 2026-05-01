@@ -1,5 +1,4 @@
-import React from "react";
-import { HiOutlineCalendar, HiOutlineSearch, HiOutlineX } from "react-icons/hi";
+import { HiOutlineCalendar, HiOutlineSearch, HiOutlineRefresh } from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import styles from "./PersonalFilters.module.scss";
 
@@ -11,6 +10,7 @@ interface PersonalFiltersProps {
   onApply: () => void;
   onClear: () => void;
   isExpanded: boolean;
+  isStatic?: boolean;
 }
 
 const PersonalFilters: React.FC<PersonalFiltersProps> = ({
@@ -21,54 +21,55 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
   onApply,
   onClear,
   isExpanded,
+  isStatic = false,
 }) => {
-  if (!isExpanded) return null;
+  if (!isExpanded && !isStatic) return null;
+
+  const isAnyValuePresent = !!(startDate || endDate);
 
   return (
-    <div className={styles.filtersContainer}>
-      <div className={styles.filterBar}>
-        <div className={styles.filterGroup}>
-          <div className={styles.inputWrapper}>
-            <label>From Date</label>
-            <div className={styles.dateInput}>
-              <HiOutlineCalendar />
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                placeholder="mm/dd/yyyy"
-              />
-            </div>
+    <div className={`${styles.filterBar} ${isStatic ? styles.isStatic : ""}`}>
+      <div className={styles.filterGroup}>
+        <div className={styles.inputWrapper}>
+          <label>From Date</label>
+          <div className={styles.dateInput}>
+            <HiOutlineCalendar />
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              placeholder="mm/dd/yyyy"
+            />
           </div>
-          <div className={styles.inputWrapper}>
-            <label>To Date</label>
-            <div className={styles.dateInput}>
-              <HiOutlineCalendar />
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                placeholder="mm/dd/yyyy"
-              />
-            </div>
+        </div>
+        <div className={styles.inputWrapper}>
+          <label>To Date</label>
+          <div className={styles.dateInput}>
+            <HiOutlineCalendar />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              placeholder="mm/dd/yyyy"
+            />
           </div>
+        </div>
 
-          <div className={styles.actionRow}>
-            <Button size="sm" onClick={onApply}>
-              <span
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <HiOutlineSearch />
-                Search
-              </span>
-            </Button>
-            {(startDate || endDate) && (
-              <button className={styles.clearFilters} onClick={onClear}>
-                <HiOutlineX />
+        <div className={styles.filterActions}>
+          <Button size="sm" onClick={onApply}>
+            <div className={styles.btnContent}>
+              <HiOutlineSearch />
+              Search
+            </div>
+          </Button>
+          {isAnyValuePresent && (
+            <Button size="sm" variant="outline" onClick={onClear}>
+              <div className={styles.btnContent}>
+                <HiOutlineRefresh />
                 Clear
-              </button>
-            )}
-          </div>
+              </div>
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -76,4 +77,3 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
 };
 
 export default PersonalFilters;
-

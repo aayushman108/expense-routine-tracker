@@ -133,12 +133,11 @@
   box-shadow: $shadow-lg;
   max-height: 220px;
   overflow-y: auto;
-  padding: $space-1 0;
+  padding: 4px 0;
   list-style: none;
   margin: 0;
   @include styled-scrollbar;
 
-  // Entrance animation
   animation: dropdownIn 0.15s ease-out;
 }
 
@@ -158,9 +157,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $space-2 $space-3;
-  margin: 0 $space-1;
-  border-radius: $radius-sm;
+  padding: 6px 12px;
+  margin: 2px 4px;
+  border-radius: 4px;
   font-size: $font-size-sm;
   color: var(--text-primary);
   cursor: pointer;
@@ -170,17 +169,17 @@
   user-select: none;
 
   &.highlighted {
-    background: var(--bg-surface-hover);
+    background: var(--bg-hover);
   }
 
   &.selected {
     color: var(--color-primary);
-    font-weight: $font-weight-semibold;
-    background: var(--bg-primary-subtle);
+    font-weight: 600;
+    background: var(--color-primary-50);
   }
 
   &.selected.highlighted {
-    background: var(--bg-primary-subtle);
+    background: var(--color-primary-100);
   }
 
   &.optionDisabled {
@@ -201,7 +200,7 @@
   font-size: $font-size-base;
   display: flex;
   align-items: center;
-  margin-left: $space-2;
+  margin-left: 8px;
   flex-shrink: 0;
 }
 

@@ -2,57 +2,49 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  HiOutlineUserAdd,
-  HiOutlineCurrencyDollar,
-  HiCheck,
-} from "react-icons/hi";
+import { HiOutlineCurrencyDollar, HiCheck } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 import {
   fetchGroupExpenses,
   fetchUserGroupSummaries,
+  deleteExpense,
 } from "@/store/slices/expenseSlice";
 import { fetchGroupBalances } from "@/store/slices/settlementSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
-import InviteUserModal from "@/components/dashboard/GroupMembers/InviteUserModal";
-import AddMemberModal from "@/components/dashboard/GroupMembers/AddMemberModal";
 import BulkSettlementModal from "@/components/dashboard/Settlement/BulkSettlementModal";
 import EditGroupModal from "@/components/dashboard/GroupModals/EditGroupModal";
 import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import Pagination from "@/components/ui/Pagination/Pagination";
 import {
   FullPageSkeleton,
-  ExpenseListSkeleton,
-  BalanceSkeleton,
+  ExpenseCardSkeleton,
+  TableSkeleton,
 } from "./GroupLoadingSkeletons";
 import styles from "./group-details.module.scss";
 import {
   clearGroupDetails,
   fetchGroupDetailsAction,
-  leaveGroupAction,
-  removeMemberAction,
-  updateMemberRoleAction,
 } from "@/store/slices/groupSlice";
-import { handleThunk } from "@/lib/utils";
 import api from "@/lib/api";
+import { handleThunk } from "@/lib/utils";
 import { EXPENSE_TYPE, REPORT_TYPE } from "@expense-tracker/shared";
 
-import type { GroupMember, Expense, GroupBalance } from "@/lib/types";
+import type { Expense, GroupBalance } from "@/lib/types";
 
 // New modular components
 import GroupHeader from "@/components/dashboard/GroupDetails/GroupHeader/GroupHeader";
 import GroupTabs from "@/components/dashboard/GroupDetails/GroupTabs/GroupTabs";
 import ExpenseFilters from "@/components/dashboard/GroupDetails/ExpenseFilters/ExpenseFilters";
 import ExpenseCard from "@/components/dashboard/GroupDetails/ExpenseCard/ExpenseCard";
+import ExpenseTable from "@/components/dashboard/GroupDetails/ExpenseTable/ExpenseTable";
 import SettlementCard from "@/components/dashboard/GroupDetails/SettlementCard/SettlementCard";
+import SettlementTable from "@/components/dashboard/GroupDetails/SettlementTable/SettlementTable";
 import GroupStats from "@/components/dashboard/GroupDetails/GroupStats/GroupStats";
-import MemberItem from "@/components/dashboard/GroupDetails/MemberItem/MemberItem";
 import DownloadStatementModal from "@/components/dashboard/GroupDetails/DownloadStatementModal/DownloadStatementModal";
-import { showToast } from "@/lib/toast";
-import { ToastType } from "@/enums/general.enum";
 
 export default function GroupDetailsPage() {
   const { id } = useParams();
@@ -65,6 +57,7 @@ export default function GroupDetailsPage() {
     groupExpenses,
     isLoading: expensesLoading,
     groupSummaries,
+    pagination,
   } = useAppSelector((s) => s.expenses);
 
   const { groupBalances, isLoading: balancesLoading } = useAppSelector(
@@ -72,43 +65,64 @@ export default function GroupDetailsPage() {
   );
 
   const { user } = useAppSelector((s) => s.auth);
-  const [activeTab, setActiveTab] = useState<"expenses" | "settlements">(
-    "expenses",
-  );
+  const { updateQuery, searchParams } = useUpdateQuery();
+
+  const [activeTab, setActiveTab] = useState<"expenses" | "settlements">(() => {
+    const tab = searchParams.get("tab");
+    return tab === "settlements" ? "settlements" : "expenses";
+  });
+
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
     null,
   );
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
+  const [expenseToDeleteId, setExpenseToDeleteId] = useState<string | null>(
+    null,
+  );
+  const [isDeleteSubmitting, setIsDeleteSubmitting] = useState(false);
+
   const [selectedBalance, setSelectedBalance] = useState<GroupBalance | null>(
     null,
   );
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
-  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
-  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
-  const [memberToPromote, setMemberToPromote] = useState<string | null>(null);
 
   // Filters state
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(
+    () => Number(searchParams.get("page")) || 1,
+  );
   const [limit] = useState(6);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [expenseStatus, setExpenseStatus] = useState("");
-  const [settlementStatus, setSettlementStatus] = useState("");
+  const [startDate, setStartDate] = useState(
+    searchParams.get("startDate") || "",
+  );
+  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
+  const [expenseStatus, setExpenseStatus] = useState(
+    searchParams.get("expenseStatus") || "",
+  );
+  const [settlementStatus, setSettlementStatus] = useState(
+    searchParams.get("settlementStatus") || "",
+  );
   const [appliedFilters, setAppliedFilters] = useState({
-    startDate: "",
-    endDate: "",
-    expenseStatus: "",
-    settlementStatus: "",
+    startDate: searchParams.get("startDate") || "",
+    endDate: searchParams.get("endDate") || "",
+    expenseStatus: searchParams.get("expenseStatus") || "",
+    settlementStatus: searchParams.get("settlementStatus") || "",
   });
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
-  const { pagination } = useAppSelector((s) => s.expenses);
+  // Responsive state
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024); // lg breakpoint
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -125,7 +139,7 @@ export default function GroupDetailsPage() {
     return groupSummaries.find((gs) => gs.id === id);
   }, [groupSummaries, id]);
 
-  useEffect(() => {
+  const fetchExpenses = () => {
     if (id && activeTab === "expenses") {
       dispatch(
         fetchGroupExpenses({
@@ -141,7 +155,28 @@ export default function GroupDetailsPage() {
         }),
       );
     }
-  }, [id, dispatch, currentPage, limit, appliedFilters, activeTab]);
+  };
+
+  useEffect(() => {
+    fetchExpenses();
+    // Sync with URL query params
+    updateQuery({
+      tab: activeTab,
+      page: currentPage,
+      startDate: appliedFilters.startDate,
+      endDate: appliedFilters.endDate,
+      expenseStatus: appliedFilters.expenseStatus,
+      settlementStatus: appliedFilters.settlementStatus,
+    });
+  }, [
+    id,
+    dispatch,
+    currentPage,
+    limit,
+    appliedFilters,
+    activeTab,
+    updateQuery,
+  ]);
 
   const handleApplyFilters = () => {
     setAppliedFilters({
@@ -203,7 +238,6 @@ export default function GroupDetailsPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      // Close modal on success
       setIsDownloadModalOpen(false);
     } catch (error) {
       console.error("Failed to download group statement", error);
@@ -217,6 +251,22 @@ export default function GroupDetailsPage() {
     setIsBulkModalOpen(true);
   };
 
+  const handleDeleteExpense = async () => {
+    if (!expenseToDeleteId) return;
+    setIsDeleteSubmitting(true);
+    await handleThunk(
+      dispatch(deleteExpense(expenseToDeleteId)),
+      () => {
+        setExpenseToDeleteId(null);
+        fetchExpenses();
+      },
+      () => {
+        setIsDeleteSubmitting(false);
+      },
+    );
+    setIsDeleteSubmitting(false);
+  };
+
   const members = useMemo(
     () => groupDetails?.data?.members || [],
     [groupDetails],
@@ -226,14 +276,6 @@ export default function GroupDetailsPage() {
     const me = members.find((m) => m.user_id === user?.id);
     return me?.role === "admin";
   }, [members, user]);
-
-  const isLastAdmin = useMemo(() => {
-    if (!isAdmin) return false;
-    const otherAdmins = members.filter(
-      (m) => m.role === "admin" && m.user_id !== user?.id,
-    );
-    return otherAdmins.length === 0 && members.length > 1;
-  }, [isAdmin, members, user]);
 
   const totalGroupSpend = useMemo(() => {
     if (pagination?.totalAmount !== undefined) return pagination.totalAmount;
@@ -269,51 +311,6 @@ export default function GroupDetailsPage() {
     };
   };
 
-  const handleLeaveGroup = async () => {
-    await handleThunk(
-      dispatch(leaveGroupAction(id as string)),
-      () => {
-        router.push("/dashboard");
-      },
-      (error: string) => {
-        showToast(ToastType.ERROR, error);
-      },
-    );
-  };
-
-  const handleRemoveMember = async () => {
-    if (!memberToRemove) return;
-
-    await handleThunk(
-      dispatch(
-        removeMemberAction({ groupId: id as string, userId: memberToRemove }),
-      ),
-      () => {
-        setMemberToRemove(null);
-      },
-      (error: string) => {
-        showToast(ToastType.ERROR, error);
-      },
-    );
-  };
-
-  const handlePromoteMember = async () => {
-    if (!memberToPromote) return;
-
-    await handleThunk(
-      dispatch(
-        updateMemberRoleAction({
-          groupId: id as string,
-          userId: memberToPromote,
-          role: "admin",
-        }),
-      ),
-      () => {
-        setMemberToPromote(null);
-      },
-    );
-  };
-
   const hasFiltersApplied = !!(
     appliedFilters.startDate ||
     appliedFilters.endDate ||
@@ -330,13 +327,21 @@ export default function GroupDetailsPage() {
       <GroupHeader
         groupDetails={groupDetails}
         onBack={() => router.push("/dashboard")}
-        onInvite={() => setIsInviteModalOpen(true)}
         onAddExpense={() => setIsExpenseModalOpen(true)}
         onEdit={isAdmin ? () => setIsEditModalOpen(true) : undefined}
-        onLeave={() => setIsLeaveModalOpen(true)}
+        onSettings={() => router.push(`/dashboard/groups/${id}/settings`)}
       />
 
       <div className={styles.contentGrid}>
+        <section className={styles.statsSection}>
+          <GroupStats
+            groupDetails={groupDetails}
+            totalGroupSpend={totalGroupSpend}
+            netPosition={netPosition}
+            summary={currentGroupSummary}
+          />
+        </section>
+
         <main className={styles.mainColumn}>
           <GroupTabs
             activeTab={activeTab}
@@ -345,9 +350,10 @@ export default function GroupDetailsPage() {
             setIsFilterExpanded={setIsFilterExpanded}
             hasFiltersApplied={hasFiltersApplied}
             onDownloadStatement={() => setIsDownloadModalOpen(true)}
+            isLargeScreen={isLargeScreen}
           />
 
-          {activeTab === "expenses" && isFilterExpanded && (
+          {activeTab === "expenses" && (isLargeScreen || isFilterExpanded) && (
             <ExpenseFilters
               startDate={startDate}
               setStartDate={setStartDate}
@@ -360,25 +366,59 @@ export default function GroupDetailsPage() {
               onApply={handleApplyFilters}
               onClear={handleClearFilters}
               hasFiltersApplied={hasFiltersApplied}
+              isStatic={isLargeScreen}
             />
           )}
 
           {activeTab === "expenses" ? (
             <div className={styles.expenseSection}>
-              {expensesLoading ? (
-                <ExpenseListSkeleton count={limit} />
+              {expensesLoading && groupExpenses.length === 0 ? (
+                isLargeScreen ? (
+                  <TableSkeleton rows={6} cols={6} />
+                ) : (
+                  <ExpenseCardSkeleton count={limit} />
+                )
               ) : groupExpenses.length > 0 ? (
-                <div className={styles.expenseList}>
-                  {groupExpenses.map((expense: Expense) => (
-                    <ExpenseCard
-                      key={expense.id}
-                      expense={expense}
-                      user={user}
-                      onSelect={setSelectedExpenseId}
-                      formatDate={formatDate}
-                    />
-                  ))}
-                </div>
+                isLargeScreen ? (
+                  <ExpenseTable
+                    expenses={groupExpenses}
+                    user={user}
+                    onSelect={setSelectedExpenseId}
+                    onEdit={setExpenseToEdit}
+                    onDelete={setExpenseToDeleteId}
+                    isLoading={expensesLoading}
+                    onPageChange={(page) => setCurrentPage(page)}
+                    pagination={{
+                      currentPage,
+                      totalPages: pagination?.totalPages || 0,
+                      totalResults: pagination?.total || 0,
+                      pageSize: limit,
+                    }}
+                  />
+                ) : (
+                  <>
+                    <div className={styles.expenseList}>
+                      {groupExpenses.map((expense: Expense) => (
+                        <ExpenseCard
+                          key={expense.id}
+                          expense={expense}
+                          user={user}
+                          onSelect={setSelectedExpenseId}
+                          formatDate={formatDate}
+                        />
+                      ))}
+                    </div>
+                    {pagination && (
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={pagination.totalPages}
+                        onPageChange={(page) => setCurrentPage(page)}
+                        totalResults={pagination.total}
+                        pageSize={limit}
+                      />
+                    )}
+                  </>
+                )
               ) : (
                 <div className={styles.emptyStateCard}>
                   <div className={styles.icon}>
@@ -397,31 +437,38 @@ export default function GroupDetailsPage() {
                   </Button>
                 </div>
               )}
-
-              {pagination && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={pagination.totalPages}
-                  onPageChange={(page) => setCurrentPage(page)}
-                  totalResults={pagination.total}
-                  pageSize={limit}
-                />
-              )}
             </div>
           ) : (
-            <div className={styles.settlements}>
+            <div className={styles.settlementSection}>
               {balancesLoading ||
               (groupDetails.isLoading && groupBalances.length === 0) ? (
-                <BalanceSkeleton />
+                isLargeScreen ? (
+                  <TableSkeleton rows={4} cols={4} />
+                ) : (
+                  <ExpenseCardSkeleton count={3} />
+                )
               ) : groupBalances.length > 0 ? (
-                groupBalances.map((balance: GroupBalance, index: number) => (
-                  <SettlementCard
-                    key={`balance-${index}`}
-                    balance={balance}
+                isLargeScreen ? (
+                  <SettlementTable
+                    balances={groupBalances}
                     user={user}
                     onAction={handleOpenBulkModal}
+                    isLoading={balancesLoading}
                   />
-                ))
+                ) : (
+                  <div className={styles.settlements}>
+                    {groupBalances.map(
+                      (balance: GroupBalance, index: number) => (
+                        <SettlementCard
+                          key={`balance-${index}`}
+                          balance={balance}
+                          user={user}
+                          onAction={handleOpenBulkModal}
+                        />
+                      ),
+                    )}
+                  </div>
+                )
               ) : (
                 <div className={styles.emptyStateCard}>
                   <div className={styles.icon}>
@@ -436,78 +483,16 @@ export default function GroupDetailsPage() {
             </div>
           )}
         </main>
-
-        <aside className={styles.sidebarColumn}>
-          <GroupStats
-            groupDetails={groupDetails}
-            totalGroupSpend={totalGroupSpend}
-            netPosition={netPosition}
-            summary={currentGroupSummary}
-          />
-
-          <section className={styles.sidebarSection}>
-            <h3>
-              Members{" "}
-              <span className={styles.memberCount}>({members.length})</span>
-            </h3>
-            <div className={styles.memberList}>
-              {members.map((member: GroupMember) => (
-                <MemberItem
-                  key={member.id}
-                  member={member}
-                  currentUser={user}
-                  isAdmin={isAdmin}
-                  onRemove={(userId) => {
-                    setMemberToRemove(userId);
-                    setIsRemoveModalOpen(true);
-                  }}
-                  onPromote={(userId) => {
-                    setMemberToPromote(userId);
-                    setIsPromoteModalOpen(true);
-                  }}
-                />
-              ))}
-            </div>
-            <div className={styles.sidebarBtnWrapper}>
-              <Button
-                variant="outline"
-                fullWidth
-                size="sm"
-                onClick={() => setIsAddMemberModalOpen(true)}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "0.5rem",
-                    alignItems: "center",
-                  }}
-                >
-                  <HiOutlineUserAdd /> Add Member
-                </div>
-              </Button>
-            </div>
-          </section>
-        </aside>
       </div>
 
       <AddExpenseModal
-        isOpen={isExpenseModalOpen}
-        onClose={() => setIsExpenseModalOpen(false)}
+        isOpen={isExpenseModalOpen || !!expenseToEdit}
+        onClose={() => {
+          setIsExpenseModalOpen(false);
+          setExpenseToEdit(null);
+        }}
         expenseType={EXPENSE_TYPE.GROUP}
-      />
-
-      <InviteUserModal
-        isOpen={isInviteModalOpen}
-        onClose={() => setIsInviteModalOpen(false)}
-        groupId={id as string}
-        groupName={groupDetails?.data?.name || ""}
-      />
-
-      <AddMemberModal
-        isOpen={isAddMemberModalOpen}
-        onClose={() => setIsAddMemberModalOpen(false)}
-        groupId={id as string}
-        existingMemberIds={members.map((m: GroupMember) => m.user_id)}
+        expense={expenseToEdit || undefined}
       />
 
       <ExpenseDetailsModal
@@ -540,38 +525,13 @@ export default function GroupDetailsPage() {
       />
 
       <ConfirmModal
-        isOpen={isLeaveModalOpen}
-        onClose={() => setIsLeaveModalOpen(false)}
-        onConfirm={handleLeaveGroup}
-        title="Leave Group"
-        message={
-          isLastAdmin
-            ? "You are the last admin of this group. You must promote another member to admin before you can leave."
-            : "Are you sure you want to leave this group? This action cannot be undone and you must have no pending settlements."
-        }
-        confirmText={isLastAdmin ? "Cannot Leave" : "Leave Group"}
-        confirmVariant="danger"
-        confirmDisabled={isLastAdmin}
-      />
-
-      <ConfirmModal
-        isOpen={isRemoveModalOpen}
-        onClose={() => setIsRemoveModalOpen(false)}
-        onConfirm={handleRemoveMember}
-        title="Remove Member"
-        message="Are you sure you want to remove this member from the group? All their expenses must be verified."
-        confirmText="Remove Member"
-        confirmVariant="danger"
-      />
-
-      <ConfirmModal
-        isOpen={isPromoteModalOpen}
-        onClose={() => setIsPromoteModalOpen(false)}
-        onConfirm={handlePromoteMember}
-        title="Promote to Admin"
-        message="Are you sure you want to promote this member to an administrator? Admins can manage group details, invite members, and remove others."
-        confirmText="Promote Member"
-        confirmVariant="primary"
+        isOpen={!!expenseToDeleteId}
+        onClose={() => setExpenseToDeleteId(null)}
+        onConfirm={handleDeleteExpense}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense? This action cannot be undone and will affect all participants' balances."
+        confirmText="Delete Expense"
+        isLoading={isDeleteSubmitting}
       />
     </div>
   );
