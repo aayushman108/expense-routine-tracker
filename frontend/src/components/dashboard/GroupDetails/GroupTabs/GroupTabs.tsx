@@ -1,37 +1,44 @@
 import React from "react";
 import styles from "./GroupTabs.module.scss";
-import { HiOutlineCurrencyDollar, HiCheck, HiOutlineFilter, HiOutlineDownload } from "react-icons/hi";
+import {
+  HiOutlineCurrencyDollar,
+  HiCheck,
+  HiOutlineDownload,
+} from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
+import { GROUP_TAB } from "@/enums/general.enum";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 interface GroupTabsProps {
-  activeTab: "expenses" | "settlements";
-  setActiveTab: (tab: "expenses" | "settlements") => void;
   onDownloadStatement: () => void;
 }
 
-const GroupTabs: React.FC<GroupTabsProps> = ({
-  activeTab,
-  setActiveTab,
-  onDownloadStatement,
-}) => {
+const GroupTabs: React.FC<GroupTabsProps> = ({ onDownloadStatement }) => {
+  const { query, updateQuery } = useUpdateQuery();
+
+  const activeTab =
+    query.tab === GROUP_TAB.SETTLEMENTS
+      ? GROUP_TAB.SETTLEMENTS
+      : GROUP_TAB.EXPENSES;
+
   return (
     <div className={styles.tabHeader}>
       <div className={styles.tabsWrapper}>
         <div
-          className={`${styles.tab} ${activeTab === "expenses" ? styles.active : ""}`}
-          onClick={() => setActiveTab("expenses")}
+          className={`${styles.tab} ${activeTab === GROUP_TAB.EXPENSES ? styles.active : ""}`}
+          onClick={() => updateQuery({ tab: GROUP_TAB.EXPENSES })}
         >
           <HiOutlineCurrencyDollar /> Expenses
         </div>
         <div
-          className={`${styles.tab} ${activeTab === "settlements" ? styles.active : ""}`}
-          onClick={() => setActiveTab("settlements")}
+          className={`${styles.tab} ${activeTab === GROUP_TAB.SETTLEMENTS ? styles.active : ""}`}
+          onClick={() => updateQuery({ tab: GROUP_TAB.SETTLEMENTS })}
         >
           <HiCheck /> Settlements
         </div>
       </div>
 
-      {activeTab === "expenses" && (
+      {activeTab === GROUP_TAB.EXPENSES && (
         <div className={styles.tabActions}>
           <Button
             variant="outline"

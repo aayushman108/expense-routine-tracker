@@ -1,39 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./ExpenseFilters.module.scss";
-import { HiOutlineCalendar, HiOutlineSearch, HiOutlineRefresh, HiOutlineDownload } from "react-icons/hi";
+import {
+  HiOutlineCalendar,
+  HiOutlineSearch,
+  HiOutlineRefresh,
+} from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import Select from "@/components/ui/Select/Select";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import { LIMITS } from "@/constants/general.constant";
 
 interface ExpenseFiltersProps {
-  startDate: string;
-  setStartDate: (date: string) => void;
-  endDate: string;
-  setEndDate: (date: string) => void;
-  expenseStatus: string;
-  setExpenseStatus: (status: string) => void;
-  settlementStatus: string;
-  setSettlementStatus: (status: string) => void;
-  onApply: () => void;
-  onClear: () => void;
-  hasFiltersApplied: boolean;
   isStatic?: boolean;
 }
 
 const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
-  expenseStatus,
-  setExpenseStatus,
-  settlementStatus,
-  setSettlementStatus,
-  onApply,
-  onClear,
-  hasFiltersApplied,
   isStatic = false,
 }) => {
-  const isAnyValuePresent = !!(startDate || endDate || expenseStatus || settlementStatus);
+  const { searchParams, updateQuery } = useUpdateQuery();
+
+  const [startDate, setStartDate] = useState(
+    searchParams.get("startDate") || "",
+  );
+  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
+  const [expenseStatus, setExpenseStatus] = useState(
+    searchParams.get("expenseStatus") || "",
+  );
+  const [settlementStatus, setSettlementStatus] = useState(
+    searchParams.get("settlementStatus") || "",
+  );
+
+  const isAnyValuePresent = !!(
+    startDate ||
+    endDate ||
+    expenseStatus ||
+    settlementStatus
+  );
+
+  const handleApplyFilters = () => {
+    updateQuery({
+      page: 1,
+      limit: LIMITS.DEFAULT_EXPENSE,
+      startDate,
+      endDate,
+      expenseStatus,
+      settlementStatus,
+    });
+  };
+
+  const handleClearFilters = () => {
+    updateQuery({
+      page: 1,
+      limit: LIMITS.DEFAULT_EXPENSE,
+      startDate: "",
+      endDate: "",
+      expenseStatus: "",
+      settlementStatus: "",
+    });
+  };
 
   return (
     <div className={`${styles.filterBar} ${isStatic ? styles.isStatic : ""}`}>
@@ -89,7 +113,7 @@ const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
         />
 
         <div className={styles.filterActions}>
-          <Button size="sm" onClick={onApply}>
+          <Button size="sm" onClick={handleApplyFilters}>
             <span className={styles.btnContent}>
               <HiOutlineSearch />
               Search
@@ -97,7 +121,7 @@ const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
           </Button>
 
           {isAnyValuePresent && (
-            <Button size="sm" variant="outline" onClick={onClear}>
+            <Button size="sm" variant="outline" onClick={handleClearFilters}>
               <span className={styles.btnContent}>
                 <HiOutlineRefresh />
                 Clear

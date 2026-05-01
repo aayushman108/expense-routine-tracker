@@ -1,0 +1,4 @@
+export const LIMITS = {
+  DEFAULT_EXPENSE: 6,
+  DEFAULT_SETTLEMENT: 6,
+};

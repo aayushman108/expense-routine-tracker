@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { HiOutlineCurrencyDollar, HiCheck } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -11,7 +11,7 @@ import {
   fetchUserGroupSummaries,
   deleteExpense,
 } from "@/store/slices/expenseSlice";
-import { fetchGroupBalances } from "@/store/slices/settlementSlice";
+import { fetchGroupSettlementBalances } from "@/store/slices/settlementSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
 import ExpenseDetailsModal from "@/components/dashboard/ExpenseForm/ExpenseDetailsModal";
@@ -29,9 +29,8 @@ import {
   clearGroupDetails,
   fetchGroupDetailsAction,
 } from "@/store/slices/groupSlice";
-import api from "@/lib/api";
 import { handleThunk } from "@/lib/utils";
-import { EXPENSE_TYPE, REPORT_TYPE } from "@expense-tracker/shared";
+import { EXPENSE_TYPE } from "@expense-tracker/shared";
 
 import type { Expense, GroupBalance } from "@/lib/types";
 
@@ -45,6 +44,14 @@ import SettlementCard from "@/components/dashboard/GroupDetails/SettlementCard/S
 import SettlementTable from "@/components/dashboard/GroupDetails/SettlementTable/SettlementTable";
 import GroupStats from "@/components/dashboard/GroupDetails/GroupStats/GroupStats";
 import DownloadStatementModal from "@/components/dashboard/GroupDetails/DownloadStatementModal/DownloadStatementModal";
+import { GROUP_TAB, ToastType } from "@/enums/general.enum";
+import { useDownloadStatement } from "@/hooks/useDownloadStatement";
+import { LIMITS } from "@/constants/general.constant";
+import { showToast } from "@/lib/toast";
+
+export enum GROUP_DETAILS_ACTION_TYPE {
+  DELETE = "delete",
+}
 
 export default function GroupDetailsPage() {
   const { id } = useParams();
@@ -58,19 +65,14 @@ export default function GroupDetailsPage() {
     isLoading: expensesLoading,
     groupSummaries,
     pagination,
+    isSubmitting,
   } = useAppSelector((s) => s.expenses);
 
-  const { groupBalances, isLoading: balancesLoading } = useAppSelector(
-    (s) => s.settlements,
-  );
+  const { groupSettlementBalances, isLoading: balancesLoading } =
+    useAppSelector((s) => s.settlements);
 
   const { user } = useAppSelector((s) => s.auth);
-  const { updateQuery, searchParams } = useUpdateQuery();
-
-  const [activeTab, setActiveTab] = useState<"expenses" | "settlements">(() => {
-    const tab = searchParams.get("tab");
-    return tab === "settlements" ? "settlements" : "expenses";
-  });
+  const { updateQuery, query } = useUpdateQuery();
 
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
@@ -80,7 +82,6 @@ export default function GroupDetailsPage() {
   const [expenseToDeleteId, setExpenseToDeleteId] = useState<string | null>(
     null,
   );
-  const [isDeleteSubmitting, setIsDeleteSubmitting] = useState(false);
 
   const [selectedBalance, setSelectedBalance] = useState<GroupBalance | null>(
     null,
@@ -89,28 +90,10 @@ export default function GroupDetailsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
-  // Filters state
-  const [currentPage, setCurrentPage] = useState(
-    () => Number(searchParams.get("page")) || 1,
-  );
-  const [limit] = useState(6);
-  const [startDate, setStartDate] = useState(
-    searchParams.get("startDate") || "",
-  );
-  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
-  const [expenseStatus, setExpenseStatus] = useState(
-    searchParams.get("expenseStatus") || "",
-  );
-  const [settlementStatus, setSettlementStatus] = useState(
-    searchParams.get("settlementStatus") || "",
-  );
-  const [appliedFilters, setAppliedFilters] = useState({
-    startDate: searchParams.get("startDate") || "",
-    endDate: searchParams.get("endDate") || "",
-    expenseStatus: searchParams.get("expenseStatus") || "",
-    settlementStatus: searchParams.get("settlementStatus") || "",
-  });
-  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const activeTab =
+    query.tab === GROUP_TAB.SETTLEMENTS
+      ? GROUP_TAB.SETTLEMENTS
+      : GROUP_TAB.EXPENSES;
 
   // Responsive state
   const [isLargeScreen, setIsLargeScreen] = useState(false);
@@ -127,7 +110,7 @@ export default function GroupDetailsPage() {
   useEffect(() => {
     if (id) {
       dispatch(fetchGroupDetailsAction(id as string));
-      dispatch(fetchGroupBalances(id as string));
+      dispatch(fetchGroupSettlementBalances(id as string));
       dispatch(fetchUserGroupSummaries());
     }
     return () => {
@@ -139,112 +122,31 @@ export default function GroupDetailsPage() {
     return groupSummaries.find((gs) => gs.id === id);
   }, [groupSummaries, id]);
 
-  const fetchExpenses = () => {
-    if (id && activeTab === "expenses") {
-      dispatch(
-        fetchGroupExpenses({
-          groupId: id as string,
-          filters: {
-            page: currentPage,
-            limit,
-            startDate: appliedFilters.startDate || undefined,
-            endDate: appliedFilters.endDate || undefined,
-            expenseStatus: appliedFilters.expenseStatus || undefined,
-            settlementStatus: appliedFilters.settlementStatus || undefined,
-          },
-        }),
-      );
-    }
-  };
+  const fetchExpenses = useCallback(() => {
+    if (!id || activeTab !== GROUP_TAB.EXPENSES) return;
+    dispatch(
+      fetchGroupExpenses({
+        groupId: id as string,
+        filters: {
+          page: Number(query.page) || 1,
+          limit: Number(query.limit) || LIMITS.DEFAULT_EXPENSE,
+          startDate: query.startDate || undefined,
+          endDate: query.endDate || undefined,
+          expenseStatus: query.expenseStatus || undefined,
+          settlementStatus: query.settlementStatus || undefined,
+        },
+      }),
+    );
+  }, [id, dispatch, query, activeTab]);
 
   useEffect(() => {
     fetchExpenses();
-    // Sync with URL query params
-    updateQuery({
-      tab: activeTab,
-      page: currentPage,
-      startDate: appliedFilters.startDate,
-      endDate: appliedFilters.endDate,
-      expenseStatus: appliedFilters.expenseStatus,
-      settlementStatus: appliedFilters.settlementStatus,
-    });
-  }, [
-    id,
-    dispatch,
-    currentPage,
-    limit,
-    appliedFilters,
-    activeTab,
-    updateQuery,
-  ]);
+  }, [fetchExpenses]);
 
-  const handleApplyFilters = () => {
-    setAppliedFilters({
-      startDate,
-      endDate,
-      expenseStatus,
-      settlementStatus,
-    });
-    setCurrentPage(1);
-  };
-
-  const handleClearFilters = () => {
-    setStartDate("");
-    setEndDate("");
-    setExpenseStatus("");
-    setSettlementStatus("");
-    setAppliedFilters({
-      startDate: "",
-      endDate: "",
-      expenseStatus: "",
-      settlementStatus: "",
-    });
-    setCurrentPage(1);
-  };
-
-  const [downloadingFormat, setDownloadingFormat] = useState<string | null>(
-    null,
-  );
-
-  const handleDownloadStatement = async (
-    format: REPORT_TYPE,
-    modalStartDate: string,
-    modalEndDate: string,
-  ) => {
-    setDownloadingFormat(format);
-    try {
-      const params = new URLSearchParams();
-      if (id) params.append("groupId", id as string);
-      if (modalStartDate) params.append("startDate", modalStartDate);
-      if (modalEndDate) params.append("endDate", modalEndDate);
-      params.append("format", format);
-
-      const response = await api.get(
-        `/expenses/user/download-statement?${params.toString()}`,
-        {
-          responseType: "blob",
-        },
-      );
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `group_expense_statement_${Date.now()}.${format}`,
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      setIsDownloadModalOpen(false);
-    } catch (error) {
-      console.error("Failed to download group statement", error);
-    } finally {
-      setDownloadingFormat(null);
-    }
-  };
+  const { handleDownloadStatement, downloadingFormat } = useDownloadStatement({
+    groupId: id as string,
+    onSuccess: () => setIsDownloadModalOpen(false),
+  });
 
   const handleOpenBulkModal = (balance: GroupBalance) => {
     setSelectedBalance(balance);
@@ -253,18 +155,16 @@ export default function GroupDetailsPage() {
 
   const handleDeleteExpense = async () => {
     if (!expenseToDeleteId) return;
-    setIsDeleteSubmitting(true);
     await handleThunk(
       dispatch(deleteExpense(expenseToDeleteId)),
       () => {
         setExpenseToDeleteId(null);
         fetchExpenses();
       },
-      () => {
-        setIsDeleteSubmitting(false);
+      (err: string) => {
+        showToast(ToastType.ERROR, err);
       },
     );
-    setIsDeleteSubmitting(false);
   };
 
   const members = useMemo(
@@ -290,7 +190,7 @@ export default function GroupDetailsPage() {
     let owedToMe = 0;
     let iOwe = 0;
 
-    groupBalances.forEach((bal) => {
+    groupSettlementBalances.forEach((bal) => {
       if (bal.to_user_id === user.id) {
         owedToMe += Number(bal.total_amount);
       }
@@ -300,23 +200,7 @@ export default function GroupDetailsPage() {
     });
 
     return owedToMe - iOwe;
-  }, [groupBalances, user]);
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return {
-      day: d.getDate(),
-      month: d.toLocaleString("en-US", { month: "short" }),
-      year: d.getFullYear(),
-    };
-  };
-
-  const hasFiltersApplied = !!(
-    appliedFilters.startDate ||
-    appliedFilters.endDate ||
-    appliedFilters.expenseStatus ||
-    appliedFilters.settlementStatus
-  );
+  }, [groupSettlementBalances, user]);
 
   if (groupDetails?.isLoading || !groupDetails?.data) {
     return <FullPageSkeleton />;
@@ -343,36 +227,19 @@ export default function GroupDetailsPage() {
         </section>
 
         <main className={styles.mainColumn}>
-          <GroupTabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            onDownloadStatement={() => setIsDownloadModalOpen(true)}
-          />
+          <GroupTabs onDownloadStatement={() => setIsDownloadModalOpen(true)} />
 
-          {activeTab === "expenses" && (
-            <ExpenseFilters
-              startDate={startDate}
-              setStartDate={setStartDate}
-              endDate={endDate}
-              setEndDate={setEndDate}
-              expenseStatus={expenseStatus}
-              setExpenseStatus={setExpenseStatus}
-              settlementStatus={settlementStatus}
-              setSettlementStatus={setSettlementStatus}
-              onApply={handleApplyFilters}
-              onClear={handleClearFilters}
-              hasFiltersApplied={hasFiltersApplied}
-              isStatic={isLargeScreen}
-            />
+          {activeTab === GROUP_TAB.EXPENSES && (
+            <ExpenseFilters isStatic={isLargeScreen} />
           )}
 
-          {activeTab === "expenses" ? (
+          {activeTab === GROUP_TAB.EXPENSES ? (
             <div className={styles.expenseSection}>
               {expensesLoading && groupExpenses.length === 0 ? (
                 isLargeScreen ? (
                   <TableSkeleton rows={6} cols={6} />
                 ) : (
-                  <ExpenseCardSkeleton count={limit} />
+                  <ExpenseCardSkeleton count={LIMITS.DEFAULT_EXPENSE} />
                 )
               ) : groupExpenses.length > 0 ? (
                 isLargeScreen ? (
@@ -381,14 +248,15 @@ export default function GroupDetailsPage() {
                     user={user}
                     onSelect={setSelectedExpenseId}
                     onEdit={setExpenseToEdit}
-                    onDelete={setExpenseToDeleteId}
+                    onDelete={(id: string) => {
+                      setExpenseToDeleteId(id);
+                    }}
                     isLoading={expensesLoading}
-                    onPageChange={(page) => setCurrentPage(page)}
                     pagination={{
-                      currentPage,
+                      currentPage: Number(query.page) || 1,
                       totalPages: pagination?.totalPages || 0,
                       totalResults: pagination?.total || 0,
-                      pageSize: limit,
+                      pageSize: Number(query.limit) || LIMITS.DEFAULT_EXPENSE,
                     }}
                   />
                 ) : (
@@ -405,11 +273,11 @@ export default function GroupDetailsPage() {
                     </div>
                     {pagination && (
                       <Pagination
-                        currentPage={currentPage}
+                        currentPage={Number(query.page) || 1}
                         totalPages={pagination.totalPages}
-                        onPageChange={(page) => setCurrentPage(page)}
+                        onPageChange={(page) => updateQuery({ page })}
                         totalResults={pagination.total}
-                        pageSize={limit}
+                        pageSize={Number(query.limit) || LIMITS.DEFAULT_EXPENSE}
                       />
                     )}
                   </>
@@ -436,23 +304,24 @@ export default function GroupDetailsPage() {
           ) : (
             <div className={styles.settlementSection}>
               {balancesLoading ||
-              (groupDetails.isLoading && groupBalances.length === 0) ? (
+              (groupDetails.isLoading &&
+                groupSettlementBalances.length === 0) ? (
                 isLargeScreen ? (
                   <TableSkeleton rows={4} cols={4} />
                 ) : (
                   <ExpenseCardSkeleton count={3} />
                 )
-              ) : groupBalances.length > 0 ? (
+              ) : groupSettlementBalances.length > 0 ? (
                 isLargeScreen ? (
                   <SettlementTable
-                    balances={groupBalances}
+                    balances={groupSettlementBalances}
                     user={user}
                     onAction={handleOpenBulkModal}
                     isLoading={balancesLoading}
                   />
                 ) : (
                   <div className={styles.settlements}>
-                    {groupBalances.map(
+                    {groupSettlementBalances.map(
                       (balance: GroupBalance, index: number) => (
                         <SettlementCard
                           key={`balance-${index}`}
@@ -486,6 +355,9 @@ export default function GroupDetailsPage() {
           setIsExpenseModalOpen(false);
           setExpenseToEdit(null);
         }}
+        fetchCb={() => {
+          fetchExpenses();
+        }}
         expenseType={EXPENSE_TYPE.GROUP}
         expense={expenseToEdit || undefined}
       />
@@ -494,6 +366,7 @@ export default function GroupDetailsPage() {
         isOpen={!!selectedExpenseId}
         onClose={() => setSelectedExpenseId(null)}
         expenseId={selectedExpenseId}
+        fetchCb={fetchExpenses}
       />
 
       <BulkSettlementModal
@@ -521,12 +394,14 @@ export default function GroupDetailsPage() {
 
       <ConfirmModal
         isOpen={!!expenseToDeleteId}
-        onClose={() => setExpenseToDeleteId(null)}
+        onClose={() => {
+          setExpenseToDeleteId(null);
+        }}
         onConfirm={handleDeleteExpense}
         title="Delete Expense"
         message="Are you sure you want to delete this expense? This action cannot be undone and will affect all participants' balances."
         confirmText="Delete Expense"
-        isLoading={isDeleteSubmitting}
+        isLoading={isSubmitting && !!expenseToDeleteId}
       />
     </div>
   );

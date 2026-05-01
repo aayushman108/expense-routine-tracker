@@ -16,11 +16,11 @@ import Pagination from "@/components/ui/Pagination/Pagination";
 import MonthlyExpenditureChart from "@/components/dashboard/Charts/MonthlyExpenditureChart";
 import styles from "./personal.module.scss";
 import { handleThunk } from "@/lib/utils";
-import api from "@/lib/api";
 import type { RootState } from "@/store";
-import { EXPENSE_TYPE, REPORT_TYPE } from "@expense-tracker/shared";
+import { EXPENSE_TYPE } from "@expense-tracker/shared";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import PersonalExpenseTable from "@/components/dashboard/PersonalDetails/PersonalExpenseTable/PersonalExpenseTable";
+import { useDownloadStatement } from "@/hooks/useDownloadStatement";
 
 // Modular Components
 import PersonalHeader from "@/components/dashboard/PersonalDetails/PersonalHeader/PersonalHeader";
@@ -87,50 +87,10 @@ export default function PersonalDetailsPage() {
     setAppliedFilters({ startDate: "", endDate: "" });
     setCurrentPage(1);
   };
-  const [downloadingFormat, setDownloadingFormat] = useState<string | null>(
-    null,
-  );
-
-  const handleDownloadStatement = async (
-    format: REPORT_TYPE,
-    modalStartDate: string,
-    modalEndDate: string,
-  ) => {
-    setDownloadingFormat(format);
-    try {
-      const params = new URLSearchParams();
-      if (modalStartDate) params.append("startDate", modalStartDate);
-      if (modalEndDate) params.append("endDate", modalEndDate);
-      params.append("format", format);
-      params.append("expenseType", "personal");
-
-      const response = await api.get(
-        `/expenses/user/download-statement?${params.toString()}`,
-        {
-          responseType: "blob",
-        },
-      );
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `expense_statement_${Date.now()}.${format}`,
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      // Close modal on success
-      setIsDownloadModalOpen(false);
-    } catch (error) {
-      console.error("Failed to download statement", error);
-    } finally {
-      setDownloadingFormat(null);
-    }
-  };
+  const { handleDownloadStatement, downloadingFormat } = useDownloadStatement({
+    expenseType: EXPENSE_TYPE.PERSONAL,
+    onSuccess: () => setIsDownloadModalOpen(false),
+  });
 
   useEffect(() => {
     handleThunk(dispatch(fetchUserSummary()));
@@ -292,10 +252,12 @@ export default function PersonalDetailsPage() {
       <AddExpenseModal
         isOpen={isExpenseModalOpen || !!expenseToEdit}
         onClose={() => {
-          fetchExpenses();
-          handleThunk(dispatch(fetchUserSummary()));
           setIsExpenseModalOpen(false);
           setExpenseToEdit(null);
+        }}
+        fetchCb={() => {
+          fetchExpenses();
+          handleThunk(dispatch(fetchUserSummary()));
         }}
         expenseType={EXPENSE_TYPE.PERSONAL}
         expense={expenseToEdit}

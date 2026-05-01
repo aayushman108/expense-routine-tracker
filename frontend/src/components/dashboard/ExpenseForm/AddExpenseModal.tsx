@@ -28,13 +28,15 @@ import {
 } from "@expense-tracker/shared";
 import { handleThunk } from "@/lib/utils";
 import { GroupMember, Expense, CreateExpensePayload } from "@/lib/types";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 interface FormProps {
   onClose: () => void;
   expense?: Expense | null;
+  fetchCb?: () => void;
 }
 
-const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
+const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
   const dispatch = useAppDispatch();
   const [submittingAction, setSubmittingAction] = useState<string | null>(null);
   const { isSubmitting } = useAppSelector((state: RootState) => state.expenses);
@@ -89,6 +91,7 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
           dispatch(
             addToast({ type: "success", message: "Personal expense added!" }),
           );
+          fetchCb();
           onClose();
           setForm((prev) => ({
             ...prev,
@@ -189,9 +192,10 @@ const AddPersonalExpenseForm = ({ onClose, expense }: FormProps) => {
   );
 };
 
-const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
+const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
   const dispatch = useAppDispatch();
   const params = useParams();
+  const { updateQuery } = useUpdateQuery();
   const groupIdFromParams = params?.id as string;
 
   const { groupDetails } = useAppSelector((s: RootState) => s.groups);
@@ -428,6 +432,7 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
           dispatch(
             addToast({ type: "success", message: "Group expense updated!" }),
           );
+          fetchCb?.();
           onClose();
         },
         () => setSubmittingAction(null),
@@ -440,6 +445,13 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
           dispatch(
             addToast({ type: "success", message: "Group expense added!" }),
           );
+          updateQuery({
+            page: 1,
+            startDate: null,
+            endDate: null,
+            expenseStatus: null,
+            settlementStatus: null,
+          });
           onClose();
           setForm((prev) => ({
             ...prev,
@@ -839,6 +851,7 @@ const AddGroupExpenseForm = ({ onClose, expense }: FormProps) => {
 interface AddExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
+  fetchCb?: () => void;
   expenseType: EXPENSE_TYPE;
   expense?: Expense | null;
 }
@@ -846,6 +859,7 @@ interface AddExpenseModalProps {
 export default function AddExpenseModal({
   isOpen,
   onClose,
+  fetchCb,
   expenseType,
   expense,
 }: AddExpenseModalProps) {
@@ -866,9 +880,17 @@ export default function AddExpenseModal({
       fullHeight
     >
       {expenseType === EXPENSE_TYPE.PERSONAL ? (
-        <AddPersonalExpenseForm onClose={onClose} expense={expense} />
+        <AddPersonalExpenseForm
+          onClose={onClose}
+          fetchCb={fetchCb}
+          expense={expense}
+        />
       ) : (
-        <AddGroupExpenseForm onClose={onClose} expense={expense} />
+        <AddGroupExpenseForm
+          onClose={onClose}
+          fetchCb={fetchCb}
+          expense={expense}
+        />
       )}
     </Modal>
   );

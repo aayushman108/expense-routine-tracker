@@ -21,6 +21,7 @@ import {
   updateExpense,
   deleteExpense,
   fetchGroupExpenses,
+  fetchUserGroupSummaries,
 } from "@/store/slices/expenseSlice";
 import {
   SETTLEMENT_STATUS,
@@ -28,21 +29,26 @@ import {
   EXPENSE_STATUS,
   EXPENSE_TYPE,
 } from "@expense-tracker/shared";
-import type { ExpenseSplit } from "@/lib/types";
+import type { Expense, ExpenseSplit } from "@/lib/types";
 import { handleThunk } from "@/lib/utils";
 import styles from "./ExpenseDetailsModal.module.scss";
+import { fetchGroupSettlementBalances } from "@/store/slices/settlementSlice";
+import { useParams } from "next/navigation";
 
 interface ExpenseDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   expenseId: string | null;
+  fetchCb?: () => void;
 }
 
 export default function ExpenseDetailsModal({
   isOpen,
   onClose,
   expenseId,
+  fetchCb,
 }: ExpenseDetailsModalProps) {
+  const { id: groupId } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -72,7 +78,12 @@ export default function ExpenseDetailsModal({
     await handleThunk(
       dispatch(updateSplitStatus({ expenseId, splitId, status })),
       () => {
-        fetchExpenseDetails();
+        handleThunk(dispatch(fetchExpenseById(expenseId)), (data: Expense) => {
+          if (data?.expense_status === EXPENSE_STATUS.VERIFIED) {
+            dispatch(fetchGroupSettlementBalances(groupId));
+            dispatch(fetchUserGroupSummaries());
+          }
+        });
         setSubmittingAction(null);
       },
       (error) => {
@@ -90,8 +101,9 @@ export default function ExpenseDetailsModal({
         updateExpense({ id: expenseId, body: { expenseStatus: status } }),
       ),
       () => {
-        fetchExpenseDetails();
+        fetchCb?.();
         setSubmittingAction(null);
+        onClose();
       },
       (error) => {
         setSubmittingAction(null);
@@ -107,9 +119,7 @@ export default function ExpenseDetailsModal({
       dispatch(deleteExpense(expenseId)),
       () => {
         setIsDeleteConfirmOpen(false);
-        if (details?.group_id) {
-          dispatch(fetchGroupExpenses({ groupId: details?.group_id }));
-        }
+        fetchCb?.();
         setSubmittingAction(null);
         onClose();
       },
@@ -428,9 +438,10 @@ export default function ExpenseDetailsModal({
           isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
-            if (expenseId) {
-              fetchExpenseDetails();
-            }
+          }}
+          fetchCb={() => {
+            fetchExpenseDetails();
+            fetchCb?.();
           }}
           expenseType={details.expense_type as EXPENSE_TYPE}
           expense={details}

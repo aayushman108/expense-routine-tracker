@@ -3,21 +3,24 @@ import api from "../../lib/api";
 import type { GroupBalance } from "../../lib/types";
 
 interface SettlementState {
-  groupBalances: GroupBalance[];
+  groupSettlementBalances: GroupBalance[];
   isLoading: boolean;
   isSubmitting: boolean;
   error: string | null;
 }
 
 const initialState: SettlementState = {
-  groupBalances: [],
+  groupSettlementBalances: [],
   isLoading: false,
   isSubmitting: false,
   error: null,
 };
 
-export const fetchGroupBalances = createAsyncThunk<GroupBalance[], string>(
-  "settlements/fetchGroupBalances",
+export const fetchGroupSettlementBalances = createAsyncThunk<
+  GroupBalance[],
+  string
+>(
+  "settlements/fetchGroupSettlementBalances",
   async (groupId, { rejectWithValue }) => {
     try {
       const { data } = await api.get(`/settlements/group/${groupId}/balances`);
@@ -58,7 +61,7 @@ export const settleBulkAction = createAsyncThunk<
       },
     );
     // Refresh balances after settlement
-    dispatch(fetchGroupBalances(payload.groupId));
+    dispatch(fetchGroupSettlementBalances(payload.groupId));
   } catch (err: unknown) {
     const error = err as { response?: { data?: { message?: string } } };
     return rejectWithValue(
@@ -81,7 +84,7 @@ export const confirmBulkAction = createAsyncThunk<
       toUserId: payload.toUserId,
     });
     // Refresh balances after confirmation
-    dispatch(fetchGroupBalances(payload.groupId));
+    dispatch(fetchGroupSettlementBalances(payload.groupId));
   } catch (err: unknown) {
     const error = err as { response?: { data?: { message?: string } } };
     return rejectWithValue(
@@ -100,15 +103,15 @@ const settlementSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchGroupBalances.pending, (state) => {
+      .addCase(fetchGroupSettlementBalances.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchGroupBalances.fulfilled, (state, action) => {
+      .addCase(fetchGroupSettlementBalances.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.groupBalances = action.payload;
+        state.groupSettlementBalances = action.payload;
       })
-      .addCase(fetchGroupBalances.rejected, (state, action) => {
+      .addCase(fetchGroupSettlementBalances.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });

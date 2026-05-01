@@ -4,6 +4,7 @@ import { EXPENSE_STATUS } from "@expense-tracker/shared";
 import type { Expense, User } from "@/lib/types";
 import { HiOutlineEye, HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import Table, { Column } from "@/components/ui/Table/Table";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 interface ExpenseTableProps {
   expenses: Expense[];
@@ -12,7 +13,6 @@ interface ExpenseTableProps {
   onEdit?: (expense: Expense) => void;
   onDelete?: (id: string) => void;
   isLoading?: boolean;
-  onPageChange?: (page: number) => void;
   pagination?: {
     currentPage: number;
     totalPages: number;
@@ -28,9 +28,10 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
   onEdit,
   onDelete,
   isLoading,
-  onPageChange,
   pagination,
 }) => {
+  const { updateQuery } = useUpdateQuery();
+
   const columns: Column<Expense>[] = [
     {
       header: "Date",
@@ -157,6 +158,10 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
     [onSelect, onEdit, onDelete, user],
   );
 
+  const handlePageChange = (page: number) => {
+    updateQuery({ page });
+  };
+
   return (
     <Table<Expense>
       data={expenses}
@@ -164,7 +169,7 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
       loading={isLoading}
       onRowClick={(expense) => onSelect(expense.id)}
       pagination={pagination}
-      onPageChange={onPageChange}
+      onPageChange={handlePageChange}
       actions={renderActions}
     />
   );

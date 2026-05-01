@@ -4,3 +4,8 @@ export enum ToastType {
   WARNING = "warning",
   INFO = "info",
 }
+
+export enum GROUP_TAB {
+  EXPENSES = "expenses",
+  SETTLEMENTS = "settlements",
+}
