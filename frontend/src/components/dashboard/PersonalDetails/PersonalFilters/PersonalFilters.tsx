@@ -9,8 +9,6 @@ interface PersonalFiltersProps {
   setEndDate: (date: string) => void;
   onApply: () => void;
   onClear: () => void;
-  isExpanded: boolean;
-  isStatic?: boolean;
 }
 
 const PersonalFilters: React.FC<PersonalFiltersProps> = ({
@@ -20,53 +18,52 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
   setEndDate,
   onApply,
   onClear,
-  isExpanded,
-  isStatic = false,
 }) => {
-  if (!isExpanded && !isStatic) return null;
-
   const isAnyValuePresent = !!(startDate || endDate);
 
   return (
-    <div className={`${styles.filterBar} ${isStatic ? styles.isStatic : ""}`}>
+    <div className={styles.filterBar}>
       <div className={styles.filterGroup}>
         <div className={styles.inputWrapper}>
-          <label>From Date</label>
+          <label>FROM</label>
           <div className={styles.dateInput}>
-            <HiOutlineCalendar />
+            <HiOutlineCalendar className={styles.leftIcon} />
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              placeholder="mm/dd/yyyy"
             />
           </div>
         </div>
         <div className={styles.inputWrapper}>
-          <label>To Date</label>
+          <label>TO</label>
           <div className={styles.dateInput}>
-            <HiOutlineCalendar />
+            <HiOutlineCalendar className={styles.leftIcon} />
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              placeholder="mm/dd/yyyy"
             />
           </div>
         </div>
 
         <div className={styles.filterActions}>
-          <Button size="sm" onClick={onApply}>
+          <Button size="sm" onClick={onApply} className={styles.actionBtn}>
             <div className={styles.btnContent}>
               <HiOutlineSearch />
-              Search
+              <span>Search</span>
             </div>
           </Button>
           {isAnyValuePresent && (
-            <Button size="sm" variant="outline" onClick={onClear}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onClear}
+              className={styles.actionBtn}
+            >
               <div className={styles.btnContent}>
                 <HiOutlineRefresh />
-                Clear
+                <span>Clear</span>
               </div>
             </Button>
           )}

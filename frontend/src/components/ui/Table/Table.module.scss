@@ -12,6 +12,24 @@
   border-radius: 8px;
   border: 1px solid var(--border-default);
   box-shadow: var(--shadow-sm);
+
+  // Custom horizontal scrollbar
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 10px;
+
+    &:hover {
+      background: var(--border-strong);
+    }
+  }
 }
 
 .table {

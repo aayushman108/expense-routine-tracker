@@ -34,6 +34,16 @@
   gap: 0.5rem;
 }
 
+.expenseList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+
+  @include responsive(480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .settlementSection {
   display: flex;
   flex-direction: column;
@@ -41,9 +51,13 @@
 }
 
 .settlements {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
+
+  @include responsive(480px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .loaderContainer {

@@ -346,14 +346,10 @@ export default function GroupDetailsPage() {
           <GroupTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
-            isFilterExpanded={isFilterExpanded}
-            setIsFilterExpanded={setIsFilterExpanded}
-            hasFiltersApplied={hasFiltersApplied}
             onDownloadStatement={() => setIsDownloadModalOpen(true)}
-            isLargeScreen={isLargeScreen}
           />
 
-          {activeTab === "expenses" && (isLargeScreen || isFilterExpanded) && (
+          {activeTab === "expenses" && (
             <ExpenseFilters
               startDate={startDate}
               setStartDate={setStartDate}
@@ -365,6 +361,7 @@ export default function GroupDetailsPage() {
               setSettlementStatus={setSettlementStatus}
               onApply={handleApplyFilters}
               onClear={handleClearFilters}
+              onDownloadStatement={() => setIsDownloadModalOpen(true)}
               hasFiltersApplied={hasFiltersApplied}
               isStatic={isLargeScreen}
             />
@@ -404,7 +401,6 @@ export default function GroupDetailsPage() {
                           expense={expense}
                           user={user}
                           onSelect={setSelectedExpenseId}
-                          formatDate={formatDate}
                         />
                       ))}
                     </div>

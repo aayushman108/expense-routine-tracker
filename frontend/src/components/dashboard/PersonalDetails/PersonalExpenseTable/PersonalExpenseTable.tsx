@@ -1,10 +1,7 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styles from "./PersonalExpenseTable.module.scss";
 import type { Expense, User } from "@/lib/types";
-import { 
-  HiOutlinePencil, 
-  HiOutlineTrash 
-} from "react-icons/hi";
+import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import Table, { Column } from "@/components/ui/Table/Table";
 
 interface PersonalExpenseTableProps {
@@ -55,15 +52,6 @@ const PersonalExpenseTable: React.FC<PersonalExpenseTableProps> = ({
       ),
     },
     {
-      header: "Category",
-      key: "category",
-      render: (expense) => (
-        <span className={styles.categoryBadge}>
-          {expense.category || "General"}
-        </span>
-      ),
-    },
-    {
       header: "Amount",
       key: "total_amount",
       render: (expense) => (
@@ -77,6 +65,36 @@ const PersonalExpenseTable: React.FC<PersonalExpenseTableProps> = ({
     },
   ];
 
+  const renderActions = useCallback(
+    (expense: Expense) => {
+      return (
+        <>
+          <button
+            className={`${styles.actionBtn} ${styles.editBtn}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit?.(expense);
+            }}
+            title="Update"
+          >
+            <HiOutlinePencil />
+          </button>
+          <button
+            className={`${styles.actionBtn} ${styles.deleteBtn}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete?.(expense.id);
+            }}
+            title="Delete"
+          >
+            <HiOutlineTrash />
+          </button>
+        </>
+      );
+    },
+    [onDelete, onEdit],
+  );
+
   return (
     <div className={styles.tableWrapper}>
       <Table<Expense>
@@ -85,30 +103,7 @@ const PersonalExpenseTable: React.FC<PersonalExpenseTableProps> = ({
         loading={isLoading}
         pagination={pagination}
         onPageChange={onPageChange}
-        actions={(expense) => (
-          <>
-            <button 
-              className={`${styles.actionBtn} ${styles.editBtn}`} 
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit?.(expense);
-              }}
-              title="Update"
-            >
-              <HiOutlinePencil />
-            </button>
-            <button 
-              className={`${styles.actionBtn} ${styles.deleteBtn}`} 
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete?.(expense.id);
-              }}
-              title="Delete"
-            >
-              <HiOutlineTrash />
-            </button>
-          </>
-        )}
+        actions={renderActions}
       />
     </div>
   );

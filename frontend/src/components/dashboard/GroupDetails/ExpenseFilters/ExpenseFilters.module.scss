@@ -24,10 +24,11 @@
     gap: 0.75rem;
     flex-wrap: wrap;
 
-    @include mobile-only {
-      flex-direction: column;
-      align-items: stretch;
+    @include responsive($bp-md) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 0.5rem;
+      align-items: stretch;
     }
   }
 
@@ -108,12 +109,15 @@
     padding-bottom: 1px;
     flex-wrap: wrap;
 
-    @include mobile-only {
+    @include responsive($bp-md) {
+      grid-column: span 2;
       margin-left: 0;
       align-self: stretch;
       justify-content: flex-start;
       margin-top: 0.25rem;
       padding-bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
     }
 
     button {
@@ -157,7 +161,8 @@
       font-size: 0.8125rem; // Standardized to 13px
       font-weight: 500; // Match Select weight
       color: var(--text-primary);
-      width: 115px;
+      width: 100%;
+      flex: 1;
       cursor: pointer;
       color-scheme: light dark;
 
@@ -204,6 +209,18 @@
 
     &:hover {
       color: var(--color-danger);
+    }
+  }
+
+  .downloadWrapper {
+    @include responsive($bp-md) {
+      grid-column: span 2;
+    }
+    
+    .downloadBtn {
+      width: 100%;
+      background: var(--bg-secondary);
+      border-color: var(--border-light);
     }
   }
 }

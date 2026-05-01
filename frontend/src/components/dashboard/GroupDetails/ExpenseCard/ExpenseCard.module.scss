@@ -23,104 +23,60 @@
   }
 
   .cardHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: $space-5 $space-6;
-    background: var(--bg-secondary);
-    position: relative;
+    padding: $space-3 $space-4;
     border-bottom: 1px solid var(--border-light);
-    transition: background 0.3s ease;
 
-    .amountSection {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-
-      .currency {
-        font-size: $font-size-sm;
-        font-weight: 700;
-        color: var(--text-tertiary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      .amountValue {
-        font-size: $font-size-xl;
-        font-weight: 800;
-        color: var(--text-primary);
-        letter-spacing: -0.02em;
-        line-height: 1;
-      }
-    }
-
-    .date {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-card);
-      border: 1px solid var(--border-light);
-      padding: 4px 8px;
-      border-radius: 8px;
-      min-width: 44px;
-      box-shadow: var(--shadow-sm);
-
-      .day {
-        font-size: $font-size-sm;
-        font-weight: 800;
-        color: var(--text-primary);
-        line-height: 1.1;
-      }
-
-      .month {
-        font-size: 9px;
-        text-transform: uppercase;
-        color: var(--text-tertiary);
-        font-weight: 700;
-        letter-spacing: 0.05em;
-      }
+    .description {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-style: italic;
+      line-height: 1.2;
+      display: block;
+      width: 100%;
+      @include truncate(3);
     }
   }
 
   .cardBody {
-    padding: $space-5 $space-6;
+    padding: $space-3 $space-4;
     display: flex;
     flex-direction: column;
-    gap: $space-4;
-    flex: 1;
-    @include responsive(sm) {
-      padding: $space-5 $space-3 !important;
-    }
+    gap: $space-2;
 
-    .titleText {
-      font-weight: 700;
-      font-size: $font-size-sm;
-      color: var(--text-primary);
-      line-height: 1.4;
-      @include truncate(2);
-      white-space: normal;
+    .amountSection {
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+
+      .currency {
+        font-size: 0.6875rem;
+        font-weight: 700;
+        color: var(--text-tertiary);
+      }
+
+      .amountValue {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+      }
     }
 
     .tagsRow {
       display: flex;
-      align-items: center;
       flex-wrap: wrap;
-      gap: $space-2;
+      gap: 0.375rem;
     }
 
     .tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 10px;
-      border-radius: $radius-full;
-      font-size: 10px;
+      padding: 0.125rem 0.5rem;
+      font-size: 0.625rem;
       font-weight: 700;
+      border-radius: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      @include responsive(sm) {
-        font-size: 9px;
-      }
+      letter-spacing: 0.02em;
+      border: 1px solid transparent;
 
       &.verified,
       &.confirmed {
@@ -162,30 +118,42 @@
   }
 
   .cardFooter {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: $space-3 $space-6;
+    @include flex-between;
+    padding: $space-3 $space-4;
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-light);
+    gap: $space-2;
     margin-top: auto;
-    font-size: 11px;
 
     .dateBadge {
+      font-size: 0.6875rem;
       font-weight: 600;
       color: var(--text-tertiary);
+      letter-spacing: 0.02em;
     }
 
-    .payer {
-      font-weight: 500;
-      color: var(--text-secondary);
+    .footerInfo {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 0.25rem;
+      color: var(--text-tertiary);
 
-      .payerHighlight {
+      .statusDot {
+        font-size: 1rem;
+        line-height: 1;
+        opacity: 0.4;
+      }
+
+      .compactStatus {
+        font-size: 0.6875rem;
         font-weight: 700;
-        color: var(--color-primary);
+        text-transform: none;
+        letter-spacing: 0.02em;
+
+        // Highlight 'You' specifically if needed
+        span {
+          color: var(--color-primary);
+        }
       }
     }
   }

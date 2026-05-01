@@ -29,7 +29,7 @@ const SettlementCard: React.FC<SettlementCardProps> = ({
         <div className={styles.party}>
           <div className={styles.label}>OWES</div>
           <div className={styles.name}>
-            {isFromUser ? "You" : balance.from_user_name}
+            {isFromUser ? "You" : balance.from_user_name.split(" ")[0]}
           </div>
         </div>
         <span className={styles.arrow}>
@@ -38,7 +38,7 @@ const SettlementCard: React.FC<SettlementCardProps> = ({
         <div className={styles.party}>
           <div className={styles.label}>TO</div>
           <div className={styles.name}>
-            {isToUser ? "You" : balance.to_user_name}
+            {isToUser ? "You" : balance.to_user_name.split(" ")[0]}
           </div>
         </div>
       </div>

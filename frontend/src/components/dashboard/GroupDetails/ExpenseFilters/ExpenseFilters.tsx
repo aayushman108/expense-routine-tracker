@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./ExpenseFilters.module.scss";
-import { HiOutlineCalendar, HiOutlineSearch, HiOutlineRefresh } from "react-icons/hi";
+import { HiOutlineCalendar, HiOutlineSearch, HiOutlineRefresh, HiOutlineDownload } from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import Select from "@/components/ui/Select/Select";
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { HiOutlineFilter, HiOutlineShoppingBag, HiOutlineDownload } from "react-icons/hi";
+import { HiOutlineShoppingBag, HiOutlineDownload } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   deleteExpense,
@@ -18,7 +18,7 @@ import styles from "./personal.module.scss";
 import { handleThunk } from "@/lib/utils";
 import api from "@/lib/api";
 import type { RootState } from "@/store";
-import { EXPENSE_TYPE } from "@expense-tracker/shared";
+import { EXPENSE_TYPE, REPORT_TYPE } from "@expense-tracker/shared";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import PersonalExpenseTable from "@/components/dashboard/PersonalDetails/PersonalExpenseTable/PersonalExpenseTable";
 
@@ -51,25 +51,26 @@ export default function PersonalDetailsPage() {
   const [submittingAction, setSubmittingAction] = useState<string | null>(null);
 
   const { updateQuery, searchParams } = useUpdateQuery();
-  const [currentPage, setCurrentPage] = useState(() => 
-    Number(searchParams.get("page")) || 1
+  const [currentPage, setCurrentPage] = useState(
+    () => Number(searchParams.get("page")) || 1,
   );
   const [limit] = useState(10); // Increased limit for table view
 
-  const [startDate, setStartDate] = useState(searchParams.get("startDate") || "");
+  const [startDate, setStartDate] = useState(
+    searchParams.get("startDate") || "",
+  );
   const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
   const [appliedFilters, setAppliedFilters] = useState({
     startDate: searchParams.get("startDate") || "",
     endDate: searchParams.get("endDate") || "",
   });
-  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // Responsive state
   const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   useEffect(() => {
-    const checkScreen = () => setIsLargeScreen(window.innerWidth > 768);
+    const checkScreen = () => setIsLargeScreen(window.innerWidth > 1024);
     checkScreen();
     window.addEventListener("resize", checkScreen);
     return () => window.removeEventListener("resize", checkScreen);
@@ -90,7 +91,11 @@ export default function PersonalDetailsPage() {
     null,
   );
 
-  const handleDownloadStatement = async (format: "pdf" | "xls", modalStartDate: string, modalEndDate: string) => {
+  const handleDownloadStatement = async (
+    format: REPORT_TYPE,
+    modalStartDate: string,
+    modalEndDate: string,
+  ) => {
     setDownloadingFormat(format);
     try {
       const params = new URLSearchParams();
@@ -99,22 +104,25 @@ export default function PersonalDetailsPage() {
       params.append("format", format);
       params.append("expenseType", "personal");
 
-      const response = await api.get(`/expenses/user/download-statement?${params.toString()}`, {
-        responseType: "blob",
-      });
+      const response = await api.get(
+        `/expenses/user/download-statement?${params.toString()}`,
+        {
+          responseType: "blob",
+        },
+      );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute(
         "download",
-        `expense_statement_${Date.now()}.${format === "xls" ? "xlsx" : "pdf"}`
+        `expense_statement_${Date.now()}.${format}`,
       );
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
+
       // Close modal on success
       setIsDownloadModalOpen(false);
     } catch (error) {
@@ -200,46 +208,12 @@ export default function PersonalDetailsPage() {
                 onClick={() => setIsDownloadModalOpen(true)}
               >
                 <HiOutlineDownload />
-                Download Statement
+                Statement
               </Button>
-              {!isLargeScreen && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={styles.filterToggleBtn}
-                  onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                >
-                  <HiOutlineFilter />
-                  {isFilterExpanded ? "Hide Filters" : "Filters"}
-                  {(startDate || endDate) && (
-                    <span className={styles.filterDot} />
-                  )}
-                </Button>
-              )}
-            </div>
-            <div className={styles.filterActionsSm}>
-              <button
-                className={styles.downloadBtnSm}
-                onClick={() => setIsDownloadModalOpen(true)}
-                title="Download Statement"
-              >
-                <HiOutlineDownload />
-              </button>
-              <button
-                className={styles.filterToggleBtn}
-                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              >
-                <HiOutlineFilter />
-                {(startDate || endDate) && (
-                  <span className={styles.filterDot} />
-                )}
-              </button>
             </div>
           </div>
 
           <PersonalFilters
-            isExpanded={isFilterExpanded}
-            isStatic={isLargeScreen}
             startDate={startDate}
             setStartDate={setStartDate}
             endDate={endDate}
@@ -276,7 +250,6 @@ export default function PersonalDetailsPage() {
                     <PersonalExpenseCard
                       key={expense.id}
                       expense={expense}
-                      user={user}
                       onEdit={setExpenseToEdit}
                       onDelete={setExpenseToDelete}
                     />
