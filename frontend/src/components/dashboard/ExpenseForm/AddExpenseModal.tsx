@@ -411,13 +411,28 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
     };
 
     if (groupId || expense?.group_id) {
-      body.splits = splits
-        .filter((s) => activeMembers.includes(s.userId))
-        .map((s) => ({
-          ...s,
-          splitPercentage: Number(Number(s.splitPercentage).toFixed(2)),
-          splitAmount: Number(Number(s.splitAmount).toFixed(2)),
-        }));
+      const activeSplits = splits.filter((s) => activeMembers.includes(s.userId));
+      const sumOfSplits = activeSplits.reduce(
+        (acc, s) => acc + s.splitAmount,
+        0,
+      );
+
+      if (Math.abs(sumOfSplits - totalAmount) > 0.01) {
+        dispatch(
+          addToast({
+            type: "error",
+            message: `Sum of splits (रू ${sumOfSplits.toFixed(2)}) must equal total amount (रू ${totalAmount.toFixed(2)})`,
+          }),
+        );
+        setSubmittingAction(null);
+        return;
+      }
+
+      body.splits = activeSplits.map((s) => ({
+        ...s,
+        splitPercentage: Number(Number(s.splitPercentage).toFixed(2)),
+        splitAmount: Number(Number(s.splitAmount).toFixed(2)),
+      }));
     }
 
     const currentGroupId = groupId || expense?.group_id;

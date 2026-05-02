@@ -14,6 +14,8 @@ import { keysToSnakeCase } from "../utils/caseConverter";
 import PDFDocument from "pdfkit";
 import ExcelJS from "exceljs";
 import { Response } from "express";
+import { BaseError } from "../utils/baseError.util";
+import { HttpStatusCode } from "../enums/statusCode.enum";
 
 export type IAddExpense = ICreateExpenseSchema["body"] &
   ICreateExpenseSchema["params"] & {
@@ -37,12 +39,18 @@ async function addExpense(data: IAddExpense) {
       split_amount: split.splitAmount,
     }));
 
-    // Rounding adjustment logic
     const sumCalculated = calculatedSplits.reduce(
       (acc, s) => acc + s.split_amount,
       0,
     );
     const diff = Number((data.totalAmount - sumCalculated).toFixed(2));
+
+    if (Math.abs(diff) > 0.01) {
+      throw new BaseError(
+        HttpStatusCode.BAD_REQUEST,
+        `Sum of splits (रू ${sumCalculated.toFixed(2)}) must match total amount (रू ${data.totalAmount.toFixed(2)})`,
+      );
+    }
 
     if (diff !== 0) {
       const findIndex = calculatedSplits.findIndex(
@@ -84,6 +92,13 @@ async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
       0,
     );
     const diff = Number((totalAmount - sumCalculated).toFixed(2));
+
+    if (Math.abs(diff) > 0.01) {
+      throw new BaseError(
+        HttpStatusCode.BAD_REQUEST,
+        `Sum of splits (रू ${sumCalculated.toFixed(2)}) must match total amount (रू ${totalAmount.toFixed(2)})`,
+      );
+    }
 
     if (diff !== 0) {
       const paidBy = data?.paidBy ?? userId;
