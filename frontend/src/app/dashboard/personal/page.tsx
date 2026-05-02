@@ -6,8 +6,8 @@ import { HiOutlineShoppingBag, HiOutlineDownload } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   deleteExpense,
-  fetchUserSummary,
   fetchPersonalExpenses,
+  fetchMonthlyAnalytics,
 } from "@/store/slices/expenseSlice";
 import Button from "@/components/ui/Button/Button";
 import AddExpenseModal from "@/components/dashboard/ExpenseForm/AddExpenseModal";
@@ -28,21 +28,17 @@ import PersonalFilters from "@/components/dashboard/PersonalDetails/PersonalFilt
 import PersonalExpenseCard from "@/components/dashboard/PersonalDetails/PersonalExpenseCard/PersonalExpenseCard";
 import DownloadStatementModal from "@/components/dashboard/GroupDetails/DownloadStatementModal/DownloadStatementModal";
 import {
-  FullPersonalSkeleton,
   PersonalExpenseListSkeleton,
   TableSkeleton,
 } from "./PersonalLoadingSkeletons";
+import { LIMITS } from "@/constants/general.constant";
 
 export default function PersonalDetailsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const {
-    personalExpenses,
-    summary,
-    isSummaryLoading,
-    isPersonalExpensesLoading,
-    pagination,
-  } = useAppSelector((s: RootState) => s.expenses);
+  const { query, updateQuery } = useUpdateQuery();
+  const { personalExpenses, isPersonalExpensesLoading, pagination } =
+    useAppSelector((s: RootState) => s.expenses);
   const { user } = useAppSelector((state: RootState) => state.auth);
 
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -50,20 +46,6 @@ export default function PersonalDetailsPage() {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [submittingAction, setSubmittingAction] = useState<string | null>(null);
 
-  const { updateQuery, searchParams } = useUpdateQuery();
-  const [currentPage, setCurrentPage] = useState(
-    () => Number(searchParams.get("page")) || 1,
-  );
-  const [limit] = useState(10); // Increased limit for table view
-
-  const [startDate, setStartDate] = useState(
-    searchParams.get("startDate") || "",
-  );
-  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
-  const [appliedFilters, setAppliedFilters] = useState({
-    startDate: searchParams.get("startDate") || "",
-    endDate: searchParams.get("endDate") || "",
-  });
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // Responsive state
@@ -76,49 +58,30 @@ export default function PersonalDetailsPage() {
     return () => window.removeEventListener("resize", checkScreen);
   }, []);
 
-  const handleApplyFilters = () => {
-    setAppliedFilters({ startDate, endDate });
-    setCurrentPage(1);
-  };
-
-  const handleClearFilters = () => {
-    setStartDate("");
-    setEndDate("");
-    setAppliedFilters({ startDate: "", endDate: "" });
-    setCurrentPage(1);
-  };
   const { handleDownloadStatement, downloadingFormat } = useDownloadStatement({
     expenseType: EXPENSE_TYPE.PERSONAL,
     onSuccess: () => setIsDownloadModalOpen(false),
   });
 
   useEffect(() => {
-    handleThunk(dispatch(fetchUserSummary()));
+    dispatch(fetchMonthlyAnalytics());
   }, [dispatch]);
 
   const fetchExpenses = useCallback(() => {
-    handleThunk(
-      dispatch(
-        fetchPersonalExpenses({
-          limit,
-          page: currentPage,
-          expenseType: "personal",
-          startDate: appliedFilters.startDate || undefined,
-          endDate: appliedFilters.endDate || undefined,
-        }),
-      ),
+    dispatch(
+      fetchPersonalExpenses({
+        limit: Number(query?.limit || LIMITS.DEFAULT_EXPENSE),
+        page: Number(query?.page || 1),
+        expenseType: EXPENSE_TYPE.PERSONAL,
+        startDate: query?.startDate || undefined,
+        endDate: query?.endDate || undefined,
+      }),
     );
-  }, [dispatch, currentPage, limit, appliedFilters]);
+  }, [dispatch, query]);
 
   useEffect(() => {
     fetchExpenses();
-    // Sync with URL
-    updateQuery({
-      page: currentPage,
-      startDate: appliedFilters.startDate,
-      endDate: appliedFilters.endDate,
-    });
-  }, [fetchExpenses, currentPage, appliedFilters, updateQuery]);
+  }, [fetchExpenses]);
 
   const handleDeleteExpense = async () => {
     if (!expenseToDelete) return;
@@ -129,7 +92,7 @@ export default function PersonalDetailsPage() {
         setExpenseToDelete(null);
         setSubmittingAction(null);
         fetchExpenses();
-        handleThunk(dispatch(fetchUserSummary()));
+        dispatch(fetchMonthlyAnalytics());
       },
       () => {
         setExpenseToDelete(null);
@@ -137,10 +100,6 @@ export default function PersonalDetailsPage() {
       },
     );
   };
-
-  if (isSummaryLoading || !summary) {
-    return <FullPersonalSkeleton />;
-  }
 
   return (
     <div className={styles.page}>
@@ -173,20 +132,15 @@ export default function PersonalDetailsPage() {
             </div>
           </div>
 
-          <PersonalFilters
-            startDate={startDate}
-            setStartDate={setStartDate}
-            endDate={endDate}
-            setEndDate={setEndDate}
-            onApply={handleApplyFilters}
-            onClear={handleClearFilters}
-          />
+          <PersonalFilters />
 
           {isPersonalExpensesLoading ? (
             isLargeScreen ? (
               <TableSkeleton rows={8} cols={4} />
             ) : (
-              <PersonalExpenseListSkeleton count={limit} />
+              <PersonalExpenseListSkeleton
+                count={Number(query?.limit || LIMITS.DEFAULT_EXPENSE)}
+              />
             )
           ) : (
             <div className={styles.groupList}>
@@ -198,12 +152,12 @@ export default function PersonalDetailsPage() {
                     onEdit={setExpenseToEdit}
                     onDelete={setExpenseToDelete}
                     pagination={{
-                      currentPage,
+                      currentPage: Number(query?.page || 1),
                       totalPages: pagination?.totalPages || 1,
                       totalResults: pagination?.total || 0,
-                      pageSize: limit,
+                      pageSize: Number(query?.limit || LIMITS.DEFAULT_EXPENSE),
                     }}
-                    onPageChange={setCurrentPage}
+                    onPageChange={(page) => updateQuery({ page })}
                   />
                 ) : (
                   personalExpenses.map((expense) => (
@@ -239,11 +193,11 @@ export default function PersonalDetailsPage() {
 
           {!isLargeScreen && pagination && pagination.totalPages > 1 && (
             <Pagination
-              currentPage={currentPage}
+              currentPage={Number(query?.page || 1)}
               totalPages={pagination.totalPages}
-              onPageChange={(page) => setCurrentPage(page)}
+              onPageChange={(page) => updateQuery({ page })}
               totalResults={pagination.total}
-              pageSize={limit}
+              pageSize={Number(query?.limit || LIMITS.DEFAULT_EXPENSE)}
             />
           )}
         </div>
@@ -257,7 +211,7 @@ export default function PersonalDetailsPage() {
         }}
         fetchCb={() => {
           fetchExpenses();
-          handleThunk(dispatch(fetchUserSummary()));
+          dispatch(fetchMonthlyAnalytics());
         }}
         expenseType={EXPENSE_TYPE.PERSONAL}
         expense={expenseToEdit}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import {
   AreaChart,
   Area,
@@ -10,9 +10,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchMonthlyAnalytics } from "@/store/slices/expenseSlice";
+import { useAppSelector } from "@/store/hooks";
 import styles from "./MonthlyExpenditureChart.module.scss";
+import { ChartSkeleton } from "@/app/dashboard/DashboardLoadingSkeletons";
 
 interface GroupDetail {
   groupName: string;
@@ -64,13 +64,14 @@ const CustomTooltip = ({
                   <p>रू {data.totalGroupExpenditure.toLocaleString()}</p>
                 </div>
                 <div className={styles.metric}>
-                  <span>Paid by me</span>
-                  <p>रू {data.totalPaidInGroup.toLocaleString()}</p>
-                </div>
-                <div className={styles.metric}>
                   <span>My share</span>
                   <p>रू {data.groupExpense.toLocaleString()}</p>
                 </div>
+                <div className={styles.metric}>
+                  <span>Paid by me</span>
+                  <p>रू {data.totalPaidInGroup.toLocaleString()}</p>
+                </div>
+
                 <div
                   className={`${styles.metric} ${data.netGroupFlow >= 0 ? styles.success : styles.danger}`}
                 >
@@ -119,12 +120,12 @@ const AnalyticsCard = ({
               <p>रू {data.totalGroupExpenditure.toLocaleString()}</p>
             </div>
             <div className={styles.metric}>
-              <span>Paid by me</span>
-              <p>रू {data.totalPaidInGroup.toLocaleString()}</p>
-            </div>
-            <div className={styles.metric}>
               <span>My share</span>
               <p>रू {data.groupExpense.toLocaleString()}</p>
+            </div>
+            <div className={styles.metric}>
+              <span>Paid by me</span>
+              <p>रू {data.totalPaidInGroup.toLocaleString()}</p>
             </div>
             <div
               className={`${styles.metric} ${data.netGroupFlow >= 0 ? styles.success : styles.danger}`}
@@ -156,15 +157,16 @@ const MonthlyExpenditureChart: React.FC<MonthlyExpenditureChartProps> = ({
   variant = "default",
   mode = "default",
 }) => {
-  const dispatch = useAppDispatch();
-  const { monthlyAnalytics } = useAppSelector((state) => state.expenses);
+  const { monthlyAnalytics, monthlyAnalyticsLoading } = useAppSelector(
+    (state) => state.expenses,
+  );
 
-  useEffect(() => {
-    dispatch(fetchMonthlyAnalytics());
-  }, [dispatch]);
+  if (monthlyAnalyticsLoading || !monthlyAnalytics?.length) {
+    return <ChartSkeleton />;
+  }
 
   // Format data for the chart (shorten month names)
-  const chartData = monthlyAnalytics.map((item) => ({
+  const chartData = monthlyAnalytics?.map((item) => ({
     ...item,
     displayMonth: item.month.slice(0, 3),
   }));

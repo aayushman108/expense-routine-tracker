@@ -4,6 +4,8 @@ import type {
   Expense,
   CreateExpensePayload,
   GroupSummary,
+  IUserExpenseSummary,
+  IMonthlyAnalytics,
 } from "../../lib/types";
 import {
   EXPENSE_TYPE,
@@ -15,27 +17,10 @@ interface ExpenseState {
   personalExpenses: Expense[];
   groupExpenses: Expense[];
   currentExpense: Expense | null;
-  summary: {
-    lifetimeSpend: number;
-    currentMonthSpend: number;
-    currentMonthPersonalSpend: number;
-    personalSpend: number;
-    groupSpend: number;
-    remainingToPay: number;
-    remainingToReceive: number;
-    pendingVerificationsCount: number;
-  } | null;
+  summary: IUserExpenseSummary | null;
   groupSummaries: GroupSummary[];
-  monthlyAnalytics: {
-    month: string;
-    personalExpense: number;
-    groupExpense: number;
-    totalGroupExpenditure: number;
-    totalPaidInGroup: number;
-    netGroupFlow: number;
-    totalExpense: number;
-    groupDetails: { groupName: string; amount: number }[];
-  }[];
+  monthlyAnalytics: IMonthlyAnalytics[];
+  monthlyAnalyticsLoading: boolean;
   isLoading: boolean;
   isSummaryLoading: boolean;
   isPersonalExpensesLoading: boolean;
@@ -60,6 +45,7 @@ const initialState: ExpenseState = {
   summary: null,
   groupSummaries: [],
   monthlyAnalytics: [],
+  monthlyAnalyticsLoading: false,
   isLoading: false,
   isSummaryLoading: false,
   isPersonalExpensesLoading: false,
@@ -173,7 +159,7 @@ export const fetchUserGroupSummaries = createAsyncThunk<GroupSummary[], void>(
 );
 
 export const fetchMonthlyAnalytics = createAsyncThunk<
-  ExpenseState["monthlyAnalytics"],
+  IMonthlyAnalytics[],
   void
 >("expenses/fetchMonthlyAnalytics", async (_, { rejectWithValue }) => {
   try {
@@ -373,8 +359,15 @@ const expenseSlice = createSlice({
     });
 
     // Monthly analytics
+    builder.addCase(fetchMonthlyAnalytics.pending, (state) => {
+      state.monthlyAnalyticsLoading = true;
+    });
     builder.addCase(fetchMonthlyAnalytics.fulfilled, (state, action) => {
-      state.monthlyAnalytics = action.payload;
+      state.monthlyAnalytics = action.payload || [];
+      state.monthlyAnalyticsLoading = false;
+    });
+    builder.addCase(fetchMonthlyAnalytics.rejected, (state) => {
+      state.monthlyAnalyticsLoading = false;
     });
 
     // Group expenses

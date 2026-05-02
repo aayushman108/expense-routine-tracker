@@ -17,17 +17,15 @@ interface ExpenseFiltersProps {
 const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
   isStatic = false,
 }) => {
-  const { searchParams, updateQuery } = useUpdateQuery();
+  const { query, updateQuery } = useUpdateQuery();
 
-  const [startDate, setStartDate] = useState(
-    searchParams.get("startDate") || "",
-  );
-  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
+  const [startDate, setStartDate] = useState(query?.startDate || "");
+  const [endDate, setEndDate] = useState(query?.endDate || "");
   const [expenseStatus, setExpenseStatus] = useState(
-    searchParams.get("expenseStatus") || "",
+    query?.expenseStatus || "",
   );
   const [settlementStatus, setSettlementStatus] = useState(
-    searchParams.get("settlementStatus") || "",
+    query?.settlementStatus || "",
   );
 
   const isAnyValuePresent = !!(
@@ -57,6 +55,10 @@ const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
       expenseStatus: "",
       settlementStatus: "",
     });
+    setStartDate("");
+    setEndDate("");
+    setExpenseStatus("");
+    setSettlementStatus("");
   };
 
   return (

@@ -762,7 +762,10 @@ async function getUserSummary(userId: string) {
       COALESCE(SUM(others_owe) FILTER (WHERE expense_type = 'group' AND expense_status = 'verified'), 0) as remaining_to_receive,
 
       -- Pending Verifications Count
-      COUNT(*) FILTER (WHERE expense_type = 'group' AND expense_status = 'submitted' AND split_status = 'pending') as pending_verifications
+      COUNT(*) FILTER (WHERE expense_type = 'group' AND expense_status = 'submitted' AND split_status = 'pending') as pending_verifications,
+
+      -- Number of Active Groups
+      (SELECT COUNT(*) FROM group_members WHERE user_id = ? AND left_at IS NULL) as no_of_groups
     FROM user_expenses
     `,
     [
@@ -771,6 +774,7 @@ async function getUserSummary(userId: string) {
       SETTLEMENT_STATUS.CONFIRMED,
       userId,
       SETTLEMENT_STATUS.CONFIRMED,
+      userId,
       userId,
       userId,
       userId,
@@ -787,6 +791,7 @@ async function getUserSummary(userId: string) {
     remainingToPay: Number(row.remaining_to_pay || 0),
     remainingToReceive: Number(row.remaining_to_receive || 0),
     pendingVerificationsCount: Number(row.pending_verifications || 0),
+    noOfGroups: Number(row.no_of_groups || 0),
   };
 }
 

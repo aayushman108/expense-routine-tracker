@@ -181,3 +181,26 @@ export interface GroupSummary {
   iOweOthers: number;
   othersOweMe: number;
 }
+
+export interface IUserExpenseSummary {
+  lifetimeSpend: number;
+  currentMonthSpend: number;
+  currentMonthPersonalSpend: number;
+  personalSpend: number;
+  groupSpend: number;
+  remainingToPay: number;
+  remainingToReceive: number;
+  pendingVerificationsCount: number;
+  noOfGroups: number;
+}
+
+export interface IMonthlyAnalytics {
+  month: string;
+  personalExpense: number;
+  groupExpense: number;
+  totalGroupExpenditure: number;
+  totalPaidInGroup: number;
+  netGroupFlow: number;
+  totalExpense: number;
+  groupDetails: { groupName: string; amount: number }[];
+}

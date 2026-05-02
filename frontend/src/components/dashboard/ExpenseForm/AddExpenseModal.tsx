@@ -28,7 +28,6 @@ import {
 } from "@expense-tracker/shared";
 import { handleThunk } from "@/lib/utils";
 import { GroupMember, Expense, CreateExpensePayload } from "@/lib/types";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 interface FormProps {
   onClose: () => void;
@@ -79,6 +78,7 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
           dispatch(
             addToast({ type: "success", message: "Personal expense updated!" }),
           );
+          fetchCb?.();
           onClose();
         },
         () => setSubmittingAction(null),
@@ -91,7 +91,7 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
           dispatch(
             addToast({ type: "success", message: "Personal expense added!" }),
           );
-          fetchCb();
+          fetchCb?.();
           onClose();
           setForm((prev) => ({
             ...prev,
@@ -195,7 +195,6 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
 const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
   const dispatch = useAppDispatch();
   const params = useParams();
-  const { updateQuery } = useUpdateQuery();
   const groupIdFromParams = params?.id as string;
 
   const { groupDetails } = useAppSelector((s: RootState) => s.groups);
@@ -445,13 +444,7 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
           dispatch(
             addToast({ type: "success", message: "Group expense added!" }),
           );
-          updateQuery({
-            page: 1,
-            startDate: null,
-            endDate: null,
-            expenseStatus: null,
-            settlementStatus: null,
-          });
+          fetchCb?.();
           onClose();
           setForm((prev) => ({
             ...prev,

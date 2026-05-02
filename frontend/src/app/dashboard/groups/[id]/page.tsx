@@ -50,7 +50,6 @@ import { GROUP_TAB, ToastType } from "@/enums/general.enum";
 import { useDownloadStatement } from "@/hooks/useDownloadStatement";
 import { LIMITS } from "@/constants/general.constant";
 import { showToast } from "@/lib/toast";
-import { current } from "@reduxjs/toolkit";
 
 export enum GROUP_DETAILS_ACTION_TYPE {
   DELETE = "delete",
@@ -178,31 +177,6 @@ export default function GroupDetailsPage() {
     const me = members.find((m) => m.user_id === user?.id);
     return me?.role === "admin";
   }, [members, user]);
-
-  const totalGroupSpend = useMemo(() => {
-    if (pagination?.totalAmount !== undefined) return pagination.totalAmount;
-    return groupExpenses.reduce(
-      (acc, curr) => acc + Number(curr.total_amount),
-      0,
-    );
-  }, [groupExpenses, pagination]);
-
-  const netPosition = useMemo(() => {
-    if (!user) return 0;
-    let owedToMe = 0;
-    let iOwe = 0;
-
-    groupSettlementBalances.forEach((bal) => {
-      if (bal.to_user_id === user.id) {
-        owedToMe += Number(bal.total_amount);
-      }
-      if (bal.from_user_id === user.id) {
-        iOwe += Number(bal.total_amount);
-      }
-    });
-
-    return owedToMe - iOwe;
-  }, [groupSettlementBalances, user]);
 
   if (groupDetails?.isLoading || !groupDetails?.data) {
     return <FullPageSkeleton />;

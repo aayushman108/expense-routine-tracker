@@ -1,25 +1,41 @@
-import { HiOutlineCalendar, HiOutlineSearch, HiOutlineRefresh } from "react-icons/hi";
+import {
+  HiOutlineCalendar,
+  HiOutlineSearch,
+  HiOutlineRefresh,
+} from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import styles from "./PersonalFilters.module.scss";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import { useState } from "react";
+import { LIMITS } from "@/constants/general.constant";
 
-interface PersonalFiltersProps {
-  startDate: string;
-  setStartDate: (date: string) => void;
-  endDate: string;
-  setEndDate: (date: string) => void;
-  onApply: () => void;
-  onClear: () => void;
-}
+const PersonalFilters = () => {
+  const { query, updateQuery } = useUpdateQuery();
 
-const PersonalFilters: React.FC<PersonalFiltersProps> = ({
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
-  onApply,
-  onClear,
-}) => {
-  const isAnyValuePresent = !!(startDate || endDate);
+  const [startDate, setStartDate] = useState<string>(query?.startDate || "");
+  const [endDate, setEndDate] = useState<string>(query?.endDate || "");
+
+  const isAnyValuePresent = !!(query?.startDate || query?.endDate);
+
+  const handleApplyFilters = () => {
+    updateQuery({
+      page: 1,
+      limit: LIMITS.DEFAULT_EXPENSE,
+      startDate,
+      endDate,
+    });
+  };
+
+  const handleClearFilters = () => {
+    updateQuery({
+      page: 1,
+      limit: LIMITS.DEFAULT_EXPENSE,
+      startDate: "",
+      endDate: "",
+    });
+    setStartDate("");
+    setEndDate("");
+  };
 
   return (
     <div className={styles.filterBar}>
@@ -52,7 +68,11 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
         </div>
 
         <div className={styles.filterActions}>
-          <Button size="sm" onClick={onApply} className={styles.actionBtn}>
+          <Button
+            size="sm"
+            onClick={handleApplyFilters}
+            className={styles.actionBtn}
+          >
             <div className={styles.btnContent}>
               <span className={styles.btnIcon}>
                 <HiOutlineSearch />
@@ -64,7 +84,7 @@ const PersonalFilters: React.FC<PersonalFiltersProps> = ({
             <Button
               size="sm"
               variant="outline"
-              onClick={onClear}
+              onClick={handleClearFilters}
               className={styles.actionBtn}
             >
               <div className={styles.btnContent}>

@@ -20,7 +20,6 @@ import {
   updateSplitStatus,
   updateExpense,
   deleteExpense,
-  fetchGroupExpenses,
   fetchUserGroupSummaries,
 } from "@/store/slices/expenseSlice";
 import {
