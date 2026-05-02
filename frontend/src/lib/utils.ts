@@ -21,3 +21,6 @@ export const handleThunk = async <T>(
     return undefined;
   }
 };
+
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

@@ -148,6 +148,7 @@ export const fetchUserGroupSummaries = createAsyncThunk<GroupSummary[], void>(
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await api.get("/expenses/user/group-summaries");
+
       return data.data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };

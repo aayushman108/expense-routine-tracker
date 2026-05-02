@@ -1,18 +1,31 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   HiOutlineShoppingBag,
   HiOutlineChartBar,
   HiOutlineCurrencyDollar,
 } from "react-icons/hi";
 import styles from "./GroupStats.module.scss";
-import type { GroupSummary } from "@/lib/types";
+import { GroupStatsSkeleton } from "@/app/dashboard/groups/[id]/GroupLoadingSkeletons";
+import { useAppSelector } from "@/store/hooks";
+import { useParams } from "next/navigation";
 
-interface GroupStatsProps {
-  details: GroupSummary;
-}
+const GroupStats = () => {
+  const { isGroupSummariesLoading, groupSummaries } = useAppSelector(
+    (s) => s.expenses,
+  );
+  const { id } = useParams();
 
-const GroupStats: React.FC<GroupStatsProps> = ({ details }) => {
-  const { totalGroupSpend, myTotalShare, totalPaidByMe } = details;
+  const currentGroupSummary = useMemo(() => {
+    return groupSummaries.find((gs) => gs.id === id);
+  }, [groupSummaries, id]);
+
+  console.log(isGroupSummariesLoading, "IS GROUP SUMMARY LOADING");
+
+  if (isGroupSummariesLoading) return <GroupStatsSkeleton />;
+
+  if (!groupSummaries?.length || !currentGroupSummary) return null;
+
+  const { totalGroupSpend, myTotalShare, totalPaidByMe } = currentGroupSummary;
 
   const netPosition =
     myTotalShare > 0 ? myTotalShare - totalPaidByMe : totalPaidByMe;
@@ -31,19 +44,17 @@ const GroupStats: React.FC<GroupStatsProps> = ({ details }) => {
         </div>
       </div>
 
-      {details && (
-        <div className={styles.statCard}>
-          <div className={styles.iconWrapper}>
-            <HiOutlineChartBar />
-          </div>
-          <div className={styles.statInfo}>
-            <span className={styles.statLabel}>My Share</span>
-            <div className={`${styles.statValue} ${styles.highlight}`}>
-              रू {myTotalShare.toLocaleString()}
-            </div>
+      <div className={styles.statCard}>
+        <div className={styles.iconWrapper}>
+          <HiOutlineChartBar />
+        </div>
+        <div className={styles.statInfo}>
+          <span className={styles.statLabel}>My Share</span>
+          <div className={`${styles.statValue} ${styles.highlight}`}>
+            रू {myTotalShare.toLocaleString()}
           </div>
         </div>
-      )}
+      </div>
 
       <div className={styles.statCard}>
         <div className={styles.iconWrapper}>

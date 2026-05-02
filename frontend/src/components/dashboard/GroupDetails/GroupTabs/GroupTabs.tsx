@@ -32,7 +32,15 @@ const GroupTabs: React.FC<GroupTabsProps> = ({ onDownloadStatement }) => {
         </div>
         <div
           className={`${styles.tab} ${activeTab === GROUP_TAB.SETTLEMENTS ? styles.active : ""}`}
-          onClick={() => updateQuery({ tab: GROUP_TAB.SETTLEMENTS })}
+          onClick={() =>
+            updateQuery({
+              tab: GROUP_TAB.SETTLEMENTS,
+              startDate: null,
+              endDate: null,
+              settlementStatus: null,
+              expenseStatus: null,
+            })
+          }
         >
           <HiCheck /> Settlements
         </div>

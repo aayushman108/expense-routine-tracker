@@ -19,11 +19,7 @@ import BulkSettlementModal from "@/components/dashboard/Settlement/BulkSettlemen
 import EditGroupModal from "@/components/dashboard/GroupModals/EditGroupModal";
 import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
 import Pagination from "@/components/ui/Pagination/Pagination";
-import {
-  FullPageSkeleton,
-  ExpenseCardSkeleton,
-  TableSkeleton,
-} from "./GroupLoadingSkeletons";
+import { ExpenseCardSkeleton, TableSkeleton } from "./GroupLoadingSkeletons";
 import styles from "./group-details.module.scss";
 import {
   clearGroupDetails,
@@ -50,6 +46,7 @@ import { GROUP_TAB, ToastType } from "@/enums/general.enum";
 import { useDownloadStatement } from "@/hooks/useDownloadStatement";
 import { LIMITS } from "@/constants/general.constant";
 import { showToast } from "@/lib/toast";
+import NotFound from "@/app/not-found";
 
 export enum GROUP_DETAILS_ACTION_TYPE {
   DELETE = "delete",
@@ -65,7 +62,6 @@ export default function GroupDetailsPage() {
   const {
     groupExpenses,
     isLoading: expensesLoading,
-    groupSummaries,
     pagination,
     isSubmitting,
   } = useAppSelector((s) => s.expenses);
@@ -118,10 +114,6 @@ export default function GroupDetailsPage() {
       dispatch(clearGroupDetails());
     };
   }, [id, dispatch]);
-
-  const currentGroupSummary = useMemo(() => {
-    return groupSummaries.find((gs) => gs.id === id);
-  }, [groupSummaries, id]);
 
   const fetchExpenses = useCallback(() => {
     if (!id || activeTab !== GROUP_TAB.EXPENSES) return;
@@ -178,8 +170,8 @@ export default function GroupDetailsPage() {
     return me?.role === "admin";
   }, [members, user]);
 
-  if (groupDetails?.isLoading || !groupDetails?.data) {
-    return <FullPageSkeleton />;
+  if (groupDetails?.error) {
+    return <NotFound />;
   }
 
   return (
@@ -193,11 +185,9 @@ export default function GroupDetailsPage() {
       />
 
       <div className={styles.contentGrid}>
-        {currentGroupSummary && (
-          <section className={styles.statsSection}>
-            <GroupStats details={currentGroupSummary} />
-          </section>
-        )}
+        <section className={styles.statsSection}>
+          <GroupStats />
+        </section>
 
         <main className={styles.mainColumn}>
           <GroupTabs onDownloadStatement={() => setIsDownloadModalOpen(true)} />
@@ -208,7 +198,7 @@ export default function GroupDetailsPage() {
 
           {activeTab === GROUP_TAB.EXPENSES ? (
             <div className={styles.expenseSection}>
-              {expensesLoading && groupExpenses.length === 0 ? (
+              {expensesLoading && groupExpenses?.length === 0 ? (
                 isLargeScreen ? (
                   <TableSkeleton rows={6} cols={6} />
                 ) : (

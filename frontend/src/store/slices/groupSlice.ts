@@ -207,6 +207,7 @@ const groupSlice = createSlice({
     builder.addCase(fetchGroupDetailsAction.fulfilled, (state, action) => {
       state.groupDetails.isLoading = false;
       state.groupDetails.data = action.payload;
+      state.groupDetails.error = null;
     });
     builder.addCase(fetchGroupDetailsAction.rejected, (state, action) => {
       state.groupDetails.isLoading = false;

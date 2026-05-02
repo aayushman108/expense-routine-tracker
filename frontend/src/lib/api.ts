@@ -32,20 +32,7 @@ const onRefreshFailed = (error: any) => {
 // ==============================
 // ❌ REQUEST CANCELLATION
 // ==============================
-const pendingRequests = new Map<string, AbortController>();
-
-const getRequestKey = (config: InternalAxiosRequestConfig) => {
-  return `${config.method}:${config.url}:${JSON.stringify(
-    config.params || {},
-  )}:${JSON.stringify(config.data || {})}`;
-};
-
-const cancelPendingRequest = (key: string) => {
-  if (pendingRequests.has(key)) {
-    pendingRequests.get(key)?.abort();
-    pendingRequests.delete(key);
-  }
-};
+const activeControllers = new Set<AbortController>();
 
 // ==============================
 // 🌐 AXIOS INSTANCE
@@ -64,16 +51,10 @@ const api = axios.create({
 // ==============================
 api.interceptors.request.use(
   (config) => {
-    const key = getRequestKey(config);
-
-    // Cancel duplicate GET requests (optional flag)
-    if (config.method === "get" && !config.headers?.["x-no-cancel"]) {
-      cancelPendingRequest(key);
-    }
-
     const controller = new AbortController();
     config.signal = controller.signal;
-    pendingRequests.set(key, controller);
+    (config as any)._controller = controller;
+    activeControllers.add(controller);
 
     // Attach token (client-side only)
     if (typeof window !== "undefined") {
@@ -94,22 +75,22 @@ api.interceptors.request.use(
 // ==============================
 api.interceptors.response.use(
   (response) => {
-    const key = getRequestKey(response.config);
-    pendingRequests.delete(key);
+    const controller = (response.config as any)._controller;
+    if (controller) activeControllers.delete(controller);
     return response;
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
+      _controller?: AbortController;
     };
 
-    if (originalRequest) {
-      const key = getRequestKey(originalRequest);
-      pendingRequests.delete(key);
+    if (originalRequest?._controller) {
+      activeControllers.delete(originalRequest._controller);
     }
 
     // Handle cancellation properly
-    if ((error as any)?.name === "CanceledError") {
+    if (axios.isCancel(error)) {
       return Promise.reject(error);
     }
 
@@ -119,7 +100,12 @@ api.interceptors.response.use(
     // ==============================
     // 🔁 HANDLE 401 TOKEN REFRESH
     // ==============================
-    if (status === 401 && originalRequest && !originalRequest._retry && !isRefreshRequest) {
+    if (
+      status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isRefreshRequest
+    ) {
       originalRequest._retry = true;
 
       // If already refreshing → queue requests
@@ -144,7 +130,7 @@ api.interceptors.response.use(
       try {
         // Robust URL joining for refresh endpoint
         const refreshUrl = `${API_BASE_URL.replace(/\/$/, "")}/auth/refresh`;
-        
+
         const { data } = await axios.get(refreshUrl, {
           withCredentials: true,
         });
@@ -169,7 +155,7 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         onRefreshFailed(refreshError);
-        
+
         // 🔴 Refresh failed → logout
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
@@ -194,8 +180,8 @@ api.interceptors.response.use(
 
 // Cancel all requests (e.g., on route change)
 export const cancelAllRequests = () => {
-  pendingRequests.forEach((controller) => controller.abort());
-  pendingRequests.clear();
+  activeControllers.forEach((controller) => controller.abort());
+  activeControllers.clear();
 };
 
 // Manual cancellation support

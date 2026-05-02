@@ -3,17 +3,16 @@ import styles from "./GroupHeader.module.scss";
 import {
   HiOutlineChevronLeft,
   HiOutlineChartPie,
-  HiOutlineUserAdd,
   HiOutlinePlus,
   HiOutlinePencil,
-  HiOutlineLogout,
 } from "react-icons/hi";
 import Image from "next/image";
 import Button from "@/components/ui/Button/Button";
 import type { GroupDetails } from "@/lib/types";
+import { GroupHeaderSkeleton } from "@/app/dashboard/groups/[id]/GroupLoadingSkeletons";
 
 interface GroupHeaderProps {
-  groupDetails: { data: GroupDetails | null };
+  groupDetails: { data: GroupDetails | null; isLoading: boolean };
   onBack: () => void;
   onAddExpense: () => void;
   onSettings: () => void;
@@ -27,6 +26,10 @@ const GroupHeader: React.FC<GroupHeaderProps> = ({
   onSettings,
   onEdit,
 }) => {
+  if (groupDetails?.isLoading || !groupDetails?.data) {
+    return <GroupHeaderSkeleton />;
+  }
+
   return (
     <header className={styles.header}>
       <div className={styles.titleArea}>
