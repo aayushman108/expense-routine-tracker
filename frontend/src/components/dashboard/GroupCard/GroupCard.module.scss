@@ -1,147 +1,5 @@
 @use "../../../styles/mixins" as *;
 
-.page {
-  @include flex-column;
-  gap: $space-8;
-  @include mobile-only {
-    padding: $space-6 0;
-    gap: $space-6;
-  }
-}
-
-.header {
-  @include flex-between;
-  align-items: flex-end;
-  gap: $space-6;
-  padding-bottom: $space-6;
-  border-bottom: 1px solid var(--border-light);
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100px;
-    height: 1px;
-    background: var(--color-primary);
-    box-shadow: 0 0 10px var(--color-primary);
-    z-index: 2;
-  }
-
-  @include mobile-only {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.titleArea {
-  flex: 1;
-  @include flex-column;
-  gap: 4px;
-
-  .sessionTag {
-    font-family: $font-mono;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--color-primary-600);
-    letter-spacing: 0.2em;
-    margin-bottom: $space-1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    &::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      background: var(--color-success);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--color-success);
-    }
-  }
-
-  .backBtn {
-    background: none;
-    border: none;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    gap: $space-2;
-    color: var(--text-tertiary);
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: $space-4;
-    cursor: pointer;
-    transition: all $transition-fast;
-
-    &:hover {
-      color: var(--color-primary);
-      transform: translateX(-4px);
-    }
-  }
-
-  .titleWrapper {
-    display: flex;
-    align-items: center;
-    gap: $space-4;
-
-    .icon {
-      width: 48px;
-      height: 48px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      @include flex-center;
-      font-size: 24px;
-      color: var(--color-primary);
-      box-shadow: var(--shadow-sm);
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: var(--text-primary);
-      letter-spacing: -0.04em;
-      margin: 0;
-      line-height: 1;
-      @include responsive(sm) {
-        font-size: 1.5rem;
-      }
-    }
-  }
-
-  p {
-    @include body-text;
-    max-width: 600px;
-    margin-top: $space-3;
-    color: var(--text-secondary);
-    font-weight: 500;
-    @include responsive(sm) {
-      font-size: 14px;
-    }
-  }
-}
-
-.actions {
-  display: flex;
-  gap: $space-3;
-  align-items: center;
-}
-
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: $space-6;
-
-  @include mobile-only {
-    grid-template-columns: 1fr;
-  }
-}
-
 .groupCard {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
@@ -154,7 +12,7 @@
   box-shadow: var(--shadow-sm);
   height: 100%;
   position: relative;
-  backface-visibility: hidden; // Stabilize entire card
+  backface-visibility: hidden;
   transform: translateZ(0);
 
   &::before {
@@ -174,22 +32,20 @@
 
   .image {
     height: 160px;
-    background: var(
-      --bg-card
-    ); // Match card background to prevent contrast flickering
+    background: var(--bg-card);
     position: relative;
     @include flex-center;
     overflow: hidden;
     color: var(--text-tertiary);
     font-size: 3.5rem;
-    isolation: isolate; // Prevent paint overlaps
+    isolation: isolate;
     backface-visibility: hidden;
 
     &::after {
       content: "";
       position: absolute;
       inset: 0;
-      bottom: -1px; // Slight overlap
+      bottom: -1px;
       background: linear-gradient(
         to bottom,
         transparent 40%,
@@ -246,9 +102,9 @@
     @include flex-column;
     gap: $space-4;
     position: relative;
-    z-index: 3; // Higher than image overlay
-    background: var(--bg-card); // Explicitly set background
-    margin-top: -2px; // Overlap the image container to hide sub-pixel gaps
+    z-index: 3;
+    background: var(--bg-card);
+    margin-top: -2px;
     border-radius: 0 0 16px 16px;
 
     .topRow {
@@ -372,35 +228,6 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-  }
-}
-
-.emptyState {
-  @include card;
-  @include flex-center;
-  flex-direction: column;
-  padding: $space-16 $space-8;
-  text-align: center;
-  gap: $space-4;
-  color: var(--text-secondary);
-  border: 2px dashed var(--border-default);
-  background: transparent;
-
-  .emptyIcon {
-    font-size: $font-size-5xl;
-    color: var(--text-tertiary);
-    opacity: 0.3;
-    margin-bottom: $space-2;
-  }
-
-  h3 {
-    @include heading($font-size-xl);
-  }
-
-  p {
-    max-width: 360px;
-    margin: 0 auto;
-    @include body-text;
   }
 }
 
