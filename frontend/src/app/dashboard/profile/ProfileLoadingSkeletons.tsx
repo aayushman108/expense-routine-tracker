@@ -3,7 +3,7 @@ import Skeleton from "@/components/ui/Skeleton/Skeleton";
 import styles from "./profile.module.scss";
 
 /** ── Header Skeleton ── */
-const HeaderSkeleton = () => (
+export const HeaderSkeleton = () => (
   <header className={styles.header}>
     <div className={styles.titleArea}>
       <Skeleton width={140} height={11} borderRadius="4px" />
@@ -29,7 +29,7 @@ const HeaderSkeleton = () => (
 );
 
 /** ── Profile Hero (Avatar + Info) Skeleton ── */
-const ProfileHeroSkeleton = () => (
+export const ProfileHeroSkeleton = () => (
   <div className={styles.profileHero}>
     <div className={styles.avatarSection}>
       <Skeleton width={120} height={120} borderRadius="50%" />
@@ -53,7 +53,7 @@ const ProfileHeroSkeleton = () => (
 );
 
 /** ── User Details Card Skeleton ── */
-const UserDetailsCardSkeleton = () => (
+export const UserDetailsCardSkeleton = () => (
   <div className={styles.card}>
     <ProfileHeroSkeleton />
 
@@ -80,7 +80,7 @@ const UserDetailsCardSkeleton = () => (
 );
 
 /** ── Account Security Card Skeleton ── */
-const SecurityCardSkeleton = () => (
+export const SecurityCardSkeleton = () => (
   <div className={styles.card}>
     <div className={styles.sectionHeader}>
       <Skeleton width={180} height={18} borderRadius="6px" />
@@ -110,7 +110,7 @@ const SecurityCardSkeleton = () => (
 );
 
 /** ── Payment Methods Skeleton ── */
-const PaymentMethodsSkeleton = () => (
+export const PaymentMethodsSkeleton = () => (
   <section className={styles.paymentSection}>
     <div className={styles.paymentHeader}>
       <Skeleton width={180} height={18} borderRadius="6px" />

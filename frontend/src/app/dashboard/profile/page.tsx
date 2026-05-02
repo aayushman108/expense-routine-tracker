@@ -30,7 +30,11 @@ import type { User } from "@/lib/types";
 import { PAYMENT_METHOD_TYPE } from "@expense-tracker/shared/enum/payment.enum";
 import { BankCard } from "@/components/dashboard/BankCard/BankCard";
 import { WalletCard } from "@/components/dashboard/WalletCard/WalletCard";
-import { FullProfileSkeleton } from "./ProfileLoadingSkeletons";
+import {
+  FullProfileSkeleton,
+  UserDetailsCardSkeleton,
+  PaymentMethodsSkeleton,
+} from "./ProfileLoadingSkeletons";
 import { PaymentDetailsForm } from "@/components/dashboard/PaymentDetailsForm/PaymentDetailsForm";
 import { FORM_MODE } from "@expense-tracker/shared";
 import { ChangePasswordForm } from "@/components/dashboard/ChangePasswordForm/ChangePasswordForm";
@@ -189,7 +193,7 @@ export default function ProfilePage() {
     handleThunk(dispatch(logoutUser()), () => router.push("/"));
   };
 
-  if (!user || authLoading || pmLoading) {
+  if (!user) {
     return <FullProfileSkeleton />;
   }
 
@@ -221,93 +225,97 @@ export default function ProfilePage() {
       <div className={styles.profileLayout}>
         <div className={styles.leftColumn}>
           {/* ── User Details Card ── */}
-          <Card className={styles.card}>
-            <div className={styles.profileHero}>
-              <div className={styles.avatarSection}>
-                <div className={styles.avatar}>
-                  {user?.avatar?.url ? (
-                    <Image
-                      src={user.avatar.url}
-                      alt={user.full_name}
-                      fill
-                      style={{ objectFit: "cover" }}
+          {authLoading ? (
+            <UserDetailsCardSkeleton />
+          ) : (
+            <Card className={styles.card}>
+              <div className={styles.profileHero}>
+                <div className={styles.avatarSection}>
+                  <div className={styles.avatar}>
+                    {user?.avatar?.url ? (
+                      <Image
+                        src={user.avatar.url}
+                        alt={user.full_name}
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      getInitials(user?.full_name)
+                    )}
+                  </div>
+                  <label className={styles.editBtn} title="Upload New Avatar">
+                    <input
+                      type="file"
+                      className={styles.hiddenInput}
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
                     />
-                  ) : (
-                    getInitials(user?.full_name)
-                  )}
+                    <HiOutlineCamera />
+                  </label>
                 </div>
-                <label className={styles.editBtn} title="Upload New Avatar">
-                  <input
-                    type="file"
-                    className={styles.hiddenInput}
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                  />
-                  <HiOutlineCamera />
-                </label>
+                <div className={styles.infoSection}>
+                  <span className={styles.name}>{user?.full_name}</span>
+                  <span className={styles.email}>{user?.email}</span>
+                  <span className={styles.joined}>
+                    Member since{" "}
+                    {user?.created_at
+                      ? new Date(user.created_at).toLocaleDateString("en-US", {
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : "N/A"}
+                  </span>
+                </div>
               </div>
-              <div className={styles.infoSection}>
-                <span className={styles.name}>{user?.full_name}</span>
-                <span className={styles.email}>{user?.email}</span>
-                <span className={styles.joined}>
-                  Member since{" "}
-                  {user?.created_at
-                    ? new Date(user.created_at).toLocaleDateString("en-US", {
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "N/A"}
-                </span>
-              </div>
-            </div>
 
-            <div className={styles.sectionHeader}>
-              <h3 className={styles.sectionTitle}>Personal Information</h3>
-              {!isEditing && (
-                <button
-                  className={styles.editIconBtn}
-                  onClick={() => setIsEditing(true)}
-                  title="Edit profile"
-                >
-                  <HiOutlinePencil />
-                </button>
+              <div className={styles.sectionHeader}>
+                <h3 className={styles.sectionTitle}>Personal Information</h3>
+                {!isEditing && (
+                  <button
+                    className={styles.editIconBtn}
+                    onClick={() => setIsEditing(true)}
+                    title="Edit profile"
+                  >
+                    <HiOutlinePencil />
+                  </button>
+                )}
+              </div>
+
+              {isEditing ? (
+                <EditProfileForm
+                  user={user as User}
+                  closeEdit={() => setIsEditing(false)}
+                />
+              ) : (
+                <div className={styles.detailsGrid}>
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>
+                      <HiOutlineUser /> Full Name
+                    </span>
+                    <span className={styles.detailValue}>
+                      {user?.full_name || "—"}
+                    </span>
+                  </div>
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>
+                      <HiOutlineMail /> Email Address
+                    </span>
+                    <span className={styles.detailValue}>
+                      {user?.email || "—"}
+                    </span>
+                  </div>
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>
+                      <HiOutlinePhone /> Phone Number
+                    </span>
+                    <span className={styles.detailValue}>
+                      {user?.phone || "—"}
+                    </span>
+                  </div>
+                </div>
               )}
-            </div>
-
-            {isEditing ? (
-              <EditProfileForm
-                user={user as User}
-                closeEdit={() => setIsEditing(false)}
-              />
-            ) : (
-              <div className={styles.detailsGrid}>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>
-                    <HiOutlineUser /> Full Name
-                  </span>
-                  <span className={styles.detailValue}>
-                    {user?.full_name || "—"}
-                  </span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>
-                    <HiOutlineMail /> Email Address
-                  </span>
-                  <span className={styles.detailValue}>
-                    {user?.email || "—"}
-                  </span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>
-                    <HiOutlinePhone /> Phone Number
-                  </span>
-                  <span className={styles.detailValue}>
-                    {user?.phone || "—"}
-                  </span>
-                </div>
-              </div>
-            )}
-          </Card>
+            </Card>
+          )}
 
           <Card className={styles.card}>
             <div className={styles.sectionHeader}>
@@ -348,61 +356,66 @@ export default function ProfilePage() {
 
         <div className={styles.rightColumn}>
           {/* ── Payment Methods Section ── */}
-          <section className={styles.paymentSection}>
-            <div className={styles.paymentHeader}>
-              <h3 className={styles.sectionTitle}>
-                <HiOutlineCreditCard /> Payment Methods
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsPaymentModalOpen(true)}
-              >
-                <HiOutlinePlus /> Add New
-              </Button>
-            </div>
+          {pmLoading && paymentMethods.length === 0 ? (
+            <PaymentMethodsSkeleton />
+          ) : (
+            <section className={styles.paymentSection}>
+              <div className={styles.paymentHeader}>
+                <h3 className={styles.sectionTitle}>
+                  <HiOutlineCreditCard /> Payment Methods
+                </h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsPaymentModalOpen(true)}
+                >
+                  <HiOutlinePlus /> Add New
+                </Button>
+              </div>
 
-            <div className={styles.paymentGrid}>
-              {paymentMethods.length === 0 && !pmLoading && (
-                <Card className={styles.emptyCard}>
-                  <div className={styles.emptyState}>
-                    <HiOutlineCreditCard />
-                    <p>No payment methods added yet.</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsPaymentModalOpen(true)}
-                    >
-                      <HiOutlinePlus size={18} /> Add Your First Payment Method
-                    </Button>
-                  </div>
-                </Card>
-              )}
+              <div className={styles.paymentGrid}>
+                {paymentMethods.length === 0 ? (
+                  <Card className={styles.emptyCard}>
+                    <div className={styles.emptyState}>
+                      <HiOutlineCreditCard />
+                      <p>No payment methods added yet.</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsPaymentModalOpen(true)}
+                      >
+                        <HiOutlinePlus size={18} /> Add Your First Payment
+                        Method
+                      </Button>
+                    </div>
+                  </Card>
+                ) : (
+                  paymentMethods.map((pm) => {
+                    const isBank = pm.provider === PAYMENT_METHOD_TYPE.BANK;
 
-              {paymentMethods.map((pm) => {
-                const isBank = pm.provider === PAYMENT_METHOD_TYPE.BANK;
+                    if (isBank) {
+                      return (
+                        <BankCard
+                          key={pm.id}
+                          pm={pm}
+                          handleCopyToClipboard={handleCopyToClipboard}
+                        />
+                      );
+                    }
 
-                if (isBank) {
-                  return (
-                    <BankCard
-                      key={pm.id}
-                      pm={pm}
-                      handleCopyToClipboard={handleCopyToClipboard}
-                    />
-                  );
-                }
-
-                return (
-                  <WalletCard
-                    key={pm.id}
-                    pm={pm}
-                    user={user as User}
-                    handleCopyToClipboard={handleCopyToClipboard}
-                  />
-                );
-              })}
-            </div>
-          </section>
+                    return (
+                      <WalletCard
+                        key={pm.id}
+                        pm={pm}
+                        user={user as User}
+                        handleCopyToClipboard={handleCopyToClipboard}
+                      />
+                    );
+                  })
+                )}
+              </div>
+            </section>
+          )}
         </div>
       </div>
 
