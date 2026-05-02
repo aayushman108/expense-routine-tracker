@@ -96,6 +96,18 @@
   }
 }
 
+.success {
+  background: var(--color-success);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+
+  &:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  }
+}
+
 // ── Sizes ──
 .sm {
   padding: $space-2 $space-4;

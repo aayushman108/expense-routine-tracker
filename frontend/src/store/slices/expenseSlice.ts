@@ -1,6 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
-import type { Expense, CreateExpensePayload } from "../../lib/types";
+import type {
+  Expense,
+  CreateExpensePayload,
+  GroupSummary,
+} from "../../lib/types";
 import {
   EXPENSE_TYPE,
   SPLIT_STATUS,
@@ -21,15 +25,7 @@ interface ExpenseState {
     remainingToReceive: number;
     pendingVerificationsCount: number;
   } | null;
-  groupSummaries: {
-    id: string;
-    name: string;
-    totalGroupSpend: number;
-    totalPaidByMe: number;
-    myTotalShare: number;
-    iOweOthers: number;
-    othersOweMe: number;
-  }[];
+  groupSummaries: GroupSummary[];
   monthlyAnalytics: {
     month: string;
     personalExpense: number;
@@ -161,20 +157,20 @@ export const fetchUserSummary = createAsyncThunk<ExpenseState["summary"], void>(
   },
 );
 
-export const fetchUserGroupSummaries = createAsyncThunk<
-  ExpenseState["groupSummaries"],
-  void
->("expenses/fetchUserGroupSummaries", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await api.get("/expenses/user/group-summaries");
-    return data.data;
-  } catch (err: unknown) {
-    const error = err as { response?: { data?: { message?: string } } };
-    return rejectWithValue(
-      error.response?.data?.message || "Failed to fetch group summaries",
-    );
-  }
-});
+export const fetchUserGroupSummaries = createAsyncThunk<GroupSummary[], void>(
+  "expenses/fetchUserGroupSummaries",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get("/expenses/user/group-summaries");
+      return data.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch group summaries",
+      );
+    }
+  },
+);
 
 export const fetchMonthlyAnalytics = createAsyncThunk<
   ExpenseState["monthlyAnalytics"],

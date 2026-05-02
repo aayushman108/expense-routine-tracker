@@ -122,7 +122,7 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
       return (
         <>
           <button
-            className={styles.actionBtn}
+            className={`${styles.actionBtn} ${styles.view}`}
             onClick={() => onSelect(expense.id)}
             title="View Details"
           >
@@ -130,7 +130,7 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
           </button>
           {canEdit && (
             <button
-              className={`${styles.actionBtn} ${styles.editBtn}`}
+              className={`${styles.actionBtn} ${styles.edit}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit?.(expense);
@@ -142,7 +142,7 @@ const ExpenseTable: React.FC<ExpenseTableProps> = ({
           )}
           {canDelete && (
             <button
-              className={`${styles.actionBtn} ${styles.deleteBtn}`}
+              className={`${styles.actionBtn} ${styles.danger}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete?.(expense.id);

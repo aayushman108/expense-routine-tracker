@@ -115,7 +115,10 @@ export interface GroupBalance {
   to_user_email: string;
   to_user_avatar?: { url: string; publicId: string } | null;
   status: SETTLEMENT_STATUS;
+  settlement_id?: string | null;
   proof_image?: { url: string; publicId: string } | null;
+  paid_at?: string | null;
+  reviewed_at?: string | null;
 }
 
 // ── API Response types ──
@@ -167,4 +170,14 @@ export interface CreateExpensePayload {
   params: {
     groupId?: string | null;
   };
+}
+
+export interface GroupSummary {
+  id: string;
+  name: string;
+  totalGroupSpend: number;
+  totalPaidByMe: number;
+  myTotalShare: number;
+  iOweOthers: number;
+  othersOweMe: number;
 }

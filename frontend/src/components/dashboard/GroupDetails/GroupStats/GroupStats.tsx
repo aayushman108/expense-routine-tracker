@@ -5,30 +5,18 @@ import {
   HiOutlineCurrencyDollar,
 } from "react-icons/hi";
 import styles from "./GroupStats.module.scss";
-import type { GroupDetails } from "@/lib/types";
-
-interface GroupSummary {
-  id: string;
-  name: string;
-  totalGroupSpend: number;
-  totalPaidByMe: number;
-  myTotalShare: number;
-  iOweOthers: number;
-  othersOweMe: number;
-}
+import type { GroupSummary } from "@/lib/types";
 
 interface GroupStatsProps {
-  groupDetails: { data: GroupDetails | null };
-  totalGroupSpend: number;
-  netPosition: number;
-  summary?: GroupSummary;
+  details: GroupSummary;
 }
 
-const GroupStats: React.FC<GroupStatsProps> = ({
-  totalGroupSpend,
-  netPosition,
-  summary,
-}) => {
+const GroupStats: React.FC<GroupStatsProps> = ({ details }) => {
+  const { totalGroupSpend, myTotalShare, totalPaidByMe } = details;
+
+  const netPosition =
+    myTotalShare > 0 ? myTotalShare - totalPaidByMe : totalPaidByMe;
+
   return (
     <div className={styles.statsGrid}>
       <div className={styles.statCard}>
@@ -43,7 +31,7 @@ const GroupStats: React.FC<GroupStatsProps> = ({
         </div>
       </div>
 
-      {summary && (
+      {details && (
         <div className={styles.statCard}>
           <div className={styles.iconWrapper}>
             <HiOutlineChartBar />
@@ -51,25 +39,23 @@ const GroupStats: React.FC<GroupStatsProps> = ({
           <div className={styles.statInfo}>
             <span className={styles.statLabel}>My Share</span>
             <div className={`${styles.statValue} ${styles.highlight}`}>
-              रू {summary.myTotalShare.toLocaleString()}
+              रू {myTotalShare.toLocaleString()}
             </div>
           </div>
         </div>
       )}
 
-      {summary && (
-        <div className={styles.statCard}>
-          <div className={styles.iconWrapper}>
-            <HiOutlineCurrencyDollar />
-          </div>
-          <div className={styles.statInfo}>
-            <span className={styles.statLabel}>Paid by Me</span>
-            <div className={styles.statValue}>
-              रू {summary.totalPaidByMe.toLocaleString()}
-            </div>
+      <div className={styles.statCard}>
+        <div className={styles.iconWrapper}>
+          <HiOutlineCurrencyDollar />
+        </div>
+        <div className={styles.statInfo}>
+          <span className={styles.statLabel}>Paid by Me</span>
+          <div className={styles.statValue}>
+            रू {totalPaidByMe.toLocaleString()}
           </div>
         </div>
-      )}
+      </div>
 
       <div className={styles.statCard}>
         <div className={styles.iconWrapper}>

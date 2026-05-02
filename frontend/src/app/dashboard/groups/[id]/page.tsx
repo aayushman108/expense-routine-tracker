@@ -41,13 +41,16 @@ import ExpenseFilters from "@/components/dashboard/GroupDetails/ExpenseFilters/E
 import ExpenseCard from "@/components/dashboard/GroupDetails/ExpenseCard/ExpenseCard";
 import ExpenseTable from "@/components/dashboard/GroupDetails/ExpenseTable/ExpenseTable";
 import SettlementCard from "@/components/dashboard/GroupDetails/SettlementCard/SettlementCard";
-import SettlementTable from "@/components/dashboard/GroupDetails/SettlementTable/SettlementTable";
+import SettlementTable, {
+  GroupBalanceWithId,
+} from "@/components/dashboard/GroupDetails/SettlementTable/SettlementTable";
 import GroupStats from "@/components/dashboard/GroupDetails/GroupStats/GroupStats";
 import DownloadStatementModal from "@/components/dashboard/GroupDetails/DownloadStatementModal/DownloadStatementModal";
 import { GROUP_TAB, ToastType } from "@/enums/general.enum";
 import { useDownloadStatement } from "@/hooks/useDownloadStatement";
 import { LIMITS } from "@/constants/general.constant";
 import { showToast } from "@/lib/toast";
+import { current } from "@reduxjs/toolkit";
 
 export enum GROUP_DETAILS_ACTION_TYPE {
   DELETE = "delete",
@@ -83,9 +86,8 @@ export default function GroupDetailsPage() {
     null,
   );
 
-  const [selectedBalance, setSelectedBalance] = useState<GroupBalance | null>(
-    null,
-  );
+  const [selectedBalance, setSelectedBalance] =
+    useState<GroupBalanceWithId | null>(null);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
@@ -148,7 +150,7 @@ export default function GroupDetailsPage() {
     onSuccess: () => setIsDownloadModalOpen(false),
   });
 
-  const handleOpenBulkModal = (balance: GroupBalance) => {
+  const handleOpenBulkModal = (balance: GroupBalanceWithId) => {
     setSelectedBalance(balance);
     setIsBulkModalOpen(true);
   };
@@ -217,14 +219,11 @@ export default function GroupDetailsPage() {
       />
 
       <div className={styles.contentGrid}>
-        <section className={styles.statsSection}>
-          <GroupStats
-            groupDetails={groupDetails}
-            totalGroupSpend={totalGroupSpend}
-            netPosition={netPosition}
-            summary={currentGroupSummary}
-          />
-        </section>
+        {currentGroupSummary && (
+          <section className={styles.statsSection}>
+            <GroupStats details={currentGroupSummary} />
+          </section>
+        )}
 
         <main className={styles.mainColumn}>
           <GroupTabs onDownloadStatement={() => setIsDownloadModalOpen(true)} />
@@ -321,16 +320,22 @@ export default function GroupDetailsPage() {
                   />
                 ) : (
                   <div className={styles.settlements}>
-                    {groupSettlementBalances.map(
-                      (balance: GroupBalance, index: number) => (
+                    {groupSettlementBalances.map((balance: GroupBalance) => {
+                      const balanceWithId = {
+                        ...balance,
+                        id:
+                          balance.settlement_id ||
+                          `${balance.from_user_id}-${balance.to_user_id}`,
+                      };
+                      return (
                         <SettlementCard
-                          key={`balance-${index}`}
-                          balance={balance}
+                          key={`balance-${balanceWithId.id}`}
+                          balance={balanceWithId}
                           user={user}
                           onAction={handleOpenBulkModal}
                         />
-                      ),
-                    )}
+                      );
+                    })}
                   </div>
                 )
               ) : (
@@ -370,6 +375,7 @@ export default function GroupDetailsPage() {
       />
 
       <BulkSettlementModal
+        key={selectedBalance?.id}
         isOpen={isBulkModalOpen}
         onClose={() => setIsBulkModalOpen(false)}
         groupId={id as string}

@@ -4,10 +4,29 @@ import { sendSuccessResponse } from "../utils/successResponseHandler.utils";
 import { asyncHandler } from "../utils/asyncHandler";
 import { BaseError } from "../utils/baseError.util";
 import { HttpStatusCode } from "../enums/statusCode.enum";
+import { SETTLEMENT_STATUS } from "@expense-tracker/shared";
 
 const updateStatus = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await settlementService.updateStatus(id, req.body);
+  const { status } = req.body;
+
+  // Build proof image from uploaded file if present
+  const file = req.file as any;
+  const proofImage = file
+    ? { url: file.path, publicId: file.filename }
+    : req.body.proofImage;
+
+  const payload = {
+    status,
+    proofImage,
+    reviewedBy:
+      status === SETTLEMENT_STATUS.CONFIRMED ||
+      status === SETTLEMENT_STATUS.REJECTED
+        ? (req.userId as string)
+        : undefined,
+  };
+
+  const result = await settlementService.updateStatus(id, payload);
   return sendSuccessResponse(res, {
     message: "Settlement updated successfully",
     data: result,
@@ -52,26 +71,8 @@ const settleBulk = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-const confirmBulk = asyncHandler(async (req: Request, res: Response) => {
-  const { groupId } = req.params;
-  const { fromUserId, toUserId } = req.body;
-  const confirmedBy = req.userId as string;
-
-  const result = await settlementService.confirmBulk(
-    groupId,
-    fromUserId,
-    toUserId,
-    confirmedBy,
-  );
-  return sendSuccessResponse(res, {
-    message: "Settlement confirmed successfully",
-    data: result,
-  });
-});
-
 export const settlementController = {
   updateStatus,
   getGroupBalances,
   settleBulk,
-  confirmBulk,
 };

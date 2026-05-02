@@ -56,7 +56,7 @@ export async function getGroupBalances(groupId: string) {
   // 2. Greedy algorithm for simplified debts (Virtual Settlements)
   const simplifiedDebts = simplifyDebts(users);
 
-  // 3. Fetch active settlements (Paid or Pending review)
+  // 3. Fetch active settlements (Paid, Rejected, or Confirmed)
   const activeSettlementsQuery = `
     SELECT 
         s.from_user_id,
@@ -65,6 +65,8 @@ export async function getGroupBalances(groupId: string) {
         s.status,
         s.id as settlement_id,
         s.proof_image,
+        s.paid_at,
+        s.reviewed_at,
         fu.full_name as from_user_name,
         fu.email as from_user_email,
         fu.avatar as from_user_avatar,
@@ -75,7 +77,7 @@ export async function getGroupBalances(groupId: string) {
     JOIN users fu ON s.from_user_id = fu.id
     JOIN users tu ON s.to_user_id = tu.id
     WHERE s.group_id = ? 
-      AND s.status IN (?, ?)
+      AND s.status IN (?, ?, ?, ?)
     ORDER BY status DESC, total_amount DESC
   `;
 
@@ -83,6 +85,8 @@ export async function getGroupBalances(groupId: string) {
     groupId,
     SETTLEMENT_STATUS.PENDING,
     SETTLEMENT_STATUS.PAID,
+    SETTLEMENT_STATUS.REJECTED,
+    SETTLEMENT_STATUS.CONFIRMED,
   ]);
 
   return [...simplifiedDebts, ...activeSettlementsResult.rows];
@@ -299,20 +303,74 @@ export async function confirmBulk(
 export async function updateSettlementStatus(
   settlementId: string,
   status: SETTLEMENT_STATUS,
-  proofImage?: { url: string; publicId: string },
+  options: {
+    proofImage?: { url: string; publicId: string };
+    reviewedBy?: string;
+  } = {},
 ) {
-  const result = await db.raw(
-    `
-    UPDATE settlements 
-    SET status = ?, proof_image = ?, updated_at = CURRENT_TIMESTAMP
-    ${status === SETTLEMENT_STATUS.PAID ? ", paid_at = CURRENT_TIMESTAMP" : ""}
-    WHERE id = ? 
-    RETURNING *
-  `,
-    [status, proofImage ? JSON.stringify(proofImage) : null, settlementId],
-  );
+  return await db.transaction(async (trx) => {
+    const { proofImage, reviewedBy } = options;
 
-  return result.rows[0];
+    const result = await trx.raw(
+      `
+      UPDATE settlements 
+      SET status = ?, 
+          proof_image = COALESCE(?, proof_image), 
+          reviewed_by = COALESCE(?, reviewed_by),
+          reviewed_at = CASE WHEN ? IS NOT NULL THEN CURRENT_TIMESTAMP ELSE reviewed_at END,
+          paid_at = CASE WHEN ? = 'paid' THEN CURRENT_TIMESTAMP ELSE paid_at END,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? 
+      RETURNING *
+    `,
+      [
+        status,
+        proofImage ? JSON.stringify(proofImage) : null,
+        reviewedBy,
+        reviewedBy,
+        status,
+        settlementId,
+      ],
+    );
+
+    const settlement = result.rows[0];
+
+    if (!settlement) {
+      throw new Error("Settlement not found");
+    }
+
+    if (status === SETTLEMENT_STATUS.REJECTED) {
+      // If rejected, free the splits so they can be settled again
+      await trx.raw(
+        `UPDATE expense_splits SET settlement_id = NULL WHERE settlement_id = ?`,
+        [settlementId],
+      );
+    } else if (status === SETTLEMENT_STATUS.PAID) {
+      // Re-link splits if they were unlinked (e.g. from REJECTED state)
+      // Logic for re-linking: link splits that belong to this group, are verified, not settled,
+      // and involve the payer/receiver.
+      await trx.raw(
+        `
+        UPDATE expense_splits
+        SET settlement_id = ?
+        WHERE id IN (
+          SELECT es.id FROM expense_splits es
+          JOIN expenses e ON es.expense_id = e.id
+          WHERE e.group_id = ? AND es.settlement_id IS NULL AND e.expense_status = 'verified'
+          AND (es.user_id = ? OR e.paid_by = ?)
+        )
+      `,
+        [
+          settlementId,
+          settlement.group_id,
+          settlement.from_user_id,
+          settlement.to_user_id,
+        ],
+      );
+    }
+
+    return settlement;
+  });
 }
 
 export const settlementDao = {

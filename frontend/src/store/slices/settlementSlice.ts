@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
 import type { GroupBalance } from "../../lib/types";
+import { SETTLEMENT_STATUS } from "@expense-tracker/shared";
 
 interface SettlementState {
   groupSettlementBalances: GroupBalance[];
@@ -70,28 +71,73 @@ export const settleBulkAction = createAsyncThunk<
   }
 });
 
-export const confirmBulkAction = createAsyncThunk<
+/**
+ * Update settlement status using the settlement ID.
+ * Used for: confirm (PAID -> CONFIRMED), reject (PAID/CONFIRMED -> REJECTED)
+ */
+export const updateSettlementStatusAction = createAsyncThunk<
   void,
   {
+    settlementId: string;
     groupId: string;
-    fromUserId: string;
-    toUserId: string;
+    status: SETTLEMENT_STATUS;
   }
->("settlements/confirmBulk", async (payload, { dispatch, rejectWithValue }) => {
-  try {
-    await api.post(`/settlements/group/${payload.groupId}/confirm-bulk`, {
-      fromUserId: payload.fromUserId,
-      toUserId: payload.toUserId,
-    });
-    // Refresh balances after confirmation
-    dispatch(fetchGroupSettlementBalances(payload.groupId));
-  } catch (err: unknown) {
-    const error = err as { response?: { data?: { message?: string } } };
-    return rejectWithValue(
-      error.response?.data?.message || "Failed to confirm settlement",
-    );
+>(
+  "settlements/updateStatus",
+  async (payload, { dispatch, rejectWithValue }) => {
+    try {
+      await api.patch(`/settlements/${payload.settlementId}/status`, {
+        status: payload.status,
+      });
+      // Refresh balances after status change
+      dispatch(fetchGroupSettlementBalances(payload.groupId));
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update settlement status",
+      );
+    }
+  },
+);
+
+/**
+ * Update settlement proof image (re-upload) using the settlement ID.
+ * Used when debtor re-uploads proof in PAID or REJECTED state.
+ */
+export const updateSettlementProofAction = createAsyncThunk<
+  void,
+  {
+    settlementId: string;
+    groupId: string;
+    proofImage: File;
   }
-});
+>(
+  "settlements/updateProof",
+  async (payload, { dispatch, rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("proofImage", payload.proofImage);
+      formData.append("status", SETTLEMENT_STATUS.PAID);
+
+      await api.patch(
+        `/settlements/${payload.settlementId}/status`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      // Refresh balances after proof update
+      dispatch(fetchGroupSettlementBalances(payload.groupId));
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update payment proof",
+      );
+    }
+  },
+);
 
 const settlementSlice = createSlice({
   name: "settlements",
@@ -130,14 +176,27 @@ const settlementSlice = createSlice({
       });
 
     builder
-      .addCase(confirmBulkAction.pending, (state) => {
+      .addCase(updateSettlementStatusAction.pending, (state) => {
         state.isSubmitting = true;
         state.error = null;
       })
-      .addCase(confirmBulkAction.fulfilled, (state) => {
+      .addCase(updateSettlementStatusAction.fulfilled, (state) => {
         state.isSubmitting = false;
       })
-      .addCase(confirmBulkAction.rejected, (state, action) => {
+      .addCase(updateSettlementStatusAction.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(updateSettlementProofAction.pending, (state) => {
+        state.isSubmitting = true;
+        state.error = null;
+      })
+      .addCase(updateSettlementProofAction.fulfilled, (state) => {
+        state.isSubmitting = false;
+      })
+      .addCase(updateSettlementProofAction.rejected, (state, action) => {
         state.isSubmitting = false;
         state.error = action.payload as string;
       });

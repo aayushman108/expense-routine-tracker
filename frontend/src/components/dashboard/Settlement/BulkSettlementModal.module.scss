@@ -197,7 +197,8 @@
   border: 1px solid var(--border-default);
 
   .verificationFlow,
-  .paymentFlow {
+  .paymentFlow,
+  .rejectionFlow {
     display: flex;
     gap: $space-4;
     align-items: center;
@@ -238,6 +239,17 @@
     }
     h4 {
       color: var(--color-success);
+    }
+  }
+
+  .rejectionFlow {
+    .iconWrapper {
+      background: var(--color-danger-100);
+      color: var(--color-danger);
+      border: 1px solid var(--color-danger-200);
+    }
+    h4 {
+      color: var(--color-danger);
     }
   }
 

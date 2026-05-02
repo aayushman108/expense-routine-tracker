@@ -9,6 +9,7 @@ const upload = uploadMiddleware("settlements");
 
 router.patch(
   "/:id/status",
+  upload.single("proofImage"),
   validateRequest(updateSettlementStatusSchema),
   settlementController.updateStatus,
 );
@@ -20,7 +21,5 @@ router.post(
   upload.single("proofImage"),
   settlementController.settleBulk,
 );
-
-router.post("/group/:groupId/confirm-bulk", settlementController.confirmBulk);
 
 export { router as settlementRouter };

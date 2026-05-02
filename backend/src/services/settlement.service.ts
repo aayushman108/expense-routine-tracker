@@ -6,13 +6,12 @@ import { SETTLEMENT_STATUS } from "@expense-tracker/shared";
 
 async function updateStatus(
   id: string,
-  data: IUpdateSettlementStatusSchema["body"],
+  data: IUpdateSettlementStatusSchema["body"] & { reviewedBy?: string },
 ) {
-  return await settlementDao.updateSettlementStatus(
-    id,
-    data.status,
-    data.proofImage,
-  );
+  return await settlementDao.updateSettlementStatus(id, data.status, {
+    proofImage: data.proofImage,
+    reviewedBy: data.reviewedBy,
+  });
 }
 
 async function getGroupBalances(groupId: string) {
