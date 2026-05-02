@@ -10,10 +10,10 @@ export default function FinancialHealthCard() {
 
   const owedToYou = summary?.remainingToReceive || 0;
   const youOwe = summary?.remainingToPay || 0;
-  const netBalance = owedToYou - youOwe;
+  const netBalance = youOwe - owedToYou;
 
-  const total = summary?.groupSpend ?? 0;
-  const receivablePercent = total > 0 ? (owedToYou / total) * 100 : 0;
+  const totalBalance = owedToYou + youOwe;
+  const payablePercent = totalBalance > 0 ? (youOwe / totalBalance) * 100 : 0;
 
   if (isSummaryLoading || !summary) {
     return <FinancialHealthSkeleton />;
@@ -34,11 +34,11 @@ export default function FinancialHealthCard() {
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span
               className={styles.legendDot}
-              style={{ background: "var(--color-success)" }}
+              style={{ background: "var(--color-danger)" }}
             ></span>
             <span className={styles.legendLabel}>Receivable</span>
           </div>
-          <span className={styles.legendValueSuccess}>
+          <span className={styles.legendValueDanger}>
             रू {owedToYou.toLocaleString()}
           </span>
         </div>
@@ -48,9 +48,9 @@ export default function FinancialHealthCard() {
             className={styles.pieChart}
             style={{
               background:
-                total === 0
+                totalBalance === 0
                   ? "var(--bg-tertiary)"
-                  : `conic-gradient(var(--color-success) 0% ${receivablePercent}%, var(--color-danger) ${receivablePercent}% 100%)`,
+                  : `conic-gradient(var(--color-success) 0% ${payablePercent}%, var(--color-danger) ${payablePercent}% 100%)`,
             }}
           >
             <div className={styles.pieInner}>
@@ -68,11 +68,11 @@ export default function FinancialHealthCard() {
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span
               className={styles.legendDot}
-              style={{ background: "var(--color-danger)" }}
+              style={{ background: "var(--color-success)" }}
             ></span>
             <span className={styles.legendLabel}>Payable</span>
           </div>
-          <span className={styles.legendValueDanger}>
+          <span className={styles.legendValueSuccess}>
             रू {youOwe.toLocaleString()}
           </span>
         </div>

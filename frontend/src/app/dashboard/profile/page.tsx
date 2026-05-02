@@ -133,7 +133,7 @@ export default function ProfilePage() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
-    handleThunk(dispatch(fetchPaymentMethods()), () => {});
+    dispatch(fetchPaymentMethods());
   }, [dispatch]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -490,8 +490,8 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
   const { isLoading: authLoading } = useAppSelector((s: RootState) => s.auth);
 
   const [form, setForm] = useState({
-    fullName: "",
-    phone: "",
+    fullName: user.full_name || "",
+    phone: user.phone || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -520,14 +520,6 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
     );
   };
 
-  useEffect(() => {
-    if (user) {
-      setForm({
-        fullName: user.full_name || "",
-        phone: user.phone || "",
-      });
-    }
-  }, [user]);
 
   return (
     <form onSubmit={handleSubmit}>

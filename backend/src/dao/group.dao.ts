@@ -3,10 +3,7 @@ import {
   ICreateGroupInput,
   IUpdateGroupInput,
 } from "@expense-tracker/shared/validationSchema";
-import {
-  EXPENSE_STATUS,
-  SETTLEMENT_STATUS,
-} from "@expense-tracker/shared";
+import { EXPENSE_STATUS, SETTLEMENT_STATUS } from "@expense-tracker/shared";
 import { keysToSnakeCase } from "../utils/caseConverter";
 
 export interface IGroup {
@@ -125,7 +122,7 @@ const findByUserId = async (userId: string): Promise<IGroup[]> => {
       COALESCE(gs.total_group_spend, 0) as total_group_spend,
       COALESCE(gs.total_paid_by_me, 0) as total_paid_by_me,
       COALESCE(gs.my_total_share, 0) as my_total_share,
-      COALESCE(gs.others_owe_me, 0) - COALESCE(gs.i_owe_others, 0) as net_balance,
+      COALESCE(gs.i_owe_others, 0) - COALESCE(gs.others_owe_me, 0) as net_balance,
       COALESCE(ps.pending_count, 0) as pending_verifications
     FROM groups g
     JOIN group_members gm ON g.id = gm.group_id
@@ -285,7 +282,13 @@ const hasPendingSettlements = async (
      WHERE group_id = ? AND (from_user_id = ? OR to_user_id = ?) 
      AND status IN (?, ?)
      LIMIT 1`,
-    [groupId, userId, userId, SETTLEMENT_STATUS.PENDING, SETTLEMENT_STATUS.PAID],
+    [
+      groupId,
+      userId,
+      userId,
+      SETTLEMENT_STATUS.PENDING,
+      SETTLEMENT_STATUS.PAID,
+    ],
   );
 
   return activeSettlements.rows.length > 0;
