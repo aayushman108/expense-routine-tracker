@@ -35,11 +35,12 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.2"
   },
+  "overrides": { "postcss": "^8.5.10", "uuid": "^14.0.0", "tar": "^7.5.13" },
   "dependencies": {
     "@expense-tracker/shared": "*",
     "@types/cors": "^2.8.19",
     "bcrypt": "^5.1.1",
-    "cloudinary": "^1.41.3",
+    "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -53,6 +54,6 @@
     "multer-storage-cloudinary": "^4.0.0",
     "pdfkit": "^0.18.0",
     "pg": "^8.13.1",
-    "resend": "^6.10.0"
+    "resend": "^6.12.2"
   }
 }

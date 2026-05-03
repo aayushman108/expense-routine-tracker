@@ -16,11 +16,8 @@
     "build:backend": "npm run build -w backend",
     "build": "npm run build -w frontend && npm run build -w backend"
   },
-  "dependencies": {
-    "zod": "^4.3.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "concurrently": "^9.1.0"
-    
   }
 }
