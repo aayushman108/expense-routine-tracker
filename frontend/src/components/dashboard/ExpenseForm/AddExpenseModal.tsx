@@ -334,19 +334,19 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
   const recalculateEqualSplits = useCallback(
     (members: string[], amount: number) => {
       setSplits((prev) =>
-          prev.map((s) => ({
-            ...s,
-            splitPercentage: members.includes(s.userId)
-                ? members.length
-                    ? Number(Number(100 / members.length).toFixed(2))
-                    : 0
-                : 0,
-            splitAmount: members.includes(s.userId)
-                ? members.length
-                    ? Number(Number(amount / members.length).toFixed(2))
-                    : 0
-                : 0,
-          })),
+        prev.map((s) => ({
+          ...s,
+          splitPercentage: members.includes(s.userId)
+            ? members.length
+              ? Number(Number(100 / members.length).toFixed(2))
+              : 0
+            : 0,
+          splitAmount: members.includes(s.userId)
+            ? members.length
+              ? Number(Number(amount / members.length).toFixed(2))
+              : 0
+            : 0,
+        })),
       );
     },
     [],
@@ -493,11 +493,11 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
         0,
       );
 
-      if (Math.abs(sumOfSplits - totalAmount) > 0.01) {
+      if (Math.round(sumOfSplits) !== Math.round(totalAmount)) {
         dispatch(
           addToast({
             type: "error",
-            message: `Sum of splits (रू ${sumOfSplits.toFixed(2)}) must equal total amount (रू ${totalAmount.toFixed(2)})`,
+            message: `Sum of splits (रू ${Math.round(sumOfSplits)}) must equal total amount (रू ${Math.round(totalAmount)})`,
           }),
         );
         setSubmittingAction(null);
@@ -950,10 +950,13 @@ export default function AddExpenseModal({
   expenseType,
   expense,
 }: AddExpenseModalProps) {
+  const { isSubmitting } = useAppSelector((state) => state.expenses);
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={isSubmitting}
       title={
         expense
           ? expenseType === EXPENSE_TYPE.PERSONAL

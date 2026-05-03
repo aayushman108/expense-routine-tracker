@@ -45,10 +45,10 @@ async function addExpense(data: IAddExpense) {
     );
     const diff = Number((data.totalAmount - sumCalculated).toFixed(2));
 
-    if (Math.abs(diff) > 0.01) {
+    if (Math.round(sumCalculated) !== Math.round(data.totalAmount)) {
       throw new BaseError(
         HttpStatusCode.BAD_REQUEST,
-        `Sum of splits (रू ${sumCalculated.toFixed(2)}) must match total amount (रू ${data.totalAmount.toFixed(2)})`,
+        `Sum of splits (रू ${Math.round(sumCalculated)}) must match total amount (रू ${Math.round(data.totalAmount)})`,
       );
     }
 
@@ -93,10 +93,10 @@ async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
     );
     const diff = Number((totalAmount - sumCalculated).toFixed(2));
 
-    if (Math.abs(diff) > 0.01) {
+    if (Math.round(sumCalculated) !== Math.round(totalAmount)) {
       throw new BaseError(
         HttpStatusCode.BAD_REQUEST,
-        `Sum of splits (रू ${sumCalculated.toFixed(2)}) must match total amount (रू ${totalAmount.toFixed(2)})`,
+        `Sum of splits (रू ${Math.round(sumCalculated)}) must match total amount (रू ${Math.round(totalAmount)})`,
       );
     }
 
