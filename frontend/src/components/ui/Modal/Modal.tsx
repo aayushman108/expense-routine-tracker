@@ -13,6 +13,7 @@ interface ModalProps {
   footer?: React.ReactNode;
   size?: "sm" | "md" | "lg" | "xl";
   fullHeight?: boolean;
+  disableClose?: boolean;
 }
 
 export default function Modal({
@@ -23,12 +24,13 @@ export default function Modal({
   footer,
   size,
   fullHeight,
+  disableClose = false,
 }: ModalProps) {
   const handleEsc = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !disableClose) onClose();
     },
-    [onClose],
+    [onClose, disableClose],
   );
 
   useEffect(() => {
@@ -45,7 +47,12 @@ export default function Modal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className={styles.overlay} onClick={onClose}>
+    <div
+      className={styles.overlay}
+      onClick={(e) => {
+        if (!disableClose) onClose();
+      }}
+    >
       <div
         className={`${styles.modal} ${styles[size || "md"]}`}
         onClick={(e) => e.stopPropagation()}
@@ -53,13 +60,17 @@ export default function Modal({
         {title && (
           <div className={styles.header}>
             <h2>{title}</h2>
-            <button
-              className={styles.closeBtn}
-              onClick={onClose}
-              aria-label="Close modal"
-            >
-              <HiX />
-            </button>
+            {!disableClose && (
+              <button
+                className={styles.closeBtn}
+                onClick={(e) => {
+                  if (!disableClose) onClose();
+                }}
+                aria-label="Close modal"
+              >
+                <HiX />
+              </button>
+            )}
           </div>
         )}
         <div

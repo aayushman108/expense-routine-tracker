@@ -156,6 +156,7 @@ export default function ExpenseDetailsModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={!!submittingAction || isSubmitting}
       title="Expense Breakdown"
       size="lg"
       footer={

@@ -27,7 +27,7 @@ export default function Sidebar() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
-    handleThunk(dispatch(logoutUser()), () => router.push("/"));
+    return handleThunk(dispatch(logoutUser()), () => router.push("/"));
   };
 
   const getInitials = (name?: string) => {

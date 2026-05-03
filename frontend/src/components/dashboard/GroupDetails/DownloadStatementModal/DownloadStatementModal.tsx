@@ -54,6 +54,7 @@ const DownloadStatementModal: React.FC<DownloadStatementModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      disableClose={!!isDownloading}
       title="Download Statement"
       size="md"
       footer={

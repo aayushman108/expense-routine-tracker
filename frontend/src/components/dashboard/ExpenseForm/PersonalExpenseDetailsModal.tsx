@@ -97,6 +97,7 @@ export default function PersonalExpenseDetailsModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={isSubmitting}
       title="Personal Expense"
       size="lg"
       footer={

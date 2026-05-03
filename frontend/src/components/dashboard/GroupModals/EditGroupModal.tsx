@@ -82,6 +82,7 @@ export default function EditGroupModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={isLoading}
       title="Edit Group Details"
       footer={
         <>

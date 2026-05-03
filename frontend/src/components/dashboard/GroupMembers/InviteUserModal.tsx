@@ -89,6 +89,7 @@ export default function InviteUserModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      disableClose={isSending}
       title="Invite to Group"
       footer={
         !sent ? (

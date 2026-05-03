@@ -217,6 +217,7 @@ export default function BulkSettlementModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={isSubmitting}
       title="Settle Balance"
       size="lg"
       footer={

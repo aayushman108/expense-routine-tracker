@@ -11,7 +11,7 @@ import type { User } from "@/lib/types";
 import Image from "next/image";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { deletePaymentMethod } from "@/store/slices/paymentMethodSlice";
+import { deletePaymentMethod, fetchPaymentMethods } from "@/store/slices/paymentMethodSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import Modal from "@/components/ui/Modal/Modal";
 import Button from "@/components/ui/Button/Button";
@@ -49,6 +49,8 @@ export function WalletCard({
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const openEditModal = (pm: PaymentMethod) => {
     setEditingPM(pm);
     setIsModalOpen(true);
@@ -56,6 +58,7 @@ export function WalletCard({
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setIsDeleting(true);
 
     await handleThunk(
       dispatch(deletePaymentMethod(deleteId)),
@@ -63,6 +66,7 @@ export function WalletCard({
         dispatch(
           addToast({ type: "success", message: "Payment method removed." }),
         );
+        dispatch(fetchPaymentMethods());
       },
       () => {
         dispatch(
@@ -73,6 +77,7 @@ export function WalletCard({
         );
       },
     );
+    setIsDeleting(false);
     setDeleteId(null);
   };
 
@@ -155,6 +160,7 @@ export function WalletCard({
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        disableClose={pmLoading}
         title={"Update Payment Method"}
         size="md"
       >
@@ -168,6 +174,7 @@ export function WalletCard({
       <Modal
         isOpen={!!deleteId}
         onClose={() => setDeleteId(null)}
+        disableClose={isDeleting}
         title="Remove Payment Method"
         size="sm"
         footer={
@@ -178,7 +185,7 @@ export function WalletCard({
             <Button
               variant="danger"
               onClick={handleDelete}
-              isLoading={pmLoading}
+              isLoading={isDeleting}
             >
               <HiOutlineTrash /> Remove
             </Button>

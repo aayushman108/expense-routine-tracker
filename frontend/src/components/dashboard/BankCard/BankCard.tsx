@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import Modal from "@/components/ui/Modal/Modal";
 import { PaymentDetailsForm } from "../PaymentDetailsForm/PaymentDetailsForm";
 import { FORM_MODE } from "@expense-tracker/shared";
-import { deletePaymentMethod } from "@/store/slices/paymentMethodSlice";
+import { deletePaymentMethod, fetchPaymentMethods } from "@/store/slices/paymentMethodSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import Button from "@/components/ui/Button/Button";
 import { RootState } from "@/store";
@@ -37,6 +37,8 @@ export function BankCard({ pm, handleCopyToClipboard, readOnly }: BankCardProps)
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const openEditModal = (pm: PaymentMethod) => {
     setEditingPM(pm);
     setIsModalOpen(true);
@@ -44,12 +46,14 @@ export function BankCard({ pm, handleCopyToClipboard, readOnly }: BankCardProps)
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setIsDeleting(true);
     await handleThunk(
       dispatch(deletePaymentMethod(deleteId)),
       () => {
         dispatch(
           addToast({ type: "success", message: "Payment method removed." }),
         );
+        dispatch(fetchPaymentMethods());
       },
       () => {
         dispatch(
@@ -60,6 +64,7 @@ export function BankCard({ pm, handleCopyToClipboard, readOnly }: BankCardProps)
         );
       },
     );
+    setIsDeleting(false);
     setDeleteId(null);
   };
 
@@ -133,6 +138,7 @@ export function BankCard({ pm, handleCopyToClipboard, readOnly }: BankCardProps)
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        disableClose={pmLoading}
         title={"Update Payment Method"}
         size="md"
         footer={
@@ -165,6 +171,7 @@ export function BankCard({ pm, handleCopyToClipboard, readOnly }: BankCardProps)
       <Modal
         isOpen={!!deleteId}
         onClose={() => setDeleteId(null)}
+        disableClose={isDeleting}
         title="Remove Payment Method"
         size="sm"
         footer={
@@ -175,7 +182,7 @@ export function BankCard({ pm, handleCopyToClipboard, readOnly }: BankCardProps)
             <Button
               variant="danger"
               onClick={handleDelete}
-              isLoading={pmLoading}
+              isLoading={isDeleting}
             >
               <HiOutlineTrash /> Remove
             </Button>

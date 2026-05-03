@@ -11,6 +11,7 @@ import { PAYMENT_METHOD_TYPE } from "@expense-tracker/shared/enum/payment.enum";
 import {
   createPaymentMethod,
   updatePaymentMethod,
+  fetchPaymentMethods,
 } from "@/store/slices/paymentMethodSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToast } from "@/store/slices/uiSlice";
@@ -152,6 +153,7 @@ export function PaymentDetailsForm({
               message: "Payment method updated!",
             }),
           );
+          dispatch(fetchPaymentMethods());
           closeModal();
         },
       );
@@ -171,6 +173,7 @@ export function PaymentDetailsForm({
               message: "Payment method added!",
             }),
           );
+          dispatch(fetchPaymentMethods());
           closeModal();
         },
       );

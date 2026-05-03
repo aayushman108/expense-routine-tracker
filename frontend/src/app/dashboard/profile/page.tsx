@@ -423,6 +423,7 @@ export default function ProfilePage() {
       <Modal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
+        disableClose={pmLoading}
         title={"Add Payment Method"}
         size="md"
         footer={

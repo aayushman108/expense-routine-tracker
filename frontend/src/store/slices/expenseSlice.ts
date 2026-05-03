@@ -399,13 +399,14 @@ const expenseSlice = createSlice({
     });
 
     // Create
-    builder.addCase(createExpense.fulfilled, (state, action) => {
-      state.expenses.unshift(action.payload);
-      if (action.payload.expense_type === EXPENSE_TYPE.PERSONAL) {
-        state.personalExpenses.unshift(action.payload);
-      } else {
-        state.groupExpenses.unshift(action.payload);
-      }
+    builder.addCase(createExpense.pending, (state) => {
+      state.isSubmitting = true;
+    });
+    builder.addCase(createExpense.fulfilled, (state) => {
+      state.isSubmitting = false;
+    });
+    builder.addCase(createExpense.rejected, (state) => {
+      state.isSubmitting = false;
     });
 
     // Update expense

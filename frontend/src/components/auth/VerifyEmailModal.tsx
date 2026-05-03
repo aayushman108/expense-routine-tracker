@@ -102,6 +102,7 @@ export default function VerifyEmailModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={isLoading}
       title="Email Verification"
       footer={
         <Button

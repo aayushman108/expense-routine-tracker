@@ -27,25 +27,45 @@ export default function ConfirmModal({
   isLoading = false,
   confirmDisabled = false,
 }: ConfirmModalProps) {
+  const [localLoading, setLocalLoading] = React.useState(false);
+  const isCurrentlyLoading = isLoading || localLoading;
+
+  const handleConfirmClick = async () => {
+    let isPromise = false;
+    try {
+      const result = onConfirm();
+      if (result instanceof Promise) {
+        isPromise = true;
+        setLocalLoading(true);
+        await result;
+      }
+      onClose();
+    } catch (error) {
+      // Parent should handle error display, we just stop loading
+    } finally {
+      if (isPromise) {
+        setLocalLoading(false);
+      }
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={isCurrentlyLoading}
       title={title}
       size="sm"
       footer={
         <>
-          <Button variant="ghost" onClick={onClose} disabled={isLoading}>
+          <Button variant="ghost" onClick={onClose} disabled={isCurrentlyLoading}>
             {cancelText}
           </Button>
           <Button
             variant={confirmVariant}
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
-            isLoading={isLoading}
-            disabled={confirmDisabled}
+            onClick={handleConfirmClick}
+            isLoading={isCurrentlyLoading}
+            disabled={confirmDisabled || isCurrentlyLoading}
           >
             {confirmText}
           </Button>

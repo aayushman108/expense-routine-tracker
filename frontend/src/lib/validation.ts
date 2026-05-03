@@ -22,11 +22,18 @@ export const validateData = <T>(
     if (error instanceof ZodError) {
       const errors: Record<string, string> = {};
       error.issues.forEach((issue) => {
+        // Ignore params validation for frontend
+        if (issue.path[0] === "params") return;
+
         // Remove "body" from the path
         const path = issue.path.filter((p) => p !== "body");
         const field = path.join(".") || "_global";
         errors[field] = issue.message;
       });
+
+      if (Object.keys(errors).length === 0) {
+        return { success: true };
+      }
 
       return { success: false, errors };
     }

@@ -140,6 +140,7 @@ export default function AddMemberModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={!!addingUserId}
       title="Add Member"
       footer={
         <Button variant="ghost" onClick={onClose}>

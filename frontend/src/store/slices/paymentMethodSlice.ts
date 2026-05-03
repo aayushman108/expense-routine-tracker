@@ -128,16 +128,8 @@ const paymentMethodSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(createPaymentMethod.fulfilled, (state, action) => {
+      .addCase(createPaymentMethod.fulfilled, (state) => {
         state.isLoading = false;
-        // If the new method is default, unset others
-        if (action.payload.is_default) {
-          state.paymentMethods = state.paymentMethods.map((pm) => ({
-            ...pm,
-            is_default: false,
-          }));
-        }
-        state.paymentMethods.unshift(action.payload);
       })
       .addCase(createPaymentMethod.rejected, (state, action) => {
         state.isLoading = false;
@@ -150,18 +142,8 @@ const paymentMethodSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(updatePaymentMethod.fulfilled, (state, action) => {
+      .addCase(updatePaymentMethod.fulfilled, (state) => {
         state.isLoading = false;
-        // If updated method is now default, unset others
-        if (action.payload.is_default) {
-          state.paymentMethods = state.paymentMethods.map((pm) => ({
-            ...pm,
-            is_default: pm.id === action.payload.id,
-          }));
-        }
-        state.paymentMethods = state.paymentMethods.map((pm) =>
-          pm.id === action.payload.id ? action.payload : pm,
-        );
       })
       .addCase(updatePaymentMethod.rejected, (state, action) => {
         state.isLoading = false;
@@ -174,11 +156,8 @@ const paymentMethodSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(deletePaymentMethod.fulfilled, (state, action) => {
+      .addCase(deletePaymentMethod.fulfilled, (state) => {
         state.isLoading = false;
-        state.paymentMethods = state.paymentMethods.filter(
-          (pm) => pm.id !== action.payload,
-        );
       })
       .addCase(deletePaymentMethod.rejected, (state, action) => {
         state.isLoading = false;

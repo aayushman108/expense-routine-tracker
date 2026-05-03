@@ -96,6 +96,7 @@ export default function CreateGroupModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      disableClose={isLoading}
       title="Create A Shared Group"
       footer={
         <>
