@@ -14,6 +14,7 @@ import MemberItem from "@/components/dashboard/GroupDetails/MemberItem/MemberIte
 import { showToast } from "@/lib/toast";
 import { ToastType } from "@/enums/general.enum";
 import styles from "./settings.module.scss";
+import { GroupSettingsSkeleton } from "../GroupLoadingSkeletons";
 
 export default function GroupSettingsPage() {
   const { id } = useParams();
@@ -78,7 +79,7 @@ export default function GroupSettingsPage() {
   };
 
   if (groupDetails?.isLoading || !groupDetails?.data) {
-    return <div className={styles.loading}>Loading settings...</div>;
+    return <GroupSettingsSkeleton />;
   }
 
   return (

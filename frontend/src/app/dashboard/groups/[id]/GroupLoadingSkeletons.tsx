@@ -121,3 +121,56 @@ export const FullPageSkeleton = () => (
     </div>
   </div>
 );
+
+export const GroupSettingsSkeleton = () => (
+  <div className={styles.page} style={{ maxWidth: '800px', margin: '0 auto', padding: '1.25rem 0.5rem', width: '100%', gap: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <Skeleton width={100} height={12} />
+      <Skeleton width={180} height={28} style={{ marginTop: '0.25rem' }} />
+    </div>
+
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <section style={{ background: 'var(--bg-card)', borderRadius: '6px', border: '1px solid var(--border-default)', padding: '1.25rem', boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', gap: '1rem', flexWrap: 'wrap' }}>
+          <div>
+            <Skeleton width={80} height={18} style={{ marginBottom: '0.25rem' }} />
+            <Skeleton width={220} height={14} />
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Skeleton width={120} height={32} borderRadius="4px" />
+            <Skeleton width={100} height={32} borderRadius="4px" />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', borderBottom: i === 2 ? 'none' : '1px solid var(--border-light)' }}>
+              <Skeleton width={40} height={40} borderRadius="50%" />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <Skeleton width={140} height={16} />
+                <Skeleton width={200} height={12} />
+                <Skeleton width={60} height={10} style={{ marginTop: '0.25rem' }} />
+              </div>
+              <Skeleton width={24} height={24} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ background: 'var(--bg-card)', borderRadius: '6px', border: '1px solid var(--border-default)', padding: '1.25rem', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '3px', height: '100%', background: 'var(--color-danger)' }} />
+        <div style={{ marginBottom: '1rem' }}>
+          <Skeleton width={100} height={18} style={{ marginBottom: '0.25rem' }} />
+          <Skeleton width={260} height={14} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1.5rem', padding: '1rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border-default)', borderRadius: '6px', flexWrap: 'wrap' }}>
+          <div>
+            <Skeleton width={90} height={16} style={{ marginBottom: '0.25rem' }} />
+            <Skeleton width={320} height={12} />
+          </div>
+          <Skeleton width={110} height={32} borderRadius="4px" />
+        </div>
+      </section>
+    </div>
+  </div>
+);
