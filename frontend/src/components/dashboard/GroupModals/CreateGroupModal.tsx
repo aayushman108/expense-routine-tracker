@@ -14,6 +14,8 @@ import { addToast } from "@/store/slices/uiSlice";
 import Modal from "@/components/ui/Modal/Modal";
 import Input from "@/components/ui/Input/Input";
 import Button from "@/components/ui/Button/Button";
+import { GroupValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
 import styles from "./GroupModals.module.scss";
 import type { RootState } from "@/store";
 import { handleThunk } from "@/lib/utils";
@@ -35,11 +37,21 @@ export default function CreateGroupModal({
     description: "",
   });
 
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (validationErrors[e.target.name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[e.target.name];
+        return newErrors;
+      });
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +64,12 @@ export default function CreateGroupModal({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!form.name.trim()) return;
+
+    const result = validateData(GroupValidation.createGroupSchema, { body: form });
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
 
     const formData = new FormData();
     formData.append("name", form.name);
@@ -65,13 +82,14 @@ export default function CreateGroupModal({
       dispatch(
         addToast({ type: "success", message: "Group created successfully!" }),
       );
-    });
-    onClose();
+      onClose();
 
-    // Reset form
-    setForm({ name: "", description: "" });
-    setImage(null);
-    setPreview(null);
+      // Reset form
+      setForm({ name: "", description: "" });
+      setImage(null);
+      setPreview(null);
+      setValidationErrors({});
+    });
   };
 
   return (
@@ -137,9 +155,10 @@ export default function CreateGroupModal({
           icon={<HiOutlineUserGroup />}
           value={form.name}
           onChange={handleChange}
+          error={validationErrors.name}
           required
         />
-
+  
         <Input
           label="Description"
           name="description"
@@ -147,6 +166,7 @@ export default function CreateGroupModal({
           icon={<HiOutlineClipboardList />}
           value={form.description}
           onChange={handleChange}
+          error={validationErrors.description}
         />
 
         <div className="mt-4 p-4 bg-tertiary rounded-lg border border-default text-xs text-secondary leading-relaxed">

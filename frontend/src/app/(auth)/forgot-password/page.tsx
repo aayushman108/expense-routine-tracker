@@ -13,6 +13,8 @@ import { FiPieChart } from "react-icons/fi";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
+import { UserValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
 import styles from "../auth.module.scss";
 import api from "@/lib/api";
 
@@ -21,6 +23,9 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useGSAP(
@@ -40,8 +45,18 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = validateData(UserValidation.forgotPasswordSchema, {
+      body: { email },
+    });
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
+    setValidationErrors({});
 
     try {
       await api.post("/auth/forgot-password", { email });
@@ -100,7 +115,11 @@ export default function ForgotPasswordPage() {
                 placeholder="you@example.com"
                 icon={<HiOutlineMail />}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (validationErrors.email) setValidationErrors({});
+                }}
+                error={validationErrors.email}
                 required
               />
               <Button type="submit" fullWidth isLoading={isLoading}>

@@ -26,6 +26,8 @@ interface SelectProps {
   listHeight?: string | number;
 }
 
+import { createPortal } from "react-dom";
+
 export default function Select({
   label,
   error,
@@ -43,7 +45,9 @@ export default function Select({
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const selectId = id || `select-${label?.toLowerCase().replace(/\s+/g, "-")}`;
 
@@ -51,12 +55,38 @@ export default function Select({
   const selectedOption = options.find((opt) => opt.value === value);
   const displayLabel = selectedOption ? selectedOption.label : placeholder;
 
+  const updateCoords = useCallback(() => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, []);
+
+  // Update coords when opening
+  useEffect(() => {
+    if (isOpen) {
+      updateCoords();
+      window.addEventListener("scroll", updateCoords, true);
+      window.addEventListener("resize", updateCoords);
+    }
+    return () => {
+      window.removeEventListener("scroll", updateCoords, true);
+      window.removeEventListener("resize", updateCoords);
+    };
+  }, [isOpen, updateCoords]);
+
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        !containerRef.current.contains(e.target as Node) &&
+        listRef.current &&
+        !listRef.current.contains(e.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -174,6 +204,7 @@ export default function Select({
 
         {/* Custom trigger button */}
         <button
+          ref={triggerRef}
           type="button"
           className={`${styles.trigger} ${icon ? styles.hasIcon : ""} ${error ? styles.hasError : ""} ${isOpen ? styles.isOpen : ""} ${disabled ? styles.isDisabled : ""}`}
           onClick={() => !disabled && setIsOpen((prev) => !prev)}
@@ -195,39 +226,50 @@ export default function Select({
         </button>
 
         {/* Dropdown list */}
-        {isOpen && (
-          <ul
-            ref={listRef}
-            className={styles.dropdown}
-            role="listbox"
-            aria-labelledby={selectId}
-            style={listHeight ? { maxHeight: listHeight } : undefined}
-          >
-            {options.map((option, index) => {
-              const isSelected = option.value === value;
-              const isHighlighted = index === highlightedIndex;
-              return (
-                <li
-                  key={option.value}
-                  role="option"
-                  aria-selected={isSelected}
-                  className={`${styles.option} ${isSelected ? styles.selected : ""} ${isHighlighted ? styles.highlighted : ""} ${option.disabled ? styles.optionDisabled : ""}`}
-                  onClick={() => !option.disabled && handleSelect(option.value)}
-                  onMouseEnter={() =>
-                    !option.disabled && setHighlightedIndex(index)
-                  }
-                >
-                  <span className={styles.optionLabel}>{option.label}</span>
-                  {isSelected && (
-                    <span className={styles.checkIcon}>
-                      <HiCheck />
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        {isOpen &&
+          createPortal(
+            <ul
+              ref={listRef}
+              className={styles.dropdown}
+              role="listbox"
+              aria-labelledby={selectId}
+              style={{
+                position: "absolute",
+                top: `${coords.top}px`,
+                left: `${coords.left}px`,
+                width: `${coords.width}px`,
+                maxHeight: listHeight || "220px",
+                zIndex: 9999,
+              }}
+            >
+              {options.map((option, index) => {
+                const isSelected = option.value === value;
+                const isHighlighted = index === highlightedIndex;
+                return (
+                  <li
+                    key={option.value}
+                    role="option"
+                    aria-selected={isSelected}
+                    className={`${styles.option} ${isSelected ? styles.selected : ""} ${isHighlighted ? styles.highlighted : ""} ${option.disabled ? styles.optionDisabled : ""}`}
+                    onClick={() =>
+                      !option.disabled && handleSelect(option.value)
+                    }
+                    onMouseEnter={() =>
+                      !option.disabled && setHighlightedIndex(index)
+                    }
+                  >
+                    <span className={styles.optionLabel}>{option.label}</span>
+                    {isSelected && (
+                      <span className={styles.checkIcon}>
+                        <HiCheck />
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>,
+            document.body,
+          )}
       </div>
       {error && <span className={styles.error}>{error}</span>}
     </div>

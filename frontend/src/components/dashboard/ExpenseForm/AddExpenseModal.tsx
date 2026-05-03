@@ -26,6 +26,8 @@ import {
   EXPENSE_TYPE,
   EXPENSE_STATUS,
 } from "@expense-tracker/shared";
+import { ExpenseValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
 import { handleThunk } from "@/lib/utils";
 import { GroupMember, Expense, CreateExpensePayload } from "@/lib/types";
 
@@ -50,11 +52,22 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
     currency: expense?.currency || "NPR",
   });
 
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (
@@ -62,7 +75,27 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
     e?: React.FormEvent,
   ) => {
     e?.preventDefault();
+
+    const result = validateData(
+      expense?.id
+        ? ExpenseValidation.updateExpenseSchema
+        : ExpenseValidation.createExpenseSchema,
+      {
+        body: {
+          ...form,
+          totalAmount: Number(form.totalAmount) || 0,
+          expenseStatus: status,
+        },
+      },
+    );
+
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
+
     setSubmittingAction(status);
+    setValidationErrors({});
 
     const body: any = {
       ...form,
@@ -114,6 +147,7 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
     <form
       className={`${styles.form} ${styles.formFull}`}
       onSubmit={(e) => handleSubmit(EXPENSE_STATUS.SUBMITTED, e)}
+      noValidate
     >
       <div className={styles.scrollableContent}>
         <Input
@@ -123,6 +157,7 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
           icon={<HiOutlineClipboardList />}
           value={form.description}
           onChange={handleChange}
+          error={validationErrors.description}
           required
         />
 
@@ -135,6 +170,7 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
             icon={<HiOutlineCurrencyDollar />}
             value={form.totalAmount}
             onChange={handleChange}
+            error={validationErrors.totalAmount}
             required
             step="0.01"
           />
@@ -157,6 +193,7 @@ const AddPersonalExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
           icon={<HiOutlineCalendar />}
           value={form.expenseDate}
           onChange={handleChange}
+          error={validationErrors.expenseDate}
           required
         />
 
@@ -230,6 +267,10 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
     currency: expense?.currency || "NPR",
   });
 
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+
   const activeGroupDetails = currentGroupFromContext;
 
   const groupMembers = useMemo(() => {
@@ -293,19 +334,19 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
   const recalculateEqualSplits = useCallback(
     (members: string[], amount: number) => {
       setSplits((prev) =>
-        prev.map((s) => ({
-          ...s,
-          splitPercentage: members.includes(s.userId)
-            ? members.length
-              ? Number(Number(100 / members.length).toFixed(2))
-              : 0
-            : 0,
-          splitAmount: members.includes(s.userId)
-            ? members.length
-              ? Number(Number(amount / members.length).toFixed(2))
-              : 0
-            : 0,
-        })),
+          prev.map((s) => ({
+            ...s,
+            splitPercentage: members.includes(s.userId)
+                ? members.length
+                    ? Number(Number(100 / members.length).toFixed(2))
+                    : 0
+                : 0,
+            splitAmount: members.includes(s.userId)
+                ? members.length
+                    ? Number(Number(amount / members.length).toFixed(2))
+                    : 0
+                : 0,
+          })),
       );
     },
     [],
@@ -316,6 +357,13 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
 
     if (name === "totalAmount") {
       const newAmount = Number(value) || 0;
@@ -402,7 +450,36 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
     e?: React.FormEvent,
   ) => {
     e?.preventDefault();
+
+    const activeSplits = splits.filter((s) => activeMembers.includes(s.userId));
+    const currentGroupId = groupId || expense?.group_id;
+
+    const result = validateData(
+      expense?.id
+        ? ExpenseValidation.updateExpenseSchema
+        : ExpenseValidation.createExpenseSchema,
+      {
+        body: {
+          ...form,
+          expenseStatus: status,
+          totalAmount: Number(form.totalAmount) || 0,
+          splits: activeSplits.map((s) => ({
+            ...s,
+            splitPercentage: Number(Number(s.splitPercentage).toFixed(2)),
+            splitAmount: Number(Number(s.splitAmount).toFixed(2)),
+          })),
+        },
+        params: { groupId: currentGroupId },
+      },
+    );
+
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
+
     setSubmittingAction(status);
+    setValidationErrors({});
 
     const body: CreateExpensePayload["body"] = {
       ...form,
@@ -410,8 +487,7 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
       totalAmount: Number(form.totalAmount) || 0,
     };
 
-    if (groupId || expense?.group_id) {
-      const activeSplits = splits.filter((s) => activeMembers.includes(s.userId));
+    if (currentGroupId) {
       const sumOfSplits = activeSplits.reduce(
         (acc, s) => acc + s.splitAmount,
         0,
@@ -435,7 +511,6 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
       }));
     }
 
-    const currentGroupId = groupId || expense?.group_id;
     const params = currentGroupId ? { groupId: currentGroupId } : {};
 
     if (expense?.id) {
@@ -520,6 +595,7 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
     <form
       className={`${styles.form} ${styles.formFull}`}
       onSubmit={(e) => handleSubmit(EXPENSE_STATUS.SUBMITTED, e)}
+      noValidate
     >
       <div className={styles.scrollableContent}>
         <Input
@@ -529,6 +605,7 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
           icon={<HiOutlineClipboardList />}
           value={form.description}
           onChange={handleChange}
+          error={validationErrors.description}
           required
         />
 
@@ -541,6 +618,7 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
             icon={<HiOutlineCurrencyDollar />}
             value={form.totalAmount}
             onChange={handleChange}
+            error={validationErrors.totalAmount}
             required
             step="0.01"
           />
@@ -564,6 +642,7 @@ const AddGroupExpenseForm = ({ onClose, fetchCb, expense }: FormProps) => {
             icon={<HiOutlineCalendar />}
             value={form.expenseDate}
             onChange={handleChange}
+            error={validationErrors.expenseDate}
             required
           />
           <Select

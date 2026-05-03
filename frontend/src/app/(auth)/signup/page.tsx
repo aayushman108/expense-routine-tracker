@@ -85,10 +85,12 @@ export default function SignupPage() {
     }
 
     const result = validateData(UserValidation.signupSchema, {
-      fullName: form.fullName,
-      email: form.email,
-      phone: form.phone,
-      password: form.password,
+      body: {
+        fullName: form.fullName,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+      },
     });
 
     if (!result.success && result.errors) {
@@ -207,7 +209,11 @@ export default function SignupPage() {
             and symbols (@$!%*?&#).
           </p>
 
-          <Button type="submit" fullWidth isLoading={isLoading}>
+          <Button
+            type="submit"
+            fullWidth
+            isLoading={isLoading}
+          >
             Create Account
           </Button>
         </form>

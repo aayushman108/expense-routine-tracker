@@ -7,6 +7,8 @@ import Input from "@/components/ui/Input/Input";
 import Button from "@/components/ui/Button/Button";
 import { useAppDispatch } from "@/store/hooks";
 import { addToast } from "@/store/slices/uiSlice";
+import { GroupValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
 import api from "@/lib/api";
 import styles from "./group-member-modals.module.scss";
 
@@ -26,17 +28,25 @@ export default function InviteUserModal({
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const [sent, setSent] = useState(false);
 
   const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!email.trim()) {
-      dispatch(addToast({ type: "error", message: "Please enter an email" }));
+    const result = validateData(GroupValidation.inviteMemberSchema, {
+      body: { email },
+    });
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
       return;
     }
 
     setIsSending(true);
+    setValidationErrors({});
+
     try {
       await api.post(`/groups/${groupId}/invite`, { email: email.trim() });
       setSent(true);
@@ -58,12 +68,21 @@ export default function InviteUserModal({
     setEmail("");
     setSent(false);
     setIsSending(false);
+    setValidationErrors({});
     onClose();
   };
 
   const handleSendAnother = () => {
     setEmail("");
     setSent(false);
+    setValidationErrors({});
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (validationErrors.email) {
+      setValidationErrors({});
+    }
   };
 
   return (
@@ -80,7 +99,7 @@ export default function InviteUserModal({
             <Button
               variant="primary"
               onClick={() => handleSend()}
-              disabled={isSending || !email.trim()}
+              disabled={isSending}
             >
               {isSending ? (
                 "Sending..."
@@ -104,7 +123,7 @@ export default function InviteUserModal({
       }
     >
       {!sent ? (
-        <form className={styles.inviteForm} onSubmit={handleSend}>
+        <form className={styles.inviteForm} onSubmit={handleSend} noValidate>
           <div className={styles.infoBlock}>
             <div className={styles.infoIcon}>
               <HiOutlineMail />
@@ -127,7 +146,8 @@ export default function InviteUserModal({
             placeholder="user@example.com"
             icon={<HiOutlineMail />}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
+            error={validationErrors.email}
             required
           />
         </form>

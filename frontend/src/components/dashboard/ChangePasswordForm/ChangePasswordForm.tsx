@@ -30,15 +30,24 @@ export function ChangePasswordForm({ closeModal }: ChangePasswordFormProps) {
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (validationErrors[e.target.name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[e.target.name];
+        return newErrors;
+      });
+    }
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const result = validateData(UserValidation.changePasswordSchema, {
-      oldPassword: form.oldPassword,
-      newPassword: form.newPassword,
-      confirmPassword: form.confirmPassword,
+      body: {
+        oldPassword: form.oldPassword,
+        newPassword: form.newPassword,
+        confirmPassword: form.confirmPassword,
+      },
     });
 
     if (!result.success && result.errors) {

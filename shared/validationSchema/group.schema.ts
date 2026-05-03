@@ -83,7 +83,9 @@ export class GroupValidation {
     body: z.object({
       email: z.preprocess(
         requiredPreprocessor,
-        z.string().email({ message: "Invalid email address" }),
+        z
+          .string({ message: "Email is required" })
+          .email({ message: "Invalid email address" }),
       ),
     }),
   });

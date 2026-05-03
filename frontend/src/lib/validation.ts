@@ -11,14 +11,13 @@ export interface ValidationResult<T> {
  * Does NOT throw errors. Catches them and formats them for the UI.
  */
 export const validateData = <T>(
-  schema: ZodSchema<{ body: T }>,
+  schema: ZodSchema<T>,
   data: unknown,
 ): ValidationResult<T> => {
   try {
-    // Wrap data in body to match schema structure
-    const parsedData = schema.parse({ body: data });
+    const parsedData = schema.parse(data);
 
-    return { success: true, data: parsedData.body };
+    return { success: true, data: parsedData as any };
   } catch (error) {
     if (error instanceof ZodError) {
       const errors: Record<string, string> = {};

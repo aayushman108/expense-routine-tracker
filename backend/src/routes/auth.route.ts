@@ -39,7 +39,12 @@ authRouter.post(
 authRouter.get("/me", verifyJWT, authController.getMe);
 authRouter.get("/refresh", authController.refresh);
 authRouter.get("/logout", verifyJWT, authController.logout);
-authRouter.patch("/update-profile", verifyJWT, authController.updateProfile);
+authRouter.patch(
+  "/update-profile",
+  verifyJWT,
+  validateRequest(UserValidation.updateProfileSchema),
+  authController.updateProfile,
+);
 authRouter.patch(
   "/upload-avatar",
   verifyJWT,

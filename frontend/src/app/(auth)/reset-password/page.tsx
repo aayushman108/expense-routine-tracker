@@ -14,6 +14,8 @@ import { FiPieChart } from "react-icons/fi";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
+import { UserValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
 import styles from "../auth.module.scss";
 import api from "@/lib/api";
 
@@ -26,6 +28,9 @@ function ResetPasswordForm() {
   const [form, setForm] = useState({ password: "", confirmPassword: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useGSAP(
@@ -45,8 +50,21 @@ function ResetPasswordForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match.");
+      setValidationErrors({ confirmPassword: "Passwords do not match." });
+      return;
+    }
+
+    const result = validateData(UserValidation.resetPasswordSchema, {
+      body: {
+        token: token || "",
+        password: form.password,
+      },
+    });
+
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
       return;
     }
 
@@ -57,6 +75,7 @@ function ResetPasswordForm() {
 
     setIsLoading(true);
     setError(null);
+    setValidationErrors({});
 
     try {
       await api.post("/auth/reset-password", {
@@ -76,6 +95,13 @@ function ResetPasswordForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (validationErrors[e.target.name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[e.target.name];
+        return newErrors;
+      });
+    }
   };
 
   return (
@@ -123,6 +149,7 @@ function ResetPasswordForm() {
                 icon={<HiOutlineLockClosed />}
                 value={form.password}
                 onChange={handleChange}
+                error={validationErrors.password}
                 required
               />
               <Input
@@ -133,6 +160,7 @@ function ResetPasswordForm() {
                 icon={<HiOutlineLockClosed />}
                 value={form.confirmPassword}
                 onChange={handleChange}
+                error={validationErrors.confirmPassword}
                 required
               />
               <Button

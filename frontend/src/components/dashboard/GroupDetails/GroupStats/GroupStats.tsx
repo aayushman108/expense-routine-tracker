@@ -19,8 +19,6 @@ const GroupStats = () => {
     return groupSummaries.find((gs) => gs.id === id);
   }, [groupSummaries, id]);
 
-  console.log(isGroupSummariesLoading, "IS GROUP SUMMARY LOADING");
-
   if (isGroupSummariesLoading) return <GroupStatsSkeleton />;
 
   if (!groupSummaries?.length || !currentGroupSummary) return null;

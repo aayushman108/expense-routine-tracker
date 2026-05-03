@@ -17,6 +17,8 @@ import { handleThunk } from "@/lib/utils";
 import Button from "@/components/ui/Button/Button";
 import Input from "@/components/ui/Input/Input";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
+import { UserValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
 import styles from "../auth.module.scss";
 
 export default function LoginPage() {
@@ -26,6 +28,9 @@ export default function LoginPage() {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState({ email: "", password: "" });
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     if (isAuthenticated) router.push("/dashboard");
@@ -52,10 +57,24 @@ export default function LoginPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (validationErrors[e.target.name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[e.target.name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = validateData(UserValidation.loginSchema, { body: form });
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
+
     await handleThunk(dispatch(loginUser(form)), () => {
       dispatch(getCurrentUser());
     });
@@ -90,6 +109,7 @@ export default function LoginPage() {
             icon={<HiOutlineMail />}
             value={form.email}
             onChange={handleChange}
+            error={validationErrors.email}
             required
           />
           <Input
@@ -100,9 +120,14 @@ export default function LoginPage() {
             icon={<HiOutlineLockClosed />}
             value={form.password}
             onChange={handleChange}
+            error={validationErrors.password}
             required
           />
-          <Button type="submit" fullWidth isLoading={isLoading}>
+          <Button
+            type="submit"
+            fullWidth
+            isLoading={isLoading}
+          >
             Sign In
           </Button>
 

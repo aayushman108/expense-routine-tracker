@@ -493,6 +493,9 @@ export default function ProfilePage() {
   );
 }
 
+import { UserValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
+
 interface EditProfileFormProps {
   user: User;
   closeEdit: () => void;
@@ -507,12 +510,31 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
     phone: user.phone || "",
   });
 
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (validationErrors[e.target.name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[e.target.name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = validateData(UserValidation.updateProfileSchema, {
+      body: form,
+    });
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
 
     await handleThunk(
       dispatch(updateProfile(form)),
@@ -524,6 +546,7 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
           }),
         );
         closeEdit();
+        setValidationErrors({});
       },
       () => {
         dispatch(
@@ -544,6 +567,7 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
           onChange={handleChange}
           icon={<HiOutlineUser />}
           placeholder="Enter full name"
+          error={validationErrors.fullName}
           required
         />
 
@@ -554,6 +578,7 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
           onChange={handleChange}
           icon={<HiOutlinePhone />}
           placeholder="+977 98XXXXXXXX"
+          error={validationErrors.phone}
         />
       </div>
 

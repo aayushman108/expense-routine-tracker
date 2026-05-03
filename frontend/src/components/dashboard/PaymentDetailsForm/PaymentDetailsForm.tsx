@@ -25,6 +25,9 @@ interface PaymentDetailsFormProps {
   mode: FORM_MODE;
   closeModal: () => void;
 }
+import { PaymentMethodValidation } from "@expense-tracker/shared/validationSchema";
+import { validateData } from "@/lib/validation";
+
 export function PaymentDetailsForm({
   pm,
   mode,
@@ -45,17 +48,22 @@ export function PaymentDetailsForm({
     isDefault: false,
   });
 
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+
   useEffect(() => {
     if (mode === FORM_MODE.EDIT && pm) {
       setPmForm({
         provider: pm?.provider,
-        metadata: pm?.metadata as Record<string, string>,
+        metadata: (pm?.metadata as Record<string, string>) || {},
         isDefault: pm?.is_default || false,
       });
     }
-  }, [pm]);
+  }, [pm, mode]);
 
   const handlePmProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as PAYMENT_METHOD_TYPE;
     setPmForm((prev) => {
       const newMetadata: Record<string, string> = {};
       if (prev.metadata.qrCode) {
@@ -63,10 +71,17 @@ export function PaymentDetailsForm({
       }
       return {
         ...prev,
-        provider: e.target.value as PAYMENT_METHOD_TYPE,
+        provider: value,
         metadata: newMetadata,
       };
     });
+    if (validationErrors.provider) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.provider;
+        return newErrors;
+      });
+    }
   };
 
   const handlePmMetaChange = (key: string, value: string) => {
@@ -74,6 +89,13 @@ export function PaymentDetailsForm({
       ...prev,
       metadata: { ...prev.metadata, [key]: value },
     }));
+    if (validationErrors[`metadata.${key}`]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[`metadata.${key}`];
+        return newErrors;
+      });
+    }
   };
 
   const handleQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +122,19 @@ export function PaymentDetailsForm({
   const handlePmSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const schema =
+      mode === FORM_MODE.EDIT
+        ? PaymentMethodValidation.updatePaymentMethodSchema
+        : PaymentMethodValidation.createPaymentMethodSchema;
+
+    const result = validateData(schema, { body: pmForm });
+    if (!result.success && result.errors) {
+      setValidationErrors(result.errors);
+      return;
+    }
+
+    setValidationErrors({});
+
     if (mode === FORM_MODE.EDIT && pm) {
       await handleThunk(
         dispatch(
@@ -118,14 +153,6 @@ export function PaymentDetailsForm({
             }),
           );
           closeModal();
-        },
-        () => {
-          dispatch(
-            addToast({
-              type: "error",
-              message: "Failed to update payment method.",
-            }),
-          );
         },
       );
     } else {
@@ -146,14 +173,6 @@ export function PaymentDetailsForm({
           );
           closeModal();
         },
-        () => {
-          dispatch(
-            addToast({
-              type: "error",
-              message: "Failed to add payment method.",
-            }),
-          );
-        },
       );
     }
   };
@@ -171,6 +190,7 @@ export function PaymentDetailsForm({
       id="payment-details-form"
       onSubmit={handlePmSubmit}
       className={styles.pmForm}
+      noValidate
     >
       <Select
         label="Provider"
@@ -179,6 +199,7 @@ export function PaymentDetailsForm({
         onChange={handlePmProviderChange}
         options={PROVIDER_OPTIONS}
         placeholder="Select a provider"
+        error={validationErrors.provider}
         required
         listHeight={150}
       />
@@ -228,6 +249,8 @@ export function PaymentDetailsForm({
               value={pmForm.metadata[field.key] || ""}
               onChange={(e) => handlePmMetaChange(field.key, e.target.value)}
               placeholder={field.placeholder}
+              error={validationErrors[`metadata.${field.key}`]}
+              required
             />
           ),
         )}
