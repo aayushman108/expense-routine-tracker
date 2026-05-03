@@ -125,6 +125,7 @@ export default function VerifyEmailModal({
           id="verify-email-form"
           onSubmit={handleSubmit}
           className={styles.form}
+          noValidate
         >
           <OtpInput value={otp} onChange={setOtp} disabled={isLoading} />
           {error && <p className={styles.error}>{error}</p>}

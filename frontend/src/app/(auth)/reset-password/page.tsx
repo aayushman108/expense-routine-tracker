@@ -140,7 +140,7 @@ function ResetPasswordForm() {
           <>
             {error && <div className={styles.error}>{error}</div>}
 
-            <form className={styles.form} onSubmit={handleSubmit}>
+            <form className={styles.form} onSubmit={handleSubmit} noValidate>
               <Input
                 label="New Password"
                 type="password"

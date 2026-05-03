@@ -145,7 +145,7 @@ export default function SignupPage() {
           </div>
         )}
 
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <Input
             label="Full Name"
             name="fullName"

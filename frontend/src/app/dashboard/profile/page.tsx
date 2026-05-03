@@ -558,7 +558,7 @@ export function EditProfileForm({ user, closeEdit }: EditProfileFormProps) {
 
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} noValidate>
       <div className={styles.formGrid}>
         <Input
           label="Full Name"

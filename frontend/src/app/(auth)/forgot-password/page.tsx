@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
           <>
             {error && <div className={styles.error}>{error}</div>}
 
-            <form className={styles.form} onSubmit={handleSubmit}>
+            <form className={styles.form} onSubmit={handleSubmit} noValidate>
               <Input
                 label="Email"
                 type="email"

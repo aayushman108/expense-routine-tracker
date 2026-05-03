@@ -112,7 +112,7 @@ export default function CreateGroupModal({
         </>
       }
     >
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.imageUpload}>
           <label className={styles.previewWrapper}>
             <div className={styles.preview}>

@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════
 // SCSS MIXINS
 // ═══════════════════════════════════════════════════
+@use "sass:meta";
 @use "./variables" as *;
 @forward "./variables";
 
@@ -26,7 +27,7 @@
     @media (max-width: $bp-2xl) {
       @content;
     }
-  } @else if type-of($bp) == number {
+  } @else if meta.type-of($bp) == number {
     //Custom value (e.g. 300px, 40rem, etc.)
     @media (max-width: $bp) {
       @content;

@@ -14,19 +14,19 @@ export default function Hero() {
     () => {
       const tl = gsap.timeline({ delay: 0.2 });
 
-      // Animate geometric shapes
-      tl.fromTo(
-        `.${styles.shape}`,
-        { opacity: 0, scale: 0.5, rotate: -10 },
-        {
-          opacity: 1,
-          scale: 1,
-          rotate: 0,
-          stagger: 0.1,
-          duration: 1.5,
-          ease: "expo.out",
-        },
-      );
+      // Animate geometric shapes (Commented out because elements are removed from DOM)
+      // tl.fromTo(
+      //   `.${styles.shape}`,
+      //   { opacity: 0, scale: 0.5, rotate: -10 },
+      //   {
+      //     opacity: 1,
+      //     scale: 1,
+      //     rotate: 0,
+      //     stagger: 0.1,
+      //     duration: 1.5,
+      //     ease: "expo.out",
+      //   },
+      // );
 
       // Animate content items
       tl.fromTo(
@@ -46,17 +46,17 @@ export default function Hero() {
           duration: 0.8,
           ease: "power3.out",
         },
-        "-=1",
+        // "-=1", // Remove overlap if shapes are not animating
       );
 
-      // Subtle float for shapes
-      gsap.to(`.${styles.shape}`, {
-        y: "random(-20, 20)",
-        duration: "random(4, 6)",
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
+      // Subtle float for shapes (Commented out)
+      // gsap.to(`.${styles.shape}`, {
+      //   y: "random(-20, 20)",
+      //   duration: "random(4, 6)",
+      //   repeat: -1,
+      //   yoyo: true,
+      //   ease: "sine.inOut",
+      // });
     },
     { scope: heroRef },
   );

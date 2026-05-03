@@ -87,6 +87,7 @@ export function ChangePasswordForm({ closeModal }: ChangePasswordFormProps) {
       id="change-password-form"
       onSubmit={handlePasswordSubmit}
       className={styles.pmForm}
+      noValidate
     >
       <Input
         label="Old Password"
