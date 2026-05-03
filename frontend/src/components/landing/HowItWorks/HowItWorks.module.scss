@@ -58,12 +58,30 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: $space-8;
+  gap: $space-8; // 32px
   margin-top: $space-8;
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-6; // 24px
+    
+    // Make the last odd card span full width to avoid holes
+    > div:last-child {
+      grid-column: span 2;
+    }
+  }
 
   @include mobile-only {
     grid-template-columns: 1fr;
-    gap: $space-6;
+    gap: $space-5; // 20px
+
+    > div:last-child {
+      grid-column: span 1;
+    }
+  }
+
+  @include responsive(sm) {
+    gap: $space-4; // 16px
   }
 }
 
@@ -78,8 +96,17 @@
   gap: $space-16;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+  
+  @include responsive(lg) {
+    padding: $space-8;
+  }
+  @include mobile-only {
+    padding: $space-6;
+    gap: $space-12; // Reduce gap between content and number
+  }
   @include responsive(sm) {
-    padding: $space-6 $space-6;
+    padding: $space-5;
+    gap: $space-10;
   }
 
   &::before {
@@ -171,13 +198,13 @@
 }
 
 .stepTitle {
-  font-size: $font-size-2xl;
+  font-size: $font-size-xl;
   font-weight: 800;
   color: var(--text-primary);
   letter-spacing: -0.02em;
 
   @include mobile-only {
-    font-size: $font-size-xl;
+    font-size: $font-size-lg;
   }
   @include responsive(sm) {
     font-size: $font-size-md;

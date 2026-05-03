@@ -93,10 +93,20 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: $space-6; // 24px
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-5; // 20px
+  }
 
   @include mobile-only {
     grid-template-columns: 1fr;
+    gap: $space-4; // 16px
+  }
+
+  @include responsive(sm) {
+    gap: $space-3; // 12px
   }
 }
 
@@ -111,8 +121,15 @@
   gap: $space-6;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+  
+  @include responsive(lg) {
+    padding: $space-8;
+  }
+  @include mobile-only {
+    padding: $space-6;
+  }
   @include responsive(sm) {
-    padding: $space-6 $space-6;
+    padding: $space-5;
   }
 
   &:hover {
@@ -125,7 +142,25 @@
 
 .cardWide {
   grid-column: span 2;
+  
+  @include responsive(lg) {
+    grid-column: span 1;
+  }
+
   @include mobile-only {
+    grid-column: span 1;
+  }
+}
+
+// Tablet specific grid adjustments to prevent empty slots
+@include responsive(lg) {
+  .grid .card:last-child {
+    grid-column: span 2;
+  }
+}
+
+@include mobile-only {
+  .grid .card:last-child {
     grid-column: span 1;
   }
 }

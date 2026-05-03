@@ -88,10 +88,29 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: $space-8; // 32px
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-6; // 24px
+    
+    // Make the last odd card span full width to avoid holes
+    > div:last-child {
+      grid-column: span 2;
+    }
+  }
 
   @include mobile-only {
     grid-template-columns: 1fr;
+    gap: $space-5; // 20px
+
+    > div:last-child {
+      grid-column: span 1;
+    }
+  }
+
+  @include responsive(sm) {
+    gap: $space-4; // 16px
   }
 }
 
@@ -106,8 +125,15 @@
   gap: $space-6;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  
+  @include responsive(lg) {
+    padding: $space-8;
+  }
+  @include mobile-only {
+    padding: $space-6;
+  }
   @include responsive(sm) {
-    padding: $space-6 $space-6;
+    padding: $space-5;
   }
 
   &::before {
@@ -152,12 +178,12 @@
 }
 
 .cardTitle {
-  font-size: $font-size-2xl;
+  font-size: $font-size-xl;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
   @include responsive(sm) {
-    font-size: $font-size-lg;
+    font-size: $font-size-md;
   }
 }
 

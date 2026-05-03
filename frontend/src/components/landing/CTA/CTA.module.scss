@@ -38,8 +38,16 @@
   gap: $space-6;
   overflow: hidden;
   box-shadow: var(--shadow-xl), var(--shadow-glow);
+  
+  @include responsive(lg) {
+    padding: $space-12 $space-8;
+  }
+  @include mobile-only {
+    padding: $space-10 $space-6;
+    border-radius: 32px;
+  }
   @include responsive(sm) {
-    padding: $space-8 $space-6;
+    padding: $space-8 $space-5;
     border-radius: 24px;
   }
 }
@@ -135,12 +143,17 @@
   gap: $space-10;
   margin-top: $space-8;
 
+  @include responsive(lg) {
+    gap: $space-6;
+  }
+
   @include mobile-only {
     flex-direction: column;
-    gap: $space-4;
+    gap: $space-5;
   }
   @include responsive(sm) {
     margin-top: $space-4;
+    gap: $space-4;
   }
 }
 
