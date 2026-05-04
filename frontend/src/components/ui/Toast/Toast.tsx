@@ -27,7 +27,7 @@ export default function ToastContainer() {
     toasts.forEach((toast) => {
       const timer = setTimeout(() => {
         dispatch(removeToast(toast.id));
-      }, 5000);
+      }, toast.duration || 5000);
       return () => clearTimeout(timer);
     });
   }, [toasts, dispatch]);

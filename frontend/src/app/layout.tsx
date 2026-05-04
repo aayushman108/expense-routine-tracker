@@ -70,6 +70,8 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+import FCMInitializer from "@/components/pwa/FCMInitializer";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -118,6 +120,7 @@ export default function RootLayout({
         {/* <Suspense fallback={<PageLoader />}> */}
         <LoadingProvider>
           <AppProvider>
+            <FCMInitializer />
             {children}
             <ToastContainer />
           </AppProvider>
