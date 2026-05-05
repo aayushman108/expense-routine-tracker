@@ -78,12 +78,28 @@ const addMember = async (data: IAddMember) => {
     throw new BadRequestError("User is already a member of this group");
   }
 
-  return await groupDao.addMember({
+  const result = await groupDao.addMember({
     group_id: data.groupId,
     nickname: data.nickname,
     user_id: data.newMemberId,
     role: data.role || "member",
   });
+
+  try {
+    const group = await groupDao.findById(data.groupId);
+    const admin = await authDao.findById(data.adminId);
+    appEmitter.emit(EVENTS.NOTIFICATION.MEMBER_ADDED, {
+      groupId: data.groupId,
+      groupName: group?.name || "a group",
+      addedByUserId: data.adminId,
+      addedByName: admin?.full_name || "An admin",
+      newMemberId: data.newMemberId,
+    });
+  } catch (error) {
+    console.error("Error emitting member added event:", error);
+  }
+
+  return result;
 };
 
 const checkRemovalConstraints = async (groupId: string, userId: string) => {

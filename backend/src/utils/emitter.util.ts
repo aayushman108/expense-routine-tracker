@@ -13,4 +13,13 @@ export const EVENTS = {
     SETTLEMENT_UPLOADED: "email:settlement_uploaded",
     SETTLEMENT_CONFIRMED: "email:settlement_confirmed",
   },
+  NOTIFICATION: {
+    EXPENSE_CREATED: "notification:expense_created",
+    EXPENSE_UPDATED: "notification:expense_updated",
+    EXPENSE_DELETED: "notification:expense_deleted",
+    EXPENSE_VERIFIED: "notification:expense_verified",
+    MEMBER_ADDED: "notification:member_added",
+    SETTLEMENT_PAID: "notification:settlement_paid",
+    SETTLEMENT_CONFIRMED: "notification:settlement_confirmed",
+  },
 };

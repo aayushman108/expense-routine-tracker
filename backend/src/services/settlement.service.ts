@@ -47,6 +47,14 @@ async function settleBulk(
           amount: result.amount,
           currency: "NPR", // Default currency for now
         });
+
+        appEmitter.emit(EVENTS.NOTIFICATION.SETTLEMENT_PAID, {
+          groupId,
+          payerId: fromUserId,
+          receiverId: toUserId,
+          amount: result.amount,
+          currency: "NPR",
+        });
       }
     } catch (error) {
       console.error("Error emitting settlement uploaded event:", error);
@@ -82,6 +90,15 @@ async function confirmBulk(
           payerEmail: payer.email,
           payerName: payer.full_name,
           receiverName: receiver.full_name,
+          amount: result.amount,
+          currency: "NPR",
+        });
+
+        appEmitter.emit(EVENTS.NOTIFICATION.SETTLEMENT_CONFIRMED, {
+          groupId,
+          payerId: fromUserId,
+          receiverId: toUserId,
+          confirmedBy,
           amount: result.amount,
           currency: "NPR",
         });

@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
 import path from "path";
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 if (!process.env.DATABASE_URL && process.env.NODE_ENV === "production") {
-  console.warn("⚠️  WARNING: DATABASE_URL is not set in production environment!");
+  console.warn(
+    "⚠️  WARNING: DATABASE_URL is not set in production environment!",
+  );
 }
 
 export const ENV = {
@@ -39,4 +41,6 @@ export const ENV = {
   SMTP_SECURE: process.env.SMTP_SECURE || "",
   SMTP_USER: process.env.SMTP_USER || "",
   SMTP_PASSWORD: process.env.SMTP_PASSWORD || "",
+
+  FIREBASE_SERVICE_ACCOUNT_KEY: process.env.FIREBASE_SERVICE_ACCOUNT_KEY || "",
 };

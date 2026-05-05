@@ -71,7 +71,22 @@ async function addExpense(data: IAddExpense) {
     (data as any).expenseStatus = EXPENSE_STATUS.VERIFIED;
   }
 
-  return await expenseDao.createExpense({ data, splits: calculatedSplits });
+  const newExpense = await expenseDao.createExpense({
+    data,
+    splits: calculatedSplits,
+  });
+
+  if (data.expenseType === EXPENSE_TYPE.GROUP && data.groupId) {
+    appEmitter.emit(EVENTS.NOTIFICATION.EXPENSE_CREATED, {
+      groupId: data.groupId,
+      payerId: data.paidBy,
+      totalAmount: data.totalAmount,
+      description: data.description,
+      currency: data.currency || "NPR",
+    });
+  }
+
+  return newExpense;
 }
 
 async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
@@ -115,12 +130,23 @@ async function updateExpense(id: string, userId: string, data: IUpdateExpense) {
 
   delete data.splits;
 
-  return await expenseDao.updateExpense({
+  const updatedExpense = await expenseDao.updateExpense({
     expenseId: id,
     userId,
     data,
     splits: calculatedSplits,
   });
+
+  if (updatedExpense && updatedExpense.expense_type === EXPENSE_TYPE.GROUP) {
+    appEmitter.emit(EVENTS.NOTIFICATION.EXPENSE_UPDATED, {
+      groupId: updatedExpense.group_id,
+      updaterId: userId,
+      expenseId: updatedExpense.id,
+      description: updatedExpense.description,
+    });
+  }
+
+  return updatedExpense;
 }
 
 async function getExpenseDetails(id: string) {
@@ -172,7 +198,18 @@ async function getPersonalExpenses(
 }
 
 async function deleteExpense(id: string, userId: string) {
-  return await expenseDao.deleteExpense(id, userId);
+  const expense = await expenseDao.getExpenseById(id);
+  const result = await expenseDao.deleteExpense(id, userId);
+
+  if (result && expense && expense.expense_type === EXPENSE_TYPE.GROUP) {
+    appEmitter.emit(EVENTS.NOTIFICATION.EXPENSE_DELETED, {
+      groupId: expense.group_id,
+      deleterId: userId,
+      description: expense.description,
+    });
+  }
+
+  return result;
 }
 
 async function updateSplitStatus(
@@ -205,8 +242,15 @@ async function updateSplitStatus(
         totalAmount: expense.total_amount,
         currency: expense.currency || "NPR",
       });
+
+      appEmitter.emit(EVENTS.NOTIFICATION.EXPENSE_VERIFIED, {
+        groupId: expense.group_id,
+        expenseId: expense.id,
+        description: expense.description,
+        payerId: expense.paid_by,
+      });
     }
-  }
+}
 
   return newExpenseStatus;
 }

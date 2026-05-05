@@ -4,3 +4,4 @@ export * from "./group.routes";
 export * from "./user.routes";
 export * from "./settlement.routes";
 export * from "./payment-method.routes";
+export * from "./notification.routes";

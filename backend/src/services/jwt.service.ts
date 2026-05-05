@@ -14,13 +14,13 @@ class JwtService {
 
   generateAccessToken(payload: object): string {
     return jwt.sign(payload, this.accessSecret, {
-      expiresIn: ENV.ACCESS_TOKEN_EXPIRY || "15m",
+      expiresIn: (ENV.ACCESS_TOKEN_EXPIRY || "15m") as jwt.SignOptions["expiresIn"],
     });
   }
 
   generateRefreshToken(payload: object): string {
     return jwt.sign(payload, this.refreshSecret, {
-      expiresIn: ENV.REFRESH_TOKEN_EXPIRY || "15d",
+      expiresIn: (ENV.REFRESH_TOKEN_EXPIRY || "15d") as jwt.SignOptions["expiresIn"],
     });
   }
 
@@ -37,7 +37,7 @@ class JwtService {
       { id: user.id },
       this.forgotPasswordSecret + user.password_hash,
       {
-        expiresIn: ENV.FORGOT_PASSWORD_TOKEN_EXPIRY || "10m",
+        expiresIn: (ENV.FORGOT_PASSWORD_TOKEN_EXPIRY || "10m") as jwt.SignOptions["expiresIn"],
       },
     );
   }

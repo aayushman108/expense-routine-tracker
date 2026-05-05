@@ -7,6 +7,7 @@ import {
   userRouter,
   settlementRouter,
   paymentMethodRouter,
+  notificationRouter,
 } from "./routes";
 import { errorHandler, verifyJWT } from "./middlewares";
 import cookieParser from "cookie-parser";
@@ -14,9 +15,11 @@ import "./config/cloudinary.config";
 import { db } from "./database/db";
 import { ENV } from "./constants";
 import { initEmailListeners } from "./listeners/email.listener";
+import { initNotificationListeners } from "./listeners/notification.listener";
 
 // Initialize Listeners
 initEmailListeners();
+initNotificationListeners();
 
 const app = express();
 
@@ -53,6 +56,7 @@ app.use("/api/groups", groupRouter);
 app.use("/api/users", userRouter);
 app.use("/api/settlements", settlementRouter);
 app.use("/api/payment-methods", paymentMethodRouter);
+app.use("/api/notifications", notificationRouter);
 
 app.use(errorHandler);
 

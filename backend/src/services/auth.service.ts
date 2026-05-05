@@ -35,7 +35,7 @@ async function createEmailVerificationCode(user: ISignupInput) {
     { user, activationCode },
     ENV.EMAIL_VERIFICATION_SECRET as Secret,
     {
-      expiresIn: ENV.EMAIL_VERIFICATION_TOKEN_EXPIRY || "5m",
+      expiresIn: (ENV.EMAIL_VERIFICATION_TOKEN_EXPIRY || "5m") as jwt.SignOptions["expiresIn"],
     },
   );
 
