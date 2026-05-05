@@ -7,24 +7,43 @@ import { ENV } from "src/constants";
 // Set GOOGLE_APPLICATION_CREDENTIALS env var or place the key in config.
 
 if (!admin.apps.length) {
-  const serviceAccount = ENV.FIREBASE_SERVICE_ACCOUNT_KEY;
+  try {
+    const {
+      FIREBASE_PROJECT_ID,
+      FIREBASE_CLIENT_EMAIL,
+      FIREBASE_PRIVATE_KEY,
+      FIREBASE_SERVICE_ACCOUNT_KEY,
+    } = ENV;
 
-  if (serviceAccount) {
-    try {
+    if (FIREBASE_PROJECT_ID && FIREBASE_CLIENT_EMAIL && FIREBASE_PRIVATE_KEY) {
+      // Best fix: Use individual fields. Handles newline escaping in Render/Netlify.
       admin.initializeApp({
-        credential: admin.credential.cert(JSON.parse(serviceAccount)),
+        credential: admin.credential.cert({
+          projectId: FIREBASE_PROJECT_ID,
+          clientEmail: FIREBASE_CLIENT_EMAIL,
+          privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+        }),
       });
-      console.log("✅ Firebase Admin initialized successfully");
-    } catch (error) {
-      console.error("❌ Failed to initialize Firebase Admin with service account key:", error instanceof Error ? error.message : error);
-      console.warn("⚠️  Push notifications will not be available.");
-      // Fallback or just ignore so server can start
+      console.log("✅ Firebase Admin initialized with individual credentials");
+    } else if (FIREBASE_SERVICE_ACCOUNT_KEY) {
+      // Fallback: Use the full JSON string
+      admin.initializeApp({
+        credential: admin.credential.cert(JSON.parse(FIREBASE_SERVICE_ACCOUNT_KEY)),
+      });
+      console.log("✅ Firebase Admin initialized with service account JSON");
+    } else {
+      // Final fallback: Application Default Credentials
+      admin.initializeApp({
+        credential: admin.credential.applicationDefault(),
+      });
+      console.log("✅ Firebase Admin initialized with Application Default Credentials");
     }
-  } else {
-    // Falls back to Application Default Credentials
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-    });
+  } catch (error) {
+    console.error(
+      "❌ Failed to initialize Firebase Admin:",
+      error instanceof Error ? error.message : error,
+    );
+    console.warn("⚠️  Push notifications will not be available.");
   }
 }
 
