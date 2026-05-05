@@ -5,6 +5,10 @@ interface Toast {
   type: "success" | "error" | "warning" | "info";
   message: string;
   duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
 interface UiState {

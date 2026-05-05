@@ -4,11 +4,12 @@ export const showToast = (
   type: ToastType,
   message: string,
   duration: number = 5000,
+  action?: { label: string; onClick: () => void },
 ) => {
   // Use dynamic imports to avoid circular dependency issues
   Promise.all([import("@/store"), import("@/store/slices/uiSlice")]).then(
     ([{ store }, { addToast }]) => {
-      store.dispatch(addToast({ type, message, duration }));
+      store.dispatch(addToast({ type, message, duration, action }));
     },
   );
 };

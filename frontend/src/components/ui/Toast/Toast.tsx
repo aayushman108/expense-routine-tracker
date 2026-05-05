@@ -38,15 +38,32 @@ export default function ToastContainer() {
     <div className={styles.container}>
       {toasts.map((toast) => (
         <div key={toast.id} className={`${styles.toast} ${styles[toast.type]}`}>
-          <span className={styles.icon}>{icons[toast.type]}</span>
-          <span className={styles.content}>{toast.message}</span>
-          <button
-            className={styles.close}
-            onClick={() => dispatch(removeToast(toast.id))}
-            aria-label="Dismiss"
-          >
-            <HiX />
-          </button>
+          <div className={styles.main}>
+            <span className={styles.icon}>{icons[toast.type]}</span>
+            <div className={styles.body}>
+              <span className={styles.content}>{toast.message}</span>
+              {toast.action && (
+                <div className={styles.footer}>
+                  <button
+                    className={styles.actionBtn}
+                    onClick={() => {
+                      toast.action?.onClick();
+                      dispatch(removeToast(toast.id));
+                    }}
+                  >
+                    {toast.action.label}
+                  </button>
+                </div>
+              )}
+            </div>
+            <button
+              className={styles.close}
+              onClick={() => dispatch(removeToast(toast.id))}
+              aria-label="Dismiss"
+            >
+              <HiX />
+            </button>
+          </div>
         </div>
       ))}
     </div>

@@ -13,17 +13,16 @@
 }
 
 .toast {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  padding: $space-4 $space-5;
+  position: relative;
   background: var(--bg-elevated);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--border-default);
-  border-radius: $radius-lg;
-  box-shadow: var(--shadow-lg);
-  min-width: 320px;
-  max-width: 420px;
+  border-radius: $radius-xl;
+  box-shadow: var(--shadow-xl);
+  min-width: 340px;
+  max-width: 450px;
   pointer-events: auto;
+  overflow: hidden;
   animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &.exiting {
@@ -31,33 +30,80 @@
   }
 }
 
+.main {
+  display: flex;
+  gap: $space-4;
+  padding: $space-4 $space-5;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
 .icon {
-  font-size: $font-size-xl;
+  font-size: $font-size-2xl;
   flex-shrink: 0;
+  margin-top: $space-1;
 }
 
 .content {
-  flex: 1;
   font-size: $font-size-sm;
   color: var(--text-primary);
   font-weight: $font-weight-medium;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: $space-1;
 }
 
 .close {
   @include flex-center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border: none;
   background: transparent;
-  border-radius: $radius-full;
+  border-radius: $radius-md;
   color: var(--text-tertiary);
   cursor: pointer;
   flex-shrink: 0;
   transition: all $transition-fast;
+  margin-left: $space-2;
 
   &:hover {
     background: var(--bg-tertiary);
     color: var(--text-primary);
+  }
+}
+
+.actionBtn {
+  padding: $space-2 $space-4;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all $transition-fast;
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    background: var(--bg-secondary);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 

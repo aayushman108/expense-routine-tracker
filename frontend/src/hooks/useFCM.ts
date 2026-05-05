@@ -93,8 +93,26 @@ export function useFCM() {
     const unsubscribe = onMessage(messaging, (payload: MessagePayload) => {
       const title = payload.notification?.title || "New Notification";
       const body = payload.notification?.body || "";
+      const targetUrl = payload.data?.url;
 
-      showToast(ToastType.INFO, `${title}${body ? `: ${body}` : ""}`, 7000);
+      // Check if user is currently on the route the notification is pointing to
+      // We check if current pathname matches or is a parent of targetUrl
+      // Usually targetUrl is /dashboard/groups/[id]?tab=...
+      const currentPath = window.location.pathname;
+
+      if (targetUrl && (currentPath === targetUrl || targetUrl.startsWith(currentPath + "?"))) {
+        showToast(
+          ToastType.INFO,
+          `${title}${body ? `: ${body}` : ""}. Refresh the page to see the fresh data.`,
+          10000,
+          {
+            label: "Refresh",
+            onClick: () => window.location.reload(),
+          },
+        );
+      } else {
+        showToast(ToastType.INFO, `${title}${body ? `: ${body}` : ""}`, 7000);
+      }
     });
 
     unsubscribeRef.current = unsubscribe;
