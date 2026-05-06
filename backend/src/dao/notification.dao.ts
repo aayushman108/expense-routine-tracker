@@ -81,13 +81,13 @@ const createNotification = async (notification: {
 /**
  * Get all notifications for a specific user.
  */
-const getUserNotifications = async (userId: string, limit = 20) => {
+const getUserNotifications = async (userId: string, limit = 20, offset = 0) => {
   const { rows } = await db.raw(
     `SELECT * FROM notifications 
      WHERE user_id = ? 
      ORDER BY created_at DESC 
-     LIMIT ?`,
-    [userId, limit],
+     LIMIT ? OFFSET ?`,
+    [userId, limit, offset],
   );
   return rows;
 };
@@ -103,6 +103,29 @@ const markAsRead = async (notificationId: string, userId: string) => {
   );
 };
 
+/**
+ * Mark all notifications as read for a user.
+ */
+const markAllAsRead = async (userId: string) => {
+  await db.raw(
+    `UPDATE notifications SET is_read = true 
+     WHERE user_id = ? AND is_read = false`,
+    [userId],
+  );
+};
+
+/**
+ * Get the count of unread notifications for a user.
+ */
+const getUnreadCount = async (userId: string): Promise<number> => {
+  const { rows } = await db.raw(
+    `SELECT COUNT(*)::int AS count FROM notifications
+     WHERE user_id = ? AND is_read = false`,
+    [userId],
+  );
+  return rows[0]?.count ?? 0;
+};
+
 export const notificationDao = {
   saveToken,
   removeToken,
@@ -112,4 +135,6 @@ export const notificationDao = {
   createNotification,
   getUserNotifications,
   markAsRead,
+  markAllAsRead,
+  getUnreadCount,
 };

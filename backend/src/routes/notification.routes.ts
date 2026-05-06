@@ -14,8 +14,18 @@ notificationRouter.delete(
 );
 
 notificationRouter.get(
+  "/unread-count",
+  notificationController.getUnreadCount,
+);
+
+notificationRouter.get(
   "/",
   notificationController.getNotifications,
+);
+
+notificationRouter.patch(
+  "/read-all",
+  notificationController.markAllAsRead,
 );
 
 notificationRouter.patch(

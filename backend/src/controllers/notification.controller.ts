@@ -48,7 +48,11 @@ const removeToken = asyncHandler(async (req: Request, res: Response) => {
  */
 const getNotifications = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId as string;
-  const notifications = await notificationDao.getUserNotifications(userId);
+  const limit = parseInt(req.query.limit as string) || 20;
+  const page = parseInt(req.query.page as string) || 1;
+  const offset = (page - 1) * limit;
+
+  const notifications = await notificationDao.getUserNotifications(userId, limit, offset);
 
   return sendSuccessResponse(res, {
     data: notifications,
@@ -71,9 +75,39 @@ const markAsRead = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * PATCH /api/notifications/read-all
+ * Mark all notifications as read for the authenticated user.
+ */
+const markAllAsRead = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+
+  await notificationDao.markAllAsRead(userId);
+
+  return sendSuccessResponse(res, {
+    message: "All notifications marked as read",
+  });
+});
+
+/**
+ * GET /api/notifications/unread-count
+ * Get the count of unread notifications for the authenticated user.
+ */
+const getUnreadCount = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId as string;
+  const count = await notificationDao.getUnreadCount(userId);
+
+  return sendSuccessResponse(res, {
+    data: { count },
+    message: "Unread count fetched successfully",
+  });
+});
+
 export const notificationController = {
   registerToken,
   removeToken,
   getNotifications,
   markAsRead,
+  markAllAsRead,
+  getUnreadCount,
 };
