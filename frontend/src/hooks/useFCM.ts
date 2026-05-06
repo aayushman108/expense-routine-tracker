@@ -119,7 +119,15 @@ export function useFCM() {
   useEffect(() => {
     if (!user) return;
 
-    // requestPermissionAndGetToken(); // Removed to rely on custom UI prompt
+    // Auto-sync token if permission is already granted
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      Notification.permission === "granted"
+    ) {
+      requestPermissionAndGetToken();
+    }
+
     setupForegroundListener();
 
     return () => {
