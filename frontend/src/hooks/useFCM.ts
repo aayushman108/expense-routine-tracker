@@ -5,10 +5,13 @@ import { getToken, onMessage, MessagePayload } from "firebase/messaging";
 import { getFirebaseMessaging } from "@/lib/firebase";
 import api from "@/lib/api";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { addToast } from "@/store/slices/uiSlice";
 import { RootState } from "@/store";
 import { showToast } from "@/lib/toast";
 import { ToastType } from "@/enums/general.enum";
+import {
+  fetchUnreadCount,
+  setFCMEvent,
+} from "@/store/slices/notificationSlice";
 
 // Your VAPID key from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
 const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || "";
@@ -47,20 +50,23 @@ export function useFCM() {
    * Sends the token to the backend for storage.
    */
   const requestPermissionAndGetToken = useCallback(async () => {
-    if (!user || tokenSentRef.current) return;
+    if (!user) return "default";
 
     try {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         console.log("Notification permission denied");
-        return;
+        return permission;
       }
 
+      // If already sent in this session, just return granted
+      if (tokenSentRef.current) return permission;
+
       const messaging = await getFirebaseMessaging();
-      if (!messaging) return;
+      if (!messaging) return permission;
 
       const swRegistration = await registerServiceWorker();
-      if (!swRegistration) return;
+      if (!swRegistration) return permission;
 
       const token = await getToken(messaging, {
         vapidKey: VAPID_KEY,
@@ -73,13 +79,19 @@ export function useFCM() {
         tokenSentRef.current = true;
         console.log("FCM token registered successfully");
       }
+      return permission;
     } catch (err) {
       console.error("Error getting FCM token:", err);
+      return Notification.permission;
     }
   }, [user, registerServiceWorker]);
 
   /**
-   * Listen for foreground messages and show them as in-app toasts.
+   * Listen for foreground messages.
+   * - Always updates the unread badge count.
+   * - Stores the full payload in Redux so page-level hooks can react
+   *   with targeted data fetches (no full page reload).
+   * - Shows an in-app toast so the user is aware of the notification.
    */
   const setupForegroundListener = useCallback(async () => {
     const messaging = await getFirebaseMessaging();
@@ -91,32 +103,15 @@ export function useFCM() {
     }
 
     const unsubscribe = onMessage(messaging, (payload: MessagePayload) => {
-      const title = payload.notification?.title || "New Notification";
-      const body = payload.notification?.body || "";
-      const targetUrl = payload.data?.url;
+      // 🔔 Always update badge count
+      dispatch(fetchUnreadCount());
 
-      // Check if user is currently on the route the notification is pointing to
-      // We check if current pathname matches or is a parent of targetUrl
-      // Usually targetUrl is /dashboard/groups/[id]?tab=...
-      const currentPath = window.location.pathname;
-
-      if (targetUrl && (currentPath === targetUrl || targetUrl.startsWith(currentPath + "?"))) {
-        showToast(
-          ToastType.INFO,
-          `${title}${body ? `: ${body}` : ""}. Refresh the page to see the fresh data.`,
-          10000,
-          {
-            label: "Refresh",
-            onClick: () => window.location.reload(),
-          },
-        );
-      } else {
-        showToast(ToastType.INFO, `${title}${body ? `: ${body}` : ""}`, 7000);
-      }
+      // 🧠 Store full payload for page-level handling
+      dispatch(setFCMEvent(payload));
     });
 
     unsubscribeRef.current = unsubscribe;
-  }, []);
+  }, [dispatch]);
 
   /**
    * Initialize FCM: request permission, get token, and set up listener.
@@ -124,7 +119,7 @@ export function useFCM() {
   useEffect(() => {
     if (!user) return;
 
-    requestPermissionAndGetToken();
+    // requestPermissionAndGetToken(); // Removed to rely on custom UI prompt
     setupForegroundListener();
 
     return () => {

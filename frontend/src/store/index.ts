@@ -7,6 +7,7 @@ import uiReducer from "./slices/uiSlice";
 import userReducer from "./slices/userSlice";
 import settlementReducer from "./slices/settlementSlice";
 import paymentMethodReducer from "./slices/paymentMethodSlice";
+import notificationReducer from "./slices/notificationSlice";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -17,6 +18,7 @@ const appReducer = combineReducers({
   users: userReducer,
   settlements: settlementReducer,
   paymentMethods: paymentMethodReducer,
+  notifications: notificationReducer,
 });
 
 const rootReducer = (state: any, action: any) => {
@@ -35,7 +37,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ["auth/setUser"],
+        ignoredActions: ["auth/setUser", "ui/addToast"],
       },
     }),
 });

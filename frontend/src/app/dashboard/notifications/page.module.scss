@@ -1,0 +1,91 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: $space-8 $space-6;
+}
+
+.markAllBtn {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-100);
+  padding: $space-2 $space-4;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-primary-100);
+  }
+
+  svg {
+    font-size: 1.1rem;
+  }
+}
+
+.content {
+  margin-top: $space-8;
+  background: var(--bg-card);
+  border-radius: $radius-xl;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.loading {
+  padding: $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.skeleton {
+  height: 80px;
+  @include skeleton;
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.fetchingMoreLoader {
+  padding: $space-4 0;
+  opacity: 0.7;
+}
+
+.empty {
+  @include flex-center;
+  flex-direction: column;
+  padding: $space-20 $space-8;
+  text-align: center;
+  color: var(--text-tertiary);
+
+  .emptyIcon {
+    font-size: 4rem;
+    margin-bottom: $space-6;
+    opacity: 0.3;
+  }
+
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: $space-2;
+  }
+
+  p {
+    font-size: $font-size-sm;
+  }
+}

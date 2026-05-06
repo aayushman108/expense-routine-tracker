@@ -6,7 +6,9 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
 import Header from "@/components/dashboard/Header/Header";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav/MobileBottomNav";
+import NotificationSidebar from "@/components/dashboard/NotificationSidebar/NotificationSidebar";
 import { getCurrentUser } from "@/store/slices/authSlice";
+import { fetchUnreadCount } from "@/store/slices/notificationSlice";
 import { useLoading } from "@/components/providers/LoadingProvider";
 import styles from "./layout.module.scss";
 
@@ -41,6 +43,12 @@ export default function DashboardLayout({
   }, [isInitializing, isLoading, setIsLoading]);
 
   useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchUnreadCount());
+    }
+  }, [isAuthenticated, dispatch]);
+
+  useEffect(() => {
     const token = localStorage.getItem("accessToken");
     
     if (!token) {
@@ -55,6 +63,7 @@ export default function DashboardLayout({
         // isInitializing is already true from useState(!isAuthenticated)
         setIsLoading(true);
         dispatch(getCurrentUser()).then(() => {
+          dispatch(fetchUnreadCount());
           setIsLoading(false);
           setIsInitializing(false);
         });
@@ -78,6 +87,7 @@ export default function DashboardLayout({
       </main>
 
       <MobileBottomNav />
+      <NotificationSidebar />
     </div>
   );
 }

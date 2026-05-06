@@ -13,12 +13,14 @@ interface Toast {
 
 interface UiState {
   sidebarOpen: boolean;
+  notificationSidebarOpen: boolean;
   modalOpen: string | null; // modal identifier or null
   toasts: Toast[];
 }
 
 const initialState: UiState = {
   sidebarOpen: true,
+  notificationSidebarOpen: false,
   modalOpen: null,
   toasts: [],
 };
@@ -39,6 +41,12 @@ const uiSlice = createSlice({
     closeModal: (state) => {
       state.modalOpen = null;
     },
+    toggleNotificationSidebar: (state) => {
+      state.notificationSidebarOpen = !state.notificationSidebarOpen;
+    },
+    setNotificationSidebarOpen: (state, action: PayloadAction<boolean>) => {
+      state.notificationSidebarOpen = action.payload;
+    },
     addToast: (state, action: PayloadAction<Omit<Toast, "id">>) => {
       state.toasts.push({
         ...action.payload,
@@ -56,6 +64,8 @@ export const {
   setSidebarOpen,
   openModal,
   closeModal,
+  toggleNotificationSidebar,
+  setNotificationSidebarOpen,
   addToast,
   removeToast,
 } = uiSlice.actions;

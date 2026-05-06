@@ -8,7 +8,7 @@ import {
 } from "@/store/slices/expenseSlice";
 import MonthlyExpenditureChart from "@/components/dashboard/Charts/MonthlyExpenditureChart";
 import {
-  VerificationBanner,
+  NotificationBanner,
   InfrastructureStats,
   PrivateLedgerCard,
   FinancialHealthCard,
@@ -33,7 +33,7 @@ export default function DashboardPage() {
   return (
     <div className={styles.dashboard}>
       {/* ── Actionable Alerts ── */}
-      <VerificationBanner />
+      <NotificationBanner />
 
       {/* ── Infrastructure Stats ── */}
       <InfrastructureStats />

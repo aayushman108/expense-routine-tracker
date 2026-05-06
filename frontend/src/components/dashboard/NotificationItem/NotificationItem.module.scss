@@ -1,0 +1,86 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.item {
+  display: flex;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  cursor: pointer;
+  transition: all $transition-fast;
+  position: relative;
+  border-bottom: 1px solid var(--border-light);
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+
+  &.unread {
+    background: var(--bg-active);
+    
+    .title {
+      font-weight: 600;
+    }
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.iconWrapper {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  @include flex-center;
+  background: var(--bg-tertiary);
+  font-size: 1.1rem;
+
+  span {
+    display: flex;
+    &.iconGroup { color: var(--color-info); }
+    &.iconExpense { color: var(--color-warning); }
+    &.iconSuccess { color: var(--color-success); }
+    &.iconDanger { color: var(--color-danger); }
+    &.iconDefault { color: var(--text-tertiary); }
+  }
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: $font-size-sm;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  @include truncate(1);
+}
+
+.body {
+  font-size: $font-size-xs;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.time {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.unreadDot {
+  position: absolute;
+  top: $space-4;
+  right: $space-4;
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+}

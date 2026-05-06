@@ -1,17 +1,29 @@
 "use client";
 
-import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
+import { HiOutlineChevronLeft, HiOutlineChevronRight, HiOutlineBell } from "react-icons/hi";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { toggleSidebar } from "@/store/slices/uiSlice";
+import { toggleSidebar, toggleNotificationSidebar } from "@/store/slices/uiSlice";
 import ThemeToggle from "@/components/ui/ThemeToggle/ThemeToggle";
 import styles from "./Header.module.scss";
+import { useRouter } from "next/navigation";
 
 export default function DashboardHeader() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const { user } = useAppSelector((s) => s.auth);
   const { sidebarOpen } = useAppSelector((s) => s.ui);
+  const { unreadCount } = useAppSelector((s) => s.notifications);
 
   const firstName = user?.full_name?.split(" ")[0] || "there";
+
+  const handleNotificationClick = () => {
+    // For devices less than lg (1024px), navigate to notification page
+    if (window.innerWidth < 1024) {
+      router.push("/dashboard/notifications");
+    } else {
+      dispatch(toggleNotificationSidebar());
+    }
+  };
 
   return (
     <header className={`${styles.header} ${!sidebarOpen ? styles.collapsed : ""}`}>
@@ -31,14 +43,18 @@ export default function DashboardHeader() {
       </div>
 
       <div className={styles.right}>
-        {/* Search and Notification temporarily hidden */}
-        {/* <button className={styles.searchBtn} aria-label="Search">
-          <HiOutlineSearch />
-        </button>
-        <button className={styles.notifBtn} aria-label="Notifications">
+        <button 
+          className={styles.notifBtn} 
+          aria-label="Notifications"
+          onClick={handleNotificationClick}
+        >
           <HiOutlineBell />
-          <span className={styles.notifBadge} />
-        </button> */}
+          {unreadCount > 0 && (
+            <span className={styles.notifBadge}>
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </button>
         <ThemeToggle />
       </div>
     </header>

@@ -740,4 +740,31 @@
       border-color: var(--color-warning) !important;
     }
   }
+
+  &.notificationBanner {
+    border-left-color: var(--color-primary);
+    
+    .bannerIcon {
+      color: var(--color-primary);
+    }
+
+    .viewBtn {
+      background: var(--color-primary) !important;
+      color: white !important;
+      border-color: var(--color-primary) !important;
+      box-shadow: none !important;
+
+      &:hover {
+        background: var(--color-primary-600) !important;
+      }
+    }
+
+    &.denied {
+      border-left-color: var(--color-danger);
+      
+      .bannerIcon {
+        color: var(--color-danger);
+      }
+    }
+  }
 }

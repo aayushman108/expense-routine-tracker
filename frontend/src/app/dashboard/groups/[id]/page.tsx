@@ -44,6 +44,7 @@ import GroupStats from "@/components/dashboard/GroupDetails/GroupStats/GroupStat
 import DownloadStatementModal from "@/components/dashboard/GroupDetails/DownloadStatementModal/DownloadStatementModal";
 import { GROUP_TAB, ToastType } from "@/enums/general.enum";
 import { useDownloadStatement } from "@/hooks/useDownloadStatement";
+import { useFCMEventHandler } from "@/hooks/useFCMEventHandler";
 import { LIMITS } from "@/constants/general.constant";
 import { showToast } from "@/lib/toast";
 import NotFound from "@/app/not-found";
@@ -135,6 +136,11 @@ export default function GroupDetailsPage() {
   useEffect(() => {
     fetchExpenses();
   }, [fetchExpenses]);
+
+  useFCMEventHandler({
+    currentGroupId: id as string,
+    refetchExpenses: fetchExpenses,
+  });
 
   const { handleDownloadStatement, downloadingFormat } = useDownloadStatement({
     groupId: id as string,
