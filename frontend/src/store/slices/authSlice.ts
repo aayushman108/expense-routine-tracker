@@ -10,6 +10,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  isDeviceRegistered: boolean;
   isLoading: boolean;
   error: string | null;
   verificationToken: string | null;
@@ -18,6 +19,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
+  isDeviceRegistered: false,
   isLoading: false,
   error: null,
   verificationToken: null,
@@ -176,6 +178,9 @@ const authSlice = createSlice({
         state.user.is_notification_enabled = action.payload;
       }
     },
+    setDeviceRegistered: (state, action: PayloadAction<boolean>) => {
+      state.isDeviceRegistered = action.payload;
+    },
     clearError: (state) => {
       state.error = null;
     },
@@ -301,6 +306,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, updateNotificationStatus, clearError, resetAuth } =
+export const { setUser, updateNotificationStatus, setDeviceRegistered, clearError, resetAuth } =
   authSlice.actions;
 export default authSlice.reducer;

@@ -683,12 +683,36 @@
   background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-left: 4px solid var(--color-warning);
+  position: relative;
   padding: 0.875rem 1.25rem;
   border-radius: 10px;
   @include flex-between;
   animation: slideIn 0.4s ease-out forwards;
   margin-bottom: $space-2;
   box-shadow: var(--shadow-card);
+
+  .dismissBtn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    @include flex-center;
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    transition: all $transition-fast;
+    opacity: 0.4;
+    font-size: 14px;
+
+    &:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      opacity: 1;
+    }
+  }
 
   @include mobile-only {
     flex-direction: column;

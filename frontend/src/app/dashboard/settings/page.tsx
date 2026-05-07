@@ -18,30 +18,27 @@ import { addToast } from "@/store/slices/uiSlice";
 import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import styles from "./settings.module.scss";
+import { setDeviceRegistered } from "@/store/slices/authSlice";
 import type { RootState } from "@/store";
 
 export default function SettingsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((s: RootState) => s.auth);
-  const { requestPermissionAndGetToken, disableNotifications } = useFCM();
+  const { user, isDeviceRegistered } = useAppSelector((s: RootState) => s.auth);
+  const { requestPermissionAndGetToken, disableNotifications, permission } =
+    useFCM();
 
-  const [permission, setPermission] = useState<NotificationPermission>("default");
-  const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined" && "Notification" in window) {
-      setPermission(Notification.permission);
-    }
   }, []);
 
   const handleEnable = async () => {
     setIsProcessing(true);
     try {
       const result = await requestPermissionAndGetToken();
-      setPermission(result);
       if (result === "granted") {
         dispatch(addToast({ type: "success", message: "Notifications enabled successfully!" }));
       } else if (result === "denied") {
@@ -59,7 +56,6 @@ export default function SettingsPage() {
     try {
       await disableNotifications();
       dispatch(addToast({ type: "success", message: "Notifications disabled for this device." }));
-      // Permission stays 'granted' in browser, but token is removed from backend
     } catch (error) {
       dispatch(addToast({ type: "error", message: "Failed to disable notifications." }));
     } finally {
@@ -163,7 +159,7 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <div className={styles.controlActions}>
-                  {isGranted && isEnabledGlobally ? (
+                  {isDeviceRegistered ? (
                     <Button 
                       variant="danger" 
                       size="md" 

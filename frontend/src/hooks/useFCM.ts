@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { getToken, onMessage, MessagePayload } from "firebase/messaging";
 import { getFirebaseMessaging } from "@/lib/firebase";
 import api from "@/lib/api";
@@ -11,6 +11,7 @@ import { ToastType } from "@/enums/general.enum";
 import {
   setUser,
   updateNotificationStatus,
+  setDeviceRegistered,
 } from "@/store/slices/authSlice";
 import {
   fetchUnreadCount,
@@ -26,6 +27,11 @@ export function useFCM() {
   const { user } = useAppSelector((s: RootState) => s.auth);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const tokenSentRef = useRef(false);
+  const [permission, setPermission] = useState<NotificationPermission>(
+    typeof window !== "undefined" && "Notification" in window
+      ? Notification.permission
+      : "default",
+  );
 
   /**
    * Register the Firebase Messaging service worker explicitly,
@@ -59,6 +65,7 @@ export function useFCM() {
 
     try {
       const permission = await Notification.requestPermission();
+      setPermission(permission);
       if (permission !== "granted") {
         console.log("Notification permission denied");
         return permission;
@@ -82,6 +89,8 @@ export function useFCM() {
         // Send the token to the backend
         await api.post("/notifications/register-token", { token });
         tokenSentRef.current = true;
+        localStorage.setItem("fcm_token_registered", "true");
+        dispatch(setDeviceRegistered(true));
         dispatch(updateNotificationStatus(true));
         console.log("FCM token registered successfully");
       }
@@ -111,6 +120,8 @@ export function useFCM() {
       if (token) {
         await dispatch(unregisterFCMToken({ token })).unwrap();
         tokenSentRef.current = false;
+        localStorage.removeItem("fcm_token_registered");
+        dispatch(setDeviceRegistered(false));
         // Re-fetch user profile to update is_notification_enabled if needed
         // Or just update local state if we want to be optimistic
         dispatch(updateNotificationStatus(false));
@@ -154,6 +165,40 @@ export function useFCM() {
   useEffect(() => {
     if (!user) return;
 
+    // 1. Initial Sync of registration status
+    if (typeof window !== "undefined") {
+      const isRegistered =
+        localStorage.getItem("fcm_token_registered") === "true";
+      const actualRegistered =
+        Notification.permission === "granted" && isRegistered;
+      setPermission(Notification.permission);
+      dispatch(setDeviceRegistered(actualRegistered));
+
+      // 2. Listen for permission changes (browser UI)
+      if ("permissions" in navigator) {
+        navigator.permissions
+          .query({ name: "notifications" })
+          .then((status) => {
+            const handleStatusChange = () => {
+              const currentPermission = Notification.permission;
+              setPermission(currentPermission);
+              if (currentPermission !== "granted") {
+                dispatch(setDeviceRegistered(false));
+              } else {
+                dispatch(
+                  setDeviceRegistered(
+                    localStorage.getItem("fcm_token_registered") === "true",
+                  ),
+                );
+              }
+            };
+            status.addEventListener("change", handleStatusChange);
+            return () =>
+              status.removeEventListener("change", handleStatusChange);
+          });
+      }
+    }
+
     setupForegroundListener();
 
     return () => {
@@ -162,7 +207,7 @@ export function useFCM() {
         unsubscribeRef.current = null;
       }
     };
-  }, [user, setupForegroundListener]);
+  }, [user, setupForegroundListener, dispatch]);
 
-  return { requestPermissionAndGetToken, disableNotifications };
+  return { requestPermissionAndGetToken, disableNotifications, permission };
 }
