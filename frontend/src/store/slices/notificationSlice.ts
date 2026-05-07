@@ -38,6 +38,7 @@ interface NotificationState {
   notifications: Notification[];
   isLoading: boolean;
   isFetchingMore: boolean;
+  isMarkingAllRead: boolean;
   page: number;
   hasMore: boolean;
   /** The most recent FCM foreground event — consumed by page-level hooks */
@@ -49,6 +50,7 @@ const initialState: NotificationState = {
   notifications: [],
   isLoading: false,
   isFetchingMore: false,
+  isMarkingAllRead: false,
   page: 1,
   hasMore: true,
   lastEvent: null,
@@ -227,9 +229,16 @@ const notificationSlice = createSlice({
         state.unreadCount = Math.max(0, state.unreadCount - 1);
       }
     });
+    builder.addCase(markAllAsRead.pending, (state) => {
+      state.isMarkingAllRead = true;
+    });
     builder.addCase(markAllAsRead.fulfilled, (state) => {
+      state.isMarkingAllRead = false;
       state.notifications.forEach((n) => (n.is_read = true));
       state.unreadCount = 0;
+    });
+    builder.addCase(markAllAsRead.rejected, (state) => {
+      state.isMarkingAllRead = false;
     });
   },
 });

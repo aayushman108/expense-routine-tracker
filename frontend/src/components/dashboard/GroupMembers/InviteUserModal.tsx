@@ -100,15 +100,9 @@ export default function InviteUserModal({
             <Button
               variant="primary"
               onClick={() => handleSend()}
-              disabled={isSending}
+              isLoading={isSending}
             >
-              {isSending ? (
-                "Sending..."
-              ) : (
-                <>
-                  <HiOutlinePaperAirplane /> Send Invite
-                </>
-              )}
+              <HiOutlinePaperAirplane /> Send Invite
             </Button>
           </>
         ) : (

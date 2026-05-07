@@ -124,9 +124,18 @@ export const FullPageSkeleton = () => (
 
 export const GroupSettingsSkeleton = () => (
   <div className={styles.page} style={{ maxWidth: '800px', margin: '0 auto', padding: '1.25rem 0.5rem', width: '100%', gap: '1.25rem', display: 'flex', flexDirection: 'column' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <Skeleton width={100} height={12} />
-      <Skeleton width={180} height={28} style={{ marginTop: '0.25rem' }} />
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <Skeleton width={48} height={48} borderRadius="8px" />
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <Skeleton width={180} height={20} />
+            <Skeleton width={120} height={20} borderRadius="6px" />
+          </div>
+          <Skeleton width="100%" height={14} />
+        </div>
+      </div>
     </div>
 
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>

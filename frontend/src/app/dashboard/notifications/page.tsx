@@ -26,6 +26,7 @@ export default function NotificationPage() {
     notifications,
     isLoading,
     isFetchingMore,
+    isMarkingAllRead,
     unreadCount,
     page,
     hasMore,
@@ -99,6 +100,7 @@ export default function NotificationPage() {
               size="sm"
               onClick={() => dispatch(markAllAsRead())}
               className={styles.markAllBtn}
+              isLoading={isMarkingAllRead}
             >
               <HiOutlineCheckCircle />
               Mark all as read

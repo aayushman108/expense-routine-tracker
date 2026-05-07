@@ -6,24 +6,25 @@ import styles from "./profile.module.scss";
 export const HeaderSkeleton = () => (
   <header className={styles.header}>
     <div className={styles.titleArea}>
-      <Skeleton width={140} height={11} borderRadius="4px" />
-      <Skeleton
-        width={180}
-        height={10}
-        borderRadius="4px"
-        style={{ marginTop: "8px" }}
-      />
-      <div className={styles.titleWrapper} style={{ marginTop: "4px" }}>
-        <Skeleton width={48} height={48} borderRadius="12px" flexShrink={0} />
-        <Skeleton width={200} height={38} borderRadius="8px" />
+      <Skeleton width={120} height={11} borderRadius="4px" />
+      <div className={styles.headerContent} style={{ marginTop: "0.5rem" }}>
+        <div className={styles.pageIcon}>
+          <Skeleton width={32} height={32} borderRadius="8px" />
+        </div>
+        <div className={styles.textDetails}>
+          <div className={styles.titleRow}>
+            <Skeleton width={180} height={20} borderRadius="6px" />
+            <Skeleton width={100} height={18} borderRadius="4px" />
+          </div>
+          <Skeleton
+            width="100%"
+            maxWidth={460}
+            height={14}
+            borderRadius="4px"
+            style={{ marginTop: "4px" }}
+          />
+        </div>
       </div>
-      <Skeleton
-        width="100%"
-        maxWidth={460}
-        height={14}
-        borderRadius="4px"
-        style={{ marginTop: "8px" }}
-      />
     </div>
   </header>
 );
@@ -32,7 +33,7 @@ export const HeaderSkeleton = () => (
 export const ProfileHeroSkeleton = () => (
   <div className={styles.profileHero}>
     <div className={styles.avatarSection}>
-      <Skeleton width={120} height={120} borderRadius="50%" />
+      <Skeleton width={90} height={90} borderRadius="50%" />
     </div>
     <div className={styles.infoSection}>
       <Skeleton width={180} height={22} borderRadius="6px" />
@@ -179,7 +180,7 @@ export const FullProfileSkeleton = () => (
   <div className={styles.page}>
     <HeaderSkeleton />
 
-    <div className={styles.profileLayout}>
+    <div className={styles.contentGrid}>
       <div className={styles.leftColumn} style={{ animation: "none", opacity: 1 }}>
         <UserDetailsCardSkeleton />
         <SecurityCardSkeleton />

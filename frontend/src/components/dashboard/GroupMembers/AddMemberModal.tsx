@@ -228,15 +228,9 @@ export default function AddMemberModal({
                     variant="primary"
                     size="sm"
                     onClick={() => handleAddMember(user)}
-                    disabled={isAdding}
+                    isLoading={isAdding}
                   >
-                    {isAdding ? (
-                      "Adding..."
-                    ) : (
-                      <>
-                        <HiOutlineUserAdd /> Add
-                      </>
-                    )}
+                    <HiOutlineUserAdd /> Add
                   </Button>
                 )}
               </div>

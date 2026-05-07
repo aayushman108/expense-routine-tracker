@@ -82,22 +82,30 @@ export default function UserProfilePage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <div className={styles.titleArea}>
-          <button className={styles.backBtn} onClick={() => router.back()}>
-            <HiOutlineChevronLeft /> Back
+          <button
+            className={styles.backBtn}
+            onClick={() => router.push("/dashboard")}
+          >
+            <HiOutlineChevronLeft /> Back to Dashboard
           </button>
-          <div className={styles.sessionTag}>VIEWING_MEMBER_PROFILE</div>
-          <div className={styles.titleWrapper}>
-            <div className={styles.icon}>
+          <div className={styles.headerContent}>
+            <div className={styles.pageIcon}>
               <HiOutlineUser />
             </div>
-            <h1>{profileUser.full_name}&apos;s Profile</h1>
+            <div className={styles.textDetails}>
+              <div className={styles.titleRow}>
+                <h1>{profileUser.full_name}&apos;s Profile</h1>
+                <div className={styles.badge}>VIEWING_MEMBER</div>
+              </div>
+              <p>
+                Viewing member details, personal information, and payment methods.
+              </p>
+            </div>
           </div>
-          <p>Viewing member details and payment information.</p>
         </div>
-        <div className={styles.actions}></div>
       </header>
 
-      <div className={styles.profileLayout}>
+      <div className={styles.contentGrid}>
         <div className={styles.leftColumn}>
           {/* ── User Details Card ── */}
           <Card className={styles.card}>
@@ -134,7 +142,9 @@ export default function UserProfilePage() {
               </div>
             </div>
 
-            <h3 className={styles.sectionTitle}>Personal Information</h3>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>Personal Information</h3>
+            </div>
             <div className={styles.detailsGrid}>
               <div className={styles.detailItem}>
                 <span className={styles.detailLabel}>

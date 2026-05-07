@@ -6,6 +6,7 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setNotificationSidebarOpen } from "@/store/slices/uiSlice";
 import { fetchNotifications, markAsRead, markAllAsRead, resetPagination } from "@/store/slices/notificationSlice";
 import NotificationItem from "../NotificationItem/NotificationItem";
+import Button from "@/components/ui/Button/Button";
 import styles from "./NotificationSidebar.module.scss";
 import { useRouter } from "next/navigation";
 
@@ -13,7 +14,7 @@ export default function NotificationSidebar() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { notificationSidebarOpen } = useAppSelector((s) => s.ui);
-  const { notifications, isLoading, isFetchingMore, unreadCount, page, hasMore } = useAppSelector((s) => s.notifications);
+  const { notifications, isLoading, isFetchingMore, isMarkingAllRead, unreadCount, page, hasMore } = useAppSelector((s) => s.notifications);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -106,12 +107,15 @@ export default function NotificationSidebar() {
 
         {notifications.length > 0 && unreadCount > 0 && (
           <div className={styles.actions}>
-            <button 
+            <Button 
+              variant="ghost"
+              size="sm"
               className={styles.markAllBtn}
               onClick={() => dispatch(markAllAsRead())}
+              isLoading={isMarkingAllRead}
             >
               Mark all as read
-            </button>
+            </Button>
           </div>
         )}
 

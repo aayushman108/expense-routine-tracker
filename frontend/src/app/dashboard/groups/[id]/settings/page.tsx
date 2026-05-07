@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { HiOutlineChevronLeft, HiOutlineUserAdd, HiOutlineLogout, HiOutlineTrash, HiOutlineShieldCheck } from "react-icons/hi";
+import {
+  HiOutlineChevronLeft,
+  HiOutlineUserAdd,
+  HiOutlineLogout,
+  HiOutlineTrash,
+  HiOutlineShieldCheck,
+  HiOutlineChartPie,
+} from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchGroupDetailsAction, leaveGroupAction, removeMemberAction, updateMemberRoleAction, clearGroupDetails } from "@/store/slices/groupSlice";
 import { handleThunk } from "@/lib/utils";
@@ -20,7 +28,7 @@ export default function GroupSettingsPage() {
   const { id } = useParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { groupDetails } = useAppSelector((s) => s.groups);
+  const { groupDetails, isLoading: groupActionLoading } = useAppSelector((s) => s.groups);
   const { user } = useAppSelector((s) => s.auth);
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -84,12 +92,38 @@ export default function GroupSettingsPage() {
 
   return (
     <div className={styles.settingsPage}>
-      <div className={styles.header}>
-        <button className={styles.backBtn} onClick={() => router.push(`/dashboard/groups/${id}`)}>
-          <HiOutlineChevronLeft /> Back to Group
-        </button>
-        <h1>Group Settings</h1>
-      </div>
+      <header className={styles.header}>
+        <div className={styles.titleArea}>
+          <button
+            className={styles.backBtn}
+            onClick={() => router.push(`/dashboard/groups/${id}`)}
+          >
+            <HiOutlineChevronLeft /> Back to Group
+          </button>
+          <div className={styles.headerContent}>
+            <div className={styles.groupImage}>
+              {groupDetails?.data?.image?.url ? (
+                <Image
+                  src={groupDetails.data.image.url}
+                  alt={groupDetails.data.name || "Group"}
+                  fill
+                />
+              ) : (
+                <HiOutlineChartPie />
+              )}
+            </div>
+            <div className={styles.textDetails}>
+              <div className={styles.titleRow}>
+                <h1>Group Settings</h1>
+                <div className={styles.badge}>SECURE_MANAGEMENT</div>
+              </div>
+              <p className={styles.headerDescription}>
+                Manage members, roles, and configurations for <strong>{groupDetails?.data?.name}</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <div className={styles.content}>
         <section className={styles.section}>
@@ -172,6 +206,7 @@ export default function GroupSettingsPage() {
         confirmText="Leave"
         confirmVariant="danger"
         confirmDisabled={isLastAdmin}
+        isLoading={groupActionLoading}
       />
 
       <ConfirmModal
@@ -182,6 +217,7 @@ export default function GroupSettingsPage() {
         message="Are you sure you want to remove this member?"
         confirmText="Remove"
         confirmVariant="danger"
+        isLoading={groupActionLoading}
       />
 
       <ConfirmModal
@@ -192,6 +228,7 @@ export default function GroupSettingsPage() {
         message="Are you sure you want to promote this member?"
         confirmText="Promote"
         confirmVariant="primary"
+        isLoading={groupActionLoading}
       />
     </div>
   );
