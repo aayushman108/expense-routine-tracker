@@ -9,8 +9,13 @@ import { RootState } from "@/store";
 import { showToast } from "@/lib/toast";
 import { ToastType } from "@/enums/general.enum";
 import {
+  setUser,
+  updateNotificationStatus,
+} from "@/store/slices/authSlice";
+import {
   fetchUnreadCount,
   setFCMEvent,
+  unregisterFCMToken,
 } from "@/store/slices/notificationSlice";
 
 // Your VAPID key from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
@@ -77,6 +82,7 @@ export function useFCM() {
         // Send the token to the backend
         await api.post("/notifications/register-token", { token });
         tokenSentRef.current = true;
+        dispatch(updateNotificationStatus(true));
         console.log("FCM token registered successfully");
       }
       return permission;
@@ -84,7 +90,36 @@ export function useFCM() {
       console.error("Error getting FCM token:", err);
       return Notification.permission;
     }
-  }, [user, registerServiceWorker]);
+  }, [user, registerServiceWorker, dispatch]);
+
+  /**
+   * Explicitly unregister the current device token from the backend.
+   */
+  const disableNotifications = useCallback(async () => {
+    try {
+      const messaging = await getFirebaseMessaging();
+      if (!messaging) return;
+
+      const swRegistration = await registerServiceWorker();
+      if (!swRegistration) return;
+
+      const token = await getToken(messaging, {
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: swRegistration,
+      });
+
+      if (token) {
+        await dispatch(unregisterFCMToken({ token })).unwrap();
+        tokenSentRef.current = false;
+        // Re-fetch user profile to update is_notification_enabled if needed
+        // Or just update local state if we want to be optimistic
+        dispatch(updateNotificationStatus(false));
+      }
+    } catch (err) {
+      console.error("Error disabling notifications:", err);
+      throw err;
+    }
+  }, [dispatch, registerServiceWorker]);
 
   /**
    * Listen for foreground messages.
@@ -119,15 +154,6 @@ export function useFCM() {
   useEffect(() => {
     if (!user) return;
 
-    // Auto-sync token if permission is already granted
-    if (
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      Notification.permission === "granted"
-    ) {
-      requestPermissionAndGetToken();
-    }
-
     setupForegroundListener();
 
     return () => {
@@ -136,7 +162,7 @@ export function useFCM() {
         unsubscribeRef.current = null;
       }
     };
-  }, [user, requestPermissionAndGetToken, setupForegroundListener]);
+  }, [user, setupForegroundListener]);
 
-  return { requestPermissionAndGetToken };
+  return { requestPermissionAndGetToken, disableNotifications };
 }

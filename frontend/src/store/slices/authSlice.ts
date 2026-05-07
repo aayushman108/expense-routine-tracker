@@ -171,6 +171,11 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
     },
+    updateNotificationStatus: (state, action: PayloadAction<boolean>) => {
+      if (state.user) {
+        state.user.is_notification_enabled = action.payload;
+      }
+    },
     clearError: (state) => {
       state.error = null;
     },
@@ -296,5 +301,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, clearError, resetAuth } = authSlice.actions;
+export const { setUser, updateNotificationStatus, clearError, resetAuth } =
+  authSlice.actions;
 export default authSlice.reducer;

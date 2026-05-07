@@ -5,12 +5,17 @@ import { HiOutlineBell, HiOutlineExclamationCircle } from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import styles from "@/app/dashboard/dashboard.module.scss";
 import { useFCM } from "@/hooks/useFCM";
+import { useAppSelector } from "@/store/hooks";
+import { RootState } from "@/store";
 
 export default function NotificationBanner() {
-  const [permission, setPermission] = useState<NotificationPermission>("granted");
+  const [permission, setPermission] = useState<NotificationPermission>("default");
+  const [mounted, setMounted] = useState(false);
   const { requestPermissionAndGetToken } = useFCM();
+  const { user } = useAppSelector((state: RootState) => state.auth);
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== "undefined" && "Notification" in window) {
       setPermission(Notification.permission);
     }
@@ -21,7 +26,10 @@ export default function NotificationBanner() {
     setPermission(result);
   };
 
-  if (permission === "granted") return null;
+  if (!mounted) return null;
+
+  // Hide banner ONLY if enabled in profile AND granted in this browser
+  if (user?.is_notification_enabled && permission === "granted") return null;
 
   const isDenied = permission === "denied";
 

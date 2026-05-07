@@ -119,6 +119,20 @@ export const markAllAsRead = createAsyncThunk<void, void>(
   },
 );
 
+export const unregisterFCMToken = createAsyncThunk<void, { token: string }>(
+  "notifications/unregisterFCMToken",
+  async ({ token }, { rejectWithValue }) => {
+    try {
+      await api.delete("/notifications/remove-token", { data: { token } });
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to unregister notification token",
+      );
+    }
+  },
+);
+
 // ── Slice ───────────────────────────────────────────────────────────────────
 
 const notificationSlice = createSlice({

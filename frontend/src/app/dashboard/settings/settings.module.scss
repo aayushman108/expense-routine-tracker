@@ -1,0 +1,334 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.page {
+  @include flex-column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.header {
+  @include flex-between;
+  align-items: center;
+  gap: $space-4;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(var(--color-primary-rgb), 0.05), transparent 70%);
+    pointer-events: none;
+  }
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+}
+
+.titleArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .backBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--text-tertiary);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all $transition-fast;
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: fit-content;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-primary);
+      transform: translateX(-2px);
+    }
+  }
+
+  .headerContent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    @include mobile-only {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  .pageIcon {
+    width: 42px;
+    height: 42px;
+    background: var(--bg-tertiary);
+    color: var(--color-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    @include flex-center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .textDetails {
+    flex: 1;
+
+    .titleRow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.125rem;
+
+      @include mobile-only {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0;
+      }
+
+      .badge {
+        font-family: $font-mono;
+        font-size: 0.625rem;
+        padding: 0.2rem 0.5rem;
+        background: var(--color-primary-50);
+        color: var(--color-primary);
+        border: 1px solid var(--color-primary-100);
+        border-radius: 4px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+      }
+    }
+
+    p {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0;
+    }
+  }
+}
+
+.contentGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-left: 0.25rem;
+
+    svg {
+      font-size: 1.1rem;
+      color: var(--color-primary);
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.statusCard {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: all $transition-base !important;
+
+  &:hover {
+    border-color: var(--color-primary-600) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md) !important;
+  }
+
+  .statusInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .statusLabel {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .statusBadge {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    
+    &.success {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+    
+    &.warning {
+      background: var(--color-warning-light);
+      color: var(--color-warning);
+    }
+    
+    &.danger {
+      background: var(--color-danger-light);
+      color: var(--color-danger);
+    }
+
+    svg {
+      font-size: 0.9rem;
+    }
+  }
+
+  .statusDesc {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+}
+
+.controlsCard {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  border-left: 3px solid var(--color-primary) !important;
+  box-shadow: var(--shadow-sm) !important;
+
+  .controlRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+
+    @include mobile-only {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+      text-align: center;
+    }
+  }
+
+  .controlText {
+    h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    p {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+    }
+  }
+
+  .controlActions {
+    @include mobile-only {
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.alertBox {
+  margin-top: 1.25rem;
+  padding: 0.875rem;
+  background: var(--color-warning-light);
+  border: 1px solid rgba(var(--color-warning-rgb), 0.2);
+  border-radius: 8px;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+
+  svg {
+    font-size: 1.25rem;
+    color: var(--color-warning);
+    flex-shrink: 0;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+}
+
+.simpleCard {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  padding: 1rem !important;
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    
+    @include mobile-only {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    span {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+  }
+}

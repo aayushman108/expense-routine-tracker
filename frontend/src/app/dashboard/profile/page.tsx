@@ -207,22 +207,25 @@ export default function ProfilePage() {
           >
             <HiOutlineChevronLeft /> Back to Dashboard
           </button>
-          <div className={styles.sessionTag}>SECURE_PROFILE_SETTINGS</div>
-          <div className={styles.titleWrapper}>
-            <div className={styles.icon}>
+          <div className={styles.headerContent}>
+            <div className={styles.pageIcon}>
               <HiOutlineUser />
             </div>
-            <h1>My Profile</h1>
+            <div className={styles.textDetails}>
+              <div className={styles.titleRow}>
+                <h1>My Profile</h1>
+                <div className={styles.badge}>SECURE_PROFILE</div>
+              </div>
+              <p>
+                Manage your account settings, personal information, and payment
+                methods.
+              </p>
+            </div>
           </div>
-          <p>
-            Manage your account settings, personal information, and payment
-            methods.
-          </p>
         </div>
-        <div className={styles.actions}></div>
       </header>
 
-      <div className={styles.profileLayout}>
+      <div className={styles.contentGrid}>
         <div className={styles.leftColumn}>
           {/* ── User Details Card ── */}
           {authLoading ? (

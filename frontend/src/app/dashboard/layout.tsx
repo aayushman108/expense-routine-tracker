@@ -10,6 +10,7 @@ import NotificationSidebar from "@/components/dashboard/NotificationSidebar/Noti
 import { getCurrentUser } from "@/store/slices/authSlice";
 import { fetchUnreadCount } from "@/store/slices/notificationSlice";
 import { useLoading } from "@/components/providers/LoadingProvider";
+import { NotificationBanner } from "@/components/dashboard/DashboardSections";
 import styles from "./layout.module.scss";
 
 import type { RootState } from "@/store";
@@ -83,7 +84,10 @@ export default function DashboardLayout({
         className={`${styles.main} ${!sidebarOpen ? styles.collapsed : ""}`}
       >
         <Header />
-        <div className={styles.content}>{children}</div>
+        <div className={styles.content}>
+          <NotificationBanner />
+          {children}
+        </div>
       </main>
 
       <MobileBottomNav />

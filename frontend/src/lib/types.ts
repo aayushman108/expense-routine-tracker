@@ -14,6 +14,7 @@ export interface User {
   avatar?: { url: string; publicId: string } | null;
   created_at: string;
   updated_at: string;
+  is_notification_enabled?: boolean;
 }
 
 export interface GroupMember {

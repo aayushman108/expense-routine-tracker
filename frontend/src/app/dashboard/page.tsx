@@ -32,9 +32,6 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.dashboard}>
-      {/* ── Actionable Alerts ── */}
-      <NotificationBanner />
-
       {/* ── Infrastructure Stats ── */}
       <InfrastructureStats />
 

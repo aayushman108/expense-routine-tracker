@@ -3,6 +3,7 @@ import {
   HiOutlineHome,
   HiOutlineUserGroup,
   HiOutlineCurrencyDollar,
+  HiOutlineCog,
 } from "react-icons/hi";
 import { FiUser } from "react-icons/fi";
 
@@ -24,6 +25,12 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItemDef[] = [
     icon: HiOutlineCurrencyDollar,
   },
   { href: "/dashboard/profile", label: "Profile", tabLabel: "Profile", icon: FiUser },
+  {
+    href: "/dashboard/settings",
+    label: "Settings",
+    tabLabel: "Settings",
+    icon: HiOutlineCog,
+  },
 ];
 
 export function isDashboardNavActive(pathname: string, href: string): boolean {

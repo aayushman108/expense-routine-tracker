@@ -9,7 +9,7 @@ import {
   UnAuthorizedError,
 } from "../utils";
 import { appEmitter, EVENTS } from "../utils/emitter.util";
-import { authDao } from "../dao";
+import { authDao, notificationDao } from "../dao";
 import { jwtService } from "./jwt.service";
 import { v2 as cloudinary } from "cloudinary";
 import {
@@ -268,7 +268,15 @@ async function getMe(userId: string) {
   if (!user) {
     throw new NotFoundError("User not found");
   }
-  return { ...user, password_hash: undefined };
+
+  const tokens = await notificationDao.getTokensByUserId(userId);
+  const is_notification_enabled = tokens.length > 0;
+
+  return {
+    ...user,
+    password_hash: undefined,
+    is_notification_enabled,
+  };
 }
 
 export const authService = {

@@ -3,3 +3,4 @@ export * from "./expense.dao";
 export * from "./group.dao";
 export * from "./settlement.dao";
 export * from "./user.dao";
+export * from "./notification.dao";
