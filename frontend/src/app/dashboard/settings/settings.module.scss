@@ -5,6 +5,13 @@
   @include flex-column;
   gap: 1.25rem;
   width: 100%;
+  padding-top: 0.5rem;
+  padding-bottom: 2rem;
+
+  @include mobile-only {
+    padding-top: 1rem;
+    padding-bottom: 2rem; // Extra space for mobile bottom nav
+  }
 }
 
 .header {
@@ -26,7 +33,11 @@
     right: 0;
     width: 150px;
     height: 100%;
-    background: radial-gradient(circle at top right, rgba(var(--color-primary-rgb), 0.05), transparent 70%);
+    background: radial-gradient(
+      circle at top right,
+      rgba(var(--color-primary-rgb), 0.05),
+      transparent 70%
+    );
     pointer-events: none;
   }
 
@@ -213,17 +224,17 @@
     font-weight: 700;
     padding: 0.25rem 0.6rem;
     border-radius: 6px;
-    
+
     &.success {
       background: var(--color-success-light);
       color: var(--color-success);
     }
-    
+
     &.warning {
       background: var(--color-warning-light);
       color: var(--color-warning);
     }
-    
+
     &.danger {
       background: var(--color-danger-light);
       color: var(--color-danger);
@@ -319,7 +330,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    
+
     @include mobile-only {
       flex-direction: column;
       text-align: center;

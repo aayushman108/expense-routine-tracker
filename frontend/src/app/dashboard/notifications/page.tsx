@@ -1,18 +1,35 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { HiOutlineBellSlash, HiOutlineCheckCircle } from "react-icons/hi2";
+import {
+  HiOutlineBell,
+  HiOutlineChevronLeft,
+  HiOutlineCheckCircle,
+  HiOutlineBellSlash,
+} from "react-icons/hi2";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { fetchNotifications, markAsRead, markAllAsRead, resetPagination } from "@/store/slices/notificationSlice";
+import {
+  fetchNotifications,
+  markAsRead,
+  markAllAsRead,
+  resetPagination,
+} from "@/store/slices/notificationSlice";
 import NotificationItem from "@/components/dashboard/NotificationItem/NotificationItem";
 import { useRouter } from "next/navigation";
-import SectionHeader from "@/components/ui/SectionHeader/SectionHeader";
+import Button from "@/components/ui/Button/Button";
 import styles from "./page.module.scss";
 
 export default function NotificationPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { notifications, isLoading, isFetchingMore, unreadCount, page, hasMore } = useAppSelector((s) => s.notifications);
+  const {
+    notifications,
+    isLoading,
+    isFetchingMore,
+    unreadCount,
+    page,
+    hasMore,
+  } = useAppSelector((s) => s.notifications);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,11 +41,16 @@ export default function NotificationPage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading && !isFetchingMore) {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !isLoading &&
+          !isFetchingMore
+        ) {
           dispatch(fetchNotifications({ page: page + 1, limit: 10 }));
         }
       },
-      { threshold: 1.0 }
+      { threshold: 1.0 },
     );
 
     if (observerTarget.current) {
@@ -46,23 +68,46 @@ export default function NotificationPage() {
   };
 
   return (
-    <div className={styles.container}>
-      <SectionHeader 
-        title="Notifications" 
-        subtitle="Stay updated with your group and personal expenses"
-      >
-        {notifications.length > 0 && unreadCount > 0 && (
-          <button 
-            className={styles.markAllBtn}
-            onClick={() => dispatch(markAllAsRead())}
+    <div className={styles.page}>
+      <header className={styles.header}>
+        <div className={styles.titleArea}>
+          <button
+            className={styles.backBtn}
+            onClick={() => router.push("/dashboard")}
           >
-            <HiOutlineCheckCircle />
-            Mark all as read
+            <HiOutlineChevronLeft /> Back to Dashboard
           </button>
-        )}
-      </SectionHeader>
+          <div className={styles.headerContent}>
+            <div className={styles.pageIcon}>
+              <HiOutlineBell />
+            </div>
+            <div className={styles.textDetails}>
+              <div className={styles.titleRow}>
+                <h1>Notifications</h1>
+                {unreadCount > 0 && (
+                  <div className={styles.unreadBadge}>{unreadCount} UNREAD</div>
+                )}
+              </div>
+              <p>Stay updated with your group and personal expenses.</p>
+            </div>
+          </div>
+        </div>
+        <div className={styles.actions}>
+          {notifications.length > 0 && unreadCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => dispatch(markAllAsRead())}
+              className={styles.markAllBtn}
+            >
+              <HiOutlineCheckCircle />
+              Mark all as read
+            </Button>
+          )}
+        </div>
+      </header>
 
-      <div className={styles.content}>
+      <div className={styles.contentGrid}>
         {isLoading ? (
           <div className={styles.loading}>
             {[...Array(6)].map((_, i) => (
@@ -72,10 +117,12 @@ export default function NotificationPage() {
         ) : notifications.length > 0 ? (
           <div className={styles.list}>
             {notifications.map((notif) => (
-              <NotificationItem 
-                key={notif.id} 
+              <NotificationItem
+                key={notif.id}
                 notification={notif}
-                onClick={() => handleNotificationClick(notif.id, notif.data?.url)}
+                onClick={() =>
+                  handleNotificationClick(notif.id, notif.data?.url)
+                }
               />
             ))}
             

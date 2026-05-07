@@ -5,6 +5,13 @@
   @include flex-column;
   gap: 1.25rem;
   width: 100%;
+  padding-top: 0.5rem;
+  padding-bottom: 2rem;
+
+  @include mobile-only {
+    padding-top: 1rem;
+    padding-bottom: 4rem;
+  }
 }
 
 .header {
