@@ -119,29 +119,54 @@ export const PaymentMethodsSkeleton = () => (
 
     <div className={styles.paymentGrid}>
       {Array.from({ length: 2 }).map((_, i) => (
-        <div key={i} className={styles.pmCard}>
-          <div className={styles.pmCardTop}>
-            <Skeleton
-              width={44}
-              height={44}
-              borderRadius="10px"
-              flexShrink={0}
-            />
-            <div className={styles.pmInfo}>
-              <Skeleton width={120} height={16} borderRadius="4px" />
+        <div key={i} className={styles.pmSkeletonCard}>
+          <div className={styles.pmSkeletonInfo}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Skeleton width={100} height={20} borderRadius="6px" />
+              <Skeleton width={60} height={20} borderRadius="12px" />
+            </div>
+
+            <div style={{ marginTop: "0.5rem" }}>
+              <Skeleton width={80} height={10} borderRadius="4px" />
               <Skeleton
                 width={160}
-                height={14}
-                borderRadius="4px"
-                style={{ marginTop: "4px" }}
+                height={24}
+                borderRadius="6px"
+                style={{ marginTop: "8px" }}
               />
             </div>
-            <Skeleton width={60} height={20} borderRadius="12px" />
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+                marginTop: "auto",
+              }}
+            >
+              <div>
+                <Skeleton width={60} height={10} borderRadius="4px" />
+                <Skeleton
+                  width={120}
+                  height={14}
+                  borderRadius="4px"
+                  style={{ marginTop: "4px" }}
+                />
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <Skeleton width={32} height={32} borderRadius="50%" />
+                <Skeleton width={32} height={32} borderRadius="50%" />
+              </div>
+            </div>
           </div>
-          <div className={styles.pmActions}>
-            <Skeleton width={50} height={24} borderRadius="4px" />
-            <Skeleton width={50} height={24} borderRadius="4px" />
-            <Skeleton width={50} height={24} borderRadius="4px" />
+          <div className={styles.pmSkeletonQR}>
+            <Skeleton width={100} height={100} borderRadius="8px" />
           </div>
         </div>
       ))}
