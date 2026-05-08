@@ -11,6 +11,8 @@ import {
   HiOutlineExclamationCircle,
   HiOutlineCheckCircle,
   HiOutlineExternalLink,
+  HiOutlineVolumeUp,
+  HiOutlineVolumeOff,
 } from "react-icons/hi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useFCM } from "@/hooks/useFCM";
@@ -19,12 +21,15 @@ import Button from "@/components/ui/Button/Button";
 import Card from "@/components/ui/Card/Card";
 import styles from "./settings.module.scss";
 import { setDeviceRegistered } from "@/store/slices/authSlice";
+import { toggleSound } from "@/store/slices/notificationSlice";
+import { playNotificationSound } from "@/lib/audio";
 import type { RootState } from "@/store";
 
 export default function SettingsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isDeviceRegistered } = useAppSelector((s: RootState) => s.auth);
+  const { soundEnabled } = useAppSelector((s: RootState) => s.notifications);
   const { requestPermissionAndGetToken, disableNotifications, permission } =
     useFCM();
 
@@ -61,6 +66,10 @@ export default function SettingsPage() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleToggleSound = () => {
+    dispatch(toggleSound());
   };
 
   if (!mounted) return null;
@@ -190,6 +199,46 @@ export default function SettingsPage() {
                   </div>
                 </div>
               )}
+            </Card>
+
+            <Card className={styles.controlsCard}>
+              <div className={styles.controlRow}>
+                <div className={styles.controlText}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    {soundEnabled ? (
+                      <HiOutlineVolumeUp color="var(--color-primary)" />
+                    ) : (
+                      <HiOutlineVolumeOff color="var(--text-tertiary)" />
+                    )}
+                    <h4>Notification Sound</h4>
+                  </div>
+                  <p>
+                    Play a sound when a notification arrives while the app is
+                    open.
+                  </p>
+                </div>
+                <div
+                  className={styles.controlActions}
+                  style={{ display: "flex", gap: "0.75rem" }}
+                >
+                  <Button variant="outline" size="md" onClick={playNotificationSound}>
+                    Test Sound
+                  </Button>
+                  <Button
+                    variant={soundEnabled ? "danger" : "primary"}
+                    size="md"
+                    onClick={handleToggleSound}
+                  >
+                    {soundEnabled ? "Mute Sound" : "Enable Sound"}
+                  </Button>
+                </div>
+              </div>
             </Card>
           </section>
 

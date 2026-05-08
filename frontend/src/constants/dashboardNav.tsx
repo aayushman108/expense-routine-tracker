@@ -16,20 +16,35 @@ export type DashboardNavItemDef = {
 };
 
 export const DASHBOARD_NAV_ITEMS: DashboardNavItemDef[] = [
-  { href: "/dashboard", label: "Dashboard", tabLabel: "Home", icon: HiOutlineHome },
-  { href: "/dashboard/groups", label: "Groups", tabLabel: "Groups", icon: HiOutlineUserGroup },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    tabLabel: "Home",
+    icon: HiOutlineHome,
+  },
+  {
+    href: "/dashboard/groups",
+    label: "Groups",
+    tabLabel: "Groups",
+    icon: HiOutlineUserGroup,
+  },
   {
     href: "/dashboard/personal",
     label: "Personal",
     tabLabel: "Personal",
     icon: HiOutlineCurrencyDollar,
   },
-  { href: "/dashboard/profile", label: "Profile", tabLabel: "Profile", icon: FiUser },
   {
     href: "/dashboard/settings",
     label: "Settings",
     tabLabel: "Settings",
     icon: HiOutlineCog,
+  },
+  {
+    href: "/dashboard/profile",
+    label: "Profile",
+    tabLabel: "Profile",
+    icon: FiUser,
   },
 ];
 

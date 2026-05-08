@@ -8,6 +8,7 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { RootState } from "@/store";
 import { showToast } from "@/lib/toast";
 import { ToastType } from "@/enums/general.enum";
+import { playNotificationSound } from "@/lib/audio";
 import {
   setUser,
   updateNotificationStatus,
@@ -25,6 +26,7 @@ const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || "";
 export function useFCM() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s: RootState) => s.auth);
+  const { soundEnabled } = useAppSelector((s: RootState) => s.notifications);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const tokenSentRef = useRef(false);
   const [permission, setPermission] = useState<NotificationPermission>(
@@ -154,10 +156,15 @@ export function useFCM() {
 
       // 🧠 Store full payload for page-level handling
       dispatch(setFCMEvent(payload));
+
+      // 🎵 Play sound if enabled
+      if (soundEnabled) {
+        playNotificationSound();
+      }
     });
 
     unsubscribeRef.current = unsubscribe;
-  }, [dispatch]);
+  }, [dispatch, soundEnabled]);
 
   /**
    * Initialize FCM: request permission, get token, and set up listener.

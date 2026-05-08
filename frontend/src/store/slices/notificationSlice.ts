@@ -43,7 +43,14 @@ interface NotificationState {
   hasMore: boolean;
   /** The most recent FCM foreground event — consumed by page-level hooks */
   lastEvent: FCMEvent | null;
+  soundEnabled: boolean;
 }
+
+const getInitialSoundSetting = () => {
+  if (typeof window === "undefined") return true;
+  const saved = localStorage.getItem("notification_sound_enabled");
+  return saved === null ? true : saved === "true";
+};
 
 const initialState: NotificationState = {
   unreadCount: 0,
@@ -54,6 +61,7 @@ const initialState: NotificationState = {
   page: 1,
   hasMore: true,
   lastEvent: null,
+  soundEnabled: getInitialSoundSetting(),
 };
 
 // ── Thunks ──────────────────────────────────────────────────────────────────
@@ -170,6 +178,15 @@ const notificationSlice = createSlice({
       state.hasMore = true;
       state.notifications = [];
     },
+    toggleSound: (state) => {
+      state.soundEnabled = !state.soundEnabled;
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "notification_sound_enabled",
+          state.soundEnabled.toString()
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchUnreadCount.fulfilled, (state, action) => {
@@ -243,6 +260,11 @@ const notificationSlice = createSlice({
   },
 });
 
-export const { setFCMEvent, clearFCMEvent, setUnreadCount, resetPagination } =
-  notificationSlice.actions;
+export const {
+  setFCMEvent,
+  clearFCMEvent,
+  setUnreadCount,
+  resetPagination,
+  toggleSound,
+} = notificationSlice.actions;
 export default notificationSlice.reducer;
