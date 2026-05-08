@@ -3,6 +3,15 @@ import { HiOutlineChevronLeft, HiOutlineDocumentText } from "react-icons/hi";
 import styles from "../privacy/legal.module.scss";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer/Footer";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Review the terms and conditions for using SyncSplit's expense tracking and bill splitting platform.",
+  alternates: {
+    canonical: "/terms",
+  },
+};
 
 export default function TermsPage() {
   return (
@@ -32,7 +41,7 @@ export default function TermsPage() {
         <section className={styles.content}>
           <div className={styles.intro}>
             <p>
-              By using Expensora, you agree to comply with and be bound by the
+              By using SyncSplit, you agree to comply with and be bound by the
               following terms and conditions. Please review them carefully
               before using our services.
             </p>
@@ -41,7 +50,7 @@ export default function TermsPage() {
           <div className={styles.section}>
             <h2>1. Acceptance of Terms</h2>
             <p>
-              Expensora provides a cloud-based expense management platform. By
+              SyncSplit provides a cloud-based expense management platform. By
               creating an account or using the service, you agree to these
               terms. If you do not agree, you may not use the service.
             </p>
@@ -51,7 +60,7 @@ export default function TermsPage() {
             <h2>2. User Content & Expenses</h2>
             <p>
               You are solely responsible for the accuracy of the expenses,
-              splitting ratios, and settlement proofs you upload. Expensora acts
+              splitting ratios, and settlement proofs you upload. SyncSplit acts
               as a protocol for tracking and is not responsible for disputes
               between users.
             </p>
@@ -87,7 +96,7 @@ export default function TermsPage() {
             <p>
               We reserve the right to suspend or terminate accounts that violate
               these terms or engage in fraudulent activity that compromises the
-              integrity of the Expensora protocol.
+              integrity of the SyncSplit protocol.
             </p>
           </div>
         </section>

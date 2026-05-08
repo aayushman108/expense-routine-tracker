@@ -130,7 +130,7 @@ export default function SignupPage() {
             <div className={styles.logoIcon}>
               <FiPieChart />
             </div>
-            <span className={styles.logoText}>Expensora</span>
+            <span className={styles.logoText}>SyncSplit</span>
           </Link>
           <h1 className={styles.title}>Create an account</h1>
           <p className={styles.subtitle}>

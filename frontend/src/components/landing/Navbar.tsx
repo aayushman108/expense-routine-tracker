@@ -67,7 +67,7 @@ export default function LandingNavbar() {
     <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.navContent}>
         <Link href="/" className={styles.logo}>
-          <span className={styles.logoText}>Expensora</span>
+          <span className={styles.logoText}>SyncSplit</span>
           <FiPieChart />
         </Link>
 
@@ -111,7 +111,7 @@ export default function LandingNavbar() {
       >
         <div className={styles.drawerHeader}>
           <div className={styles.logo}>
-            <span className={styles.logoText}>Expensora</span>
+            <span className={styles.logoText}>SyncSplit</span>
             <FiPieChart />
           </div>
           <button

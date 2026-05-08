@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { FiArrowRight, FiCheckCircle, FiZap, FiTarget } from "react-icons/fi";
+import { FiArrowRight, FiCheckCircle, FiZap, FiTarget, FiBell } from "react-icons/fi";
 import styles from "./Hero.module.scss";
 
 export default function Hero() {
@@ -80,8 +80,8 @@ export default function Hero() {
 
       <div className={styles.heroInner}>
         <div className={styles.badge}>
-          <span className={styles.badgeText}>New</span>
-          Smart monthly settlements are now live!
+          <span className={styles.badgeText}>Update</span>
+          Push Notifications are live! Stay updated on every split 🔔
         </div>
 
         <h1 className={styles.heroTitle}>
@@ -128,6 +128,15 @@ export default function Hero() {
             <div className={styles.featureText}>
               <strong>Smart Settle</strong>
               <span>Optimized payment paths</span>
+            </div>
+          </div>
+          <div className={styles.featureItem}>
+            <span className={styles.featureIcon}>
+              <FiBell />
+            </span>
+            <div className={styles.featureText}>
+              <strong>Real-time Alerts</strong>
+              <span>Push notifications live</span>
             </div>
           </div>
           <div className={styles.featureItem}>

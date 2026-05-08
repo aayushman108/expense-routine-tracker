@@ -3,6 +3,15 @@ import { HiOutlineChevronLeft, HiOutlineEye } from "react-icons/hi";
 import styles from "./legal.module.scss";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer/Footer";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Learn how SyncSplit protects your privacy and manages your financial data with transparency and security.",
+  alternates: {
+    canonical: "/privacy",
+  },
+};
 
 export default function PrivacyPage() {
   return (
@@ -32,7 +41,7 @@ export default function PrivacyPage() {
         <section className={styles.content}>
           <div className={styles.intro}>
             <p>
-              At Expensora, we prioritize your privacy and the security of your
+              At SyncSplit, we prioritize your privacy and the security of your
               financial data. This Privacy Policy outlines how we collect, use,
               and protect your information when you use our platform.
             </p>
@@ -69,7 +78,7 @@ export default function PrivacyPage() {
             <h2>2. How We Use Your Information</h2>
             <p>
               We use your information solely to provide and improve the
-              Expensora protocol:
+              SyncSplit protocol:
             </p>
             <ul>
               <li>To facilitate expense splitting and group management.</li>

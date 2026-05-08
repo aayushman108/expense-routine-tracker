@@ -3,7 +3,7 @@ import { BiSearch } from "react-icons/bi";
 import ErrorState from "@/components/ui/ErrorState/ErrorState";
 
 export const metadata = {
-  title: "404 - Page Not Found | Expensora",
+  title: "404 - Page Not Found | SyncSplit",
   description: "Oops! We can't seem to find the page you're looking for.",
 };
 

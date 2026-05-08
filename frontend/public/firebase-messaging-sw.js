@@ -22,12 +22,12 @@ const messaging = firebase.messaging();
 // Handle background messages
 messaging.onBackgroundMessage((payload) => {
   const notificationTitle =
-    payload.notification?.title || "Expensora Notification";
+    payload.notification?.title || "SyncSplit Notification";
   const notificationOptions = {
     body: payload.notification?.body || "",
     icon: "/icon.png",
     badge: "/icon.png",
-    tag: payload.data?.tag || "expensora-notification",
+    tag: payload.data?.tag || "syncsplit-notification",
     data: payload.data || {},
   };
 

@@ -116,7 +116,7 @@ function ResetPasswordForm() {
             <div className={styles.logoIcon}>
               <FiPieChart />
             </div>
-            <span className={styles.logoText}>Expensora</span>
+            <span className={styles.logoText}>SyncSplit</span>
           </Link>
           <h1 className={styles.title}>Reset Password</h1>
           <p className={styles.subtitle}>Enter your new password below</p>

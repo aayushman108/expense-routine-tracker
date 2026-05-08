@@ -93,20 +93,30 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: $space-6; // 24px
+  gap: $space-6;
 
   @include responsive(lg) {
     grid-template-columns: repeat(2, 1fr);
-    gap: $space-5; // 20px
-  }
-
-  @include mobile-only {
-    grid-template-columns: 1fr;
-    gap: $space-4; // 16px
+    gap: $space-5;
   }
 
   @include responsive(sm) {
-    gap: $space-3; // 12px
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+}
+
+// Orphan card stretching — if the last card is alone in its row, span full width
+.card:last-child:nth-child(3n + 1) {
+  grid-column: 1 / -1;
+}
+
+@include responsive(lg) {
+  .card:last-child:nth-child(3n + 1) {
+    grid-column: auto;
+  }
+  .card:last-child:nth-child(2n + 1) {
+    grid-column: 1 / -1;
   }
 }
 
@@ -119,6 +129,7 @@
   display: flex;
   flex-direction: column;
   gap: $space-6;
+  height: 100%;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
   
@@ -140,30 +151,7 @@
   }
 }
 
-.cardWide {
-  grid-column: span 2;
-  
-  @include responsive(lg) {
-    grid-column: span 1;
-  }
-
-  @include mobile-only {
-    grid-column: span 1;
-  }
-}
-
-// Tablet specific grid adjustments to prevent empty slots
-@include responsive(lg) {
-  .grid .card:last-child {
-    grid-column: span 2;
-  }
-}
-
-@include mobile-only {
-  .grid .card:last-child {
-    grid-column: span 1;
-  }
-}
+// Cleaned up wide card logic for uniformity
 
 .cardGlow {
   position: absolute;
@@ -213,6 +201,34 @@
   padding: 4px 10px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 6px;
+  position: relative;
+
+  &[data-tag="New"] {
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 6px;
+      height: 6px;
+      background: #818cf8;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #818cf8;
+      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+  }
+}
+
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
 .cardContent {

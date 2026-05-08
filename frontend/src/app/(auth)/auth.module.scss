@@ -157,11 +157,14 @@
   background: var(--color-danger-light);
   border-radius: $radius-md;
   animation: slideIn 0.2s ease;
+  margin-bottom: $space-4;
 }
 
 .success {
   background: var(--color-success-light);
   border-radius: $radius-md;
+  padding: $space-3;
+  margin-bottom: $space-4;
 }
 
 .successState {

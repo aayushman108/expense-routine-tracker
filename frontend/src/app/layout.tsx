@@ -7,13 +7,13 @@ import LoadingProvider from "@/components/providers/LoadingProvider";
 
 export const metadata: Metadata = {
   title: {
-    default: "Expensora | Smart Expense Tracker & Bill Splitter",
-    template: "%s | Expensora",
+    default: "SyncSplit | Smart Expense Tracker & Bill Splitter",
+    template: "%s | SyncSplit",
   },
   description:
-    "Expensora is a smart expense tracker designed for individuals and groups. Track personal expenses, split bills with custom ratios, and settle debts monthly. Built for roommates, trips, and teams.",
+    "SyncSplit is a smart expense tracker designed for individuals and groups. Track personal expenses, split bills with custom ratios, and settle debts monthly. Built for roommates, trips, and teams.",
   keywords: [
-    "Expensora",
+    "SyncSplit",
     "expense tracker",
     "split bills",
     "group expenses",
@@ -25,27 +25,30 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Aayushman Sharma" }],
   creator: "Aayushman Sharma",
-  metadataBase: new URL("https://expensora.netlify.app"), // Replace with actual URL if known
+  metadataBase: new URL("https://syncsplit.netlify.app"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://expensora.netlify.app",
-    title: "Expensora | Smart Expense Tracker & Bill Splitter",
+    url: "https://syncsplit.netlify.app",
+    title: "SyncSplit | Smart Expense Tracker & Bill Splitter",
     description:
-      "Expensora helps you track and split expenses with ease. Perfect for managing shared living costs, travel budgets, and personal finances.",
-    siteName: "Expensora",
+      "SyncSplit helps you track and split expenses with ease. Perfect for managing shared living costs, travel budgets, and personal finances.",
+    siteName: "SyncSplit",
     images: [
       {
         url: "/landing.png",
         width: 1200,
         height: 630,
-        alt: "Expensora App Preview",
+        alt: "SyncSplit App Preview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Expensora | Smart Expense Tracker",
+    title: "SyncSplit | Smart Expense Tracker",
     description:
       "Efficiently track and manage your shared and individual expenses.",
     images: ["/landing.png"],
@@ -62,10 +65,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
-    ],
+    icon: "/favicon.ico",
     apple: [
       { url: "/icon.png", sizes: "180x180", type: "image/png" },
     ],
@@ -101,8 +101,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              name: "Expensora",
-              url: "https://expensora.netlify.app",
+              name: "SyncSplit",
+              url: "https://syncsplit.netlify.app",
               applicationCategory: "FinanceApplication",
               operatingSystem: "Web",
               description:

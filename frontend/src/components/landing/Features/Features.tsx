@@ -10,6 +10,7 @@ import {
   HiOutlineChartBar,
   HiOutlineShieldCheck,
   HiOutlineLightningBolt,
+  HiOutlineBell,
 } from "react-icons/hi";
 import styles from "./Features.module.scss";
 
@@ -22,6 +23,13 @@ const features = [
     desc: "Capture every transaction instantly — from recurring rent to spontaneous coffee runs. Your financial story, all in one place.",
     wide: false,
     tag: "Core",
+  },
+  {
+    icon: <HiOutlineBell />,
+    title: "Instant Push Notifications",
+    desc: "Stay in the loop with real-time alerts for new expenses, group invites, and settlement confirmations. Never miss a beat.",
+    wide: false,
+    tag: "New",
   },
   {
     icon: <HiOutlineUserGroup />,
@@ -41,7 +49,7 @@ const features = [
     icon: <HiOutlineShieldCheck />,
     title: "Monthly Settlements",
     desc: "Generate optimized settlement paths that minimize transactions. Verify payments with digital receipts. Every payment, tracked and confirmed.",
-    wide: true,
+    wide: false,
     tag: "Settlements",
   },
   {
@@ -125,7 +133,9 @@ export default function Features() {
                 <div className={styles.cardIcon}>
                   <span>{f.icon}</span>
                 </div>
-                <span className={styles.cardTag}>{f.tag}</span>
+                <span className={styles.cardTag} data-tag={f.tag}>
+                  {f.tag}
+                </span>
               </div>
               <div className={styles.cardContent}>
                 <h3 className={styles.cardTitle}>{f.title}</h3>

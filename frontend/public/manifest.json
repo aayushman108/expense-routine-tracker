@@ -1,6 +1,6 @@
 {
-  "name": "Expensora",
-  "short_name": "Expensora",
+  "name": "SyncSplit",
+  "short_name": "SyncSplit",
   "description": "Smart expense tracker and bill splitter for groups and individuals.",
   "start_url": "/",
   "scope": "/",

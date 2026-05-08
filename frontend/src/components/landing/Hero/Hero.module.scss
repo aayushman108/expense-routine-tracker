@@ -314,7 +314,8 @@
 .featureHighlights {
   display: flex;
   justify-content: center;
-  gap: $space-16;
+  flex-wrap: wrap;
+  gap: $space-8 $space-16;
   margin-top: $space-12;
   padding-top: $space-12;
   width: 100%;

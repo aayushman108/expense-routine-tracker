@@ -53,6 +53,7 @@ export default function CTA() {
           <div className={styles.benefits}>
             <span className={styles.benefitItem}>Deployment: Live</span>
             <span className={styles.benefitItem}>Unlimited groups</span>
+            <span className={styles.benefitItem}>Real-time Alerts</span>
             <span className={styles.benefitItem}>Lifetime free tier</span>
           </div>
         </div>

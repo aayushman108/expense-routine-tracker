@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
             <div className={styles.logoIcon}>
               <FiPieChart />
             </div>
-            <span className={styles.logoText}>Expensora</span>
+            <span className={styles.logoText}>SyncSplit</span>
           </Link>
           <h1 className={styles.title}>Forgot Password?</h1>
           <p className={styles.subtitle}>

@@ -49,7 +49,7 @@ export default function Sidebar() {
           <div className={styles.logoIcon}>
             <FiPieChart />
           </div>
-          <span>Expensora</span>
+          <span>SyncSplit</span>
         </Link>
         
       </div>
@@ -83,7 +83,7 @@ export default function Sidebar() {
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirm={handleLogout}
         title="Confirm Logout"
-        message="Are you sure you want to log out of your Expensora account? You will need to sign back in to access your groups and personal expenses."
+        message="Are you sure you want to log out of your SyncSplit account? You will need to sign back in to access your groups and personal expenses."
         confirmText="Log Out"
         confirmVariant="danger"
       />

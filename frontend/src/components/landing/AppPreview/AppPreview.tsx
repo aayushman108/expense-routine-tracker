@@ -47,7 +47,7 @@ export default function AppPreview() {
           <div className={styles.mockWindow}>
             <Image
               src="/preview.png"
-              alt="Expensora Dashboard Preview"
+              alt="SyncSplit Dashboard Preview"
               width={1200}
               height={800}
               className={styles.previewImage}

@@ -13,80 +13,77 @@ export default function Footer() {
 
   return (
     <footer className={styles.footer}>
+      {/* Background decoration */}
+      <div className={styles.backgroundGlow} />
+      <div className={styles.gridOverlay} />
+      <div className={styles.watermark}>SYNCSPLIT</div>
+
       <div className={styles.footerInner}>
-        <div className={styles.top}>
+        <div className={styles.mainContent}>
           <div className={styles.brand}>
             <div className={styles.logo}>
               <span className={styles.logoIcon}>
                 <FiPieChart />
               </span>
-              <span className={styles.logoText}>Expensora</span>
+              <span className={styles.logoText}>SyncSplit</span>
             </div>
             <p className={styles.brandDesc}>
               The precision-engineered protocol for shared economy and personal
-              expense management.
+              expense management. Track, split, and settle with mathematical
+              clarity.
             </p>
-            <div className={styles.social}>
-              <a
-                href="https://github.com/aayushman108"
-                aria-label="Github"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FiGithub />
-              </a>
-              <a href="#" aria-label="Twitter">
-                <FiTwitter />
-              </a>
-              <a
-                href="mailto:aayushmansharma1008@gmail.com"
-                aria-label="Mail"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FiMail />
-              </a>
-              <a
-                href="https://portfolio.aayushmansharma.com.np"
-                aria-label="Web"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FiGlobe />
-              </a>
-            </div>
           </div>
 
-          <div className={styles.linksGrid}>
-            <div className={styles.column}>
-              <h4>Features</h4>
-              <Link href="/#features">Group Splitting</Link>
-              <Link href="/#features">Personal Ledger</Link>
-              <Link href="/#features">Smart Settlement</Link>
-              <Link href="/#features">Verified Proof</Link>
-            </div>
-            <div className={styles.column}>
-              <h4>Resources</h4>
-              <Link href="/docs">Documentation</Link>
-              <Link href="https://github.com/aayushman108">Github</Link>
-              <Link href="mailto:aayushmansharma1008@gmail.com">Feedback</Link>
-              <Link href="/blog">Finance Blog</Link>
-            </div>
-            <div className={styles.column}>
-              <h4>Legal</h4>
-              <Link href="/privacy">Privacy Policy</Link>
-              <Link href="/terms">Terms of Service</Link>
-              {/* <Link href="/security">Data Security</Link> */}
-            </div>
+          <div className={styles.navLinks}>
+            <Link href="/#features">Features</Link>
+            <div className={styles.dot} />
+            <Link href="/#how-it-works">How it works</Link>
+            <div className={styles.dot} />
+            <Link href="/#use-cases">Use Cases</Link>
+          </div>
+
+          <div className={styles.social}>
+            <a
+              href="https://github.com/aayushman108"
+              aria-label="Github"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FiGithub />
+            </a>
+            <a href="#" aria-label="Twitter">
+              <FiTwitter />
+            </a>
+            <a
+              href="mailto:aayushmansharma1008@gmail.com"
+              aria-label="Mail"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FiMail />
+            </a>
+            <a
+              href="https://portfolio.aayushmansharma.com.np"
+              aria-label="Web"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FiGlobe />
+            </a>
           </div>
         </div>
 
         <div className={styles.bottom}>
-          <p>© {currentYear} Expensora Protocol. All rights reserved.</p>
-          <div className={styles.bottomLinks}>
-            <span>Status: Operational</span>
-            <div className={styles.dot} />
-            <span>Built with precision</span>
+          <div className={styles.legal}>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/terms">Terms of Service</Link>
+          </div>
+          <div className={styles.copyright}>
+            <p>© {currentYear} SyncSplit Protocol. All rights reserved.</p>
+          </div>
+          <div className={styles.status}>
+            <div className={styles.statusDot} />
+            <span>Systems Operational</span>
           </div>
         </div>
       </div>

@@ -7,6 +7,15 @@ import {
 import styles from "../privacy/legal.module.scss";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer/Footer";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Data Security",
+  description: "Explore the SyncSplit Security Protocol, including encryption, secure infrastructure, and settlement verification.",
+  alternates: {
+    canonical: "/security",
+  },
+};
 
 export default function SecurityPage() {
   return (
@@ -30,14 +39,14 @@ export default function SecurityPage() {
             <span>Protocol Security</span>
           </div>
           <h1>Data Security</h1>
-          <p>The Expensora Security Protocol</p>
+          <p>The SyncSplit Security Protocol</p>
         </header>
 
         <section className={styles.content}>
           <div className={styles.intro}>
             <p>
               Security is not an afterthought for us; it is integrated into
-              every layer of the Expensora protocol. We use industry-standard
+              every layer of the SyncSplit protocol. We use industry-standard
               encryption and security practices to keep your financial data
               safe.
             </p>
