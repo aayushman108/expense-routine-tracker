@@ -35,7 +35,7 @@ export default function PageLoader() {
 
         <div className={styles.brand}>
           <h1>
-            Expen<span>sora</span>
+            Sync<span>Split</span>
           </h1>
           <p>Analyzing Finances</p>
         </div>
