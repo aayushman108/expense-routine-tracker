@@ -269,13 +269,9 @@ async function getMe(userId: string) {
     throw new NotFoundError("User not found");
   }
 
-  const tokens = await notificationDao.getTokensByUserId(userId);
-  const is_notification_enabled = tokens.length > 0;
-
   return {
     ...user,
     password_hash: undefined,
-    is_notification_enabled,
   };
 }
 

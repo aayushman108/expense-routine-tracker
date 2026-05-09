@@ -11,6 +11,7 @@ interface CardProps {
   glass?: boolean;
   noPadding?: boolean;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 export default function Card({
@@ -21,11 +22,13 @@ export default function Card({
   glass = false,
   noPadding = false,
   onClick,
+  style,
 }: CardProps) {
   return (
     <div
       className={`${styles.card} ${clickable ? styles.clickable : ""} ${gradient ? styles.gradient : ""} ${glass ? styles.glass : ""} ${noPadding ? styles.noPadding : ""} ${className}`}
       onClick={onClick}
+      style={style}
     >
       {children}
     </div>

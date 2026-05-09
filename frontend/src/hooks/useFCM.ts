@@ -88,13 +88,16 @@ export function useFCM() {
       });
 
       if (token) {
-        // Send the token to the backend
+        // 1. Register the device-specific FCM token
         await api.post("/notifications/register-token", { token });
+        
+        // 2. Enable push notifications globally for the user
+        await api.patch("/auth/update-profile", { is_notification_enabled: true });
+
         tokenSentRef.current = true;
-        localStorage.setItem("fcm_token_registered", "true");
         dispatch(setDeviceRegistered(true));
         dispatch(updateNotificationStatus(true));
-        console.log("FCM token registered successfully");
+        console.log("FCM token and global status registered successfully");
       }
       return permission;
     } catch (err) {
@@ -122,11 +125,7 @@ export function useFCM() {
       if (token) {
         await dispatch(unregisterFCMToken({ token })).unwrap();
         tokenSentRef.current = false;
-        localStorage.removeItem("fcm_token_registered");
         dispatch(setDeviceRegistered(false));
-        // Re-fetch user profile to update is_notification_enabled if needed
-        // Or just update local state if we want to be optimistic
-        dispatch(updateNotificationStatus(false));
       }
     } catch (err) {
       console.error("Error disabling notifications:", err);
@@ -174,10 +173,7 @@ export function useFCM() {
 
     // 1. Initial Sync of registration status
     if (typeof window !== "undefined") {
-      const isRegistered =
-        localStorage.getItem("fcm_token_registered") === "true";
-      const actualRegistered =
-        Notification.permission === "granted" && isRegistered;
+      const actualRegistered = Notification.permission === "granted";
       setPermission(Notification.permission);
       dispatch(setDeviceRegistered(actualRegistered));
 
@@ -189,15 +185,7 @@ export function useFCM() {
             const handleStatusChange = () => {
               const currentPermission = Notification.permission;
               setPermission(currentPermission);
-              if (currentPermission !== "granted") {
-                dispatch(setDeviceRegistered(false));
-              } else {
-                dispatch(
-                  setDeviceRegistered(
-                    localStorage.getItem("fcm_token_registered") === "true",
-                  ),
-                );
-              }
+              dispatch(setDeviceRegistered(currentPermission === "granted"));
             };
             status.addEventListener("change", handleStatusChange);
             return () =>

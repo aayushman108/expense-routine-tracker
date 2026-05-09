@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { HiOutlineBell, HiOutlineExclamationCircle, HiX } from "react-icons/hi";
 import Button from "@/components/ui/Button/Button";
 import styles from "@/app/dashboard/dashboard.module.scss";
@@ -10,36 +11,28 @@ import { RootState } from "@/store";
 
 export default function NotificationBanner() {
   const dispatch = useAppDispatch();
-  const { isDeviceRegistered } = useAppSelector(
+  const pathname = usePathname();
+  const { user } = useAppSelector(
     (state: RootState) => state.auth,
   );
   const { requestPermissionAndGetToken, permission } = useFCM();
-  const [isDismissed, setIsDismissed] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined") {
-      const dismissed =
-        sessionStorage.getItem("fcm_banner_dismissed") === "true";
-      setIsDismissed(dismissed);
-    }
   }, []);
 
   const handleEnable = async () => {
     await requestPermissionAndGetToken();
-    handleDismiss();
   };
 
-  const handleDismiss = () => {
-    setIsDismissed(true);
-    sessionStorage.setItem("fcm_banner_dismissed", "true");
-  };
+  if (!mounted) return null;
 
-  if (!mounted || isDismissed) return null;
+  // Hide on settings page
+  if (pathname === "/dashboard/settings") return null;
 
-  // Hide banner ONLY if enabled on this device (which implies granted + token sent)
-  if (isDeviceRegistered && permission === "granted") return null;
+  // Hide banner if already enabled globally for the account
+  if (user?.is_notification_enabled) return null;
 
   const isDenied = permission === "denied";
 
@@ -73,14 +66,6 @@ export default function NotificationBanner() {
           Enable Notifications
         </Button>
       )}
-
-      <button
-        className={styles.dismissBtn}
-        onClick={handleDismiss}
-        title="Dismiss"
-      >
-        <HiX />
-      </button>
     </div>
   );
 }

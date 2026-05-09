@@ -153,6 +153,10 @@ export class UserValidation {
           .nullable()
           .optional(),
       ),
+      is_notification_enabled: z.preprocess(
+        patchPreprocessor,
+        z.boolean().optional(),
+      ),
     }),
   });
 }
