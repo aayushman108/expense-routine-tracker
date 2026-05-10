@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import ConfirmModal from "@/components/ui/ConfirmModal/ConfirmModal";
@@ -26,8 +27,9 @@ export default function Sidebar() {
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const handleLogout = () => {
-    return handleThunk(dispatch(logoutUser()), () => router.push("/"));
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    handleThunk(dispatch(logoutUser()), () => router.push("/"));
   };
 
   const getInitials = (name?: string) => {

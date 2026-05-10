@@ -116,6 +116,20 @@
   }
 }
 
+.googleBtn {
+  background: var(--bg-primary) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+
+  &:hover {
+    background: var(--bg-secondary) !important;
+  }
+
+  svg {
+    font-size: 1.25rem;
+  }
+}
+
 .footer {
   text-align: center;
   margin-top: $space-6;

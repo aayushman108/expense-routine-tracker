@@ -7,9 +7,12 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
+import { signIn, useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   loginUser,
+  googleLogin,
   clearError,
   getCurrentUser,
 } from "@/store/slices/authSlice";
@@ -26,15 +29,38 @@ export default function LoginPage() {
   const router = useRouter();
   const { isLoading, error, isAuthenticated } = useAppSelector((s) => s.auth);
   const cardRef = useRef<HTMLDivElement>(null);
+  const loginAttempted = useRef(false);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     if (isAuthenticated) router.push("/dashboard");
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    if (
+      session?.user &&
+      !isAuthenticated &&
+      !isLoading &&
+      !loginAttempted.current
+    ) {
+      loginAttempted.current = true;
+      dispatch(
+        googleLogin({
+          email: session.user.email!,
+          fullName: session.user.name!,
+          googleId: (session.user as any).id,
+          avatarUrl: session.user.image!,
+        }),
+      );
+    }
+  }, [session, isAuthenticated, isLoading, dispatch]);
 
   useEffect(() => {
     dispatch(clearError());
@@ -123,17 +149,37 @@ export default function LoginPage() {
             error={validationErrors.password}
             required
           />
-          <Button
-            type="submit"
-            fullWidth
-            isLoading={isLoading}
-          >
+          <Button type="submit" fullWidth isLoading={isLoading}>
             Sign In
           </Button>
 
           <div className={styles.forgotPassword}>
             <Link href="/forgot-password">Forgot your password?</Link>
           </div>
+
+          <div className={styles.divider}>
+            <span>OR</span>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            fullWidth
+            onClick={() => {
+              setIsGoogleLoading(true);
+              signIn("google");
+            }}
+            isLoading={
+              isGoogleLoading || (status === "authenticated" && isLoading)
+            }
+            disabled={
+              isGoogleLoading || (status === "authenticated" && isLoading)
+            }
+            className={styles.googleBtn}
+          >
+            <FcGoogle />
+            <span>Sign in with Google</span>
+          </Button>
         </form>
 
         <div className={styles.footer}>

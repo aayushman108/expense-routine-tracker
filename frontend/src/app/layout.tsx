@@ -4,6 +4,7 @@ import AppProvider from "@/components/providers/AppProvider";
 import ToastContainer from "@/components/ui/Toast/Toast";
 import ServiceWorkerRegister from "@/components/pwa/serviceWorkerRegister";
 import LoadingProvider from "@/components/providers/LoadingProvider";
+import AuthProvider from "@/components/providers/AuthProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -122,11 +123,13 @@ export default function RootLayout({
         <ServiceWorkerRegister />
         {/* <Suspense fallback={<PageLoader />}> */}
         <LoadingProvider>
-          <AppProvider>
-            <FCMInitializer />
-            {children}
-            <ToastContainer />
-          </AppProvider>
+          <AuthProvider>
+            <AppProvider>
+              <FCMInitializer />
+              {children}
+              <ToastContainer />
+            </AppProvider>
+          </AuthProvider>
         </LoadingProvider>
         {/* </Suspense> */}
       </body>

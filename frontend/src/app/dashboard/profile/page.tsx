@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
   HiOutlineUser,
@@ -189,7 +190,8 @@ export default function ProfilePage() {
     );
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
     handleThunk(dispatch(logoutUser()), () => router.push("/"));
   };
 
