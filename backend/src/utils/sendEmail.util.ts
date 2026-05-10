@@ -4,9 +4,10 @@ import ejs from "ejs";
 import fs from "fs";
 import juice from "juice";
 import dotenv from "dotenv";
+import { ENV } from "../constants";
 dotenv.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(ENV.RESEND_API_KEY);
 
 interface IMailOptions {
   email: string;
@@ -17,7 +18,7 @@ interface IMailOptions {
 
 export async function sendMail(options: IMailOptions) {
   const templatePath = path.join(__dirname, "..", "emails", options.template);
-  const cssPath = path.join(__dirname, "..", "emails", "style.css");  
+  const cssPath = path.join(__dirname, "..", "emails", "style.css");
 
   const html = await ejs.renderFile(templatePath, options.data);
   const css = fs.readFileSync(cssPath, "utf8");
@@ -25,7 +26,7 @@ export async function sendMail(options: IMailOptions) {
   const inlinedHtml = juice.inlineContent(html, css);
 
   const { data, error } = await resend.emails.send({
-    from: process.env.RESEND_USER!,
+    from: ENV.RESEND_USER!,
     to: options.email,
     subject: options.subject,
     html: inlinedHtml,
@@ -37,4 +38,3 @@ export async function sendMail(options: IMailOptions) {
 
   return data;
 }
-
