@@ -1,6 +1,6 @@
 # SyncSplit | Smart Expense Tracker & Bill Splitter
 
-SyncSplit is a comprehensive, full-stack expense management application designed for both individual and group finances. Whether you're tracking your personal spending or splitting bills with roommates, friends, or teammates, SyncSplit provides a seamless and intuitive experience.
+SyncSplit is a comprehensive, full-stack expense management application designed for both individual and group finances. It features secure authentication via JWT and Google OAuth, allowing for a seamless and intuitive experience whether you're tracking personal spending or splitting bills with friends.
 
 **Live Demo:** [https://syncsplit.netlify.app](https://syncsplit.netlify.app)
 
@@ -15,7 +15,7 @@ SyncSplit is a comprehensive, full-stack expense management application designed
 - **Progressive Web App (PWA):** Install SyncSplit on your mobile or desktop for a native-like experience, even offline.
 - **Real-time Notifications:** Stay updated on group activities and settlement reminders with Firebase Cloud Messaging (FCM).
 - **Dark Mode Support:** A sleek, premium UI with automatic and manual theme switching.
-- **Secure Authentication:** Robust user authentication and authorization using JWT.
+- **Secure Authentication:** Robust user authentication using JWT and Google OAuth (social login) for a seamless experience.
 
 ---
 
@@ -29,6 +29,7 @@ SyncSplit is a comprehensive, full-stack expense management application designed
 - **Animations:** [GSAP](https://greensock.com/gsap/)
 - **Charts:** [Recharts](https://recharts.org/)
 - **API Client:** [Axios](https://axios-http.com/)
+- **Authentication:** [NextAuth.js](https://next-auth.js.org/) (Google OAuth) & JWT
 - **Push Notifications:** [Firebase](https://firebase.google.com/)
 
 ### Backend
@@ -39,7 +40,7 @@ SyncSplit is a comprehensive, full-stack expense management application designed
 - **ORM/Query Builder:** [Knex.js](https://knexjs.org/)
 - **Storage:** [Cloudinary](https://cloudinary.com/) (for receipt/profile images)
 - **Email Service:** [Resend](https://resend.com/)
-- **Authentication:** JWT (JSON Web Tokens) & Bcrypt
+- **Authentication:** JWT (JSON Web Tokens), Bcrypt, & Google OAuth integration
 - **Push Notifications:** [Firebase Admin SDK](https://firebase.google.com/docs/admin) (FCM)
 - **PDF Generation:** [PDFKit](https://pdfkit.org/)
 - **Excel Export:** [ExcelJS](https://github.com/exceljs/exceljs)
