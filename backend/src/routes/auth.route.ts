@@ -20,6 +20,7 @@ authRouter.post(
   validateRequest(UserValidation.loginSchema),
   authController.login,
 );
+authRouter.post("/google-login", authController.googleLogin);
 authRouter.post(
   "/forgot-password",
   validateRequest(UserValidation.forgotPasswordSchema),

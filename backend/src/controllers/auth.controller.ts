@@ -73,6 +73,36 @@ const login = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const googleLogin = asyncHandler(async (req: Request, res: Response) => {
+  const { email, fullName, googleId, avatarUrl } = req.body;
+
+  const user = await authService.googleLogin({
+    email,
+    fullName,
+    googleId,
+    avatarUrl,
+  });
+
+  const accessToken = jwtService.generateAccessToken(user);
+  const refreshToken = jwtService.generateRefreshToken(user);
+
+  res.cookie("jwt", refreshToken, {
+    ...cookieOptions,
+    maxAge:
+      Number(ENV.REFRESH_TOKEN_EXPIRY?.trim()?.slice(0, -1)) *
+      24 *
+      60 *
+      60 *
+      1000,
+  });
+
+  return sendSuccessResponse(res, {
+    message: "Successfully logged in with Google",
+    data: { ...user, password_hash: undefined, accessToken },
+    statusCode: HttpStatusCode.OK,
+  });
+});
+
 const refresh = asyncHandler(async (req: Request, res: Response) => {
   const cookies = req.cookies;
 
@@ -198,6 +228,7 @@ export const authController = {
   signup,
   verifyEmail,
   login,
+  googleLogin,
   refresh,
   logout,
   getMe,

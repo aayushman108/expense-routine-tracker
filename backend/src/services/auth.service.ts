@@ -35,7 +35,8 @@ async function createEmailVerificationCode(user: ISignupInput) {
     { user, activationCode },
     ENV.EMAIL_VERIFICATION_SECRET as Secret,
     {
-      expiresIn: (ENV.EMAIL_VERIFICATION_TOKEN_EXPIRY || "5m") as jwt.SignOptions["expiresIn"],
+      expiresIn: (ENV.EMAIL_VERIFICATION_TOKEN_EXPIRY ||
+        "5m") as jwt.SignOptions["expiresIn"],
     },
   );
 
@@ -122,6 +123,38 @@ async function login(user: ILoginUser) {
   await comparePassword(password, userFromDb.password_hash);
 
   return userFromDb;
+}
+
+async function googleLogin(payload: {
+  email: string;
+  fullName: string;
+  googleId: string;
+  avatarUrl?: string;
+}) {
+  const { email, fullName, googleId, avatarUrl } = payload;
+
+  let user = await authDao.findByGoogleId(googleId);
+
+  if (!user) {
+    const existingUser = await authDao.findByEmail(email);
+    if (existingUser) {
+      await authDao.updateProfile(existingUser.id, {
+        google_id: googleId,
+      } as any);
+      user = (await authDao.findById(existingUser.id)) as any;
+    } else {
+      const avatar = avatarUrl ? { url: avatarUrl, publicId: "" } : null;
+      user = (await authDao.createUser({
+        email,
+        fullName,
+        password: "",
+        avatar,
+        googleId,
+      } as any)) as any;
+    }
+  }
+
+  return user;
 }
 
 async function refreshAccessToken(refreshToken: string) {
@@ -280,6 +313,7 @@ export const authService = {
   verifyEmailVerificationToken,
   createUser,
   login,
+  googleLogin,
   refreshAccessToken,
   logout,
   getMe,

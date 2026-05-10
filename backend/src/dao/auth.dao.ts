@@ -13,6 +13,14 @@ const findByEmail = async (email: string): Promise<Auth.IUser> => {
   return rows[0];
 };
 
+const findByGoogleId = async (googleId: string): Promise<Auth.IUser> => {
+  const { rows } = await db.raw(
+    "SELECT * FROM users WHERE google_id = ? LIMIT 1",
+    [googleId],
+  );
+  return rows[0];
+};
+
 const findById = async (userId: string): Promise<Auth.IUser> => {
   const { rows } = await db.raw("SELECT * FROM users WHERE id = ? LIMIT 1", [
     userId,
@@ -21,15 +29,22 @@ const findById = async (userId: string): Promise<Auth.IUser> => {
 };
 
 const createUser = async (
-  user: IRegisterUser,
+  user: IRegisterUser & { googleId?: string },
 ): Promise<Exclude<Auth.IUser, "password_hash">> => {
-  const { fullName, email, phone, password, avatar } = user;
+  const { fullName, email, phone, password, avatar, googleId } = user;
 
   const { rows } = await db.raw(
-    `INSERT INTO users (id, full_name, email, phone, password_hash, avatar) 
-       VALUES (gen_random_uuid(), ?, ?, ?, ?, ?) 
+    `INSERT INTO users (id, full_name, email, phone, password_hash, avatar, google_id) 
+       VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?) 
        RETURNING to_jsonb(users) - 'password_hash' AS user`,
-    [fullName, email, phone, password, avatar ? JSON.stringify(avatar) : null],
+    [
+      fullName || null,
+      email || null,
+      phone || null,
+      password || null,
+      avatar ? JSON.stringify(avatar) : null,
+      googleId || null,
+    ],
   );
   return rows[0].user;
 };
@@ -69,6 +84,7 @@ const updateProfile = async (
 
 export const authDao = {
   findByEmail,
+  findByGoogleId,
   findById,
   createUser,
   updateProfile,
