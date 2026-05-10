@@ -10,6 +10,7 @@ import { getCurrentUser } from "@/store/slices/authSlice";
 import { addToast } from "@/store/slices/uiSlice";
 import { handleThunk } from "@/lib/utils";
 import { useLoading } from "../providers/LoadingProvider";
+import ThemeToggle from "../ui/ThemeToggle/ThemeToggle";
 import styles from "./Navbar.module.scss";
 
 export default function LandingNavbar() {
@@ -73,12 +74,12 @@ export default function LandingNavbar() {
 
         <div className={styles.navLinks}>
           <Link href="/#features">Features</Link>
-          <Link href="/#how-it-works">How it works</Link>
+          <Link href="/how-it-works">How it works</Link>
           <Link href="/#use-cases">Use Cases</Link>
         </div>
 
         <div className={styles.navActions}>
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
 
           <div className={styles.desktopBtn}>
             <button className={styles.loginBtn} onClick={handleLoginClick}>
@@ -127,7 +128,7 @@ export default function LandingNavbar() {
           <Link href="/#features" onClick={() => setMobileOpen(false)}>
             Features
           </Link>
-          <Link href="/#how-it-works" onClick={() => setMobileOpen(false)}>
+          <Link href="/how-it-works" onClick={() => setMobileOpen(false)}>
             How it works
           </Link>
           <Link href="/#use-cases" onClick={() => setMobileOpen(false)}>

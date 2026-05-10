@@ -11,6 +11,7 @@ import {
   HiOutlineShieldCheck,
   HiOutlineLightningBolt,
   HiOutlineBell,
+  HiOutlineGlobeAlt
 } from "react-icons/hi";
 import styles from "./Features.module.scss";
 
@@ -37,6 +38,13 @@ const features = [
     desc: "Go beyond equal splits. Use custom ratios, percentages, or fixed amounts for true financial fairness.",
     wide: false,
     tag: "Pro",
+  },
+  {
+    icon: <HiOutlineGlobeAlt />,
+    title: "Anywhere Access",
+    desc: "Use SyncSplit as a desktop app, mobile app, or website. Your data is synced in real-time across all your devices.",
+    wide: false,
+    tag: "Cross-Platform",
   },
   {
     icon: <HiOutlineChartBar />,

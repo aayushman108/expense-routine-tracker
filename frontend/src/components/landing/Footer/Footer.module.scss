@@ -6,9 +6,8 @@
 
 .footer {
   position: relative;
-  background: #060814;
+  background: var(--bg-primary);
   padding: $space-20 $container-padding $space-8;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
   overflow: hidden;
   @include responsive(sm) {
     padding: $space-16 $space-6 $space-8;
@@ -24,23 +23,11 @@
   height: 400px;
   background: radial-gradient(
     circle at center,
-    rgba(99, 102, 241, 0.08),
+    var(--color-primary-50),
     transparent 70%
   );
   pointer-events: none;
   z-index: 1;
-}
-
-.gridOverlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  z-index: 1;
-  mask-image: radial-gradient(circle at center, black 0%, transparent 100%);
 }
 
 .watermark {
@@ -51,7 +38,7 @@
   font-size: 15vw;
   font-weight: 900;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.03);
+  -webkit-text-stroke: 1px var(--border-default);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   pointer-events: none;
@@ -86,21 +73,21 @@
   display: flex;
   align-items: center;
   gap: $space-3;
-  color: #fff;
+  color: var(--text-primary);
   font-weight: 800;
   font-size: 32px;
   letter-spacing: -0.02em;
 }
 
 .logoIcon {
-  color: #818cf8;
+  color: var(--color-primary);
   font-size: 36px;
   display: flex;
 }
 
 .brandDesc {
   font-size: $font-size-base;
-  color: #94a3b8;
+  color: var(--text-secondary);
   line-height: 1.6;
   max-width: 500px;
 }
@@ -119,12 +106,12 @@
   a {
     font-size: $font-size-base;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-tertiary);
     text-decoration: none;
     transition: all 0.3s ease;
 
     &:hover {
-      color: #fff;
+      color: var(--text-primary);
       transform: translateY(-2px);
     }
   }
@@ -132,7 +119,7 @@
   .dot {
     width: 4px;
     height: 4px;
-    background: #1e293b;
+    background: var(--border-default);
     border-radius: 50%;
   }
 }
@@ -144,34 +131,34 @@
   a {
     width: 46px;
     height: 46px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #475569;
+    color: var(--text-tertiary);
     font-size: 22px;
     transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
 
     &:hover {
-      color: #818cf8;
-      background: rgba(99, 102, 241, 0.1);
-      border-color: rgba(99, 102, 241, 0.3);
+      color: var(--color-primary);
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-100);
       transform: scale(1.1);
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 0 20px var(--color-primary-50);
     }
   }
 }
 
 .bottom {
   padding-top: $space-8;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border-default);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  color: #475569;
+  color: var(--text-tertiary);
 
   @include mobile-only {
     flex-direction: column;
@@ -189,7 +176,7 @@
     transition: color 0.2s ease;
 
     &:hover {
-      color: #94a3b8;
+      color: var(--text-secondary);
     }
   }
 }
@@ -202,8 +189,8 @@
   .statusDot {
     width: 6px;
     height: 6px;
-    background: #10b981;
+    background: var(--color-success);
     border-radius: 50%;
-    box-shadow: 0 0 10px #10b981;
+    box-shadow: 0 0 10px var(--color-success);
   }
 }

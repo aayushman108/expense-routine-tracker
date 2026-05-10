@@ -46,7 +46,7 @@ export default function AppPreview() {
           <div className={styles.glow} />
           <div className={styles.mockWindow}>
             <Image
-              src="/preview.png"
+              src="/dashboard.png"
               alt="SyncSplit Dashboard Preview"
               width={1200}
               height={800}

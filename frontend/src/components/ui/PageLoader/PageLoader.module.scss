@@ -34,7 +34,7 @@
   height: 80px;
   @include flex-center;
   background: var(--bg-secondary);
-  border: 4px solid var(--border-light);
+  border: 4px solid var(--border-default);
   border-radius: $radius-2xl;
   color: var(--color-primary);
   font-size: 40px;

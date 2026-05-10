@@ -17,11 +17,11 @@
 
   &.scrolled {
     padding: $space-3 0;
-    background: rgba(6, 6, 14, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--border-default);
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -39,7 +39,7 @@
   font-size: $font-size-xl;
   font-weight: 800;
   text-decoration: none;
-  color: #f1f5f9;
+  color: var(--text-primary);
 
   svg {
     color: #818cf8;
@@ -66,7 +66,7 @@
   a {
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
-    color: #64748b;
+    color: var(--text-secondary);
     transition: color 0.2s ease;
     position: relative;
 
@@ -83,7 +83,7 @@
     }
 
     &:hover {
-      color: #e2e8f0;
+      color: var(--text-primary);
 
       &::after {
         width: 100%;
@@ -111,13 +111,13 @@
   font-family: $font-primary;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   background: transparent;
   cursor: pointer;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #e2e8f0;
+    color: var(--text-primary);
   }
 }
 
@@ -128,8 +128,8 @@
   font-family: $font-primary;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
-  color: #fff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: var(--text-on-primary);
+  background: var(--color-primary);
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
@@ -137,8 +137,8 @@
 
   &:hover {
     box-shadow:
-      0 0 0 1px rgba(99, 102, 241, 0.5),
-      0 8px 20px rgba(99, 102, 241, 0.3);
+      0 0 0 1px var(--color-primary),
+      0 8px 20px var(--color-primary-50);
     transform: translateY(-1px);
   }
 }
@@ -151,14 +151,14 @@
   height: 40px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: $font-size-xl;
   cursor: pointer;
   z-index: $z-modal + 1;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #e2e8f0;
+    color: var(--text-primary);
   }
 
   @media (max-width: #{$bp-lg}) {
@@ -177,9 +177,9 @@
   right: 0;
   width: 100%;
   height: 100vh;
-  background: rgba(6, 6, 14, 0.95);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  background: var(--bg-primary);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   z-index: $z-modal;
   transform: translateX(100%);
   transition: transform 0.5s cubic-bezier(0.85, 0, 0.15, 1), visibility 0.5s;
@@ -204,7 +204,7 @@
   right: 0;
   padding: $space-6 $space-8;
   @include flex-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-default);
 
   .logo {
     font-size: $font-size-xl;
@@ -216,10 +216,10 @@
   width: 48px;
   height: 48px;
   border: none;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
   border-radius: $radius-full;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: $font-size-2xl;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -241,14 +241,14 @@
   a {
     font-size: $font-size-2xl;
     font-weight: 800;
-    color: #64748b;
+    color: var(--text-secondary);
     text-decoration: none;
     transition: all 0.3s ease;
     opacity: 0;
     transform: translateY(20px);
 
     &:hover {
-      color: #a5b4fc;
+      color: var(--color-primary);
       transform: translateX(10px);
     }
   }
@@ -276,7 +276,7 @@
   width: 100%;
   margin-top: auto;
   padding-top: $space-8;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border-default);
 }
 
 .drawerLoginBtn {
@@ -287,14 +287,14 @@
   font-family: $font-primary;
   font-size: $font-size-lg;
   font-weight: $font-weight-bold;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   background: transparent;
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-    color: #e2e8f0;
+    border-color: var(--border-strong);
+    color: var(--text-primary);
   }
 }
 

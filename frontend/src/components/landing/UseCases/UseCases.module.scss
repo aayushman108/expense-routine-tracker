@@ -6,14 +6,15 @@
 
 .useCases {
   position: relative;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   padding: $space-32 $container-padding;
   overflow: hidden;
   @include responsive(md) {
     padding: $space-16 $container-padding;
   }
   @include responsive(sm) {
-    padding: $space-16 $space-4;
+    padding: $space-8 $space-4;
+    background: var(--bg-secondary);
   }
 }
 
@@ -65,8 +66,8 @@
 .sectionEyebrow {
   display: inline-block;
   padding: 4px 12px;
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
+  background: var(--color-primary-50);
+  color: var(--color-primary);
   border-radius: 4px;
   font-size: 11px;
   font-weight: 800;
@@ -116,7 +117,8 @@
   position: relative;
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-xl);
   padding: $space-10;
   display: flex;
   flex-direction: column;
@@ -160,10 +162,10 @@
   }
 
   &:hover {
-    transform: translateY(-12px);
-    border-color: var(--border-focus);
-    background: var(--bg-elevated);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-xl);
+    background: var(--bg-elevated);
+    border-color: var(--border-focus);
     &::before {
       opacity: 1;
     }
@@ -178,9 +180,9 @@
 
 .cardTitle {
   font-size: $font-size-xl;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   @include responsive(sm) {
     font-size: $font-size-md;
   }
@@ -201,7 +203,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--border-light);
+  border-top: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .cardTag {

@@ -40,8 +40,8 @@ export default function CTA() {
           </h2>
 
           <p className={styles.sub}>
-            Join thousands of users who have automated their personal and shared economy with
-            mathematical precision.
+            Join thousands of users who have automated their personal and shared
+            economy with mathematical precision.
           </p>
 
           <div className={styles.buttonGroup}>

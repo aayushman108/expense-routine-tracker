@@ -16,19 +16,21 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <div className={`${styles.landingWrapper} app-transition-wrapper`}>
-      <div className={styles.contentWrapper}>
-        <Navbar />
-        <main>
-          <Hero />
-          <Features />
-          <HowItWorks />
-          <AppPreview />
-          <UseCases />
-          <CTA />
-        </main>
-        <Footer />
+    <>
+      <Navbar />
+      <div className={`${styles.landingWrapper} app-transition-wrapper`}>
+        <div className={styles.contentWrapper}>
+          <main>
+            <Hero />
+            <Features />
+            <HowItWorks />
+            <AppPreview />
+            <UseCases />
+            <CTA />
+          </main>
+          <Footer />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

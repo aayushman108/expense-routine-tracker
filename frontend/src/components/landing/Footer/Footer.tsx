@@ -15,7 +15,6 @@ export default function Footer() {
     <footer className={styles.footer}>
       {/* Background decoration */}
       <div className={styles.backgroundGlow} />
-      <div className={styles.gridOverlay} />
       <div className={styles.watermark}>SYNCSPLIT</div>
 
       <div className={styles.footerInner}>
@@ -37,7 +36,7 @@ export default function Footer() {
           <div className={styles.navLinks}>
             <Link href="/#features">Features</Link>
             <div className={styles.dot} />
-            <Link href="/#how-it-works">How it works</Link>
+            <Link href="/how-it-works">How it works</Link>
             <div className={styles.dot} />
             <Link href="/#use-cases">Use Cases</Link>
           </div>
