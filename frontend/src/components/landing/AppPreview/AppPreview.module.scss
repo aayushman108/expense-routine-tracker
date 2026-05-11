@@ -7,21 +7,27 @@
 .appPreview {
   position: relative;
   background: var(--bg-secondary);
-  padding: $space-32 $container-padding;
+  padding-top: $space-32;
+  padding-bottom: $space-32;
   overflow: hidden;
+
   @include responsive(md) {
-    padding: $space-16 $container-padding;
+    padding-top: $space-16;
+    padding-bottom: $space-16;
   }
+
   @include responsive(sm) {
-    padding: $space-16 $space-4;
+    padding-top: $space-16;
+    padding-bottom: $space-16;
   }
 }
 
 .appPreviewInner {
   position: relative;
   z-index: 2;
-  max-width: 1200px;
+  max-width: $container-max-width;
   margin: 0 auto;
+  padding: 0 $container-padding;
 }
 
 .header {

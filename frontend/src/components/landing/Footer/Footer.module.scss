@@ -7,10 +7,13 @@
 .footer {
   position: relative;
   background: var(--bg-primary);
-  padding: $space-20 $container-padding $space-8;
+  padding-top: $space-20;
+  padding-bottom: $space-8;
   overflow: hidden;
+
   @include responsive(sm) {
-    padding: $space-16 $space-6 $space-8;
+    padding-top: $space-16;
+    padding-bottom: $space-8;
   }
 }
 
@@ -49,8 +52,9 @@
 .footerInner {
   position: relative;
   z-index: 2;
-  max-width: 1200px;
+  max-width: $container-max-width;
   margin: 0 auto;
+  padding: 0 $container-padding;
 }
 
 .mainContent {

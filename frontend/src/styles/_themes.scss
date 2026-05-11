@@ -166,3 +166,12 @@
   --skeleton-base: #1e293b;
   --skeleton-shine: #334155;
 }
+
+// ── Responsive Layout Overrides ──
+@media (max-width: 576px) {
+  :root,
+  [data-theme="light"],
+  [data-theme="dark"] {
+    --container-padding: #{$space-4};
+  }
+}

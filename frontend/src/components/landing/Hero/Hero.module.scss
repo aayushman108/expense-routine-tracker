@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 120px $container-padding $space-24;
+  padding: 120px 0 $space-24;
   background: var(--bg-primary);
 
   @media (min-width: 1024px) {
@@ -151,8 +151,9 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1100px;
+  max-width: $container-max-width;
   margin: 0 auto;
+  padding: 0 $container-padding;
   display: flex;
   flex-direction: column;
   align-items: center;

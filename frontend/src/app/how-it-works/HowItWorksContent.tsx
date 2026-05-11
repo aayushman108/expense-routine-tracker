@@ -132,22 +132,28 @@ export default function HowItWorksContent() {
                 <div className={styles.cardIcon}>
                   <HiOutlineShieldCheck />
                 </div>
-                <h3>Identity Management</h3>
-                <p>Sign up using your email or with one-tap Google OAuth. We use JWT (JSON Web Tokens) to ensure your sessions are always encrypted and secure.</p>
+                <div className={styles.cardContent}>
+                  <h3>Identity Management</h3>
+                  <p>Sign up using your email or with one-tap Google OAuth. We use JWT (JSON Web Tokens) to ensure your sessions are always encrypted and secure.</p>
+                </div>
               </div>
               <div className={styles.featureCard}>
                 <div className={styles.cardIcon}>
                   <HiOutlineDeviceMobile />
                 </div>
-                <h3>Install as PWA</h3>
-                <p>Add SyncSplit to your home screen. Our Progressive Web App technology provides a native feel, offline access, and fast loading times.</p>
+                <div className={styles.cardContent}>
+                  <h3>Install as PWA</h3>
+                  <p>Add SyncSplit to your home screen. Our Progressive Web App technology provides a native feel, offline access, and fast loading times.</p>
+                </div>
               </div>
               <div className={styles.featureCard}>
                 <div className={styles.cardIcon}>
                   <HiOutlineGlobeAlt />
                 </div>
-                <h3>Anywhere Access</h3>
-                <p>Use SyncSplit as a desktop app, mobile app, or directly in your browser. Your data is synced in real-time across all your devices.</p>
+                <div className={styles.cardContent}>
+                  <h3>Anywhere Access</h3>
+                  <p>Use SyncSplit as a desktop app, mobile app, or directly in your browser. Your data is synced in real-time across all your devices.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -197,15 +203,19 @@ export default function HowItWorksContent() {
                 <div className={styles.cardIcon}>
                   <HiOutlineUserGroup />
                 </div>
-                <h3>Dynamic Groups</h3>
-                <p>Create groups and invite friends. Everyone in the group can add expenses, making the process transparent and fair.</p>
+                <div className={styles.cardContent}>
+                  <h3>Dynamic Groups</h3>
+                  <p>Create groups and invite friends. Everyone in the group can add expenses, making the process transparent and fair.</p>
+                </div>
               </div>
               <div className={styles.featureCard}>
                 <div className={styles.cardIcon}>
                   <HiOutlineLightningBolt />
                 </div>
-                <h3>Advanced Split Logic</h3>
-                <p>Split bills equally, by exact percentages, or fixed amounts. Our engine handles the math, so you don't have to.</p>
+                <div className={styles.cardContent}>
+                  <h3>Advanced Split Logic</h3>
+                  <p>Split bills equally, by exact percentages, or fixed amounts. Our engine handles the math, so you don't have to.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -226,15 +236,19 @@ export default function HowItWorksContent() {
                 <div className={styles.cardIcon}>
                   <HiOutlineClipboardCheck />
                 </div>
-                <h3>Mutual Approval</h3>
-                <p>Every participant in a split must review and verify the expense. This ensures that everyone agrees on the amount and the logic before money moves.</p>
+                <div className={styles.cardContent}>
+                  <h3>Mutual Approval</h3>
+                  <p>Every participant in a split must review and verify the expense. This ensures that everyone agrees on the amount and the logic before money moves.</p>
+                </div>
               </div>
               <div className={styles.featureCard}>
                 <div className={styles.cardIcon}>
                   <HiOutlineShieldCheck />
                 </div>
-                <h3>Settlement Integrity</h3>
-                <p>Our calculation engine only processes expenses that are 100% verified. This prevents disputes and ensures your final settlement figures are always indisputable.</p>
+                <div className={styles.cardContent}>
+                  <h3>Settlement Integrity</h3>
+                  <p>Our calculation engine only processes expenses that are 100% verified. This prevents disputes and ensures your final settlement figures are always indisputable.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -283,8 +297,10 @@ export default function HowItWorksContent() {
               <div className={styles.cardIcon}>
                 <HiOutlineBell />
               </div>
-              <h3>Real-time Alerts</h3>
-              <p>Powered by Firebase Cloud Messaging (FCM), you get instant push notifications whenever a new expense is added, a settlement is requested, or a debt is cleared. Stay updated across all your devices.</p>
+              <div className={styles.cardContent}>
+                <h3>Real-time Alerts</h3>
+                <p>Powered by Firebase Cloud Messaging (FCM), you get instant push notifications whenever a new expense is added, a settlement is requested, or a debt is cleared. Stay updated across all your devices.</p>
+              </div>
             </div>
           </div>
         </section>
