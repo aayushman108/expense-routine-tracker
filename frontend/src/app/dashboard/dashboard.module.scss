@@ -7,7 +7,7 @@
 .dashboard {
   @include flex-column;
   gap: 1.25rem;
-  padding-bottom: $space-10;
+  padding: 1rem 0 $space-10;
   @include mobile-only {
     padding: 1rem 0;
     gap: 1rem;
@@ -687,8 +687,10 @@
   padding: 0.875rem 1.25rem;
   border-radius: 10px;
   @include flex-between;
+  gap: 1rem;
+  flex-wrap: wrap;
   animation: slideIn 0.4s ease-out forwards;
-  margin-bottom: $space-2;
+  // margin-bottom: $space-2;
   box-shadow: var(--shadow-card);
 
   .dismissBtn {
@@ -715,6 +717,7 @@
   }
 
   @include mobile-only {
+    margin-top: $space-4;
     flex-direction: column;
     gap: $space-4;
     align-items: flex-start;
@@ -767,7 +770,7 @@
 
   &.notificationBanner {
     border-left-color: var(--color-primary);
-    
+
     .bannerIcon {
       color: var(--color-primary);
     }
@@ -785,7 +788,7 @@
 
     &.denied {
       border-left-color: var(--color-danger);
-      
+
       .bannerIcon {
         color: var(--color-danger);
       }

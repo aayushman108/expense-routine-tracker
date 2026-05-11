@@ -12,9 +12,7 @@ import { RootState } from "@/store";
 export default function NotificationBanner() {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
-  const { user } = useAppSelector(
-    (state: RootState) => state.auth,
-  );
+  const { user } = useAppSelector((state: RootState) => state.auth);
   const { requestPermissionAndGetToken, permission } = useFCM();
   const [mounted, setMounted] = useState(false);
 
