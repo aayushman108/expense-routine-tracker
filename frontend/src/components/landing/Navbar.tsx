@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { HiMenuAlt3, HiX } from "react-icons/hi";
-import { FiPieChart } from "react-icons/fi";
+import { HiMenuAlt3, HiX, HiOutlineLogin } from "react-icons/hi";
+import { FiPieChart, FiLayers, FiPlayCircle, FiZap, FiArrowRight } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/store/hooks";
 import { getCurrentUser } from "@/store/slices/authSlice";
@@ -126,14 +126,18 @@ export default function LandingNavbar() {
 
         <div className={styles.drawerLinks}>
           <Link href="/#features" onClick={() => setMobileOpen(false)}>
-            Features
+            <FiLayers />
+            <span>Features</span>
           </Link>
           <Link href="/how-it-works" onClick={() => setMobileOpen(false)}>
-            How it works
+            <FiPlayCircle />
+            <span>How it works</span>
           </Link>
           <Link href="/#use-cases" onClick={() => setMobileOpen(false)}>
-            Use Cases
+            <FiZap />
+            <span>Use Cases</span>
           </Link>
+
           <div className={styles.drawerActions}>
             <button
               className={styles.drawerLoginBtn}
@@ -142,6 +146,7 @@ export default function LandingNavbar() {
                 handleLoginClick();
               }}
             >
+              <HiOutlineLogin />
               Log in
             </button>
             <Link
@@ -150,6 +155,7 @@ export default function LandingNavbar() {
               onClick={() => setMobileOpen(false)}
             >
               Get Started
+              <FiArrowRight />
             </Link>
           </div>
         </div>

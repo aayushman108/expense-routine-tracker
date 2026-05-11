@@ -4,7 +4,13 @@ import { useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { FiArrowRight, FiCheckCircle, FiZap, FiTarget, FiBell } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiCheckCircle,
+  FiZap,
+  FiTarget,
+  FiBell,
+} from "react-icons/fi";
 import styles from "./Hero.module.scss";
 
 export default function Hero() {
@@ -86,12 +92,15 @@ export default function Hero() {
 
         <h1 className={styles.heroTitle}>
           Master your <br />
-          <span className={styles.heroTitleGradient}>Personal & Shared Finances</span>
+          <span className={styles.heroTitleGradient}>
+            Personal & Shared Finances
+          </span>
         </h1>
 
         <p className={styles.heroSub}>
-          The smarter way to track your personal spending, group expenses, and split bills with precision.
-          Perfect for individuals, roommates, travelers, and anyone sharing costs.
+          The smarter way to track your personal spending, group expenses, and
+          split bills with precision. Perfect for individuals, roommates,
+          travelers, and anyone sharing costs.
         </p>
 
         <div className={styles.ctaGroup}>
