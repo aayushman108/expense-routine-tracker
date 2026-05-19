@@ -3,34 +3,42 @@
 
 .item {
   display: flex;
-  gap: 1rem;
-  padding: 1.25rem 1.5rem;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
   cursor: pointer;
   transition: all $transition-fast;
   position: relative;
-  border-bottom: 1px solid var(--border-light);
-  background: var(--bg-card);
+  border: 1px solid transparent;
+  border-bottom-color: var(--border-light);
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
+    var(--bg-card);
 
   &:hover {
-    background: var(--bg-hover);
+    background:
+      linear-gradient(145deg, rgba(var(--bg-card-rgb), 1), color-mix(in srgb, var(--color-primary-50) 34%, var(--bg-card) 66%)),
+      var(--bg-hover);
+    border-color: color-mix(in srgb, var(--border-default) 72%, var(--color-primary) 28%);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+    transform: translateY(-1px);
   }
 
   &.unread {
-    background: rgba(var(--color-primary-rgb), 0.03);
+    background:
+      linear-gradient(145deg, rgba(var(--color-primary-rgb), 0.075), rgba(var(--bg-card-rgb), 0.96)),
+      var(--bg-card);
+    border-color: color-mix(in srgb, var(--color-primary) 18%, var(--border-light) 82%);
     
     &::before {
       content: "";
       position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      left: 8px;
+      top: 12px;
+      bottom: 12px;
       width: 3px;
-      background: var(--color-primary);
-    }
-
-    .title {
-      font-weight: 700;
-      color: var(--text-primary);
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 72%, var(--color-success) 28%));
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.08);
     }
   }
 
@@ -46,28 +54,50 @@
 
 .iconWrapper {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
   @include flex-center;
-  background: var(--bg-tertiary);
+  background: rgba(var(--bg-card-rgb), 0.88);
   font-size: 1.25rem;
-  border: 1px solid var(--border-light);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
   transition: all $transition-fast;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
 
   .item:hover & {
-    transform: scale(1.05);
+    transform: scale(1.04);
     background: var(--bg-card);
     border-color: var(--color-primary-100);
   }
 
   span {
     display: flex;
-    &.iconGroup { color: var(--color-info); }
-    &.iconExpense { color: var(--color-warning); }
-    &.iconSuccess { color: var(--color-success); }
-    &.iconDanger { color: var(--color-danger); }
-    &.iconDefault { color: var(--text-tertiary); }
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+
+    &.iconGroup {
+      color: var(--color-info);
+      background: color-mix(in srgb, var(--color-info) 12%, transparent);
+    }
+    &.iconExpense {
+      color: var(--color-warning);
+      background: color-mix(in srgb, var(--color-warning) 14%, transparent);
+    }
+    &.iconSuccess {
+      color: var(--color-success);
+      background: color-mix(in srgb, var(--color-success) 12%, transparent);
+    }
+    &.iconDanger {
+      color: var(--color-danger);
+      background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+    }
+    &.iconDefault {
+      color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 11%, transparent);
+    }
   }
 }
 
@@ -80,15 +110,16 @@
 }
 
 .title {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 750;
   color: var(--text-primary);
   @include truncate(1);
+  margin: 0;
 }
 
 .body {
   font-size: 0.8125rem;
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--text-secondary) 90%, var(--text-primary) 10%);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -99,19 +130,19 @@
 
 .time {
   font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
+  font-weight: 750;
+  color: color-mix(in srgb, var(--text-tertiary) 78%, var(--color-primary) 22%);
   text-transform: uppercase;
   letter-spacing: 0.02em;
   margin-top: 0.25rem;
 }
 
 .unreadDot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: var(--color-primary);
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
   margin-left: auto;
   align-self: center;
 }

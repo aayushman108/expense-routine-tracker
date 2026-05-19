@@ -14,6 +14,7 @@
   --color-primary-100: #e0e7ff;
   --color-primary-600: #4f46e5;
   --color-primary-700: #4338ca;
+  --color-secondary: #a855f7;
 
   // ── Semantic ──
   --color-success: #10b981;
@@ -27,6 +28,7 @@
 
   // ── Backgrounds ──
   --bg-primary: #ffffff;
+  --bg-primary-rgb: 255, 255, 255;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
   --bg-elevated: #ffffff;
@@ -95,6 +97,7 @@
   --color-primary-100: rgba(99, 102, 241, 0.15);
   --color-primary-600: #6366f1;
   --color-primary-700: #818cf8;
+  --color-secondary: #c084fc;
 
   // ── Semantic ──
   --color-success: #34d399;
@@ -107,42 +110,43 @@
   --color-info-light: rgba(59, 130, 246, 0.15);
 
   // ── Backgrounds ──
-  --bg-primary: #0b0b0d;
-  --bg-secondary: #121215;
-  --bg-tertiary: #232329;
-  --bg-elevated: #1a1a1f;
-  --bg-elevated-rgb: 26, 26, 31;
-  --bg-card: #18181b;
-  --bg-card-rgb: 24, 24, 27;
-  --bg-input: #121215;
-  --bg-hover: rgba(255, 255, 255, 0.04);
-  --bg-active: rgba(255, 255, 255, 0.08);
+  --bg-primary: #111318;
+  --bg-primary-rgb: 17, 19, 24;
+  --bg-secondary: #151922;
+  --bg-tertiary: #202634;
+  --bg-elevated: #1a1f2a;
+  --bg-elevated-rgb: 26, 31, 42;
+  --bg-card: #191e28;
+  --bg-card-rgb: 25, 30, 40;
+  --bg-input: #141923;
+  --bg-hover: rgba(148, 163, 184, 0.08);
+  --bg-active: rgba(129, 140, 248, 0.14);
 
   // ── Text ──
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #b6c2d2;
+  --text-tertiary: #8190a5;
   --text-inverse: #0f172a;
   --text-link: #818cf8;
   --text-on-primary: #f8fafc;
 
   // ── Borders ──
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-light: rgba(255, 255, 255, 0.04);
-  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-default: rgba(203, 213, 225, 0.13);
+  --border-light: rgba(203, 213, 225, 0.08);
+  --border-strong: rgba(226, 232, 240, 0.22);
   --border-focus: #818cf8;
 
   // ── Shadows ──
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 40px rgba(129, 140, 248, 0.15);
+  --shadow-sm: 0 1px 2px rgba(3, 7, 18, 0.28);
+  --shadow-md: 0 8px 22px rgba(3, 7, 18, 0.32);
+  --shadow-lg: 0 18px 46px rgba(3, 7, 18, 0.38);
+  --shadow-xl: 0 26px 70px rgba(3, 7, 18, 0.46);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 42px rgba(3, 7, 18, 0.34);
+  --shadow-glow: 0 0 42px rgba(129, 140, 248, 0.18);
 
   // ── Glassmorphism ──
-  --glass-bg: rgba(20, 27, 45, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-bg: rgba(25, 30, 40, 0.76);
+  --glass-border: rgba(226, 232, 240, 0.1);
   --glass-blur: 20px;
 
   // ── Gradients ──
@@ -158,13 +162,13 @@
     rgba(99, 102, 241, 0.08) 0%,
     rgba(139, 92, 246, 0.08) 100%
   );
-  --gradient-surface: linear-gradient(180deg, #0b0f1a 0%, #111827 100%);
+  --gradient-surface: linear-gradient(180deg, #151922 0%, #111318 100%);
 
   // ── Misc ──
-  --scrollbar-thumb: #334155;
-  --scrollbar-track: #1e293b;
-  --skeleton-base: #1e293b;
-  --skeleton-shine: #334155;
+  --scrollbar-thumb: #475569;
+  --scrollbar-track: #151922;
+  --skeleton-base: #202838;
+  --skeleton-shine: #2c3548;
 }
 
 // ── Responsive Layout Overrides ──

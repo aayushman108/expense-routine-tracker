@@ -267,8 +267,10 @@
 
 .featureCard {
   position: relative;
-  background: #ffffff;
-  border: 1px solid #dbe3ef;
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.9)),
+    var(--bg-card);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.16);
   border-radius: 8px;
   padding: $space-10;
   display: flex;
@@ -277,7 +279,7 @@
   height: 100%;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--shadow-card);
 
   @include responsive(lg) {
     padding: $space-8;
@@ -304,8 +306,8 @@
 
   &:hover {
     transform: translateY(-8px);
-    border-color: #a5b4fc;
-    box-shadow: 0 24px 70px rgba(79, 70, 229, 0.14);
+    border-color: rgba(var(--color-primary-rgb), 0.48);
+    box-shadow: 0 24px 70px rgba(var(--color-primary-rgb), 0.16);
 
     &::before {
       opacity: 1;
@@ -320,7 +322,7 @@
     color: var(--color-primary);
     width: 64px;
     height: 64px;
-    background: #eef2ff;
+    background: var(--color-primary-50);
     border-radius: 8px;
     align-items: center;
     justify-content: center;
@@ -350,7 +352,7 @@
     z-index: 1;
     font-size: $font-size-base;
     line-height: 1.6;
-    color: #475569;
+    color: var(--text-secondary);
 
     @include responsive(sm) {
       font-size: $font-size-sm;
@@ -373,16 +375,18 @@
 .processItem {
   position: relative;
   padding: 1.25rem;
-  background: #ffffff;
-  border: 1px solid #dbe3ef;
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.9)),
+    var(--bg-card);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.14);
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-4px);
-    border-color: #a5b4fc;
-    box-shadow: 0 20px 58px rgba(79, 70, 229, 0.12);
+    border-color: rgba(var(--color-primary-rgb), 0.42);
+    box-shadow: 0 20px 58px rgba(var(--color-primary-rgb), 0.12);
   }
 
   .itemContent {
@@ -399,7 +403,7 @@
     }
     p {
       font-size: 1.1rem;
-      color: #475569;
+      color: var(--text-secondary);
       line-height: 1.7;
 
       @include responsive(sm) {

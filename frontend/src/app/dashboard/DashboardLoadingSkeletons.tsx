@@ -161,14 +161,7 @@ export const PersonalOverviewSkeleton = () => (
 
 /** ── Expenditure Analytics Chart ── */
 export const ChartSkeleton = () => (
-  <div
-    style={{
-      background: "var(--bg-card)",
-      border: "1px solid var(--border-light)",
-      borderRadius: "12px",
-      padding: "24px",
-    }}
-  >
+  <div className={styles.chartSkeletonCard}>
     <div
       style={{
         display: "flex",

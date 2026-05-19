@@ -26,8 +26,8 @@ export default function NotificationBanner() {
 
   if (!mounted) return null;
 
-  // Hide on settings page
-  if (pathname === "/dashboard/settings") return null;
+  // Only show on dashboard home.
+  if (pathname !== "/dashboard") return null;
 
   // Hide banner if already enabled globally for the account
   if (user?.is_notification_enabled) return null;

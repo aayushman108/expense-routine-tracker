@@ -213,10 +213,15 @@ const MonthlyExpenditureChart: React.FC<MonthlyExpenditureChartProps> = ({
                 <stop
                   offset="5%"
                   stopColor="var(--color-primary)"
-                  stopOpacity={0.3}
+                  stopOpacity={0.34}
                 />
                 <stop
-                  offset="95%"
+                  offset="75%"
+                  stopColor="var(--color-primary)"
+                  stopOpacity={0.06}
+                />
+                <stop
+                  offset="100%"
                   stopColor="var(--color-primary)"
                   stopOpacity={0}
                 />
@@ -260,10 +265,16 @@ const MonthlyExpenditureChart: React.FC<MonthlyExpenditureChartProps> = ({
               type="monotone"
               dataKey={dataKey}
               stroke="var(--color-primary)"
-              strokeWidth={3}
+              strokeWidth={2.5}
               fillOpacity={1}
               fill="url(#colorTotal)"
               animationDuration={1500}
+              activeDot={{
+                r: 5,
+                strokeWidth: 3,
+                stroke: "var(--bg-card)",
+                fill: "var(--color-primary)",
+              }}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -34,13 +34,13 @@
 .primary {
   background: var(--gradient-primary);
   color: var(--text-on-primary);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 10px 24px rgba(var(--color-primary-rgb), 0.26);
   font-weight: $font-weight-bold;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
-    filter: brightness(1.1);
+    box-shadow: 0 14px 32px rgba(var(--color-primary-rgb), 0.34);
+    filter: brightness(1.05);
   }
 
   &:active {
@@ -50,9 +50,9 @@
 }
 
 .secondary {
-  background: var(--bg-tertiary);
+  background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid var(--border-default);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
 
   &:hover {
     background: var(--bg-hover);
@@ -64,7 +64,7 @@
 .outline {
   background: transparent;
   color: var(--color-primary);
-  border: 1.5px solid var(--color-primary);
+  border: 1px solid var(--color-primary);
   font-weight: $font-weight-bold;
 
   &:hover {
@@ -113,19 +113,21 @@
   padding: $space-2 $space-4;
   font-size: 11px;
   height: 32px;
+  border-radius: 8px;
 }
 
 .md {
   padding: 0 $space-5;
   font-size: 12px;
   height: 38px;
+  border-radius: 8px;
 }
 
 .lg {
   padding: 0 $space-6;
   font-size: 14px;
   height: 48px;
-  border-radius: $radius-md;
+  border-radius: 8px;
 }
 
 // ── Full width ──
@@ -176,5 +178,5 @@
 // ── Icon only ──
 .iconOnly {
   padding: $space-3;
-  border-radius: $radius-full;
+  border-radius: 8px;
 }

@@ -2,20 +2,22 @@
 
 .filterBar {
   padding: 0.625rem 0.875rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.99), rgba(var(--bg-card-rgb), 0.94)),
+    var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
+  border-radius: 8px;
   margin-bottom: 0.5rem;
   margin-top: -0.125rem;
   animation: slideDown 0.2s ease-out;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
 
   &.isStatic {
     animation: none;
     margin-top: 0;
     margin-bottom: 0.75rem;
-    border-color: var(--border-default);
-    box-shadow: var(--shadow-sm);
+    border-color: color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
   }
 
   .filterGroup {
@@ -44,7 +46,7 @@
     label {
       font-size: 0.625rem;
       font-weight: 700;
-      color: var(--text-tertiary) !important;
+      color: color-mix(in srgb, var(--text-tertiary) 78%, var(--color-primary) 22%) !important;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -62,15 +64,16 @@
       font-size: 0.625rem !important;
       text-transform: uppercase;
       font-weight: 700;
-      color: var(--text-tertiary) !important;
+      color: color-mix(in srgb, var(--text-tertiary) 78%, var(--color-primary) 22%) !important;
     }
 
     [class*="trigger"] {
       height: 32px;
       padding: 0 0.75rem;
       font-size: 0.8125rem !important; // Reduced to 13px for better density
-      background: var(--bg-tertiary);
-      border-radius: 4px;
+      background: var(--bg-card);
+      border-color: color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
+      border-radius: 8px;
       font-weight: 500 !important; // Consistent weight
 
       [class*="valueText"] {
@@ -88,13 +91,15 @@
 
     [class*="dropdown"] {
       padding: 0.125rem 0 !important;
-      border-radius: 4px !important;
+      border-radius: 8px !important;
+      border-color: color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%) !important;
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.1) !important;
       
       [class*="option"] {
         padding: 0.1875rem 0.5rem !important;
         margin: 1px 2px !important;
         font-size: 0.8125rem !important;
-        border-radius: 2px !important;
+        border-radius: 6px !important;
         font-weight: 500 !important;
       }
     }
@@ -125,7 +130,7 @@
       padding-right: 0.75rem !important;
       height: 32px !important;
       font-size: 0.75rem !important;
-      border-radius: 4px !important;
+      border-radius: 8px !important;
     }
   }
 
@@ -144,9 +149,9 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0 0.75rem;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-default);
-    border-radius: 4px;
+    background: var(--bg-card);
+    border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
+    border-radius: 8px;
     transition: all 0.2s;
     height: 32px;
 
@@ -184,12 +189,13 @@
 
     &:focus-within,
     &:hover {
-      background: var(--bg-secondary);
+      background: var(--bg-card);
       border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-50);
     }
 
     svg {
-      color: var(--text-tertiary);
+      color: color-mix(in srgb, var(--text-tertiary) 78%, var(--color-primary) 22%);
       font-size: 0.8125rem;
     }
   }
@@ -219,8 +225,8 @@
     
     .downloadBtn {
       width: 100%;
-      background: var(--bg-secondary);
-      border-color: var(--border-light);
+      background: var(--bg-card);
+      border-color: color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
     }
   }
 }

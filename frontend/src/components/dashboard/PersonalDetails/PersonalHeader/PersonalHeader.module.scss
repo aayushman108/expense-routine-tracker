@@ -5,19 +5,17 @@
   align-items: flex-end;
   gap: $space-6;
   padding-bottom: $space-6;
-  border-bottom: 1px solid var(--border-light);
+  padding: 1.25rem 1.5rem;
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
+    var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
+  border-radius: 8px;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
   position: relative;
 
   &::before {
-    content: "";
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100px;
-    height: 1px;
-    background: var(--color-primary);
-    box-shadow: 0 0 10px var(--color-primary);
-    z-index: 2;
+    display: none;
   }
 
   @include mobile-only {
@@ -82,13 +80,13 @@
     .icon {
       width: 48px;
       height: 48px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
+      background: var(--color-primary-50);
+      border: 1px solid var(--color-primary-100);
+      border-radius: 8px;
       @include flex-center;
       font-size: 24px;
       color: var(--color-primary);
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 10px 24px rgba(var(--color-primary-rgb), 0.08);
     }
 
     h1 {
@@ -108,7 +106,7 @@
     @include body-text;
     max-width: 600px;
     margin-top: $space-3;
-    color: var(--text-secondary);
+    color: color-mix(in srgb, var(--text-secondary) 88%, var(--text-primary) 12%);
     font-weight: 500;
     @include responsive(sm) {
       font-size: 14px;
@@ -119,4 +117,12 @@
 .actions {
   display: flex;
   gap: $space-3;
+
+  button {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    height: 36px !important;
+    font-size: 0.8125rem !important;
+    border-radius: 6px !important;
+  }
 }

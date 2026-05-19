@@ -2,6 +2,7 @@ import styles from "@/app/dashboard/dashboard.module.scss";
 import { RootState } from "@/store";
 import { useAppSelector } from "@/store/hooks";
 import { FinancialHealthSkeleton } from "@/app/dashboard/DashboardLoadingSkeletons";
+import type { CSSProperties } from "react";
 
 export default function FinancialHealthCard() {
   const { summary, isSummaryLoading } = useAppSelector(
@@ -14,6 +15,9 @@ export default function FinancialHealthCard() {
 
   const totalBalance = owedToYou + youOwe;
   const payablePercent = totalBalance > 0 ? (youOwe / totalBalance) * 100 : 0;
+  const pieStyle = {
+    "--payable-percent": `${payablePercent}%`,
+  } as CSSProperties;
 
   if (isSummaryLoading || !summary) {
     return <FinancialHealthSkeleton />;
@@ -45,15 +49,11 @@ export default function FinancialHealthCard() {
 
         <div className={styles.pieContainer}>
           <div
-            className={styles.pieChart}
-            style={{
-              background:
-                totalBalance === 0
-                  ? "var(--bg-tertiary)"
-                  : `conic-gradient(var(--color-success) 0% ${payablePercent}%, var(--color-danger) ${payablePercent}% 100%)`,
-            }}
+            className={`${styles.pieChart} ${totalBalance === 0 ? styles.emptyPie : ""}`}
+            style={pieStyle}
           >
             <div className={styles.pieInner}>
+              <span className={styles.netLiquidityLabel}>Net</span>
               <div
                 className={`${styles.netLiquidityPill} ${netBalance >= 0 ? styles.positiveStatus : styles.negativeStatus}`}
               >

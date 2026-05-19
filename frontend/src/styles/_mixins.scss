@@ -71,18 +71,20 @@
 
 // ── Card ──
 @mixin card {
-  background: var(--bg-card);
-  border-radius: $radius-sm;
-  border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-card);
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
+    var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border-default) 82%, var(--color-primary) 18%);
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
   transition:
     box-shadow $transition-base,
     transform $transition-base,
     border-color $transition-base;
 
   &:hover {
-    box-shadow: var(--shadow-lg);
-    border-color: var(--border-strong);
+    box-shadow: 0 18px 48px rgba(var(--color-primary-rgb), 0.1);
+    border-color: color-mix(in srgb, var(--border-strong) 70%, var(--color-primary) 30%);
   }
 }
 
@@ -145,21 +147,23 @@
   font-family: $font-primary;
   font-size: $font-size-xs;
   color: var(--text-primary);
-  background: var(--bg-input);
-  border: 1px solid var(--border-default);
-  border-radius: $radius-sm;
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--border-default) 82%, var(--color-primary) 18%);
+  border-radius: 8px;
   transition:
     border-color $transition-fast,
     box-shadow $transition-fast;
   outline: none;
 
   &::placeholder {
-    color: var(--text-tertiary);
+    color: color-mix(in srgb, var(--text-tertiary) 86%, var(--text-secondary) 14%);
   }
 
   &:focus {
     border-color: var(--border-focus);
-    box-shadow: 0 0 0 3px var(--color-primary-50);
+    box-shadow:
+      0 0 0 3px var(--color-primary-50),
+      0 10px 24px rgba(var(--color-primary-rgb), 0.08);
   }
 }
 

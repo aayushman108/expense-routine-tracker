@@ -4,7 +4,10 @@
   min-height: 100vh;
   @include flex-center;
   padding: $space-6;
-  background: var(--bg-secondary);
+  background:
+    radial-gradient(circle at 82% 10%, rgba(var(--color-primary-rgb), 0.12), transparent 28rem),
+    radial-gradient(circle at 14% 92%, rgba(16, 185, 129, 0.08), transparent 24rem),
+    linear-gradient(180deg, var(--bg-secondary), var(--bg-primary));
   position: relative;
   overflow: hidden;
 
@@ -27,6 +30,7 @@
 
 .card {
   @include card;
+  backdrop-filter: blur(18px);
   width: 100%;
   max-width: 440px;
   padding: $space-10;

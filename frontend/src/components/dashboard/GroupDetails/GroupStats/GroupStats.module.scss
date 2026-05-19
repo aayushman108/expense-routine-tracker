@@ -16,15 +16,17 @@
 }
 
 .statCard {
-  background: var(--glass-bg);
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
+    var(--bg-card);
   backdrop-filter: blur(var(--glass-blur, 12px));
   padding: 1.25rem;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 1rem;
-  border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
@@ -46,8 +48,7 @@
 
   &:hover {
     transform: translateY(-2px); // Reduced
-    box-shadow: var(--shadow-md);
-    background: var(--bg-card);
+    box-shadow: 0 18px 48px rgba(var(--color-primary-rgb), 0.1);
 
     &::before {
       background: var(--color-primary);
@@ -64,12 +65,12 @@
   width: 40px; // Reduced from 56px
   height: 40px;
   border-radius: 8px; // Reduced from 16px
-  background: var(--bg-tertiary);
+  background: var(--color-primary-50);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.125rem; // Reduced from 1.75rem
-  color: var(--text-tertiary);
+  color: var(--color-primary);
   flex-shrink: 0;
   transition: all 0.2s;
 
@@ -89,7 +90,7 @@
 .statLabel {
   font-size: 0.625rem; // Reduced from 0.75rem
   font-weight: 700;
-  color: var(--text-tertiary);
+  color: color-mix(in srgb, var(--text-tertiary) 78%, var(--color-primary) 22%);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }

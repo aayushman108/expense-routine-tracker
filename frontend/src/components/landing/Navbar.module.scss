@@ -178,8 +178,9 @@
   width: 100%;
   max-width: 400px; // Limit width on tablets
   height: 100vh;
-  background: var(--bg-primary);
-  background: linear-gradient(165deg, var(--bg-primary) 0%, #0f1015 100%);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--color-primary-rgb), 0.1) 0%, transparent 42%),
+    linear-gradient(165deg, rgba(var(--bg-primary-rgb), 1) 0%, rgba(var(--bg-card-rgb), 1) 100%);
   border-left: 1px solid var(--border-default);
   z-index: $z-modal;
   transform: translateX(100%);
@@ -217,7 +218,7 @@
   padding: $space-6 $space-8;
   @include flex-between;
   border-bottom: 1px solid var(--border-light);
-  background: rgba(var(--bg-primary-rgb), 0.5);
+  background: rgba(var(--bg-primary-rgb), 0.72);
   backdrop-filter: blur(10px);
   z-index: 10;
 }

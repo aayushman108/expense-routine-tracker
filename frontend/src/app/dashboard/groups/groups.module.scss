@@ -129,6 +129,14 @@
   display: flex;
   gap: $space-3;
   align-items: center;
+
+  button {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    height: 36px !important;
+    font-size: 0.8125rem !important;
+    border-radius: 6px !important;
+  }
 }
 
 

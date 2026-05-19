@@ -10,8 +10,8 @@
   overflow-x: auto;
   background: var(--bg-card);
   border-radius: 8px;
-  border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
 
   // Custom horizontal scrollbar
   &::-webkit-scrollbar {
@@ -40,16 +40,16 @@
   font-size: 0.8125rem;
 
   thead {
-    background: var(--bg-secondary);
+    background: color-mix(in srgb, var(--color-primary-50) 58%, var(--bg-card) 42%);
     
     th {
-      padding: 0.5rem 1rem;
+      padding: 0.7rem 1rem;
       font-weight: 700;
-      color: var(--text-tertiary);
+      color: color-mix(in srgb, var(--text-tertiary) 78%, var(--color-primary) 22%);
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-size: 0.6875rem;
-      border-bottom: 1px solid var(--border-default);
+      border-bottom: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
       white-space: nowrap;
 
       &:first-child {
@@ -66,7 +66,7 @@
       transition: all 0.15s ease;
 
       &:hover {
-        background-color: var(--bg-hover);
+        background-color: color-mix(in srgb, var(--bg-hover) 70%, var(--color-primary-50) 30%);
       }
 
       &.clickableRow {
@@ -74,10 +74,10 @@
       }
 
       td {
-        padding: 0.5rem 1rem;
+        padding: 0.7rem 1rem;
         color: var(--text-primary);
         vertical-align: middle;
-        border-bottom: 1px solid var(--border-default);
+        border-bottom: 1px solid color-mix(in srgb, var(--border-default) 88%, transparent);
       }
 
       &:last-child {
@@ -117,7 +117,7 @@
   padding: 0.75rem;
   background: var(--bg-card);
   border-radius: 8px;
-  border: 1px solid var(--border-default);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
 }
 
 .skeletonRow {

@@ -5,10 +5,12 @@
   align-items: center;
   gap: $space-4; // Reduced
   padding: 1.25rem 1.5rem; // Reduced from $space-6 $space-8
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
+    var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
   border-radius: 8px; // Reduced from $radius-lg
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
   position: relative;
   overflow: hidden;
 
@@ -62,11 +64,11 @@
     width: 48px; // Reduced from 64px
     height: 48px;
     border-radius: 8px; // Reduced from $radius-xl
-    background: var(--bg-tertiary);
-    color: var(--text-secondary);
+    background: var(--color-primary-50);
+    color: var(--color-primary);
     @include flex-center;
     overflow: hidden;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--color-primary-100);
     font-size: 1.25rem;
     flex-shrink: 0;
 
@@ -100,9 +102,9 @@
       }
 
       .inlineEditBtn {
-        background: var(--bg-tertiary);
-        color: var(--text-tertiary);
-        border: 1px solid var(--border-default);
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
         width: 28px; // Reduced from 32px
         height: 28px;
         border-radius: 4px; // Reduced
@@ -112,9 +114,9 @@
         font-size: 0.875rem;
 
         &:hover {
-          background: var(--bg-card);
+          background: var(--color-primary-50);
           color: var(--color-primary);
-          border-color: var(--color-primary);
+          border-color: var(--color-primary-100);
         }
       }
     }
@@ -122,7 +124,7 @@
 
   p {
     font-size: 0.8125rem; // Reduced from $font-size-sm
-    color: var(--text-secondary);
+    color: color-mix(in srgb, var(--text-secondary) 88%, var(--text-primary) 12%);
     max-width: 450px;
     margin: 0;
   }

@@ -295,11 +295,13 @@
 }
 
 .blockVisual {
-  background: #f8fafc;
-  border: 1px solid #dbe3ef;
+  background:
+    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.9)),
+    var(--bg-card);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.16);
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
   min-height: 240px;
@@ -310,7 +312,7 @@
 
   &::before {
     content: "Expense Preview";
-    color: #94a3b8;
+    color: var(--text-tertiary);
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -325,19 +327,19 @@
 
 // visual simulation mockups
 .mockupItem {
-  background: #ffffff;
-  border: 1px solid #dbe3ef;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: #a5b4fc;
+    border-color: rgba(var(--color-primary-rgb), 0.42);
     transform: translateY(-2px);
   }
 
@@ -347,12 +349,12 @@
     gap: 0.25rem;
 
     strong {
-      color: #0f172a;
+      color: var(--text-primary);
       font-weight: 700;
     }
 
     span {
-      color: #94a3b8;
+      color: var(--text-tertiary);
       font-size: 11px;
     }
   }
@@ -360,7 +362,7 @@
   .right {
     font-family: $font-mono;
     font-weight: 700;
-    color: #4f46e5;
+    color: var(--color-primary);
 
     &.negative {
       color: var(--color-danger);
@@ -379,8 +381,8 @@
 }
 
 .currencyCard {
-  background: #ffffff;
-  border: 1px solid #dbe3ef;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   display: flex;
@@ -389,7 +391,7 @@
   font-size: 13px;
 
   .label {
-    color: #94a3b8;
+    color: var(--text-tertiary);
     font-size: 10px;
     text-transform: uppercase;
     font-weight: 700;
@@ -399,12 +401,12 @@
   .amount {
     font-family: $font-mono;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-primary);
     font-size: 15px;
   }
 
   .converted {
-    color: #4f46e5;
+    color: var(--color-primary);
     font-size: 11px;
     font-weight: 600;
   }
