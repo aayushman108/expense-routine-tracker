@@ -18,51 +18,50 @@ export default function Hero() {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({ delay: 0.2 });
-
-      // Animate geometric shapes (Commented out because elements are removed from DOM)
-      // tl.fromTo(
-      //   `.${styles.shape}`,
-      //   { opacity: 0, scale: 0.5, rotate: -10 },
-      //   {
-      //     opacity: 1,
-      //     scale: 1,
-      //     rotate: 0,
-      //     stagger: 0.1,
-      //     duration: 1.5,
-      //     ease: "expo.out",
-      //   },
-      // );
-
-      // Animate content items
-      tl.fromTo(
+      gsap.set(
         [
           `.${styles.badge}`,
-          `.${styles.heroTitle}`,
+          `.${styles.titleLine}`,
+          `.${styles.heroTitleGradient}`,
           `.${styles.heroSub}`,
-          `.${styles.ctaGroup}`,
+          `.${styles.btnPrimary}`,
           `.${styles.trustRibbon}`,
-          `.${styles.featureHighlights}`,
+          `.${styles.featureItem}`,
         ],
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.1,
-          duration: 0.8,
-          ease: "power3.out",
-        },
-        // "-=1", // Remove overlap if shapes are not animating
+        { opacity: 0 },
       );
 
-      // Subtle float for shapes (Commented out)
-      // gsap.to(`.${styles.shape}`, {
-      //   y: "random(-20, 20)",
-      //   duration: "random(4, 6)",
-      //   repeat: -1,
-      //   yoyo: true,
-      //   ease: "sine.inOut",
-      // });
+      const revealItems = gsap.utils.toArray<HTMLElement>(
+        `.${styles.badge}, .${styles.titleLine}, .${styles.heroTitleGradient}, .${styles.heroSub}, .${styles.btnPrimary}, .${styles.trustRibbon}, .${styles.featureItem}`,
+      );
+
+      const tl = gsap.timeline({ delay: 0.03, paused: true });
+
+      tl.fromTo(
+        revealItems,
+        { autoAlpha: 0, y: 18 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.9,
+          stagger: 0.11,
+          ease: "power2.out",
+        },
+      );
+
+      const playWhenReady = () => {
+        if (document.documentElement.dataset.pageReady === "true") {
+          tl.play(0);
+        }
+      };
+
+      window.addEventListener("syncsplit:page-ready", playWhenReady);
+      playWhenReady();
+
+      return () => {
+        window.removeEventListener("syncsplit:page-ready", playWhenReady);
+        tl.kill();
+      };
     },
     { scope: heroRef },
   );
@@ -91,7 +90,7 @@ export default function Hero() {
         </div>
 
         <h1 className={styles.heroTitle}>
-          Master your <br />
+          <span className={styles.titleLine}>Master your</span>
           <span className={styles.heroTitleGradient}>
             Personal & Shared Finances
           </span>

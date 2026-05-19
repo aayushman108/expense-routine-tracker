@@ -34,11 +34,11 @@ export default function Footer() {
           </div>
 
           <div className={styles.navLinks}>
-            <Link href="/#features">Features</Link>
+            <Link href="/features">Features</Link>
             <div className={styles.dot} />
             <Link href="/how-it-works">How it works</Link>
             <div className={styles.dot} />
-            <Link href="/#use-cases">Use Cases</Link>
+            <Link href="/use-cases">Use Cases</Link>
           </div>
 
           <div className={styles.social}>
@@ -54,7 +54,7 @@ export default function Footer() {
               <FiTwitter />
             </a>
             <a
-              href="mailto:aayushmansharma1008@gmail.com"
+              href="mailto:dev.aayushmansharma@gmail.com"
               aria-label="Mail"
               target="_blank"
               rel="noopener noreferrer"

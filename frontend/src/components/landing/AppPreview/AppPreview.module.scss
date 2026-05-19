@@ -6,7 +6,9 @@
 
 .appPreview {
   position: relative;
-  background: var(--bg-secondary);
+  background:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.05), transparent 42%),
+    var(--bg-secondary);
   padding-top: $space-32;
   padding-bottom: $space-32;
   overflow: hidden;
@@ -75,7 +77,7 @@
   height: 120%;
   background: radial-gradient(
     circle at center,
-    var(--color-primary-50),
+    rgba(var(--color-primary-rgb), 0.16),
     transparent 70%
   );
   z-index: 1;
@@ -85,10 +87,24 @@
   position: relative;
   z-index: 2;
   background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: 12px;
-  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.24);
+  border-radius: 8px;
+  box-shadow:
+    0 30px 90px rgba(var(--color-primary-rgb), 0.18),
+    0 18px 48px rgba(15, 23, 42, 0.14);
   overflow: hidden;
+
+  &::before {
+    content: "";
+    display: block;
+    height: 36px;
+    background:
+      radial-gradient(circle, #ef4444 0 5px, transparent 6px) 18px 50% / 18px 18px no-repeat,
+      radial-gradient(circle, #f59e0b 0 5px, transparent 6px) 40px 50% / 18px 18px no-repeat,
+      radial-gradient(circle, #10b981 0 5px, transparent 6px) 62px 50% / 18px 18px no-repeat,
+      var(--bg-card);
+    border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.14);
+  }
 }
 
 .previewImage {

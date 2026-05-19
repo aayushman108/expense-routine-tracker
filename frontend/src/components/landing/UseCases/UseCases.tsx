@@ -76,6 +76,7 @@ export default function UseCases() {
         <div className={styles.grid}>
           {cases.map((c, i) => (
             <div key={i} className={styles.card}>
+              <span className={styles.cardTag}>{c.tag}</span>
               <div className={styles.cardIcon}>{c.icon}</div>
               <h3 className={styles.cardTitle}>{c.title}</h3>
               <p className={styles.cardDesc}>{c.desc}</p>

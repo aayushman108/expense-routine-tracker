@@ -2,7 +2,7 @@
 
 SyncSplit is a comprehensive, full-stack expense management application designed for both individual and group finances. It features secure authentication via JWT and Google OAuth, allowing for a seamless and intuitive experience whether you're tracking personal spending or splitting bills with friends.
 
-**Live Demo:** [https://syncsplit.netlify.app](https://syncsplit.netlify.app)
+🔗 **Live Demo:** [syncsplit.netlify.app](https://syncsplit.netlify.app)
 
 ---
 

@@ -53,8 +53,6 @@ export default function LandingNavbar() {
     } else {
       setIsLoading(true);
       router.push("/login");
-      // For simple pushes, we might want to hide it after a bit if the page doesn't take over
-      setTimeout(() => setIsLoading(false), 800);
     }
   };
 
@@ -73,9 +71,9 @@ export default function LandingNavbar() {
         </Link>
 
         <div className={styles.navLinks}>
-          <Link href="/#features">Features</Link>
+          <Link href="/features">Features</Link>
           <Link href="/how-it-works">How it works</Link>
-          <Link href="/#use-cases">Use Cases</Link>
+          <Link href="/use-cases">Use Cases</Link>
         </div>
 
         <div className={styles.navActions}>
@@ -125,7 +123,7 @@ export default function LandingNavbar() {
         </div>
 
         <div className={styles.drawerLinks}>
-          <Link href="/#features" onClick={() => setMobileOpen(false)}>
+          <Link href="/features" onClick={() => setMobileOpen(false)}>
             <FiLayers />
             <span>Features</span>
           </Link>
@@ -133,7 +131,7 @@ export default function LandingNavbar() {
             <FiPlayCircle />
             <span>How it works</span>
           </Link>
-          <Link href="/#use-cases" onClick={() => setMobileOpen(false)}>
+          <Link href="/use-cases" onClick={() => setMobileOpen(false)}>
             <FiZap />
             <span>Use Cases</span>
           </Link>

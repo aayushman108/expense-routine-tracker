@@ -110,7 +110,7 @@ export default function HowItWorksContent() {
               </div>
               <span>Complete Guide</span>
             </div>
-            <h1>How Works</h1>
+            <h1>How It <span>Works</span></h1>
             <p>
               Master the SyncSplit protocol to manage your individual and group finances with surgical precision.
             </p>
@@ -160,7 +160,7 @@ export default function HowItWorksContent() {
         </section>
 
         {/* Step 2: Personal Expenses */}
-        <section className={styles.section} id="individual-tracking">
+        <section className={`${styles.section} ${styles.trackingSection}`} id="individual-tracking">
           <div className={styles.sectionInner}>
             <h2>
               <span className={styles.stepNum}>02</span> 
@@ -171,14 +171,12 @@ export default function HowItWorksContent() {
             </p>
             <div className={styles.processList}>
               <div className={styles.processItem}>
-                <div className={styles.dot} />
                 <div className={styles.itemContent}>
                   <h4>Log Daily Spends</h4>
                   <p>Record every transaction with descriptions, amounts, and categories. Categorization helps you see where your money goes at a glance.</p>
                 </div>
               </div>
               <div className={styles.processItem}>
-                <div className={styles.dot} />
                 <div className={styles.itemContent}>
                   <h4>Monthly Analytics</h4>
                   <p>Gain insights with automated monthly reports. Visual charts help identify spending patterns and areas for potential savings.</p>

@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import {
-  HiOutlineCurrencyDollar,
+  HiOutlineCash,
   HiOutlineUserGroup,
   HiOutlineChartBar,
   HiOutlineShieldCheck,
@@ -19,7 +19,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const features = [
   {
-    icon: <HiOutlineCurrencyDollar />,
+    icon: <HiOutlineCash />,
     title: "Smart Expense Tracking",
     desc: "Capture every transaction instantly — from recurring rent to spontaneous coffee runs. Your financial story, all in one place.",
     wide: false,
@@ -49,7 +49,7 @@ const features = [
   {
     icon: <HiOutlineChartBar />,
     title: "Analytics Dashboard",
-    desc: "Visual breakdowns of spending patterns with actionable insights. Know where every rupee goes.",
+    desc: "Visual breakdowns of spending patterns with actionable insights. Know where every Rs. goes.",
     wide: false,
     tag: "Stats",
   },

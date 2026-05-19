@@ -4,7 +4,8 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { FiGitMerge, FiCheckCircle, FiDollarSign } from "react-icons/fi";
+import { FiGitMerge, FiCheckCircle } from "react-icons/fi";
+import { HiOutlineCash } from "react-icons/hi";
 import styles from "./HowItWorks.module.scss";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -13,8 +14,8 @@ const steps = [
   {
     tag: "Initialization",
     title: "Log your first expense",
-    desc: "Simply add what you've spent. Categorize it by lifestyle or group and let the protocol handle the heavy lifting.",
-    icon: FiDollarSign,
+    desc: "Simply add what you've spent in Rs. Categorize it by lifestyle or group and let the protocol handle the heavy lifting.",
+    icon: HiOutlineCash,
   },
   {
     tag: "Execution",

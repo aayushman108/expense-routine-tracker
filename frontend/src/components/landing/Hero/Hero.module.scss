@@ -12,11 +12,38 @@
   justify-content: center;
   overflow: hidden;
   padding: 120px 0 $space-24;
-  background: var(--bg-primary);
+  background:
+    linear-gradient(180deg, rgba(var(--color-primary-rgb), 0.12) 0%, transparent 68%),
+    var(--bg-primary);
 
   @media (min-width: 1024px) {
     height: 100vh;
     padding-top: 120px; // Compensate for fixed navbar to visually true-center
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 96px -8% auto;
+    height: 72%;
+    background:
+      linear-gradient(180deg, rgba(var(--bg-card-rgb), 0.72), var(--bg-primary) 86%),
+      url("/dashboard.png") center top / min(1120px, 92vw) auto no-repeat;
+    opacity: 0.32;
+    filter: saturate(1.08);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 18% 28%, rgba(var(--color-primary-rgb), 0.18), transparent 24%),
+      radial-gradient(circle at 82% 22%, rgba(16, 185, 129, 0.12), transparent 24%);
+    pointer-events: none;
+    z-index: 0;
   }
 }
 
@@ -28,6 +55,7 @@
     linear-gradient(var(--border-default) 1px, transparent 1px),
     linear-gradient(90deg, var(--border-default) 1px, transparent 1px);
   background-size: 50px 50px;
+  opacity: 0.45;
   pointer-events: none;
   z-index: 1;
 
@@ -177,12 +205,13 @@
   align-self: center;
   gap: $space-2;
   padding: 6px 16px;
-  border-radius: $radius-full;
+  border-radius: 8px;
   font-size: 12px;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  background: rgba(var(--bg-card-rgb), 0.86);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   backdrop-filter: blur(10px);
+  box-shadow: 0 12px 30px rgba(var(--color-primary-rgb), 0.12);
 
   .badgeText {
     padding: 2px 8px;
@@ -196,28 +225,37 @@
 }
 
 .heroTitle {
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-size: clamp(2.65rem, 5.2vw, 4.5rem);
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.04em;
   color: var(--text-primary);
   margin: 0;
+  perspective: 900px;
+
   @include responsive(sm) {
     font-size: 2rem;
   }
 }
 
+.titleLine,
 .heroTitleGradient {
-  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
+  display: block;
+  transform-origin: center bottom;
+  will-change: transform, opacity, filter;
+}
+
+.heroTitleGradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-success));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .heroSub {
-  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  font-size: clamp(1rem, 1.35vw, 1.3rem);
   color: var(--text-secondary);
-  max-width: 720px;
+  max-width: 780px;
   margin: 0 auto;
   line-height: 1.6;
   @include responsive(sm) {
@@ -243,10 +281,10 @@
   color: var(--text-on-primary);
   font-weight: 800;
   font-size: $font-size-lg;
-  border-radius: 12px;
+  border-radius: 8px;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: 0 4px 25px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 18px 44px rgba(var(--color-primary-rgb), 0.28);
   @include responsive(sm) {
     font-size: $font-size-sm;
     padding: 12px 20px;
@@ -307,7 +345,7 @@
 
 .trustText {
   font-size: 13px;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   font-weight: $font-weight-medium;
 }
 
@@ -320,6 +358,7 @@
   margin-top: $space-12;
   padding-top: $space-12;
   width: 100%;
+  border-top: 1px solid rgba(var(--color-primary-rgb), 0.12);
 
   @include mobile-only {
     flex-direction: column;
@@ -338,6 +377,13 @@
   align-items: flex-start;
   gap: $space-3;
   text-align: left;
+  min-width: 180px;
+  padding: 1rem;
+  background: rgba(var(--bg-card-rgb), 0.7);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
 .featureIcon {
@@ -364,7 +410,7 @@
 
   span {
     font-size: 12px;
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
     @include responsive(md) {
       font-size: $font-size-sm;
     }
