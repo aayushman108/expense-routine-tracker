@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { 
   HiOutlineChevronLeft, 
-  HiOutlineHome, 
   HiOutlineStar
 } from "react-icons/hi2";
 import styles from "./use-cases.module.scss";
@@ -29,9 +28,9 @@ export default function UseCasesContent() {
       .fromTo(`.${styles.header} h1`, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.2")
       .fromTo(`.${styles.header} p`, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, "-=0.4");
 
-    const blocks = gsap.utils.toArray(`.${styles.scenarioBlock}`);
+    const blocks = gsap.utils.toArray<HTMLElement>(`.${styles.scenarioBlock}`);
     
-    blocks.forEach((block: any) => {
+    blocks.forEach((block) => {
       const q = gsap.utils.selector(block);
       
       const targets = [
@@ -100,7 +99,7 @@ export default function UseCasesContent() {
             </div>
             <h1>SyncSplit <span>Use Cases</span></h1>
             <p>
-              Designed for every way you spend and share. See how SyncSplit fits perfectly into your lifestyle and brings financial harmony to your social circles.
+              Designed for private budgeting and shared spending workflows where every group settlement needs clear verification, payment proof, and receiver confirmation.
             </p>
           </div>
         </header>
@@ -116,12 +115,12 @@ export default function UseCasesContent() {
                   <span className={styles.categoryBadge}>Co-Living</span>
                   <h2><span>🏠</span>Roommates & Shared Flats</h2>
                   <p>
-                    Managing household bills shouldn't feel like a part-time job. SyncSplit keeps roommate spaces smooth, accurate, and completely drama-free by tracking rent, wifi subscriptions, cleaning supplies, and weekly groceries.
+                    Keep rent, utilities, wifi, cleaning supplies, and groceries in one roommate group. Any member can add a bill, included roommates verify it, and only approved expenses become part of settlement.
                   </p>
                   <div className={styles.featureChips}>
-                    <span>🔒 Safe Approvals</span>
-                    <span>📈 Recurring Bills</span>
-                    <span>💬 Equal Splits</span>
+                    <span>🔒 Member Verification</span>
+                    <span>📈 Household Summaries</span>
+                    <span>💬 Equal or Custom Splits</span>
                   </div>
                 </div>
                 <div className={styles.blockVisual}>
@@ -148,12 +147,12 @@ export default function UseCasesContent() {
                   <span className={styles.categoryBadge}>Adventure</span>
                   <h2><span>✈️</span>Travelers & Group Trips</h2>
                   <p>
-                    Embark on road trips or weekend escapes without stress. Log hotels, bus tickets, dinner meals, and fuel charges in Rs. so everyone lands with a settled bill.
+                    Create a trip group for hotels, tickets, meals, fuel, and shared activities. Add registered friends directly, invite new travelers by email, and settle verified trip costs at the end.
                   </p>
                   <div className={styles.featureChips}>
-                    <span>🇳🇵 NPR Records</span>
-                    <span>📁 Trip Folders</span>
-                    <span>⚡ Quick Settlement</span>
+                    <span>📧 Email Invites</span>
+                    <span>📁 Trip Groups</span>
+                    <span>⚡ Verified Settlement</span>
                   </div>
                 </div>
                 <div className={styles.blockVisual}>
@@ -178,11 +177,11 @@ export default function UseCasesContent() {
                   <span className={styles.categoryBadge}>Relationships</span>
                   <h2><span>💖</span>Couples & Co-Living</h2>
                   <p>
-                    Maintain financial independence while supporting joint goals. Share date night dinners, streaming subscriptions, household furniture, or weekend escapes. Set custom split percentages to align with your personal budgets.
+                    Track shared dinners, subscriptions, household furniture, rent contributions, and weekend plans while keeping personal expenses separate. Use custom split ratios when both people do not contribute equally.
                   </p>
                   <div className={styles.featureChips}>
                     <span>📊 Custom Ratios</span>
-                    <span>📈 Shared Budget</span>
+                    <span>📈 Shared Summaries</span>
                     <span>🛡️ Private Logs</span>
                   </div>
                 </div>
@@ -210,12 +209,12 @@ export default function UseCasesContent() {
                   <span className={styles.categoryBadge}>Productivity</span>
                   <h2><span>💻</span>Project Teams & Coworking</h2>
                   <p>
-                    Collaborate on project costs, software API keys, shared coworking office bookings, and team lunches. Every single expense is completely auditable, backed up by payment receipts, and visible to all participants.
+                    Track shared software, coworking bookings, cloud hosting, team lunches, and project purchases. Group management keeps members, expenses, verification status, and settlements visible to the team.
                   </p>
                   <div className={styles.featureChips}>
                     <span>📁 SaaS Splits</span>
-                    <span>🧾 Receipt Uploads</span>
-                    <span>📊 Detailed Audits</span>
+                    <span>🧾 Payment Proof</span>
+                    <span>📊 Group Management</span>
                   </div>
                 </div>
                 <div className={styles.blockVisual}>
@@ -242,12 +241,12 @@ export default function UseCasesContent() {
                   <span className={styles.categoryBadge}>Events</span>
                   <h2><span>🎉</span>Party & Event Organizers</h2>
                   <p>
-                    Organize music events, birthdays, secret Santa events, or group gift pools effortlessly. Calculate precisely who spent what for decorators, caterers, and sound hire, and pool resources immediately.
+                    Manage birthdays, dinners, group gifts, and small events without chasing spreadsheets. Organizers can add costs, participants can verify their shares, and payers can upload proof when settling.
                   </p>
                   <div className={styles.featureChips}>
                     <span>🎁 Gift Pools</span>
                     <span>🎤 Event Budgets</span>
-                    <span>💸 Minimal Paths</span>
+                    <span>💸 Proof Confirmation</span>
                   </div>
                 </div>
                 <div className={styles.blockVisual}>
@@ -268,6 +267,38 @@ export default function UseCasesContent() {
                 </div>
               </div>
 
+              {/* Scenario 6: Personal Budgeting */}
+              <div className={styles.scenarioBlock}>
+                <div className={styles.blockContent}>
+                  <span className={styles.categoryBadge}>Personal Finance</span>
+                  <h2><span>📊</span>Individual Expense Tracking</h2>
+                  <p>
+                    Use SyncSplit as a private expense tracker even when no group is involved. Log personal spends, review dashboard summaries, update profile details, and keep payment information ready for future groups.
+                  </p>
+                  <div className={styles.featureChips}>
+                    <span>🧾 Personal Ledger</span>
+                    <span>📈 Spending Dashboard</span>
+                    <span>⚙️ Profile & Settings</span>
+                  </div>
+                </div>
+                <div className={styles.blockVisual}>
+                  <div className={styles.mockupItem}>
+                    <div className={styles.left}>
+                      <strong>Monthly Groceries</strong>
+                      <span>Personal expense • Not part of any group</span>
+                    </div>
+                    <div className={styles.right}>Rs. 6200</div>
+                  </div>
+                  <div className={styles.mockupItem}>
+                    <div className={styles.left}>
+                      <strong>Notification Preferences</strong>
+                      <span>Manage FCM alerts from settings</span>
+                    </div>
+                    <div className={styles.right}>On</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
@@ -275,7 +306,7 @@ export default function UseCasesContent() {
         <div className={styles.ctaWrapper}>
           <section className={styles.ctaSection}>
             <h2>Ready to split smarter?</h2>
-            <p>Select your scenario and launch your dedicated SyncSplit room in less than a minute.</p>
+            <p>Start with personal tracking, then create groups whenever shared expenses need verification and settlement.</p>
             <div className={styles.btnGroup}>
               <Link href="/signup" className={styles.primaryBtn}>
                 Get Started Free

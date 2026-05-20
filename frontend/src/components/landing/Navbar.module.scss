@@ -82,12 +82,17 @@
       transition: width 0.3s ease;
     }
 
-    &:hover {
+    &:hover,
+    &.activeLink {
       color: var(--text-primary);
 
       &::after {
         width: 100%;
       }
+    }
+
+    &.activeLink {
+      font-weight: $font-weight-semibold;
     }
   }
 }
@@ -290,7 +295,8 @@
       transition: opacity 0.3s ease;
     }
 
-    &:hover {
+    &:hover,
+    &.activeDrawerLink {
       color: var(--text-primary);
       transform: translateX(8px);
       
@@ -302,6 +308,11 @@
       &::after {
         opacity: 1;
       }
+    }
+
+    &.activeDrawerLink {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(129, 140, 248, 0.22);
     }
   }
 }

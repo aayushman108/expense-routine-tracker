@@ -21,19 +21,7 @@
     padding-top: 120px; // Compensate for fixed navbar to visually true-center
   }
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 96px -8% auto;
-    height: 72%;
-    background:
-      linear-gradient(180deg, rgba(var(--bg-card-rgb), 0.72), var(--bg-primary) 86%),
-      url("/dashboard.png") center top / min(1120px, 92vw) auto no-repeat;
-    opacity: 0.32;
-    filter: saturate(1.08);
-    pointer-events: none;
-    z-index: 0;
-  }
+
 
   &::after {
     content: "";
@@ -361,10 +349,10 @@
   border-top: 1px solid rgba(var(--color-primary-rgb), 0.12);
 
   @include mobile-only {
-    flex-direction: column;
-    gap: $space-8;
-    align-items: center;
-    padding: $space-6 $space-4 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: $space-6 0 0;
     margin-top: $space-6;
   }
   @include responsive(sm) {
@@ -384,6 +372,12 @@
   border-radius: 8px;
   backdrop-filter: blur(12px);
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+
+  @include mobile-only {
+    min-width: 0;
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
 }
 
 .featureIcon {
@@ -413,6 +407,9 @@
     color: var(--text-secondary);
     @include responsive(md) {
       font-size: $font-size-sm;
+    }
+    @include responsive(sm) {
+      font-size: 11px;
     }
   }
 }

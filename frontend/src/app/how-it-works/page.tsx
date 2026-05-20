@@ -3,18 +3,18 @@ import HowItWorksContent from "./HowItWorksContent";
 
 export const metadata: Metadata = {
   title: "How It Works | SyncSplit - Your Ultimate Expense Tracker",
-  description: "Learn how SyncSplit simplifies shared expenses, bill splitting, and group settlements with a secure verification protocol and debt minimization algorithm.",
-  keywords: ["expense tracker", "bill splitting", "group expenses", "shared finances", "budget management", "settlement algorithm", "SyncSplit guide"],
+  description: "Learn how SyncSplit handles signup, PWA access, personal expenses, group invitations, verified group expenses, settlement payment proof, receiver confirmation, FCM notifications, profiles, and settings.",
+  keywords: ["expense tracker", "bill splitting", "group expenses", "shared finances", "verified settlements", "payment proof", "notification settings", "SyncSplit guide"],
   openGraph: {
     title: "How It Works | SyncSplit",
-    description: "Master the SyncSplit protocol to manage your individual and group finances with surgical precision.",
+    description: "Learn the SyncSplit workflow for PWA access, personal tracking, group expense verification, settlement proof uploads, receiver confirmation, and notifications.",
     type: "website",
     url: "https://syncsplit.com/how-it-works",
   },
   twitter: {
     card: "summary_large_image",
     title: "How It Works | SyncSplit",
-    description: "The complete guide to mastering group expense management with SyncSplit.",
+    description: "The complete guide to personal tracking, group expense verification, settlements, payment proof, and notifications in SyncSplit.",
   },
 };
 
@@ -23,36 +23,36 @@ export default function HowItWorksPage() {
     "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "How to use SyncSplit for Expense Tracking",
-    "description": "A comprehensive guide on setting up your account, tracking individual expenses, and managing group splits and settlements with SyncSplit.",
+    "description": "A guide to setting up your account, using SyncSplit as a desktop or mobile PWA, tracking personal expenses, managing groups, verifying shared expenses, settling balances, confirming payments, and configuring notifications.",
     "step": [
       {
         "@type": "HowToStep",
         "name": "Secure Onboarding",
-        "text": "Sign up using email or Google OAuth and install SyncSplit as a PWA for cross-platform access.",
+        "text": "Sign up or log in using email credentials or Google OAuth, then use SyncSplit in the browser or install it as a desktop or mobile PWA.",
         "url": "https://syncsplit.com/how-it-works#onboarding"
       },
       {
         "@type": "HowToStep",
         "name": "Individual Tracking",
-        "text": "Log your daily spends and view monthly analytics to gain insights into your spending habits.",
+        "text": "Log personal expenses that stay separate from group expenses, splits, and settlements.",
         "url": "https://syncsplit.com/how-it-works#individual-tracking"
       },
       {
         "@type": "HowToStep",
         "name": "Collaborative Finance",
-        "text": "Create groups, invite friends, and use advanced split logic to divide bills fairly.",
+        "text": "Create groups, add registered members, invite unregistered people by email, and let members add shared expenses.",
         "url": "https://syncsplit.com/how-it-works#collaboration"
       },
       {
         "@type": "HowToStep",
-        "name": "Verification Protocol",
-        "text": "Verify expenses within your group to ensure accuracy and settlement integrity.",
+        "name": "Expense Verification",
+        "text": "Include only expenses verified by every member involved in that expense when calculating settlements.",
         "url": "https://syncsplit.com/how-it-works#verification"
       },
       {
         "@type": "HowToStep",
         "name": "Smart Settlements",
-        "text": "Use our debt minimization algorithm to settle group debts with the fewest possible payments.",
+        "text": "Use verified balances to settle debts, upload payment proof, and let the receiver confirm the payment.",
         "url": "https://syncsplit.com/how-it-works#settlements"
       }
     ]

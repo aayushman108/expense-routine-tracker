@@ -203,6 +203,7 @@
   @include responsive(sm) {
     font-size: 1.5rem;
     gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
   .stepNum {
@@ -241,7 +242,7 @@
   }
 
   @include responsive(lg) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr !important;
     gap: $space-6;
   }
 
@@ -261,7 +262,7 @@
     grid-column: auto;
   }
   .featureCard:last-child:nth-child(2n + 1) {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 }
 
@@ -282,13 +283,16 @@
   box-shadow: var(--shadow-card);
 
   @include responsive(lg) {
-    padding: $space-8;
+    padding: $space-6;
+    gap: $space-3;
   }
   @include mobile-only {
     padding: $space-6;
   }
   @include responsive(sm) {
-    padding: $space-5;
+    padding: $space-4;
+    gap: $space-3;
+    box-shadow: var(--shadow-sm);
   }
 
   &::before {
@@ -326,6 +330,12 @@
     border-radius: 8px;
     align-items: center;
     justify-content: center;
+
+    @include responsive(sm) {
+      width: 42px;
+      height: 42px;
+      font-size: 1.35rem;
+    }
   }
 
   .cardContent {
@@ -370,6 +380,10 @@
     grid-template-columns: 1fr;
     gap: $space-4;
   }
+
+  @include responsive(lg) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .processItem {
@@ -382,6 +396,12 @@
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
+
+  @include responsive(sm) {
+    padding: $space-4;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+  }
 
   &:hover {
     transform: translateY(-4px);

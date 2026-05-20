@@ -198,6 +198,10 @@
   @include responsive(md) {
     gap: 3rem;
   }
+
+  @include responsive(sm) {
+    gap: 1.5rem;
+  }
 }
 
 .scenarioBlock {
@@ -214,17 +218,25 @@
   box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
 
   @include responsive(lg) {
-    gap: 2.5rem;
+    grid-template-columns: 1fr;
+    gap: $space-6;
+    padding: $space-6;
   }
 
   @include responsive(md) {
-    grid-template-columns: 1fr;
     gap: 2rem;
     padding: 1.25rem;
   }
 
+  @include responsive(sm) {
+    gap: $space-5;
+    padding: $space-5;
+  }
+
   &:nth-child(even) {
-    direction: rtl;
+    @media (min-width: #{$bp-lg + 1px}) {
+      direction: rtl;
+    }
 
     .blockContent, .blockVisual {
       direction: ltr; // Restore reading direction inside elements
@@ -248,6 +260,12 @@
     color: var(--color-primary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+
+    @include responsive(sm) {
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 11px;
+    }
   }
 
   h2 {
@@ -256,6 +274,7 @@
     color: var(--text-primary);
     letter-spacing: -0.03em;
     line-height: 1.2;
+    overflow-wrap: anywhere;
 
     span {
       font-size: clamp(2rem, 3.5vw, 2.8rem);
@@ -291,6 +310,14 @@
     padding: 6px 14px;
     border-radius: 6px;
     box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+
+    @include responsive(lg) {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      padding: 0;
+      border-radius: 0;
+    }
   }
 }
 
@@ -310,6 +337,17 @@
   justify-content: center;
   gap: 1.25rem;
 
+  @include responsive(lg) {
+    min-height: auto;
+    padding: $space-5 0 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--border-default);
+    border-radius: 0;
+    box-shadow: none;
+    gap: $space-3;
+  }
+
   &::before {
     content: "Expense Preview";
     color: var(--text-tertiary);
@@ -320,8 +358,14 @@
   }
 
   @include responsive(sm) {
-    padding: 1.5rem;
-    border-radius: 8px;
+    min-height: auto;
+    padding: $space-4 0 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--border-default);
+    border-radius: 0;
+    box-shadow: none;
+    gap: $space-3;
   }
 }
 
@@ -338,6 +382,33 @@
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
 
+  @include responsive(lg) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border-default);
+    padding: $space-3 0;
+    box-shadow: none;
+    gap: $space-3;
+  }
+
+  @include responsive(sm) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border-default);
+    padding: $space-3 0;
+    box-shadow: none;
+    gap: $space-3;
+  }
+
+  &:last-child {
+    @include responsive(lg) {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+
   &:hover {
     border-color: rgba(var(--color-primary-rgb), 0.42);
     transform: translateY(-2px);
@@ -347,6 +418,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    min-width: 0;
 
     strong {
       color: var(--text-primary);
@@ -363,6 +435,7 @@
     font-family: $font-mono;
     font-weight: 700;
     color: var(--color-primary);
+    flex: 0 0 auto;
 
     &.negative {
       color: var(--color-danger);
@@ -377,6 +450,12 @@
 
   @include responsive(sm) {
     grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }
 
@@ -389,6 +468,29 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 13px;
+
+  @include responsive(lg) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border-default);
+    padding: $space-3 0;
+  }
+
+  @include responsive(sm) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border-default);
+    padding: $space-3 0;
+  }
+
+  &:last-child {
+    @include responsive(lg) {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
 
   .label {
     color: var(--text-tertiary);

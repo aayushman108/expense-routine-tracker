@@ -3,18 +3,18 @@ import FeaturesContent from "./FeaturesContent";
 
 export const metadata: Metadata = {
   title: "Features | SyncSplit - Your Ultimate Expense Tracker & Bill Splitter",
-  description: "Explore SyncSplit's professional features, including smart expense tracking, custom bill splitting, debt minimization algorithms, mutual verification, and analytical dashboards.",
-  keywords: ["expense tracker features", "bill splitting app", "debt minimization algorithm", "group expenses", "shared finances", "budget insights", "SyncSplit features"],
+  description: "Explore SyncSplit features for signup, PWA access, personal expense tracking, group expense management, verified settlements, payment proof, FCM notifications, dashboards, profiles, and settings.",
+  keywords: ["expense tracker features", "bill splitting app", "verified settlements", "group expenses", "shared finances", "budget insights", "payment proof", "SyncSplit features"],
   openGraph: {
     title: "SyncSplit Features | Smart Expense Tracker & Bill Splitter",
-    description: "Discover all the professional features SyncSplit offers for tracking personal finance and splitting bills with groups.",
+    description: "Discover SyncSplit features for PWA access, personal expenses, group splits, member invitations, verified settlements, notifications, dashboards, profiles, and settings.",
     type: "website",
     url: "https://syncsplit.com/features",
   },
   twitter: {
     card: "summary_large_image",
     title: "SyncSplit Features | Smart Expense Tracker & Bill Splitter",
-    description: "Discover how SyncSplit simplifies tracking personal finances and splitting group bills with mathematical clarity.",
+    description: "Discover how SyncSplit handles PWA access, personal expenses, verified group splits, payment proof, receiver confirmation, dashboards, and notification settings.",
   },
 };
 
@@ -23,10 +23,10 @@ export default function FeaturesPage() {
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "SyncSplit Features",
-    "description": "Discover all the features SyncSplit offers, from individual expense tracking to automated debt minimization algorithms.",
+    "description": "Discover SyncSplit features for installable PWA access, personal expense tracking, group expense management, verified settlement workflows, payment proof, notifications, dashboards, profiles, and settings.",
     "publisher": {
       "@type": "Organization",
-      "name": "SyncSplit Protocol",
+      "name": "SyncSplit",
       "logo": "https://syncsplit.com/favicon.ico"
     }
   };

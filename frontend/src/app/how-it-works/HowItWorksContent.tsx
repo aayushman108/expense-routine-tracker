@@ -6,7 +6,6 @@ import {
   HiOutlineChevronLeft, 
   HiOutlineLightBulb, 
   HiOutlineUserGroup, 
-  HiOutlineCash, 
   HiOutlineShieldCheck,
   HiOutlineLightningBolt,
   HiOutlineDeviceMobile,
@@ -15,7 +14,6 @@ import {
   HiOutlineDesktopComputer,
   HiOutlineGlobeAlt
 } from "react-icons/hi";
-import { FiPieChart } from "react-icons/fi";
 import styles from "./how-it-works.module.scss";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer/Footer";
@@ -38,9 +36,9 @@ export default function HowItWorksContent() {
       .fromTo(`.${styles.header} h1`, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.2")
       .fromTo(`.${styles.header} p`, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, "-=0.4");
 
-    const sections = gsap.utils.toArray(`.${styles.section}`);
+    const sections = gsap.utils.toArray<HTMLElement>(`.${styles.section}`);
     
-    sections.forEach((section: any) => {
+    sections.forEach((section) => {
       const q = gsap.utils.selector(section);
       
       // Select all potential targets and filter out empty ones
@@ -112,7 +110,7 @@ export default function HowItWorksContent() {
             </div>
             <h1>How It <span>Works</span></h1>
             <p>
-              Master the SyncSplit protocol to manage your individual and group finances with surgical precision.
+              Move from signup to personal tracking, group collaboration, verified settlements, and payment confirmation in one structured workflow.
             </p>
           </div>
         </header>
@@ -125,7 +123,7 @@ export default function HowItWorksContent() {
               Secure Onboarding
             </h2>
             <p className={styles.introText}>
-              SyncSplit uses industry-standard security protocols to keep your financial data private and accessible only to you and your trusted group members.
+              Start with a secure account, then complete your profile so expenses, groups, notifications, and payment details are tied to the right person.
             </p>
             <div className={styles.featuresGrid}>
               <div className={styles.featureCard}>
@@ -134,7 +132,7 @@ export default function HowItWorksContent() {
                 </div>
                 <div className={styles.cardContent}>
                   <h3>Identity Management</h3>
-                  <p>Sign up using your email or with one-tap Google OAuth. We use JWT (JSON Web Tokens) to ensure your sessions are always encrypted and secure.</p>
+                  <p>Sign up or log in with email credentials or Google OAuth. Authenticated sessions protect access to your personal ledger, groups, profile, and settings.</p>
                 </div>
               </div>
               <div className={styles.featureCard}>
@@ -142,8 +140,8 @@ export default function HowItWorksContent() {
                   <HiOutlineDeviceMobile />
                 </div>
                 <div className={styles.cardContent}>
-                  <h3>Install as PWA</h3>
-                  <p>Add SyncSplit to your home screen. Our Progressive Web App technology provides a native feel, offline access, and fast loading times.</p>
+                  <h3>Profile & Payment Details</h3>
+                  <p>Use the profile page to update basic account details and add payment information, so group members know where to send settlement payments.</p>
                 </div>
               </div>
               <div className={styles.featureCard}>
@@ -151,8 +149,8 @@ export default function HowItWorksContent() {
                   <HiOutlineGlobeAlt />
                 </div>
                 <div className={styles.cardContent}>
-                  <h3>Anywhere Access</h3>
-                  <p>Use SyncSplit as a desktop app, mobile app, or directly in your browser. Your data is synced in real-time across all your devices.</p>
+                  <h3>Browser & PWA Access</h3>
+                  <p>Use SyncSplit from your browser or install it as a PWA on desktop and mobile. Account data stays connected to your login and remains available when you are online.</p>
                 </div>
               </div>
             </div>
@@ -167,19 +165,19 @@ export default function HowItWorksContent() {
               Individual Tracking
             </h2>
             <p className={styles.introText}>
-              Before you split, you need to track. SyncSplit serves as a powerful personal ledger to help you understand your spending habits.
+              Personal expenses are private records for your own budgeting. They do not affect group expenses, split calculations, or settlement balances.
             </p>
             <div className={styles.processList}>
               <div className={styles.processItem}>
                 <div className={styles.itemContent}>
                   <h4>Log Daily Spends</h4>
-                  <p>Record every transaction with descriptions, amounts, and categories. Categorization helps you see where your money goes at a glance.</p>
+                  <p>Record non-group transactions with descriptions, amounts, dates, and categories. Use this for your own meals, subscriptions, transport, rent, or personal purchases.</p>
                 </div>
               </div>
               <div className={styles.processItem}>
                 <div className={styles.itemContent}>
                   <h4>Monthly Analytics</h4>
-                  <p>Gain insights with automated monthly reports. Visual charts help identify spending patterns and areas for potential savings.</p>
+                  <p>Use summaries and charts to understand spending patterns, review category totals, and monitor monthly changes in your personal budget.</p>
                 </div>
               </div>
             </div>
@@ -194,7 +192,7 @@ export default function HowItWorksContent() {
               Collaborative Finance
             </h2>
             <p className={styles.introText}>
-              The core of SyncSplit is group management. Whether it's roommates, a weekend trip, or shared project costs, we've got you covered.
+              Groups keep shared costs separate from personal spending. Use them for roommates, trips, events, projects, or any recurring shared payment context.
             </p>
             <div className={styles.featuresGrid}>
               <div className={styles.featureCard}>
@@ -203,7 +201,7 @@ export default function HowItWorksContent() {
                 </div>
                 <div className={styles.cardContent}>
                   <h3>Dynamic Groups</h3>
-                  <p>Create groups and invite friends. Everyone in the group can add expenses, making the process transparent and fair.</p>
+                  <p>Create a group, add members who already have SyncSplit accounts, or invite unregistered people by email. Invitation emails help new members join the right group.</p>
                 </div>
               </div>
               <div className={styles.featureCard}>
@@ -212,22 +210,31 @@ export default function HowItWorksContent() {
                 </div>
                 <div className={styles.cardContent}>
                   <h3>Advanced Split Logic</h3>
-                  <p>Split bills equally, by exact percentages, or fixed amounts. Our engine handles the math, so you don't have to.</p>
+                  <p>Any member can add a group expense and define who participated in it. Split equally, by fixed amount, by percentage, or by custom shares.</p>
+                </div>
+              </div>
+              <div className={styles.featureCard}>
+                <div className={styles.cardIcon}>
+                  <HiOutlineDesktopComputer />
+                </div>
+                <div className={styles.cardContent}>
+                  <h3>Group Management Page</h3>
+                  <p>Each group has a dedicated management page for members, expenses, settlement history, and group-level actions.</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Step 4: Verification Protocol */}
+        {/* Step 4: Expense Verification */}
         <section className={styles.section} id="verification">
           <div className={styles.sectionInner}>
             <h2>
               <span className={styles.stepNum}>04</span> 
-              The Verification Protocol
+              Expense Verification
             </h2>
             <p className={styles.introText}>
-              Accuracy is paramount. Before any expense is factored into a settlement, it must pass through our verification gateway.
+              Group settlements are based only on expenses that every included participant has reviewed and verified.
             </p>
             <div className={styles.featuresGrid}>
               <div className={styles.featureCard}>
@@ -236,7 +243,7 @@ export default function HowItWorksContent() {
                 </div>
                 <div className={styles.cardContent}>
                   <h3>Mutual Approval</h3>
-                  <p>Every participant in a split must review and verify the expense. This ensures that everyone agrees on the amount and the logic before money moves.</p>
+                  <p>Every participant included in a split must verify the expense. This confirms the amount, payer, and split logic before it affects balances.</p>
                 </div>
               </div>
               <div className={styles.featureCard}>
@@ -245,7 +252,7 @@ export default function HowItWorksContent() {
                 </div>
                 <div className={styles.cardContent}>
                   <h3>Settlement Integrity</h3>
-                  <p>Our calculation engine only processes expenses that are 100% verified. This prevents disputes and ensures your final settlement figures are always indisputable.</p>
+                  <p>The settlement engine excludes pending or disputed expenses. Only fully verified records are used to calculate who owes whom.</p>
                 </div>
               </div>
             </div>
@@ -260,21 +267,21 @@ export default function HowItWorksContent() {
               Smart Settlements
             </h2>
             <p className={styles.introText}>
-              Tired of endless back-and-forth transactions? Our "Minimum Path" algorithm simplifies group debts into the fewest possible payments.
+              Once expenses are verified, SyncSplit calculates balances and guides each payment through proof upload and receiver confirmation.
             </p>
             <div className={styles.processList}>
               <div className={styles.processItem}>
                 <div className={styles.dot} />
                 <div className={styles.itemContent}>
                   <h4>Debt Minimization</h4>
-                  <p>Our algorithm calculates the most efficient way to settle up. Instead of everyone paying everyone, we find the shortest route to zero balance based on all verified expenses.</p>
+                  <p>The algorithm reduces verified balances into the fewest practical payments. The person who owes pays the assigned receiver.</p>
                 </div>
               </div>
               <div className={styles.processItem}>
                 <div className={styles.dot} />
                 <div className={styles.itemContent}>
                   <h4>Proof of Payment</h4>
-                  <p>Upload receipts or screenshots of transfers. This creates an immutable record within the group, preventing any confusion or disputes.</p>
+                  <p>After paying, the payer uploads payment proof. The receiver reviews and confirms the payment, closing that settlement item.</p>
                 </div>
               </div>
             </div>
@@ -289,15 +296,26 @@ export default function HowItWorksContent() {
               Stay Synchronized
             </h2>
             <p className={styles.introText}>
-              Never miss an update. SyncSplit keeps everyone in the loop with real-time feedback and reminders.
+              SyncSplit uses notifications and user-controlled settings to keep group activity visible without forcing every alert on every user.
             </p>
-            <div className={styles.featureCard} style={{ maxWidth: '100%' }}>
-              <div className={styles.cardIcon}>
-                <HiOutlineBell />
+            <div className={styles.featuresGrid}>
+              <div className={styles.featureCard}>
+                <div className={styles.cardIcon}>
+                  <HiOutlineBell />
+                </div>
+                <div className={styles.cardContent}>
+                  <h3>FCM Notifications</h3>
+                  <p>Firebase Cloud Messaging can notify users about invitations, expense activity, verification updates, settlement requests, proof uploads, and payment confirmations.</p>
+                </div>
               </div>
-              <div className={styles.cardContent}>
-                <h3>Real-time Alerts</h3>
-                <p>Powered by Firebase Cloud Messaging (FCM), you get instant push notifications whenever a new expense is added, a settlement is requested, or a debt is cleared. Stay updated across all your devices.</p>
+              <div className={styles.featureCard}>
+                <div className={styles.cardIcon}>
+                  <HiOutlineClipboardCheck />
+                </div>
+                <div className={styles.cardContent}>
+                  <h3>Notification Settings</h3>
+                  <p>Use the settings page to manage notification preferences and keep alerts aligned with how you want to follow group activity.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -306,7 +324,7 @@ export default function HowItWorksContent() {
         <div className={styles.ctaWrapper}>
           <section className={styles.ctaSection}>
             <h2>Ready to get started?</h2>
-            <p>Join thousands of users who trust SyncSplit for their financial coordination.</p>
+            <p>Create an account, add your first personal expense, or start a group with a verified settlement flow.</p>
             <div className={styles.btnGroup}>
               <Link href="/signup" className={styles.primaryBtn}>
                 Create Free Account

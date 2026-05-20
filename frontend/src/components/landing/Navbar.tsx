@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { HiMenuAlt3, HiX, HiOutlineLogin } from "react-icons/hi";
 import { FiPieChart, FiLayers, FiPlayCircle, FiZap, FiArrowRight } from "react-icons/fi";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch } from "@/store/hooks";
 import { getCurrentUser } from "@/store/slices/authSlice";
 import { addToast } from "@/store/slices/uiSlice";
@@ -17,8 +17,12 @@ export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
   const { setIsLoading } = useLoading();
+
+  const isDashboardPath = pathname?.startsWith("/dashboard");
+  const isActive = (href: string) => !isDashboardPath && pathname === href;
 
   const handleLoginClick = async () => {
     const accessToken =
@@ -71,9 +75,27 @@ export default function LandingNavbar() {
         </Link>
 
         <div className={styles.navLinks}>
-          <Link href="/features">Features</Link>
-          <Link href="/how-it-works">How it works</Link>
-          <Link href="/use-cases">Use Cases</Link>
+          <Link
+            href="/features"
+            className={isActive("/features") ? styles.activeLink : undefined}
+            aria-current={isActive("/features") ? "page" : undefined}
+          >
+            Features
+          </Link>
+          <Link
+            href="/how-it-works"
+            className={isActive("/how-it-works") ? styles.activeLink : undefined}
+            aria-current={isActive("/how-it-works") ? "page" : undefined}
+          >
+            How it works
+          </Link>
+          <Link
+            href="/use-cases"
+            className={isActive("/use-cases") ? styles.activeLink : undefined}
+            aria-current={isActive("/use-cases") ? "page" : undefined}
+          >
+            Use Cases
+          </Link>
         </div>
 
         <div className={styles.navActions}>
@@ -123,15 +145,30 @@ export default function LandingNavbar() {
         </div>
 
         <div className={styles.drawerLinks}>
-          <Link href="/features" onClick={() => setMobileOpen(false)}>
+          <Link
+            href="/features"
+            className={isActive("/features") ? styles.activeDrawerLink : undefined}
+            aria-current={isActive("/features") ? "page" : undefined}
+            onClick={() => setMobileOpen(false)}
+          >
             <FiLayers />
             <span>Features</span>
           </Link>
-          <Link href="/how-it-works" onClick={() => setMobileOpen(false)}>
+          <Link
+            href="/how-it-works"
+            className={isActive("/how-it-works") ? styles.activeDrawerLink : undefined}
+            aria-current={isActive("/how-it-works") ? "page" : undefined}
+            onClick={() => setMobileOpen(false)}
+          >
             <FiPlayCircle />
             <span>How it works</span>
           </Link>
-          <Link href="/use-cases" onClick={() => setMobileOpen(false)}>
+          <Link
+            href="/use-cases"
+            className={isActive("/use-cases") ? styles.activeDrawerLink : undefined}
+            aria-current={isActive("/use-cases") ? "page" : undefined}
+            onClick={() => setMobileOpen(false)}
+          >
             <FiZap />
             <span>Use Cases</span>
           </Link>

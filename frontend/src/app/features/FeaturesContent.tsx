@@ -14,11 +14,8 @@ import {
   HiOutlineClipboardCheck,
   HiOutlineCheckCircle,
   HiOutlineSparkles,
-  HiOutlineShare,
-  HiOutlineArrowDown,
-  HiOutlineUserAdd
+  HiOutlineShare
 } from "react-icons/hi";
-import { FiPieChart } from "react-icons/fi";
 import styles from "./features.module.scss";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer/Footer";
@@ -41,9 +38,9 @@ export default function FeaturesContent() {
       .fromTo(`.${styles.header} h1`, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.2")
       .fromTo(`.${styles.header} p`, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, "-=0.4");
 
-    const sections = gsap.utils.toArray(`.${styles.section}`);
+    const sections = gsap.utils.toArray<HTMLElement>(`.${styles.section}`);
     
-    sections.forEach((section: any) => {
+    sections.forEach((section) => {
       const q = gsap.utils.selector(section);
       
       const targets = [
@@ -112,7 +109,7 @@ export default function FeaturesContent() {
             </div>
             <h1>SyncSplit <span>Features</span></h1>
             <p>
-              Explore our comprehensive financial suite engineered to split bills, track daily spends, and optimize group debts with surgical precision.
+              Track personal spending, manage shared expenses, verify group splits, and settle balances with a clear approval trail.
             </p>
           </div>
         </header>
@@ -122,8 +119,8 @@ export default function FeaturesContent() {
           <div className={styles.sectionInner}>
             <div className={styles.sectionHeader}>
               <span className={styles.stepNum}>MODULE 01</span>
-              <h2>Individual Ledgers & Expense Control</h2>
-              <p>Before splitting shared bills, you need a crystal-clear understanding of your own cashflow. SyncSplit serves as your secure personal ledger.</p>
+              <h2>Personal Expense Tracking</h2>
+              <p>Keep private spending separate from group expenses, so your day-to-day budget never gets mixed with shared settlements.</p>
             </div>
 
             <div className={styles.bentoGrid}>
@@ -132,8 +129,8 @@ export default function FeaturesContent() {
                   <div className={styles.cardIcon}>
                     <HiOutlineCash />
                   </div>
-                  <h3>Smart Expense Tracking</h3>
-                  <p>Log transactions instantly with absolute ease. Capture the time, date, description, tags, and category for every single transaction. Whether it's your daily flat white coffee, monthly SaaS subscriptions, or recurring house rent, SyncSplit keeps everything beautifully structured.</p>
+                  <h3>Independent Personal Expenses</h3>
+                  <p>Add personal expenses for meals, transport, subscriptions, rent, or any private spend. These records belong only to your personal ledger and are never included in group splits or settlement calculations.</p>
                 </div>
                 <div className={styles.illustration}>
                   <div className={styles.categoryPills}>
@@ -151,8 +148,8 @@ export default function FeaturesContent() {
                   <div className={styles.cardIcon}>
                     <HiOutlineGlobeAlt />
                   </div>
-                  <h3>Cross-Device PWA Sync</h3>
-                  <p>Save SyncSplit straight to your mobile home screen or desktop application list. Our Progressive Web App technology guarantees zero delay, reliable offline logs, and blazing fast data synchronizations.</p>
+                  <h3>Installable PWA Access</h3>
+                  <p>Create an account with email or Google login and use SyncSplit in the browser or as an installable PWA on desktop and mobile. Your data stays tied to your authenticated profile.</p>
                 </div>
               </div>
             </div>
@@ -164,8 +161,8 @@ export default function FeaturesContent() {
           <div className={styles.sectionInner}>
             <div className={styles.sectionHeader}>
               <span className={styles.stepNum}>MODULE 02</span>
-              <h2>Collaborative Bill Splitting</h2>
-              <p>Tear up the napkins and calculators. SyncSplit handles every split scenario imaginable with precision-engineered math.</p>
+              <h2>Groups & Shared Expense Management</h2>
+              <p>Create dedicated groups for shared finances, add registered members directly, or invite new people by email when they are not on SyncSplit yet.</p>
             </div>
 
             <div className={styles.bentoGrid}>
@@ -174,8 +171,8 @@ export default function FeaturesContent() {
                   <div className={styles.cardIcon}>
                     <HiOutlineUserGroup />
                   </div>
-                  <h3>Custom Split Engine</h3>
-                  <p>Go far beyond simple 50/50 splits. Set specific percentages, exact cash amounts, or custom shares to split the cost fairly based on what everyone actually consumed.</p>
+                  <h3>Member-Driven Group Expenses</h3>
+                  <p>Every group member can add expenses and assign the people involved in that split. Use equal shares, exact amounts, percentages, or custom shares to match the real agreement.</p>
                 </div>
                 <div className={styles.illustration}>
                   <div className={styles.splitMatrix}>
@@ -204,8 +201,8 @@ export default function FeaturesContent() {
                   <div className={styles.cardIcon}>
                     <HiOutlineLightningBolt />
                   </div>
-                  <h3>Multi-Group Architecture</h3>
-                  <p>Keep your financial spaces completely organized. Set up dedicated rooms for your roommates, special weekend road trips, collaborative office projects, or a dinner night. Each group enjoys separate analytics, audit logs, and member permissions.</p>
+                  <h3>Group Management Workspace</h3>
+                  <p>Each group has its own management page for members, expenses, settlements, and settings. Keep roommate bills, trips, office costs, and events organized in separate workspaces.</p>
                 </div>
                 <div className={styles.illustration}>
                   <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
@@ -229,8 +226,8 @@ export default function FeaturesContent() {
           <div className={styles.sectionInner}>
             <div className={styles.sectionHeader}>
               <span className={styles.stepNum}>MODULE 03</span>
-              <h2>Algorithmic Debt Settlements & Security</h2>
-              <p>Resolve multiple overlapping payments into a singular optimized network. True convenience, backed by digital verification.</p>
+              <h2>Verified Settlements & Payment Proof</h2>
+              <p>Only expenses verified by all included members can move into settlement. Payments then follow a clear payer proof and receiver confirmation flow.</p>
             </div>
 
             <div className={styles.bentoGrid}>
@@ -240,7 +237,7 @@ export default function FeaturesContent() {
                     <HiOutlineShieldCheck />
                   </div>
                   <h3>Debt Minimization</h3>
-                  <p>Our optimization engine calculates the shortest possible routing path between group members. Instead of everyone initiating transfer loops, it simplifies debts to a bare minimum number of transactions.</p>
+                  <p>The settlement engine calculates the fewest practical payments needed to clear verified group balances. Unverified expenses stay out of the calculation until every included member approves them.</p>
                 </div>
                 <div className={styles.illustration}>
                   <div className={styles.settlementPath}>
@@ -263,17 +260,17 @@ export default function FeaturesContent() {
                     <HiOutlineClipboardCheck />
                   </div>
                   <h3>Verification Gateway</h3>
-                  <p>Every group expense must undergo mutual verification before being factored into your final monthly settlement calculation. Upload secure receipts or proof of payments to maintain absolute transparency, avoiding disputes.</p>
+                  <p>Every person included in a group expense must verify it before settlement. When someone owes money, they upload payment proof; the receiver confirms the payment to close the settlement cleanly.</p>
                 </div>
                 <div className={styles.illustration}>
                   <div className={styles.verificationLog}>
                     <div className={styles.logItem}>
                       <span className={styles.icon}><HiOutlineCheckCircle /></span>
-                      <span className={styles.text}><span>Alex</span> verified "Grocery shopping" (Rs. 2400)</span>
+                      <span className={styles.text}><span>Alex</span> verified &quot;Grocery shopping&quot; (Rs. 2400)</span>
                     </div>
                     <div className={styles.logItem}>
                       <span className={styles.icon}><HiOutlineCheckCircle /></span>
-                      <span className={styles.text}><span>Emily</span> verified "Grocery shopping" (Rs. 2400)</span>
+                      <span className={styles.text}><span>Emily</span> verified &quot;Grocery shopping&quot; (Rs. 2400)</span>
                     </div>
                   </div>
                 </div>
@@ -287,8 +284,8 @@ export default function FeaturesContent() {
           <div className={styles.sectionInner}>
             <div className={styles.sectionHeader}>
               <span className={styles.stepNum}>MODULE 04</span>
-              <h2>Real-time Alerts & Analytics</h2>
-              <p>Stay informed about your balance sheets, pending invoices, and active groups immediately.</p>
+              <h2>Dashboard, Profile & Notifications</h2>
+              <p>Stay informed with expense summaries, account controls, payment details, and configurable notification preferences.</p>
             </div>
 
             <div className={styles.bentoGrid}>
@@ -297,8 +294,8 @@ export default function FeaturesContent() {
                   <div className={styles.cardIcon}>
                     <HiOutlineChartBar />
                   </div>
-                  <h3>Actionable Financial Insights</h3>
-                  <p>Gain control over your budget with automated breakdowns. Monitor monthly trends, category divisions, and historical summaries. Discover exactly where your money goes to optimize your saving rate effortlessly.</p>
+                  <h3>Expense Summary Dashboard</h3>
+                  <p>Review personal and group spending summaries from a focused dashboard. Track totals, category patterns, group activity, and recent financial movement without digging through raw entries.</p>
                 </div>
               </div>
 
@@ -307,8 +304,8 @@ export default function FeaturesContent() {
                   <div className={styles.cardIcon}>
                     <HiOutlineBell />
                   </div>
-                  <h3>Instant Notifications</h3>
-                  <p>Powered by Firebase Cloud Messaging (FCM), receive direct push alerts whenever a peer invites you to a group, adds a shared expense, approves/rejects split amounts, or requests a settlement.</p>
+                  <h3>FCM Notifications & Settings</h3>
+                  <p>Firebase Cloud Messaging keeps users updated about invitations, expense verification, settlement activity, and payment confirmations. Profile and settings pages let users update basic details, add payment details, and manage notification preferences.</p>
                 </div>
               </div>
             </div>
@@ -318,7 +315,7 @@ export default function FeaturesContent() {
         <div className={styles.ctaWrapper}>
           <section className={styles.ctaSection}>
             <h2>Ready to split smarter?</h2>
-            <p>Join thousands of users who trust SyncSplit for their household and personal financial coordination.</p>
+            <p>Create your account, track personal expenses, and bring shared payments into one verified workflow.</p>
             <div className={styles.btnGroup}>
               <Link href="/signup" className={styles.primaryBtn}>
                 Get Started Free
