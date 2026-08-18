@@ -11,7 +11,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "SyncSplit | Smart Expense Tracker & Bill Splitter",
-  description: "Track personal expenses, split bills with friends, and manage your group finances with SyncSplit's precision-engineered protocol.",
+  description:
+    "Track personal expenses, split bills with friends, and manage your group finances with SyncSplit's precision-engineered protocol.",
 };
 
 export default function LandingPage() {
@@ -26,7 +27,7 @@ export default function LandingPage() {
             <HowItWorks />
             <AppPreview />
             <UseCases />
-            <CTA />
+            {/* <CTA /> */}
           </main>
           <Footer />
         </div>

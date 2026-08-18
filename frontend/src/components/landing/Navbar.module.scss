@@ -1,10 +1,6 @@
 @use "../../styles/variables" as *;
 @use "../../styles/mixins" as *;
 
-// ═══════════════════════════════════════════════════
-// LANDING NAVBAR — Premium Dark
-// ═══════════════════════════════════════════════════
-
 .navbar {
   position: fixed;
   top: 0;
@@ -12,16 +8,32 @@
   right: 0;
   z-index: $z-sticky;
   padding: $space-5 0;
-  transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+  will-change: padding, background-color;
+  transition: padding 0.3s ease, background-color 0.3s ease;
   overflow-x: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--border-default);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
 
   &.scrolled {
     padding: $space-3 0;
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border-bottom: 1px solid var(--border-default);
-    box-shadow: var(--shadow-sm);
+
+    &::after {
+      opacity: 1;
+    }
   }
 }
 
@@ -42,16 +54,13 @@
   color: var(--text-primary);
 
   svg {
-    color: #818cf8;
+    color: var(--color-primary);
     font-size: $font-size-lg;
   }
 }
 
 .logoText {
-  background: linear-gradient(135deg, #818cf8, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
 }
 
 .navLinks {
@@ -77,9 +86,9 @@
       left: 0;
       width: 0;
       height: 2px;
-      background: linear-gradient(90deg, #818cf8, #c084fc);
+      background: var(--color-primary);
       border-radius: 1px;
-      transition: width 0.3s ease;
+      transition: width 0.2s ease;
     }
 
     &:hover,
@@ -136,19 +145,14 @@
   color: var(--text-on-primary);
   background: var(--color-primary);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
   text-decoration: none;
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
 
   &:hover {
-    box-shadow:
-      0 0 0 1px var(--color-primary),
-      0 8px 20px var(--color-primary-50);
-    transform: translateY(-1px);
+    background: var(--color-primary-dark);
   }
 }
 
-// ── Mobile menu ──
 .mobileMenuBtn {
   @include flex-center;
   display: none;
@@ -181,37 +185,23 @@
   top: 0;
   right: 0;
   width: 100%;
-  max-width: 400px; // Limit width on tablets
+  max-width: 400px;
   height: 100vh;
-  background:
-    radial-gradient(circle at 100% 0%, rgba(var(--color-primary-rgb), 0.1) 0%, transparent 42%),
-    linear-gradient(165deg, rgba(var(--bg-primary-rgb), 1) 0%, rgba(var(--bg-card-rgb), 1) 100%);
+  background: var(--bg-primary);
   border-left: 1px solid var(--border-default);
   z-index: $z-modal;
   transform: translateX(100%);
-  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 0.3s ease;
   padding: $space-24 $space-8 $space-10;
   @include flex-column;
   align-items: flex-start;
   visibility: hidden;
   pointer-events: none;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
 
   &.showDrawer {
     transform: translateX(0);
     visibility: visible;
     pointer-events: auto;
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 300px;
-    background: radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-    pointer-events: none;
   }
 }
 
@@ -223,8 +213,7 @@
   padding: $space-6 $space-8;
   @include flex-between;
   border-bottom: 1px solid var(--border-light);
-  background: rgba(var(--bg-primary-rgb), 0.72);
-  backdrop-filter: blur(10px);
+  background: var(--bg-primary);
   z-index: 10;
 }
 
@@ -238,17 +227,11 @@
   color: var(--text-secondary);
   font-size: 1.5rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 
   &:hover {
     background: var(--bg-hover);
     color: var(--text-primary);
-    transform: rotate(90deg);
-    border-color: var(--border-strong);
-  }
-
-  &:active {
-    transform: scale(0.9) rotate(90deg);
   }
 }
 
@@ -268,68 +251,21 @@
     color: var(--text-secondary);
     text-decoration: none;
     border-radius: $radius-xl;
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateX(20px);
-    position: relative;
-    overflow: hidden;
+    transition: all 0.2s ease;
 
     svg {
       font-size: 1.5rem;
       color: var(--color-primary);
       opacity: 0.7;
-      transition: all 0.3s ease;
-    }
-
-    span {
-      position: relative;
-      z-index: 2;
-    }
-
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
     }
 
     &:hover,
     &.activeDrawerLink {
       color: var(--text-primary);
-      transform: translateX(8px);
-      
-      svg {
-        opacity: 1;
-        transform: scale(1.1);
-      }
-
-      &::after {
-        opacity: 1;
-      }
     }
 
     &.activeDrawerLink {
-      background: rgba(99, 102, 241, 0.08);
-      border: 1px solid rgba(129, 140, 248, 0.22);
-    }
-  }
-}
-
-.showDrawer {
-  .drawerLinks a {
-    opacity: 1;
-    transform: translateX(0);
-
-    @for $i from 1 through 4 {
-      &:nth-child(#{$i}) {
-        transition:
-          opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1) #{$i * 0.1s},
-          transform 0.6s cubic-bezier(0.23, 1, 0.32, 1) #{$i * 0.1s},
-          background 0.2s ease,
-          color 0.2s ease;
-      }
+      background: var(--bg-active);
     }
   }
 }
@@ -356,7 +292,7 @@
   color: var(--text-primary);
   background: var(--bg-tertiary);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
 
   svg {
     font-size: 1.25rem;
@@ -365,12 +301,6 @@
 
   &:hover {
     background: var(--bg-hover);
-    border-color: var(--border-strong);
-    
-    svg {
-      color: var(--text-primary);
-      transform: translateX(-2px);
-    }
   }
 }
 
@@ -385,30 +315,18 @@
   font-size: $font-size-md;
   font-weight: 700;
   color: white;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: var(--color-primary);
   cursor: pointer;
   text-decoration: none;
   text-align: center;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+  transition: background-color 0.2s ease;
 
   svg {
     font-size: 1.25rem;
-    transition: transform 0.3s ease;
   }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
-    filter: brightness(1.1);
-
-    svg {
-      transform: translateX(4px);
-    }
-  }
-
-  &:active {
-    transform: translateY(0);
+    background: var(--color-primary-dark);
   }
 }
 
@@ -419,7 +337,6 @@
   width: 100%;
   height: 100vh;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
   z-index: $z-modal - 1;
   opacity: 0;
   pointer-events: none;

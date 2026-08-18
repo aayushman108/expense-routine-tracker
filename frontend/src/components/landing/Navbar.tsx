@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { HiMenuAlt3, HiX, HiOutlineLogin } from "react-icons/hi";
 import { FiPieChart, FiLayers, FiPlayCircle, FiZap, FiArrowRight } from "react-icons/fi";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/store/hooks";
 import { getCurrentUser } from "@/store/slices/authSlice";
 import { addToast } from "@/store/slices/uiSlice";
@@ -17,12 +17,17 @@ export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
   const dispatch = useAppDispatch();
   const { setIsLoading } = useLoading();
 
-  const isDashboardPath = pathname?.startsWith("/dashboard");
-  const isActive = (href: string) => !isDashboardPath && pathname === href;
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const offset = 80;
+      const y = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
 
   const handleLoginClick = async () => {
     const accessToken =
@@ -75,27 +80,15 @@ export default function LandingNavbar() {
         </Link>
 
         <div className={styles.navLinks}>
-          <Link
-            href="/features"
-            className={isActive("/features") ? styles.activeLink : undefined}
-            aria-current={isActive("/features") ? "page" : undefined}
-          >
+          <a href="#features" onClick={(e) => { e.preventDefault(); scrollToSection("features"); }}>
             Features
-          </Link>
-          <Link
-            href="/how-it-works"
-            className={isActive("/how-it-works") ? styles.activeLink : undefined}
-            aria-current={isActive("/how-it-works") ? "page" : undefined}
-          >
+          </a>
+          <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection("how-it-works"); }}>
             How it works
-          </Link>
-          <Link
-            href="/use-cases"
-            className={isActive("/use-cases") ? styles.activeLink : undefined}
-            aria-current={isActive("/use-cases") ? "page" : undefined}
-          >
+          </a>
+          <a href="#use-cases" onClick={(e) => { e.preventDefault(); scrollToSection("use-cases"); }}>
             Use Cases
-          </Link>
+          </a>
         </div>
 
         <div className={styles.navActions}>
@@ -145,33 +138,27 @@ export default function LandingNavbar() {
         </div>
 
         <div className={styles.drawerLinks}>
-          <Link
-            href="/features"
-            className={isActive("/features") ? styles.activeDrawerLink : undefined}
-            aria-current={isActive("/features") ? "page" : undefined}
-            onClick={() => setMobileOpen(false)}
+          <a
+            href="#features"
+            onClick={(e) => { e.preventDefault(); setMobileOpen(false); scrollToSection("features"); }}
           >
             <FiLayers />
             <span>Features</span>
-          </Link>
-          <Link
-            href="/how-it-works"
-            className={isActive("/how-it-works") ? styles.activeDrawerLink : undefined}
-            aria-current={isActive("/how-it-works") ? "page" : undefined}
-            onClick={() => setMobileOpen(false)}
+          </a>
+          <a
+            href="#how-it-works"
+            onClick={(e) => { e.preventDefault(); setMobileOpen(false); scrollToSection("how-it-works"); }}
           >
             <FiPlayCircle />
             <span>How it works</span>
-          </Link>
-          <Link
-            href="/use-cases"
-            className={isActive("/use-cases") ? styles.activeDrawerLink : undefined}
-            aria-current={isActive("/use-cases") ? "page" : undefined}
-            onClick={() => setMobileOpen(false)}
+          </a>
+          <a
+            href="#use-cases"
+            onClick={(e) => { e.preventDefault(); setMobileOpen(false); scrollToSection("use-cases"); }}
           >
             <FiZap />
             <span>Use Cases</span>
-          </Link>
+          </a>
 
           <div className={styles.drawerActions}>
             <button

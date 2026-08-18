@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   FiGithub,
@@ -8,15 +10,20 @@ import {
 } from "react-icons/fi";
 import styles from "./Footer.module.scss";
 
+const scrollToSection = (id: string) => {
+  const el = document.getElementById(id);
+  if (el) {
+    const offset = 80;
+    const y = el.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
+};
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
-      {/* Background decoration */}
-      <div className={styles.backgroundGlow} />
-      <div className={styles.watermark}>SYNCSPLIT</div>
-
       <div className={styles.footerInner}>
         <div className={styles.mainContent}>
           <div className={styles.brand}>
@@ -34,11 +41,35 @@ export default function Footer() {
           </div>
 
           <div className={styles.navLinks}>
-            <Link href="/features">Features</Link>
+            <a
+              href="#features"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("features");
+              }}
+            >
+              Features
+            </a>
             <div className={styles.dot} />
-            <Link href="/how-it-works">How it works</Link>
+            <a
+              href="#how-it-works"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("how-it-works");
+              }}
+            >
+              How it works
+            </a>
             <div className={styles.dot} />
-            <Link href="/use-cases">Use Cases</Link>
+            <a
+              href="#use-cases"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("use-cases");
+              }}
+            >
+              Use Cases
+            </a>
           </div>
 
           <div className={styles.social}>
@@ -74,15 +105,15 @@ export default function Footer() {
 
         <div className={styles.bottom}>
           <div className={styles.legal}>
-            <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/terms">Terms of Service</Link>
+            {/* <Link href="#">Privacy Policy</Link>
+            <Link href="#">Terms of Service</Link> */}
           </div>
           <div className={styles.copyright}>
             <p>© {currentYear} SyncSplit Protocol. All rights reserved.</p>
           </div>
           <div className={styles.status}>
-            <div className={styles.statusDot} />
-            <span>Systems Operational</span>
+            {/* <div className={styles.statusDot} />
+            <span>Systems Operational</span> */}
           </div>
         </div>
       </div>

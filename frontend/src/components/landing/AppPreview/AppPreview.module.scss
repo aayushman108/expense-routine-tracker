@@ -1,14 +1,8 @@
 @use "../../../styles/mixins" as *;
 
-// ═══════════════════════════════════════════════════
-// APP PREVIEW — Built for Clarity
-// ═══════════════════════════════════════════════════
-
 .appPreview {
   position: relative;
-  background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.05), transparent 42%),
-    var(--bg-secondary);
+  background: var(--bg-secondary);
   padding-top: $space-32;
   padding-bottom: $space-32;
   overflow: hidden;
@@ -60,38 +54,19 @@
   letter-spacing: -0.04em;
 }
 
-// ── Immersive Mockup ──
 .mockContainer {
   position: relative;
   max-width: $container-max-width;
   margin: 0 auto;
 }
 
-// ✨ Large Focal Glow
-.glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120%;
-  height: 120%;
-  background: radial-gradient(
-    circle at center,
-    rgba(var(--color-primary-rgb), 0.16),
-    transparent 70%
-  );
-  z-index: 1;
-}
-
 .mockWindow {
   position: relative;
   z-index: 2;
   background: var(--bg-card);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.24);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
-  box-shadow:
-    0 30px 90px rgba(var(--color-primary-rgb), 0.18),
-    0 18px 48px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
   overflow: hidden;
 
   &::before {
@@ -103,7 +78,7 @@
       radial-gradient(circle, #f59e0b 0 5px, transparent 6px) 40px 50% / 18px 18px no-repeat,
       radial-gradient(circle, #10b981 0 5px, transparent 6px) 62px 50% / 18px 18px no-repeat,
       var(--bg-card);
-    border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.14);
+    border-bottom: 1px solid var(--border-default);
   }
 }
 

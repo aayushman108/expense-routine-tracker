@@ -10,23 +10,17 @@
   position: relative;
   border: 1px solid transparent;
   border-bottom-color: var(--border-light);
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
-    var(--bg-card);
+  background: var(--bg-card);
 
   &:hover {
-    background:
-      linear-gradient(145deg, rgba(var(--bg-card-rgb), 1), color-mix(in srgb, var(--color-primary-50) 34%, var(--bg-card) 66%)),
-      var(--bg-hover);
+    background: var(--bg-hover);
     border-color: color-mix(in srgb, var(--border-default) 72%, var(--color-primary) 28%);
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
     transform: translateY(-1px);
   }
 
   &.unread {
-    background:
-      linear-gradient(145deg, rgba(var(--color-primary-rgb), 0.075), rgba(var(--bg-card-rgb), 0.96)),
-      var(--bg-card);
+    background: var(--bg-card);
     border-color: color-mix(in srgb, var(--color-primary) 18%, var(--border-light) 82%);
     
     &::before {
@@ -37,7 +31,7 @@
       bottom: 12px;
       width: 3px;
       border-radius: 999px;
-      background: linear-gradient(180deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 72%, var(--color-success) 28%));
+      background: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.08);
     }
   }

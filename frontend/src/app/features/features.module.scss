@@ -4,55 +4,10 @@
 .featuresPage {
   position: relative;
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, rgba(var(--color-primary-rgb), 0.08) 0%, transparent 420px),
-    var(--bg-primary);
+  background: var(--bg-primary);
   overflow-x: hidden;
-  padding-top: 80px; // Navbar height
+  padding-top: 80px;
   transition: background-color 0.3s ease;
-}
-
-.gridOverlay {
-  position: fixed;
-  inset: 0;
-  background-image: radial-gradient(var(--border-default) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(circle at center, black, transparent 80%);
-  opacity: 0.15;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.blob {
-  position: fixed;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.08;
-  pointer-events: none;
-  z-index: 0;
-
-  &.primary {
-    top: -100px;
-    right: -100px;
-    background: var(--color-primary);
-  }
-
-  &.secondary {
-    bottom: -100px;
-    left: -100px;
-    background: var(--color-secondary);
-  }
-  
-  &.tertiary {
-    top: 40%;
-    left: 30%;
-    background: var(--color-primary);
-    width: 400px;
-    height: 400px;
-    opacity: 0.04;
-  }
 }
 
 .pageContent {
@@ -63,9 +18,6 @@
 .header {
   padding-top: $space-32;
   padding-bottom: $space-24;
-  background:
-    radial-gradient(circle at 16% 14%, rgba(var(--color-primary-rgb), 0.16), transparent 30%),
-    radial-gradient(circle at 82% 12%, rgba(16, 185, 129, 0.12), transparent 28%);
   text-align: center;
 
   @include responsive(md) {
@@ -95,12 +47,11 @@
   gap: 0.5rem;
   color: var(--text-tertiary);
   font-size: 0.9rem;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
   font-weight: 500;
 
   &:hover {
     color: var(--color-primary);
-    transform: translateX(-4px);
   }
 }
 
@@ -109,14 +60,12 @@
   align-items: center;
   gap: 0.75rem;
   padding: 6px 16px;
-  background: rgba(var(--bg-card-rgb), 0.86);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.22);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
-  box-shadow: 0 12px 30px rgba(var(--color-primary-rgb), 0.12);
-  backdrop-filter: blur(10px);
 
   .icon {
     display: flex;
@@ -135,9 +84,7 @@
   text-align: center;
 
   span {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-success) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-primary);
   }
 
   @include responsive(md) {
@@ -177,9 +124,7 @@
   }
 
   &:nth-child(even) {
-    background:
-      linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.05), transparent 48%),
-      var(--bg-secondary);
+    background: var(--bg-secondary);
   }
 }
 
@@ -226,7 +171,6 @@
   }
 }
 
-// Bento Grid Layout
 .bentoGrid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -247,15 +191,12 @@
 
 .bentoCard {
   position: relative;
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.88)),
-    var(--bg-card);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.16);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: $space-10;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+  transition: border-color 0.2s ease, transform 0.2s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -270,41 +211,12 @@
     padding: $space-5;
     border-radius: 8px;
     gap: $space-4;
-    box-shadow: var(--shadow-sm);
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary-50) 0%,
-      transparent 100%
-    );
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-    z-index: 1;
   }
 
   &:hover {
-    transform: translateY(-6px);
-    border-color: rgba(var(--color-primary-rgb), 0.48);
-    box-shadow: 0 24px 70px rgba(var(--color-primary-rgb), 0.16);
-
-    &::before {
-      opacity: 1;
-    }
-
-    .cardIcon {
-      background: var(--color-primary);
-      color: var(--text-on-primary);
-      transform: scale(1.05) rotate(5deg);
-    }
+    border-color: var(--border-strong);
   }
 
-  // Grid sizing helper classes
   &.col12 { grid-column: span 12; }
   &.col8 { grid-column: span 8; }
   &.col6 { grid-column: span 6; }
@@ -342,7 +254,6 @@
     border-radius: 16px;
     align-items: center;
     justify-content: center;
-    transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
 
     @include responsive(sm) {
       width: 44px;
@@ -381,15 +292,12 @@
     border-radius: 8px;
     padding: 1.5rem;
     margin-top: 1rem;
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
 
     @include responsive(lg) {
       background: transparent;
       border: 0;
       border-top: 1px solid var(--border-default);
       border-radius: 0;
-      box-shadow: none;
       margin-top: 0;
       padding: $space-4 0 0;
 
@@ -398,7 +306,6 @@
         border: 0 !important;
         border-bottom: 1px solid var(--border-default) !important;
         border-radius: 0 !important;
-        box-shadow: none !important;
         padding: $space-3 0 !important;
 
         &:last-child {
@@ -410,7 +317,6 @@
   }
 }
 
-// Custom visual components inside card illustrations
 .categoryPills {
   display: flex;
   flex-wrap: wrap;
@@ -519,7 +425,6 @@
     border: 1px solid var(--border-default);
     border-radius: 8px;
     z-index: 2;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 
     @include responsive(lg) {
       background: transparent;
@@ -527,7 +432,6 @@
       border-radius: 0;
       border-bottom: 1px solid var(--border-default);
       padding: $space-3 0;
-      box-shadow: none;
     }
 
     &:last-child {
@@ -645,7 +549,7 @@
 .ctaWrapper {
   padding: $space-32 $container-padding;
   background: var(--bg-primary);
-  
+
   @include responsive(md) {
     padding: $space-16 $container-padding;
   }
@@ -657,12 +561,9 @@
   padding-top: 6rem;
   padding-bottom: 6rem;
   text-align: center;
-  background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.16), transparent 42%),
-    var(--bg-card);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.24);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
-  box-shadow: 0 30px 80px rgba(var(--color-primary-rgb), 0.16);
   position: relative;
   overflow: hidden;
 
@@ -676,22 +577,6 @@
     padding-top: 3rem;
     padding-bottom: 3rem;
     border-radius: 8px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(
-      circle,
-      var(--color-primary-50) 0%,
-      transparent 70%
-    );
-    opacity: 0.5;
-    pointer-events: none;
   }
 
   h2 {
@@ -740,7 +625,7 @@
   border-radius: 100px;
   font-weight: 700;
   font-size: $font-size-base;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: background-color 0.2s ease, transform 0.2s ease;
 
   @include responsive(sm) {
     padding: 0.7rem 2rem;
@@ -748,8 +633,7 @@
   }
 
   &:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 24px var(--color-primary-100);
     background: var(--color-primary-dark);
+    transform: translateY(-1px);
   }
 }

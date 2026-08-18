@@ -1,9 +1,5 @@
 @use "../styles/mixins" as *;
 
-// ═══════════════════════════════════════════════════
-// LANDING PAGE — Global Wrapper
-// ═══════════════════════════════════════════════════
-
 .landingWrapper {
   position: relative;
   background: var(--bg-primary);
@@ -12,21 +8,8 @@
   overflow-x: hidden;
 }
 
-// ── The Master Technical Grid ──
-.globalGrid {
-  position: fixed; // Fixed so it stays perfectly consistent during scroll
-  inset: 0;
-  background-image: 
-    linear-gradient(var(--border-light) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
-  background-size: 50px 50px;
-  opacity: 0.58;
-  pointer-events: none;
-  z-index: 1; // Above section backgrounds, below content
-}
-
 .contentWrapper {
   position: relative;
-  z-index: 2; // Above the global grid
+  z-index: 2;
   width: 100%;
 }

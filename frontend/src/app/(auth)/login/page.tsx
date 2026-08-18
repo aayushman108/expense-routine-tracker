@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { FiPieChart } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
@@ -28,7 +26,6 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isLoading, error, isAuthenticated } = useAppSelector((s) => s.auth);
-  const cardRef = useRef<HTMLDivElement>(null);
   const loginAttempted = useRef(false);
 
   const [form, setForm] = useState({ email: "", password: "" });
@@ -66,21 +63,6 @@ export default function LoginPage() {
     dispatch(clearError());
   }, [dispatch]);
 
-  useGSAP(
-    () => {
-      if (cardRef.current) {
-        gsap.from(cardRef.current, {
-          opacity: 0,
-          y: 30,
-          scale: 0.96,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-      }
-    },
-    { scope: cardRef },
-  );
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (validationErrors[e.target.name]) {
@@ -112,7 +94,7 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
 
-      <div className={styles.card} ref={cardRef}>
+      <div className={styles.card}>
         <div className={styles.header}>
           <Link href="/" className={styles.logoLink}>
             <div className={styles.logoIcon}>

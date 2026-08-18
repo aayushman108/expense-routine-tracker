@@ -1,9 +1,4 @@
-"use client";
-
-import { useRef } from "react";
 import Link from "next/link";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import {
   FiArrowRight,
   FiCheckCircle,
@@ -14,75 +9,8 @@ import {
 import styles from "./Hero.module.scss";
 
 export default function Hero() {
-  const heroRef = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      gsap.set(
-        [
-          `.${styles.badge}`,
-          `.${styles.titleLine}`,
-          `.${styles.heroTitleGradient}`,
-          `.${styles.heroSub}`,
-          `.${styles.btnPrimary}`,
-          `.${styles.trustRibbon}`,
-          `.${styles.featureItem}`,
-        ],
-        { opacity: 0 },
-      );
-
-      const revealItems = gsap.utils.toArray<HTMLElement>(
-        `.${styles.badge}, .${styles.titleLine}, .${styles.heroTitleGradient}, .${styles.heroSub}, .${styles.btnPrimary}, .${styles.trustRibbon}, .${styles.featureItem}`,
-      );
-
-      const tl = gsap.timeline({ delay: 0.03, paused: true });
-
-      tl.fromTo(
-        revealItems,
-        { autoAlpha: 0, y: 18 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.9,
-          stagger: 0.11,
-          ease: "power2.out",
-        },
-      );
-
-      const playWhenReady = () => {
-        if (document.documentElement.dataset.pageReady === "true") {
-          tl.play(0);
-        }
-      };
-
-      window.addEventListener("syncsplit:page-ready", playWhenReady);
-      playWhenReady();
-
-      return () => {
-        window.removeEventListener("syncsplit:page-ready", playWhenReady);
-        tl.kill();
-      };
-    },
-    { scope: heroRef },
-  );
-
   return (
-    <section ref={heroRef} className={styles.hero}>
-      <div className={styles.gridOverlay} />
-
-      {/* Side Geometric Puzzle Pieces */}
-      {/* <div className={`${styles.puzzleSide} ${styles.left}`}>
-        <div className={`${styles.shape} ${styles.circle1}`} />
-        <div className={`${styles.shape} ${styles.square1}`} />
-        <div className={`${styles.shape} ${styles.dots1}`} />
-      </div>
-
-      <div className={`${styles.puzzleSide} ${styles.right}`}>
-        <div className={`${styles.shape} ${styles.circle2}`} />
-        <div className={`${styles.shape} ${styles.square2}`} />
-        <div className={`${styles.shape} ${styles.dots2}`} />
-      </div> */}
-
+    <section className={styles.hero}>
       <div className={styles.heroInner}>
         <div className={styles.badge}>
           <span className={styles.badgeText}>Update</span>

@@ -1,13 +1,8 @@
 @use "../../../styles/mixins" as *;
 
-// ═══════════════════════════════════════════════════
-// CTA — Premium Immersive Finale
-// ═══════════════════════════════════════════════════
-
 .cta {
   position: relative;
-  background:
-    linear-gradient(180deg, var(--bg-secondary), var(--bg-primary));
+  background: var(--bg-primary);
   padding-top: $space-24;
   padding-bottom: $space-24;
   overflow: hidden;
@@ -34,10 +29,6 @@
 .ctaCard {
   position: relative;
   background-color: var(--color-primary);
-  background-image:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 42%),
-    url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 15v10M15 20h10' stroke='rgba(255,255,255,0.08)' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-  background-position: center;
   border-radius: 8px;
   padding: $space-16 $space-8;
   text-align: center;
@@ -46,7 +37,6 @@
   align-items: center;
   gap: $space-6;
   overflow: hidden;
-  box-shadow: 0 30px 90px rgba(var(--color-primary-rgb), 0.28);
 
   @include responsive(lg) {
     padding: $space-12 $space-8;
@@ -117,12 +107,11 @@
   border-radius: 8px;
   font-weight: 700;
   font-size: 1.1rem;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: background-color 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 24px var(--color-primary);
-    background: white;
+    transform: translateY(-1px);
+    background: var(--bg-secondary);
   }
 }
 
@@ -163,8 +152,7 @@
     content: "";
     width: 6px;
     height: 6px;
-    background: var(--color-success);
-    border-radius: 1px;
-    box-shadow: 0 0 10px var(--color-success);
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
   }
 }

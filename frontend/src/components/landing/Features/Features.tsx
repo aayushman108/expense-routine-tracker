@@ -1,9 +1,3 @@
-"use client";
-
-import { useRef, useCallback } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 import {
   HiOutlineCash,
   HiOutlineUserGroup,
@@ -14,8 +8,6 @@ import {
   HiOutlineGlobeAlt
 } from "react-icons/hi";
 import styles from "./Features.module.scss";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const features = [
   {
@@ -70,49 +62,8 @@ const features = [
 ];
 
 export default function Features() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  // Mouse tracking for card hover glow effect
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const cards = gridRef.current?.querySelectorAll(`.${styles.card}`);
-    cards?.forEach((card) => {
-      const rect = (card as HTMLElement).getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      (card as HTMLElement).style.setProperty("--mouse-x", `${x}px`);
-      (card as HTMLElement).style.setProperty("--mouse-y", `${y}px`);
-    });
-  }, []);
-
-  useGSAP(
-    () => {
-      gsap.fromTo(
-        `.${styles.card}`,
-        { opacity: 0, scale: 0.9, y: 30 },
-        {
-          scrollTrigger: {
-            trigger: gridRef.current,
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          stagger: 0.1,
-          duration: 0.8,
-          ease: "power2.out",
-        },
-      );
-    },
-    { scope: sectionRef },
-  );
-
   return (
-    <section ref={sectionRef} id="features" className={styles.features}>
-      {/* Background puzzle shapes */}
-      <div className={styles.shape} />
-
+    <section id="features" className={styles.features}>
       <div className={styles.featuresInner}>
         <div className={styles.header}>
           <p className={styles.sectionEyebrow}>Ecosystem</p>
@@ -126,17 +77,12 @@ export default function Features() {
           </p>
         </div>
 
-        <div
-          ref={gridRef}
-          className={styles.grid}
-          onMouseMove={handleMouseMove}
-        >
+        <div className={styles.grid}>
           {features.map((f, i) => (
             <div
               key={i}
               className={`${styles.card} ${f.wide ? styles.cardWide : ""}`}
             >
-              <div className={styles.cardGlow} />
               <div className={styles.cardHeader}>
                 <div className={styles.cardIcon}>
                   <span>{f.icon}</span>

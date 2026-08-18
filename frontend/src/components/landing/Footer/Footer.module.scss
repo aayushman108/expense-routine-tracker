@@ -1,12 +1,8 @@
 @use "../../../styles/mixins" as *;
 
-// ═══════════════════════════════════════════════════
-// FOOTER — Modern Technical Finish
-// ═══════════════════════════════════════════════════
-
 .footer {
   position: relative;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   padding-top: $space-20;
   padding-bottom: $space-8;
   overflow: hidden;
@@ -15,38 +11,6 @@
     padding-top: $space-16;
     padding-bottom: $space-8;
   }
-}
-
-.backgroundGlow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 800px;
-  height: 400px;
-  background: radial-gradient(
-    circle at center,
-    var(--color-primary-50),
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-.watermark {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 15vw;
-  font-weight: 900;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--border-default);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 0;
 }
 
 .footerInner {
@@ -104,7 +68,9 @@
   @include mobile-only {
     flex-direction: column;
     gap: $space-4;
-    .dot { display: none; }
+    .dot {
+      display: none;
+    }
   }
 
   a {
@@ -112,11 +78,10 @@
     font-weight: 600;
     color: var(--text-tertiary);
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: color 0.2s ease;
 
     &:hover {
       color: var(--text-primary);
-      transform: translateY(-2px);
     }
   }
 
@@ -143,14 +108,11 @@
     justify-content: center;
     color: var(--text-tertiary);
     font-size: 22px;
-    transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+    transition: all 0.2s ease;
 
     &:hover {
       color: var(--color-primary);
-      background: var(--color-primary-50);
-      border-color: var(--color-primary-100);
-      transform: scale(1.1);
-      box-shadow: 0 0 20px var(--color-primary-50);
+      border-color: var(--border-strong);
     }
   }
 }
@@ -195,6 +157,5 @@
     height: 6px;
     background: var(--color-success);
     border-radius: 50%;
-    box-shadow: 0 0 10px var(--color-success);
   }
 }

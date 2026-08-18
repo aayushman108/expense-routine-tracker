@@ -16,9 +16,7 @@
 }
 
 .statCard {
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
-    var(--bg-card);
+  background: var(--bg-card);
   backdrop-filter: blur(var(--glass-blur, 12px));
   padding: 1.25rem;
   border-radius: 8px;

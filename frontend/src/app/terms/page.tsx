@@ -16,10 +16,6 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className={styles.legalPage}>
-      <div className={styles.gridOverlay} />
-      <div className={`${styles.blob} ${styles.primary}`} />
-      <div className={`${styles.blob} ${styles.secondary}`} />
-
       <Navbar />
 
       <main className={styles.container}>

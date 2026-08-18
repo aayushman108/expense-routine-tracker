@@ -164,11 +164,7 @@
       display: flex;
       align-items: center;
       gap: $space-2;
-      background: linear-gradient(
-        135deg,
-        var(--color-primary) 0%,
-        #7c3aed 100%
-      );
+      background: var(--color-primary);
       color: white;
       padding: 0.25rem 0.75rem;
       border-radius: $radius-full;
@@ -786,11 +782,6 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      transparent 100%
-    );
     opacity: 0;
     transition: opacity $transition-base;
   }

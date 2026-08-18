@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useRef, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import {
   HiOutlineLockClosed,
   HiOutlineArrowLeft,
@@ -24,7 +22,6 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const cardRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({ password: "", confirmPassword: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,21 +29,6 @@ function ResetPasswordForm() {
     Record<string, string>
   >({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  useGSAP(
-    () => {
-      if (cardRef.current) {
-        gsap.from(cardRef.current, {
-          opacity: 0,
-          y: 30,
-          scale: 0.96,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-      }
-    },
-    { scope: cardRef },
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +92,7 @@ function ResetPasswordForm() {
         <ThemeToggle />
       </div>
 
-      <div className={styles.card} ref={cardRef}>
+      <div className={styles.card}>
         <div className={styles.header}>
           <Link href="/" className={styles.logoLink}>
             <div className={styles.logoIcon}>

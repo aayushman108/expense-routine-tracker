@@ -1,14 +1,8 @@
 @use "../../../styles/mixins" as *;
 
-// ═══════════════════════════════════════════════════
-// FEATURES — Unified Dark Section
-// ═══════════════════════════════════════════════════
-
 .features {
   position: relative;
-  background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.05), transparent 42%),
-    var(--bg-secondary);
+  background: var(--bg-secondary);
   padding-top: $space-32;
   padding-bottom: $space-32;
   overflow: hidden;
@@ -22,23 +16,6 @@
     padding-top: $space-16;
     padding-bottom: $space-16;
   }
-}
-
-.gridOverlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-default) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-default) 1px, transparent 1px);
-  background-size: 50px 50px;
-  pointer-events: none;
-  z-index: 1;
-  mask-image: radial-gradient(circle at center, black 0%, transparent 80%);
-  -webkit-mask-image: radial-gradient(
-    circle at center,
-    black 0%,
-    transparent 80%
-  );
 }
 
 .featuresInner {
@@ -82,10 +59,7 @@
   margin-bottom: $space-6;
 
   span {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-success));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-primary);
   }
 }
 
@@ -98,7 +72,6 @@
   }
 }
 
-// ── Bento Grid ──
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -115,7 +88,6 @@
   }
 }
 
-// Orphan card stretching — if the last card is alone in its row, span full width
 .card:last-child:nth-child(3n + 1) {
   grid-column: 1 / -1;
 }
@@ -131,10 +103,8 @@
 
 .card {
   position: relative;
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.88)),
-    var(--bg-card);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.16);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: $space-10;
   display: flex;
@@ -142,9 +112,8 @@
   gap: $space-6;
   height: 100%;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
-  
+  transition: border-color 0.2s ease, transform 0.25s ease, box-shadow 0.25s ease;
+
   @include responsive(lg) {
     padding: $space-8;
   }
@@ -156,30 +125,12 @@
   }
 
   &:hover {
-    transform: translateY(-8px);
-    border-color: rgba(var(--color-primary-rgb), 0.48);
-    box-shadow: 0 24px 70px rgba(var(--color-primary-rgb), 0.16);
+    border-color: var(--border-strong);
+    transform: translateY(-4px);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.07),
+      0 10px 20px -2px rgba(0, 0, 0, 0.08);
   }
-}
-
-// Cleaned up wide card logic for uniformity
-
-.cardGlow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    600px circle at var(--mouse-x) var(--mouse-y),
-    var(--color-primary-50),
-    transparent 40%
-  );
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.card:hover .cardGlow {
-  opacity: 1;
 }
 
 .cardHeader {
@@ -193,8 +144,8 @@
 .cardIcon {
   width: 52px;
   height: 52px;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: var(--color-primary-50);
+  border: 1px solid var(--color-primary-100);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -212,33 +163,11 @@
   padding: 4px 10px;
   background: var(--bg-tertiary);
   border-radius: 6px;
-  position: relative;
 
   &[data-tag="New"] {
     background: var(--color-primary-50);
     color: var(--color-primary);
     border: 1px solid var(--color-primary-100);
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      width: 6px;
-      height: 6px;
-      background: var(--color-primary);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--color-primary);
-      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-  }
-}
-
-@keyframes ping {
-  75%,
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
   }
 }
 

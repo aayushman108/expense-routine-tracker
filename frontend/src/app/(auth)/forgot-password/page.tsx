@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import {
   HiOutlineMail,
   HiOutlineArrowLeft,
@@ -19,7 +17,6 @@ import styles from "../auth.module.scss";
 import api from "@/lib/api";
 
 export default function ForgotPasswordPage() {
-  const cardRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,21 +24,6 @@ export default function ForgotPasswordPage() {
     Record<string, string>
   >({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  useGSAP(
-    () => {
-      if (cardRef.current) {
-        gsap.from(cardRef.current, {
-          opacity: 0,
-          y: 30,
-          scale: 0.96,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-      }
-    },
-    { scope: cardRef },
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +59,7 @@ export default function ForgotPasswordPage() {
         <ThemeToggle />
       </div>
 
-      <div className={styles.card} ref={cardRef}>
+      <div className={styles.card}>
         <div className={styles.header}>
           <Link href="/" className={styles.logoLink}>
             <div className={styles.logoIcon}>
@@ -98,7 +80,7 @@ export default function ForgotPasswordPage() {
             </div>
             <h3>Check your email</h3>
             <p>
-              We've sent a password reset link to <strong>{email}</strong>.
+              We&apos;ve sent a password reset link to <strong>{email}</strong>.
             </p>
             <Link href="/login" className={styles.backToLogin}>
               <HiOutlineArrowLeft /> Back to Login

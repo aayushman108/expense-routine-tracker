@@ -52,16 +52,13 @@
 }
 
 .statCard {
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
-    var(--bg-card);
+  background: var(--bg-card);
   border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
   padding: 1rem;
   border-radius: 8px;
   position: relative;
   overflow: hidden;
   transition: all $transition-base;
-  animation: slideIn 0.4s ease-out forwards;
   box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
   @include responsive(sm) {
     padding: $space-4;
@@ -104,9 +101,8 @@
   right: -5%;
   width: 100px;
   height: 100px;
-  background: radial-gradient(circle, var(--theme-color) 0%, transparent 70%);
-  opacity: 0.1;
-  filter: blur(30px);
+  background: none;
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -169,9 +165,7 @@
 }
 
 .personalCard {
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
-    var(--bg-card);
+  background: var(--bg-card);
   border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
   border-radius: 8px;
   padding: 1.5rem;
@@ -186,23 +180,11 @@
   &:hover {
     border-color: color-mix(in srgb, var(--color-primary) 42%, var(--border-default));
     box-shadow: 0 18px 48px rgba(var(--color-primary-rgb), 0.1);
-    .cardGlow {
-      transform: scale(1.05);
-      opacity: 0.4;
-    }
   }
 }
 
 .cardGlow {
-  position: absolute;
-  top: -30%;
-  right: -10%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
-  filter: blur(50px);
-  pointer-events: none;
-  opacity: 0.1;
+  display: none;
 }
 
 .cardHeader {
@@ -363,9 +345,7 @@
 }
 
 .chartSkeletonCard {
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.99), rgba(var(--bg-card-rgb), 0.94)),
-    var(--bg-card);
+  background: var(--bg-card);
   border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
   border-radius: 8px;
   padding: 24px;
@@ -374,9 +354,7 @@
 
 // ── Scaled-Down Financial Health ──
 .healthCard {
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.94)),
-    var(--bg-card);
+  background: var(--bg-card);
   border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
   border-radius: 8px;
   padding: 1.25rem;
@@ -480,7 +458,6 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.34), transparent 42%, rgba(15, 23, 42, 0.08));
     pointer-events: none;
   }
 }
@@ -494,9 +471,7 @@
 .pieInner {
   width: 114px;
   height: 114px;
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 1), rgba(var(--bg-card-rgb), 0.92)),
-    var(--bg-card);
+  background: var(--bg-card);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -764,8 +739,6 @@
   @include flex-between;
   gap: 1rem;
   flex-wrap: wrap;
-  animation: slideIn 0.4s ease-out forwards;
-  // margin-bottom: $space-2;
   box-shadow: var(--shadow-card);
 
   .dismissBtn {

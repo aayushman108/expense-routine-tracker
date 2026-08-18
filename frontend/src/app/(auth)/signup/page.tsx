@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import {
   HiOutlineMail,
   HiOutlineLockClosed,
@@ -28,7 +26,6 @@ export default function SignupPage() {
   const router = useRouter();
   const { isLoading, error, verificationToken } = useAppSelector((s) => s.auth);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -46,24 +43,8 @@ export default function SignupPage() {
     dispatch(clearError());
   }, [dispatch]);
 
-  useGSAP(
-    () => {
-      if (cardRef.current) {
-        gsap.from(cardRef.current, {
-          opacity: 0,
-          y: 30,
-          scale: 0.96,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-      }
-    },
-    { scope: cardRef },
-  );
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    // Clear validation error when user types
     if (validationErrors[e.target.name]) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
@@ -124,7 +105,7 @@ export default function SignupPage() {
         <ThemeToggle />
       </div>
 
-      <div className={styles.card} ref={cardRef}>
+      <div className={styles.card}>
         <div className={styles.header}>
           <Link href="/" className={styles.logoLink}>
             <div className={styles.logoIcon}>

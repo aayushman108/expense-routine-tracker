@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { 
   HiOutlineChevronLeft, 
@@ -9,74 +8,10 @@ import {
 import styles from "./use-cases.module.scss";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer/Footer";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 export default function UseCasesContent() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Header animation
-    const headerTimeline = gsap.timeline();
-    headerTimeline
-      .fromTo(`.${styles.backLink}`, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.6 })
-      .fromTo(`.${styles.badge}`, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.3")
-      .fromTo(`.${styles.header} h1`, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.2")
-      .fromTo(`.${styles.header} p`, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, "-=0.4");
-
-    const blocks = gsap.utils.toArray<HTMLElement>(`.${styles.scenarioBlock}`);
-    
-    blocks.forEach((block) => {
-      const q = gsap.utils.selector(block);
-      
-      const targets = [
-        q(`.${styles.blockContent}`),
-        q(`.${styles.blockVisual}`)
-      ].filter(t => (Array.isArray(t) ? t.length > 0 : !!t));
-
-      if (targets.length > 0) {
-        gsap.fromTo(
-          targets,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.2,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: block,
-              start: "top 80%",
-              once: true
-            }
-          }
-        );
-      }
-    });
-
-    // CTA animation
-    gsap.fromTo(`.${styles.ctaSection}`,
-      { opacity: 0, scale: 0.95 },
-      {
-        opacity: 1,
-        scale: 1,
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: `.${styles.ctaSection}`,
-          start: "top 90%",
-          once: true
-        }
-      }
-    );
-  }, []);
-
   return (
-    <div className={styles.useCasesPage} ref={containerRef}>
+    <div className={styles.useCasesPage}>
       <div className={styles.gridOverlay} />
       <div className={`${styles.blob} ${styles.primary}`} />
       <div className={`${styles.blob} ${styles.secondary}`} />

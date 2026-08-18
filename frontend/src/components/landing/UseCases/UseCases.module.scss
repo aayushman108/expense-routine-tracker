@@ -1,14 +1,8 @@
 @use "../../../styles/mixins" as *;
 
-// ═══════════════════════════════════════════════════
-// USE CASES — Scenario Log
-// ═══════════════════════════════════════════════════
-
 .useCases {
   position: relative;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(var(--color-primary-rgb), 0.08), transparent 34%),
-    var(--bg-primary);
+  background: var(--bg-primary);
   padding-top: $space-32;
   padding-bottom: $space-32;
   overflow: hidden;
@@ -23,33 +17,6 @@
     padding-bottom: $space-8;
     background: var(--bg-secondary);
   }
-}
-
-.gridOverlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-default) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-default) 1px, transparent 1px);
-  background-size: 80px 80px;
-  pointer-events: none;
-  z-index: 1;
-
-  // 🎭 Focal Point Mask: Invisible -> Visible -> Invisible
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 40%,
-    black 60%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 40%,
-    black 60%,
-    transparent 100%
-  );
 }
 
 .useCasesInner {
@@ -93,7 +60,6 @@
   margin-bottom: $space-6;
 }
 
-// ── Scenario Cards ──
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -110,7 +76,6 @@
   }
 }
 
-// Orphan card stretching — last card alone in its row spans full width
 .card:last-child:nth-child(3n + 1) {
   grid-column: 1 / -1;
 }
@@ -123,20 +88,17 @@
 
 .card {
   position: relative;
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.98), rgba(var(--bg-card-rgb), 0.88)),
-    var(--bg-card);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.16);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
   padding: $space-10;
   display: flex;
   flex-direction: column;
   gap: $space-6;
   height: 100%;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s ease;
   overflow: hidden;
-  
+
   @include responsive(lg) {
     padding: $space-8;
   }
@@ -147,45 +109,39 @@
     padding: $space-5;
   }
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: 8px;
-    padding: 1.5px;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary-50),
-      transparent,
-      var(--color-danger-light)
-    );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 24px 70px rgba(var(--color-primary-rgb), 0.16);
-    background: var(--bg-elevated);
-    border-color: rgba(var(--color-primary-rgb), 0.48);
-    &::before {
-      opacity: 1;
+    background: var(--color-primary);
+    // border-color: var(--color-primary);
+
+    .cardIcon {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .cardTitle {
+      color: white;
+    }
+
+    .cardDesc {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .cardTag {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border-color: transparent;
     }
   }
 }
 
 .cardIcon {
-  font-size: 48px;
+  @include flex-center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  font-size: 24px;
   margin-bottom: $space-2;
-  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+  transition: all 0.4s ease;
 }
 
 .cardTitle {
@@ -193,6 +149,7 @@
   font-weight: 800;
   color: var(--text-primary);
   letter-spacing: -0.04em;
+  transition: color 0.4s ease;
   @include responsive(sm) {
     font-size: $font-size-md;
   }
@@ -202,19 +159,10 @@
   font-size: $font-size-base;
   color: var(--text-secondary);
   line-height: 1.6;
+  transition: color 0.4s ease;
   @include responsive(sm) {
     font-size: 14px;
   }
-}
-
-.cardFooter {
-  margin-top: auto;
-  padding-top: $space-8;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid var(--border-default);
-  border-bottom: 1px solid var(--border-default);
 }
 
 .cardTag {
@@ -228,15 +176,5 @@
   border-radius: 6px;
   padding: 4px 10px;
   width: fit-content;
-}
-
-.cardArrow {
-  color: var(--border-strong);
-  font-size: 20px;
-  transition: all 0.3s ease;
-}
-
-.card:hover .cardArrow {
-  transform: translateX(8px);
-  color: var(--color-primary);
+  transition: all 0.4s ease;
 }

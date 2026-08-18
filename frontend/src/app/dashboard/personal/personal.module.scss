@@ -185,9 +185,8 @@
   right: -5%;
   width: 100px;
   height: 100px;
-  background: radial-gradient(circle, var(--theme-color) 0%, transparent 70%);
-  opacity: 0.1;
-  filter: blur(30px);
+  background: none;
+  opacity: 0;
   pointer-events: none;
 }
 

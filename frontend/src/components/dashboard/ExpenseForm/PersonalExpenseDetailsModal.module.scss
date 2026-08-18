@@ -17,7 +17,7 @@
 .categoryIcon {
   width: 72px;
   height: 72px;
-  background: linear-gradient(135deg, var(--color-primary-100) 0%, var(--color-primary-200) 100%);
+  background: var(--color-primary-100);
   border-radius: $radius-2xl;
   display: flex;
   align-items: center;
@@ -152,7 +152,7 @@
     width: 44px;
     height: 44px;
     border-radius: $radius-full;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-600) 100%);
+    background: var(--color-primary);
     color: white;
     @include flex-center;
     font-weight: $font-weight-bold;

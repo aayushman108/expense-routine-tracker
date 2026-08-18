@@ -1,37 +1,10 @@
-"use client";
-
-import { useRef } from "react";
 import Link from "next/link";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { FiArrowRight } from "react-icons/fi";
 import styles from "./CTA.module.scss";
 
 export default function CTA() {
-  const containerRef = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      gsap.fromTo(
-        `.${styles.ctaCard}`,
-        { opacity: 0, y: 50 },
-        {
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-          },
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: "power3.out",
-        },
-      );
-    },
-    { scope: containerRef },
-  );
-
   return (
-    <section ref={containerRef} className={styles.cta}>
+    <section className={styles.cta}>
       <div className={styles.ctaInner}>
         <div className={styles.ctaCard}>
           <h2 className={styles.title}>

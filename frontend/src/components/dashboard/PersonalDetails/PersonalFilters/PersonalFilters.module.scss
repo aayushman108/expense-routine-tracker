@@ -2,9 +2,7 @@
 
 .filterBar {
   padding: 0.625rem;
-  background:
-    linear-gradient(145deg, rgba(var(--bg-card-rgb), 0.99), rgba(var(--bg-card-rgb), 0.94)),
-    var(--bg-card);
+  background: var(--bg-card);
   border: 1px solid color-mix(in srgb, var(--border-default) 84%, var(--color-primary) 16%);
   border-radius: 8px;
   margin-bottom: 0.75rem;
